@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Archivio personale
 
-## Getting Started
+Sito personale con area pubblica (portfolio, in arrivo) e area privata (spese, in questa fase).
+Next.js (App Router) + Supabase + Vercel.
 
-First, run the development server:
+> Nota per chi tocca il codice con un assistente AI: questo progetto usa Next.js 16, con
+> breaking change rispetto alle versioni precedenti (es. `middleware.ts` → `proxy.ts`). Vedi
+> `AGENTS.md` e `node_modules/next/dist/docs/` prima di modificare routing o auth.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Setup locale
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Installa le dipendenze:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Crea un progetto su [supabase.com](https://supabase.com) (piano free).
 
-## Learn More
+3. Nell'SQL Editor di Supabase, esegui lo script [`supabase/schema.sql`](supabase/schema.sql).
+   Crea le tabelle `categorie`, `spese`, `depositi`, la view `spese_con_categoria` e popola le
+   12 categorie iniziali (placeholder, rinominabili in qualsiasi momento).
 
-To learn more about Next.js, take a look at the following resources:
+4. In Supabase, vai su **Authentication > Users** e crea manualmente il tuo utente
+   (email + password). Non esiste un flusso di registrazione pubblico: l'unico account
+   previsto è quello che crei qui.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Copia `.env.example` in `.env.local` e compila le variabili (Project Settings > API):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   cp .env.example .env.local
+   ```
 
-## Deploy on Vercel
+   - `NEXT_PUBLIC_SUPABASE_URL` — URL del progetto
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — anon/public key
+   - `SUPABASE_SERVICE_ROLE_KEY` — service role key (**segreta**, mai esposta al client;
+     usata solo server-side per leggere/scrivere spese bypassando la Row Level Security)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+6. Avvia il server di sviluppo:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   npm run dev
+   ```
+
+   Apri [http://localhost:3000](http://localhost:3000). `/` è la homepage pubblica,
+   `/login` porta all'area privata, `/spese` è protetta e richiede login.
+
+## Modulo Spese
+
+- **Upload CSV** (`/spese/upload`): colonne attese `importo`, `data` (obbligatorie),
+  `descrizione`, `categoria` (opzionali; nomi alternativi accettati: `amount`, `date`).
+  Le categorie citate nel CSV ma non ancora presenti vengono create automaticamente.
+- **Dedup**: prima di inserire una riga, si controlla se esiste già una spesa con la stessa
+  combinazione data + importo + descrizione + categoria; in tal caso viene saltata. Ricaricare
+  lo stesso CSV (o uno che si sovrappone a un caricamento precedente) non duplica le righe.
+- **Dashboard** (`/spese`): andamento settimanale, ripartizione per categoria, confronto
+  settimana corrente vs precedente, saldo netto (depositi − spese), tabella spese filtrabile.
+
+## Deploy su Vercel
+
+1. Collega il repository GitHub a un nuovo progetto Vercel.
+2. In **Project Settings > Environment Variables**, aggiungi le stesse tre variabili di
+   `.env.local` (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+   `SUPABASE_SERVICE_ROLE_KEY`) per l'ambiente Production (e Preview, se lo usi).
+3. Deploy. Il piano Hobby di Vercel + il piano free di Supabase coprono questa fase a costo
+   pressoché zero.
+
+## Cosa manca volutamente in questa fase
+
+Collezione carte, agenda, portfolio pubblico DBZ: non ancora sviluppati, per scelta (vedi
+`AGENTS.md` del progetto per il contesto).
