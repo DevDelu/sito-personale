@@ -2,7 +2,7 @@ import Papa from "papaparse";
 import { parseImporto } from "@/lib/csv";
 import type { DraftSpesaRow, ParseResult } from "./types";
 
-const CATEGORIA_DEFAULT = "Da categorizzare";
+const CATEGORIA_DEFAULT = "Altro";
 
 function parseCryptoTimestamp(raw: string | undefined): string | null {
   if (!raw) return null;
@@ -68,7 +68,7 @@ export function parseCryptoCsv(text: string): ParseResult {
       categoriaNome: CATEGORIA_DEFAULT,
       categoria_banca: null,
       data,
-      fonte: "crypto.com",
+      fonte: "crypto",
     });
   }
 

@@ -129,27 +129,3 @@ export function monthlyEntrateUscite(
   return points;
 }
 
-export type FonteShare = { fonte: string; totale: number };
-
-const FONTE_LABELS: Record<string, string> = {
-  csv_upload: "CSV generico",
-  "crypto.com": "Crypto.com",
-  intesa_sanpaolo: "Intesa Sanpaolo",
-  manuale: "Manuale",
-  paypal: "PayPal",
-  contanti: "Contanti",
-};
-
-export function fonteLabel(fonte: string): string {
-  return FONTE_LABELS[fonte] ?? fonte;
-}
-
-export function fonteBreakdown(spese: Spesa[]): FonteShare[] {
-  const totals = new Map<string, number>();
-  for (const s of spese) {
-    totals.set(s.fonte, (totals.get(s.fonte) ?? 0) + s.importo);
-  }
-  return [...totals.entries()]
-    .map(([fonte, totale]) => ({ fonte, totale }))
-    .sort((a, b) => b.totale - a.totale);
-}

@@ -20,10 +20,10 @@ export async function getDashboardData(): Promise<{
       .select("*")
       .gte("data", since)
       .order("data", { ascending: false }),
-    admin.from("categorie").select("id, nome, colore").order("nome"),
+    admin.from("categorie").select("id, nome, colore, tipo").order("nome"),
     admin
-      .from("depositi")
-      .select("id, importo, titolo, descrizione, categoria_banca, data, fonte")
+      .from("depositi_con_categoria")
+      .select("*")
       .gte("data", since)
       .order("data", { ascending: false }),
   ]);

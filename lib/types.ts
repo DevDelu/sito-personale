@@ -1,7 +1,10 @@
+export type TipoCategoria = "spesa" | "entrata";
+
 export type Categoria = {
   id: string;
   nome: string;
   colore: string | null;
+  tipo: TipoCategoria;
 };
 
 export type Spesa = {
@@ -13,6 +16,10 @@ export type Spesa = {
   categoria_nome: string | null;
   categoria_colore: string | null;
   categoria_banca: string | null;
+  categoria_suggerita: string | null;
+  nominativo: string | null;
+  dettaglio: string | null;
+  note: string | null;
   data: string;
   settimana_riferimento: string | null;
   fonte: string;
@@ -23,7 +30,14 @@ export type Deposito = {
   importo: number;
   titolo: string | null;
   descrizione: string | null;
+  categoria_id: string | null;
+  categoria_nome: string | null;
+  categoria_colore: string | null;
   categoria_banca: string | null;
+  categoria_suggerita: string | null;
+  nominativo: string | null;
+  dettaglio: string | null;
+  note: string | null;
   data: string;
   fonte: string;
 };

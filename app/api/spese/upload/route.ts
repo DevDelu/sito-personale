@@ -6,9 +6,11 @@ import { keyCrypto, keyGenerico, keyIntesa } from "@/lib/dedup";
 import { parseGenericCsv } from "@/lib/parsers/generic";
 import { parseCryptoCsv } from "@/lib/parsers/crypto";
 import { parseIntesaXlsx } from "@/lib/parsers/intesa";
+import { suggestCategoria } from "@/lib/suggest-categoria";
 import type { DraftDepositoRow, DraftSpesaRow, ParseResult } from "@/lib/parsers/types";
+import type { TipoCategoria } from "@/lib/types";
 
-const CATEGORIA_DEFAULT = "Da categorizzare";
+const CATEGORIA_DEFAULT = "Altro";
 const SOURCES = ["generico", "crypto", "intesa"] as const;
 type Source = (typeof SOURCES)[number];
 
@@ -18,6 +20,7 @@ type SpesaInsertRow = {
   descrizione: string | null;
   categoria_id: string | null;
   categoria_banca: string | null;
+  categoria_suggerita: string | null;
   data: string;
   settimana_riferimento: string;
   fonte: string;
@@ -27,7 +30,9 @@ type DepositoInsertRow = {
   importo: number;
   titolo: string | null;
   descrizione: string | null;
+  categoria_id: string | null;
   categoria_banca: string | null;
+  categoria_suggerita: string | null;
   data: string;
   fonte: string;
 };
@@ -66,31 +71,39 @@ export async function POST(request: Request) {
 
   const { data: categorie, error: categorieError } = await admin
     .from("categorie")
-    .select("id, nome");
+    .select("id, nome, tipo");
   if (categorieError) {
     return NextResponse.json({ error: categorieError.message }, { status: 500 });
   }
 
+  // Le categorie possono avere lo stesso nome per tipi diversi (es. "Altro"
+  // esiste sia per spesa che per entrata), quindi la chiave include il tipo.
   const categoriaMap = new Map<string, string>(
-    (categorie ?? []).map((c) => [c.nome.toLowerCase(), c.id])
+    (categorie ?? []).map((c) => [`${c.tipo}|${c.nome.toLowerCase()}`, c.id])
   );
-  const categoriaDefaultId = categoriaMap.get(CATEGORIA_DEFAULT.toLowerCase()) ?? null;
 
-  async function resolveCategoriaId(nome: string | null): Promise<string | null> {
+  function defaultId(tipo: TipoCategoria): string | null {
+    return categoriaMap.get(`${tipo}|${CATEGORIA_DEFAULT.toLowerCase()}`) ?? null;
+  }
+
+  async function resolveCategoriaId(
+    nome: string | null,
+    tipo: TipoCategoria
+  ): Promise<string | null> {
     if (!nome) return null;
-    const key = nome.toLowerCase();
+    const key = `${tipo}|${nome.toLowerCase()}`;
     const existing = categoriaMap.get(key);
     if (existing) return existing;
 
     if (source !== "generico") {
-      // Le categorie di crypto/intesa sono già normalizzate sul set fisso dei 12;
+      // Le categorie di crypto/intesa sono già normalizzate sul set fisso;
       // se per qualche motivo mancano, non ne creiamo di nuove: fallback sicuro.
-      return categoriaDefaultId;
+      return defaultId(tipo);
     }
 
     const { data: nuova, error: insertCatError } = await admin
       .from("categorie")
-      .insert({ nome })
+      .insert({ nome, tipo })
       .select("id")
       .single();
     if (insertCatError) throw new Error(insertCatError.message);
@@ -99,33 +112,51 @@ export async function POST(request: Request) {
   }
 
   let speseInsert: SpesaInsertRow[];
+  let depositiInsert: DepositoInsertRow[];
   try {
     speseInsert = await Promise.all(
-      result.spese.map(async (row: DraftSpesaRow) => ({
-        importo: row.importo,
-        titolo: row.titolo,
-        descrizione: row.descrizione,
-        categoria_id: await resolveCategoriaId(row.categoriaNome),
-        categoria_banca: row.categoria_banca,
-        data: row.data,
-        settimana_riferimento: mondayOf(row.data),
-        fonte: row.fonte,
-      }))
+      result.spese.map(async (row: DraftSpesaRow) => {
+        const categoria_id = await resolveCategoriaId(row.categoriaNome, "spesa");
+        const testoPerSuggerimento = row.titolo ?? row.descrizione ?? "";
+        return {
+          importo: row.importo,
+          titolo: row.titolo,
+          descrizione: row.descrizione,
+          categoria_id,
+          categoria_banca: row.categoria_banca,
+          categoria_suggerita:
+            categoria_id === defaultId("spesa")
+              ? suggestCategoria(testoPerSuggerimento, "spesa")
+              : null,
+          data: row.data,
+          settimana_riferimento: mondayOf(row.data),
+          fonte: row.fonte,
+        };
+      })
+    );
+
+    depositiInsert = await Promise.all(
+      result.depositi.map(async (row: DraftDepositoRow) => {
+        const categoria_id = await resolveCategoriaId(row.categoriaNome, "entrata");
+        const testoPerSuggerimento = row.titolo ?? row.descrizione ?? "";
+        return {
+          importo: row.importo,
+          titolo: row.titolo,
+          descrizione: row.descrizione,
+          categoria_id,
+          categoria_banca: row.categoria_banca,
+          categoria_suggerita:
+            categoria_id === defaultId("entrata")
+              ? suggestCategoria(testoPerSuggerimento, "entrata")
+              : null,
+          data: row.data,
+          fonte: row.fonte,
+        };
+      })
     );
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 500 });
   }
-
-  const depositiInsert: DepositoInsertRow[] = result.depositi.map(
-    (row: DraftDepositoRow) => ({
-      importo: row.importo,
-      titolo: row.titolo,
-      descrizione: row.descrizione,
-      categoria_banca: row.categoria_banca,
-      data: row.data,
-      fonte: row.fonte,
-    })
-  );
 
   const keyFn =
     source === "generico" ? keyGenerico : source === "crypto" ? keyCrypto : keyIntesa;

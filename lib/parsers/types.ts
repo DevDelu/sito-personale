@@ -12,6 +12,7 @@ export type DraftDepositoRow = {
   importo: number;
   titolo: string | null;
   descrizione: string | null;
+  categoriaNome: string | null;
   categoria_banca: string | null;
   data: string;
   fonte: string;

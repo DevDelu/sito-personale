@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   Area,
@@ -27,14 +28,13 @@ import {
 import {
   categoryBreakdown,
   currentAndPreviousWeek,
-  fonteBreakdown,
-  fonteLabel,
   formatCurrency,
   monthlyEntrateUscite,
   weeklyNet,
   weeklyTotals,
 } from "@/lib/spese-utils";
 import { useIsDark } from "@/lib/use-is-dark";
+import { accettaSuggerimento } from "./actions";
 import type { Categoria, Deposito, Spesa } from "@/lib/types";
 
 const PERIODI = [
@@ -46,6 +46,12 @@ const PERIODI = [
 
 const WEEKLY_WINDOWS = [4, 8, 12, 26] as const;
 const MONTHLY_WINDOWS = [3, 6, 12] as const;
+
+function clickedNome(entry: unknown): string | null {
+  const e = entry as { nome?: unknown; payload?: { nome?: unknown } };
+  const nome = e.payload?.nome ?? e.nome;
+  return typeof nome === "string" ? nome : null;
+}
 
 function filterByPeriod<T extends { data: string }>(rows: T[], days: number | null): T[] {
   if (days === null) return rows;
@@ -105,6 +111,7 @@ export function SpeseDashboard({
   const isDark = useIsDark();
   const [periodo, setPeriodo] = useState<(typeof PERIODI)[number]["id"]>("30");
   const [categoriaFiltro, setCategoriaFiltro] = useState<string>("tutte");
+  const [categoriaFiltroEntrate, setCategoriaFiltroEntrate] = useState<string>("tutte");
   const [weeklyWindow, setWeeklyWindow] = useState<(typeof WEEKLY_WINDOWS)[number]>(8);
   const [monthlyWindow, setMonthlyWindow] = useState<(typeof MONTHLY_WINDOWS)[number]>(6);
 
@@ -127,7 +134,6 @@ export function SpeseDashboard({
   const usciteSpark = useMemo(() => weeklyTotals(spese, 12), [spese]);
   const entrateSpark = useMemo(() => weeklyTotals(depositi, 12), [depositi]);
 
-  const fonti = useMemo(() => fonteBreakdown(speseNelPeriodo), [speseNelPeriodo]);
   const breakdown = useMemo(() => categoryBreakdown(speseNelPeriodo), [speseNelPeriodo]);
   const { current, deltaPct } = useMemo(() => currentAndPreviousWeek(spese), [spese]);
 
@@ -147,13 +153,27 @@ export function SpeseDashboard({
   const success = isDark ? SUCCESS_COLOR.dark : SUCCESS_COLOR.light;
   const danger = isDark ? DANGER_COLOR.dark : DANGER_COLOR.light;
 
-  const tableRows = useMemo(() => {
+  const speseTableRows = useMemo(() => {
     const rows =
       categoriaFiltro === "tutte"
         ? speseNelPeriodo
-        : speseNelPeriodo.filter((s) => s.categoria_id === categoriaFiltro);
+        : speseNelPeriodo.filter((s) => s.categoria_nome === categoriaFiltro);
     return rows.slice(0, 50);
   }, [speseNelPeriodo, categoriaFiltro]);
+
+  const entrateTableRows = useMemo(() => {
+    const rows =
+      categoriaFiltroEntrate === "tutte"
+        ? depositiNelPeriodo
+        : depositiNelPeriodo.filter((d) => d.categoria_nome === categoriaFiltroEntrate);
+    return rows.slice(0, 50);
+  }, [depositiNelPeriodo, categoriaFiltroEntrate]);
+
+  const categorieSpesa = useMemo(() => categorie.filter((c) => c.tipo === "spesa"), [categorie]);
+  const categorieEntrata = useMemo(
+    () => categorie.filter((c) => c.tipo === "entrata"),
+    [categorie]
+  );
 
   const categoryColor = useMemo(() => {
     const map = new Map<string, string>();
@@ -163,8 +183,12 @@ export function SpeseDashboard({
     return map;
   }, [breakdown, palette, altro]);
 
+  function toggleCategoriaFiltro(nome: string) {
+    setCategoriaFiltro((prev) => (prev === nome ? "tutte" : nome));
+  }
+
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 pb-20 md:pb-0">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Pills
           options={PERIODI.map((p) => p.id)}
@@ -172,6 +196,12 @@ export function SpeseDashboard({
           onChange={(id) => setPeriodo(id)}
           formatLabel={(id) => PERIODI.find((p) => p.id === id)!.label}
         />
+        <Link
+          href="/spese/nuovo"
+          className="hidden rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 md:inline-flex"
+        >
+          + Aggiungi movimento
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -339,9 +369,25 @@ export function SpeseDashboard({
                     contentStyle={chartTooltipStyle}
                     cursor={{ fill: "var(--surface-hover)" }}
                   />
-                  <Bar dataKey="totale" isAnimationActive={false} radius={[0, 4, 4, 0]} maxBarSize={22}>
+                  <Bar
+                    dataKey="totale"
+                    isAnimationActive={false}
+                    radius={[0, 4, 4, 0]}
+                    maxBarSize={22}
+                    cursor="pointer"
+                    onClick={(entry) => {
+                      const nome = clickedNome(entry);
+                      if (nome) toggleCategoriaFiltro(nome);
+                    }}
+                  >
                     {breakdown.map((entry) => (
-                      <Cell key={entry.nome} fill={categoryColor.get(entry.nome)} />
+                      <Cell
+                        key={entry.nome}
+                        fill={categoryColor.get(entry.nome)}
+                        opacity={
+                          categoriaFiltro === "tutte" || categoriaFiltro === entry.nome ? 1 : 0.35
+                        }
+                      />
                     ))}
                     <LabelList
                       dataKey="totale"
@@ -358,6 +404,7 @@ export function SpeseDashboard({
 
         <section className="flex flex-col gap-3">
           <h2 className="text-sm font-medium text-muted">Ripartizione per categoria</h2>
+          <p className="text-xs text-muted">Clicca una fetta per filtrare la tabella spese.</p>
           <div className="relative h-72 w-full rounded-lg border border-border bg-surface p-4">
             {breakdown.length === 0 ? (
               <p className="flex h-full items-center justify-center text-sm text-muted">
@@ -375,9 +422,22 @@ export function SpeseDashboard({
                       innerRadius={60}
                       outerRadius={100}
                       paddingAngle={2}
+                      cursor="pointer"
+                      onClick={(entry) => {
+                      const nome = clickedNome(entry);
+                      if (nome) toggleCategoriaFiltro(nome);
+                    }}
                     >
                       {breakdown.map((entry) => (
-                        <Cell key={entry.nome} fill={categoryColor.get(entry.nome)} />
+                        <Cell
+                          key={entry.nome}
+                          fill={categoryColor.get(entry.nome)}
+                          opacity={
+                            categoriaFiltro === "tutte" || categoriaFiltro === entry.nome
+                              ? 1
+                              : 0.35
+                          }
+                        />
                       ))}
                     </Pie>
                     <Tooltip
@@ -388,8 +448,16 @@ export function SpeseDashboard({
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-10">
-                  <span className="text-lg font-bold">{formatCurrency(totaleSpesePeriodo)}</span>
-                  <span className="text-xs text-muted">totale</span>
+                  <span className="text-lg font-bold">
+                    {formatCurrency(
+                      categoriaFiltro === "tutte"
+                        ? totaleSpesePeriodo
+                        : (breakdown.find((b) => b.nome === categoriaFiltro)?.totale ?? 0)
+                    )}
+                  </span>
+                  <span className="text-xs text-muted">
+                    {categoriaFiltro === "tutte" ? "totale" : categoriaFiltro}
+                  </span>
                 </div>
               </>
             )}
@@ -397,106 +465,148 @@ export function SpeseDashboard({
         </section>
       </div>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium text-muted">Uscite per fonte</h2>
-        <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface p-4">
-          {fonti.length === 0 ? (
-            <p className="text-sm text-muted">Nessuna spesa nel periodo selezionato.</p>
-          ) : (
-            fonti.map((f) => {
-              const max = fonti[0].totale || 1;
-              return (
-                <div key={f.fonte} className="flex items-center gap-3 text-sm">
-                  <span className="w-32 shrink-0 text-muted">{fonteLabel(f.fonte)}</span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-hover">
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${(f.totale / max) * 100}%`, background: blue }}
-                    />
-                  </div>
-                  <span className="w-24 shrink-0 text-right font-medium">
-                    {formatCurrency(f.totale)}
-                  </span>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </section>
+      <TransactionTable
+        title="Spese recenti"
+        rows={speseTableRows}
+        categorie={categorieSpesa}
+        categoriaFiltro={categoriaFiltro}
+        onCategoriaFiltroChange={setCategoriaFiltro}
+        categoryColor={categoryColor}
+        tabella="spese"
+        emptyLabel="Nessuna spesa da mostrare."
+      />
 
-      <section className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-medium text-muted">Spese recenti</h2>
-          <select
-            value={categoriaFiltro}
-            onChange={(e) => setCategoriaFiltro(e.target.value)}
-            className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-foreground"
-          >
-            <option value="tutte">Tutte le categorie</option>
-            {categorie.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nome}
-              </option>
-            ))}
-          </select>
-        </div>
+      <TransactionTable
+        title="Entrate recenti"
+        rows={entrateTableRows}
+        categorie={categorieEntrata}
+        categoriaFiltro={categoriaFiltroEntrate}
+        onCategoriaFiltroChange={setCategoriaFiltroEntrate}
+        categoryColor={null}
+        tabella="depositi"
+        emptyLabel="Nessuna entrata da mostrare."
+      />
 
-        <div className="overflow-x-auto rounded-lg border border-border">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-border text-muted">
-              <tr>
-                <th className="px-3 py-2 font-medium">Data</th>
-                <th className="px-3 py-2 font-medium">Descrizione</th>
-                <th className="px-3 py-2 font-medium">Categoria</th>
-                <th className="px-3 py-2 text-right font-medium">Importo</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableRows.map((s) => (
-                <tr key={s.id} className="border-b border-border last:border-0">
-                  <td className="px-3 py-2 text-muted">
-                    {new Date(`${s.data}T00:00:00Z`).toLocaleDateString("it-IT")}
-                  </td>
-                  <td className="px-3 py-2">
-                    {s.titolo ? (
-                      <>
-                        <span>{s.titolo}</span>
-                        {s.descrizione && s.descrizione !== s.titolo && (
-                          <span className="text-muted"> — {s.descrizione}</span>
-                        )}
-                      </>
-                    ) : (
-                      (s.descrizione ?? "—")
-                    )}
-                  </td>
-                  <td className="px-3 py-2 text-muted">
-                    <span className="inline-flex items-center gap-2">
-                      <span
-                        className="h-2 w-2 shrink-0 rounded-full"
-                        style={{
-                          background: s.categoria_nome
-                            ? (categoryColor.get(s.categoria_nome) ?? "var(--muted)")
-                            : "var(--muted)",
-                        }}
-                      />
-                      {s.categoria_nome ?? "—"}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2 text-right">{formatCurrency(s.importo)}</td>
-                </tr>
-              ))}
-              {tableRows.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="px-3 py-6 text-center text-muted">
-                    Nessuna spesa da mostrare.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <Link
+        href="/spese/nuovo"
+        aria-label="Aggiungi movimento"
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-opacity hover:opacity-90 md:hidden"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-6 w-6">
+          <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+        </svg>
+      </Link>
     </div>
+  );
+}
+
+function TransactionTable({
+  title,
+  rows,
+  categorie,
+  categoriaFiltro,
+  onCategoriaFiltroChange,
+  categoryColor,
+  tabella,
+  emptyLabel,
+}: {
+  title: string;
+  rows: (Spesa | Deposito)[];
+  categorie: Categoria[];
+  categoriaFiltro: string;
+  onCategoriaFiltroChange: (v: string) => void;
+  categoryColor: Map<string, string> | null;
+  tabella: "spese" | "depositi";
+  emptyLabel: string;
+}) {
+  return (
+    <section className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-sm font-medium text-muted">{title}</h2>
+        <select
+          value={categoriaFiltro}
+          onChange={(e) => onCategoriaFiltroChange(e.target.value)}
+          className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-foreground"
+        >
+          <option value="tutte">Tutte le categorie</option>
+          {categorie.map((c) => (
+            <option key={c.id} value={c.nome}>
+              {c.nome}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="overflow-x-auto rounded-lg border border-border">
+        <table className="w-full text-left text-sm">
+          <thead className="border-b border-border text-muted">
+            <tr>
+              <th className="px-3 py-2 font-medium">Data</th>
+              <th className="px-3 py-2 font-medium">Descrizione</th>
+              <th className="px-3 py-2 font-medium">Categoria</th>
+              <th className="px-3 py-2 text-right font-medium">Importo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.id} className="border-b border-border last:border-0">
+                <td className="px-3 py-2 text-muted">
+                  {new Date(`${r.data}T00:00:00Z`).toLocaleDateString("it-IT")}
+                </td>
+                <td className="px-3 py-2">
+                  {r.titolo ? (
+                    <>
+                      <span>{r.titolo}</span>
+                      {r.descrizione && r.descrizione !== r.titolo && (
+                        <span className="text-muted"> — {r.descrizione}</span>
+                      )}
+                    </>
+                  ) : (
+                    (r.descrizione ?? "—")
+                  )}
+                </td>
+                <td className="px-3 py-2 text-muted">
+                  <div className="flex flex-col gap-1">
+                    <span className="inline-flex items-center gap-2">
+                      {categoryColor && (
+                        <span
+                          className="h-2 w-2 shrink-0 rounded-full"
+                          style={{
+                            background: r.categoria_nome
+                              ? (categoryColor.get(r.categoria_nome) ?? "var(--muted)")
+                              : "var(--muted)",
+                          }}
+                        />
+                      )}
+                      {r.categoria_nome ?? "—"}
+                    </span>
+                    {r.categoria_suggerita && (
+                      <form action={accettaSuggerimento.bind(null, tabella, r.id)}>
+                        <button
+                          type="submit"
+                          className="inline-flex w-fit items-center gap-1 rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-xs text-accent transition-colors hover:bg-accent/20"
+                        >
+                          <IconSparkle />
+                          suggerito: {r.categoria_suggerita}
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                </td>
+                <td className="px-3 py-2 text-right">{formatCurrency(r.importo)}</td>
+              </tr>
+            ))}
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-3 py-6 text-center text-muted">
+                  {emptyLabel}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 
@@ -631,6 +741,14 @@ function IconCalendar() {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
       <rect x="3" y="5" width="18" height="16" rx="2" />
       <path d="M3 10h18M8 3v4M16 3v4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconSparkle() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3">
+      <path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2Z" />
     </svg>
   );
 }

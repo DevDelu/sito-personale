@@ -2,27 +2,21 @@ import ExcelJS from "exceljs";
 import { parseData, parseImporto } from "@/lib/csv";
 import type { DraftDepositoRow, DraftSpesaRow, ParseResult } from "./types";
 
-const CATEGORIA_DEFAULT = "Da categorizzare";
+const CATEGORIA_DEFAULT = "Altro";
 
 // Bonifici verso te stesso e giroconti sono esclusi a monte (vedi parseIntesaXlsx),
 // quindi qui mappiamo solo le categorie bancarie che rappresentano vere entrate/uscite.
-const CATEGORIA_BANCA_MAP: Record<string, string> = {
-  "domiciliazioni e utenze": "Casa e Utenze",
-  cellulare: "Tecnologia e Abbonamenti",
-  "stipendi e pensioni": "Stipendio e Entrate",
-  "ristoranti e bar": "Cibo e Ristorazione",
-  "generi alimentari e supermercato": "Cibo e Ristorazione",
-  "imposte, bolli e commissioni": "Tasse e Commissioni",
-  "imposte/bolli/commissioni": "Tasse e Commissioni",
-  "bonifici ricevuti": "Stipendio e Entrate",
-  "entrate varie": "Stipendio e Entrate",
-  "addebiti vari": CATEGORIA_DEFAULT,
-  "pedaggi e telepass": "Trasporti e Carburante",
-  carburanti: "Trasporti e Carburante",
-  "corsi e sport": "Sport e Tempo libero",
-  "cura della persona": "Salute e Cura della persona",
-  regali: "Shopping e Regali",
-  prelievi: "Prelievi Contanti",
+// Set ridotto (vedi supabase/003_archivio_redesign.sql): quello che non matcha
+// finisce in "Altro", recuperabile poi col badge suggerimento in dashboard.
+const CATEGORIA_BANCA_MAP_SPESA: Record<string, string> = {
+  "ristoranti e bar": "Ristoranti",
+  "generi alimentari e supermercato": "Alimentari",
+  carburanti: "Benzina",
+};
+
+const CATEGORIA_BANCA_MAP_ENTRATA: Record<string, string> = {
+  "stipendi e pensioni": "Stipendio",
+  "bonifici ricevuti": "Bonifici",
 };
 
 const HEADER_ALIASES: Record<string, string[]> = {
@@ -63,8 +57,12 @@ function cellAmount(value: ExcelJS.CellValue): number | null {
   return text ? parseImporto(text) : null;
 }
 
-function mapCategoriaBanca(categoriaBanca: string): string {
-  return CATEGORIA_BANCA_MAP[categoriaBanca.trim().toLowerCase()] ?? CATEGORIA_DEFAULT;
+function mapCategoriaBancaSpesa(categoriaBanca: string): string {
+  return CATEGORIA_BANCA_MAP_SPESA[categoriaBanca.trim().toLowerCase()] ?? CATEGORIA_DEFAULT;
+}
+
+function mapCategoriaBancaEntrata(categoriaBanca: string): string {
+  return CATEGORIA_BANCA_MAP_ENTRATA[categoriaBanca.trim().toLowerCase()] ?? CATEGORIA_DEFAULT;
 }
 
 export async function parseIntesaXlsx(buffer: ArrayBuffer): Promise<ParseResult> {
@@ -174,19 +172,22 @@ export async function parseIntesaXlsx(buffer: ArrayBuffer): Promise<ParseResult>
         importo,
         titolo: operazione,
         descrizione: dettagli,
+        categoriaNome: categoriaBanca
+          ? mapCategoriaBancaEntrata(categoriaBanca)
+          : CATEGORIA_DEFAULT,
         categoria_banca: categoriaBanca || null,
         data,
-        fonte: "intesa_sanpaolo",
+        fonte: "intesa",
       });
     } else {
       spese.push({
         importo: Math.abs(importo),
         titolo: operazione,
         descrizione: dettagli,
-        categoriaNome: categoriaBanca ? mapCategoriaBanca(categoriaBanca) : CATEGORIA_DEFAULT,
+        categoriaNome: categoriaBanca ? mapCategoriaBancaSpesa(categoriaBanca) : CATEGORIA_DEFAULT,
         categoria_banca: categoriaBanca || null,
         data,
-        fonte: "intesa_sanpaolo",
+        fonte: "intesa",
       });
     }
   }
