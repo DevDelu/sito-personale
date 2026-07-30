@@ -1,27 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --surface: #f4f4f5;
-  --surface-hover: #e4e4e7;
-  --border: #e4e4e7;
-  --muted: #71717a;
-  --accent: #2563eb;
-  --accent-foreground: #ffffff;
-  --danger: #dc2626;
+  --background: #f7f8fb;
+  --surface: #ffffff;
+  --surface-hover: #eef1f6;
+  --border: #e2e6ee;
+  --foreground: #10131c;
+  --muted: #626b81;
+  --accent: #d97706;
+  --accent-foreground: #10131c;
+  --spesa: #dc2626;
+  --entrata: #059669;
+
+  --cat-alimentari: #2563eb;
+  --cat-benzina: #ea580c;
+  --cat-vinted: #059669;
+  --cat-paypal: #0284c7;
+  --cat-bonifici: #7c3aed;
+  --cat-ristoranti: #db2777;
+  --cat-altro: #626b81;
+  --cat-stipendio: #059669;
+  --cat-rimborso: #0d9488;
 }
 
 [data-theme="dark"] {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --surface: #18181b;
-  --surface-hover: #27272a;
-  --border: #27272a;
-  --muted: #a1a1aa;
-  --accent: #3b82f6;
-  --accent-foreground: #0a0a0a;
-  --danger: #f87171;
+  --background: #0f1420;
+  --surface: #161d2b;
+  --surface-hover: #1c2536;
+  --border: #2a3446;
+  --foreground: #e7ebf3;
+  --muted: #8a93a8;
+  --accent: #f5b942;
+  --accent-foreground: #0f1420;
+  --spesa: #f87171;
+  --entrata: #34d399;
+
+  --cat-alimentari: #60a5fa;
+  --cat-benzina: #fb923c;
+  --cat-vinted: #34d399;
+  --cat-paypal: #38bdf8;
+  --cat-bonifici: #a78bfa;
+  --cat-ristoranti: #f472b6;
+  --cat-altro: #8a93a8;
+  --cat-stipendio: #34d399;
+  --cat-rimborso: #2dd4bf;
 }
 
 @theme inline {
@@ -33,13 +55,25 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-danger: var(--danger);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-spesa: var(--spesa);
+  --color-entrata: var(--entrata);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+}
+
+.font-figures {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
 }

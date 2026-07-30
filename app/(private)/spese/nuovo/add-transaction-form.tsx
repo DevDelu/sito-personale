@@ -53,7 +53,7 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
           name="titolo"
           type="text"
           required
-          className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+          className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
         />
       </Field>
 
@@ -65,7 +65,7 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
             step="0.01"
             min="0.01"
             required
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+            className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
           />
         </Field>
         <Field label="Data">
@@ -74,7 +74,7 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
             type="date"
             required
             defaultValue={oggi()}
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+            className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
           />
         </Field>
       </div>
@@ -85,7 +85,7 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
           required
           value={categoriaId}
           onChange={(e) => setCategoriaId(e.target.value)}
-          className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+          className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
         >
           <option value="" disabled>
             Seleziona categoria
@@ -103,7 +103,7 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
           <input
             name="nominativo"
             type="text"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+            className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
           />
         </Field>
       )}
@@ -113,7 +113,7 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
           <input
             name="dettaglio"
             type="text"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+            className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
           />
         </Field>
       )}
@@ -122,12 +122,12 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
         <textarea
           name="descrizione"
           rows={2}
-          className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+          className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
         />
       </Field>
 
       {state?.error && (
-        <p className="text-sm text-danger" role="alert">
+        <p className="text-sm text-spesa" role="alert">
           {state.error}
         </p>
       )}

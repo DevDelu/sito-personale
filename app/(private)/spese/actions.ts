@@ -4,37 +4,6 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireUser } from "@/lib/supabase/dal";
-import { mondayOf } from "@/lib/csv";
-
-export async function accettaSuggerimento(tabella: "spese" | "depositi", id: string) {
-  await requireUser();
-  const admin = createAdminClient();
-  const tipo = tabella === "spese" ? "spesa" : "entrata";
-
-  const { data: row } = await admin
-    .from(tabella)
-    .select("categoria_suggerita")
-    .eq("id", id)
-    .single();
-
-  if (!row?.categoria_suggerita) return;
-
-  const { data: categoria } = await admin
-    .from("categorie")
-    .select("id")
-    .eq("nome", row.categoria_suggerita)
-    .eq("tipo", tipo)
-    .single();
-
-  if (!categoria) return;
-
-  await admin
-    .from(tabella)
-    .update({ categoria_id: categoria.id, categoria_suggerita: null })
-    .eq("id", id);
-
-  revalidatePath("/spese");
-}
 
 export type AggiungiMovimentoState = { error?: string } | undefined;
 
@@ -62,33 +31,19 @@ export async function aggiungiMovimento(
   if (!categoriaId) return { error: "Seleziona una categoria." };
 
   const admin = createAdminClient();
+  const tabella = tipo === "spesa" ? "spese" : "depositi";
 
-  if (tipo === "spesa") {
-    const { error } = await admin.from("spese").insert({
-      importo,
-      titolo,
-      descrizione,
-      categoria_id: categoriaId,
-      nominativo,
-      dettaglio,
-      data,
-      settimana_riferimento: mondayOf(data),
-      fonte: "manuale",
-    });
-    if (error) return { error: error.message };
-  } else {
-    const { error } = await admin.from("depositi").insert({
-      importo,
-      titolo,
-      descrizione,
-      categoria_id: categoriaId,
-      nominativo,
-      dettaglio,
-      data,
-      fonte: "manuale",
-    });
-    if (error) return { error: error.message };
-  }
+  const { error } = await admin.from(tabella).insert({
+    importo,
+    titolo,
+    descrizione,
+    categoria_id: categoriaId,
+    nominativo,
+    dettaglio,
+    data,
+    fonte: "manuale",
+  });
+  if (error) return { error: error.message };
 
   revalidatePath("/spese");
   redirect("/spese?added=1");

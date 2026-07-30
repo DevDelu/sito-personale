@@ -2,29 +2,42 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Categoria, Deposito, Spesa } from "@/lib/types";
 
-const HISTORY_DAYS = 180;
+export async function getCategorie(): Promise<Categoria[]> {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("categorie")
+    .select("id, nome, colore, tipo")
+    .order("nome");
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
 
-export async function getDashboardData(): Promise<{
+// Filtrata lato server per data (non si scarica mai tutto lo storico): il
+// selettore periodo/range in dashboard aggiorna l'URL, che rifà girare
+// questa query con `from`/`to` nuovi.
+export async function getDashboardData(
+  from: string,
+  to: string
+): Promise<{
   spese: Spesa[];
   categorie: Categoria[];
   depositi: Deposito[];
 }> {
   const admin = createAdminClient();
-  const since = new Date(Date.now() - HISTORY_DAYS * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .slice(0, 10);
 
   const [speseRes, categorieRes, depositiRes] = await Promise.all([
     admin
       .from("spese_con_categoria")
       .select("*")
-      .gte("data", since)
+      .gte("data", from)
+      .lte("data", to)
       .order("data", { ascending: false }),
     admin.from("categorie").select("id, nome, colore, tipo").order("nome"),
     admin
       .from("depositi_con_categoria")
       .select("*")
-      .gte("data", since)
+      .gte("data", from)
+      .lte("data", to)
       .order("data", { ascending: false }),
   ]);
 

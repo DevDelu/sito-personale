@@ -16,7 +16,6 @@ export type Spesa = {
   categoria_nome: string | null;
   categoria_colore: string | null;
   categoria_banca: string | null;
-  categoria_suggerita: string | null;
   nominativo: string | null;
   dettaglio: string | null;
   note: string | null;
@@ -34,7 +33,6 @@ export type Deposito = {
   categoria_nome: string | null;
   categoria_colore: string | null;
   categoria_banca: string | null;
-  categoria_suggerita: string | null;
   nominativo: string | null;
   dettaglio: string | null;
   note: string | null;

@@ -14,7 +14,7 @@ export default async function PrivateLayout({
     <div className="flex min-h-full flex-1 flex-col">
       <header className="flex items-center justify-between border-b border-border px-4 py-3 sm:px-6">
         <nav className="flex items-center gap-4">
-          <Link href="/spese" className="text-sm font-semibold">
+          <Link href="/spese" className="font-display text-sm font-semibold">
             Archivio
           </Link>
           <Link
@@ -24,10 +24,16 @@ export default async function PrivateLayout({
             Spese
           </Link>
           <Link
-            href="/spese/upload"
+            href="/spese/importa"
             className="text-sm text-muted transition-colors hover:text-foreground"
           >
-            Carica CSV
+            Importa
+          </Link>
+          <Link
+            href="/spese/nuovo"
+            className="text-sm text-muted transition-colors hover:text-foreground"
+          >
+            + Aggiungi
           </Link>
         </nav>
         <div className="flex items-center gap-2">
