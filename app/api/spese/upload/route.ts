@@ -1,16 +1,35 @@
 import { NextResponse } from "next/server";
-import Papa from "papaparse";
 import { getUser } from "@/lib/supabase/dal";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { dedupKey, mondayOf, parseData, parseImporto, resolveColumn } from "@/lib/csv";
+import { mondayOf } from "@/lib/csv";
+import { keyCrypto, keyGenerico, keyIntesa } from "@/lib/dedup";
+import { parseGenericCsv } from "@/lib/parsers/generic";
+import { parseCryptoCsv } from "@/lib/parsers/crypto";
+import { parseIntesaXlsx } from "@/lib/parsers/intesa";
+import type { DraftDepositoRow, DraftSpesaRow, ParseResult } from "@/lib/parsers/types";
 
-type ParsedRow = {
+const CATEGORIA_DEFAULT = "Da categorizzare";
+const SOURCES = ["generico", "crypto", "intesa"] as const;
+type Source = (typeof SOURCES)[number];
+
+type SpesaInsertRow = {
   importo: number;
+  titolo: string | null;
   descrizione: string | null;
+  categoria_id: string | null;
+  categoria_banca: string | null;
   data: string;
   settimana_riferimento: string;
-  categoria_id: string | null;
-  fonte: "csv_upload";
+  fonte: string;
+};
+
+type DepositoInsertRow = {
+  importo: number;
+  titolo: string | null;
+  descrizione: string | null;
+  categoria_banca: string | null;
+  data: string;
+  fonte: string;
 };
 
 export async function POST(request: Request) {
@@ -21,49 +40,33 @@ export async function POST(request: Request) {
 
   const formData = await request.formData();
   const file = formData.get("file");
+  const sourceRaw = String(formData.get("source") ?? "generico");
+  const source: Source = SOURCES.includes(sourceRaw as Source)
+    ? (sourceRaw as Source)
+    : "generico";
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Nessun file ricevuto." }, { status: 400 });
   }
 
-  const text = await file.text();
-  const parsed = Papa.parse<Record<string, string>>(text, {
-    header: true,
-    skipEmptyLines: true,
-  });
-
-  if (parsed.errors.length > 0) {
-    return NextResponse.json(
-      { error: `CSV non valido: ${parsed.errors[0].message}` },
-      { status: 400 }
-    );
+  let result: ParseResult;
+  if (source === "generico") {
+    result = parseGenericCsv(await file.text());
+  } else if (source === "crypto") {
+    result = parseCryptoCsv(await file.text());
+  } else {
+    result = await parseIntesaXlsx(await file.arrayBuffer());
   }
 
-  const headers = parsed.meta.fields ?? [];
-  const col = {
-    importo: resolveColumn(headers, "importo"),
-    descrizione: resolveColumn(headers, "descrizione"),
-    data: resolveColumn(headers, "data"),
-    categoria: resolveColumn(headers, "categoria"),
-  };
-
-  if (!col.importo || !col.data) {
-    return NextResponse.json(
-      {
-        error:
-          "Il CSV deve avere almeno le colonne 'importo' e 'data' (nomi accettati: importo/amount, data/date, descrizione, categoria).",
-      },
-      { status: 400 }
-    );
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
   const admin = createAdminClient();
 
-  // Mappa nome categoria (lowercase) -> id, con creazione automatica delle categorie mancanti.
   const { data: categorie, error: categorieError } = await admin
     .from("categorie")
     .select("id, nome");
-
   if (categorieError) {
     return NextResponse.json({ error: categorieError.message }, { status: 500 });
   }
@@ -71,87 +74,102 @@ export async function POST(request: Request) {
   const categoriaMap = new Map<string, string>(
     (categorie ?? []).map((c) => [c.nome.toLowerCase(), c.id])
   );
+  const categoriaDefaultId = categoriaMap.get(CATEGORIA_DEFAULT.toLowerCase()) ?? null;
 
-  const rowsSkippedInvalid: number[] = [];
-  const candidateRows: ParsedRow[] = [];
+  async function resolveCategoriaId(nome: string | null): Promise<string | null> {
+    if (!nome) return null;
+    const key = nome.toLowerCase();
+    const existing = categoriaMap.get(key);
+    if (existing) return existing;
 
-  for (let i = 0; i < parsed.data.length; i++) {
-    const raw = parsed.data[i];
-    const importo = parseImporto(raw[col.importo]);
-    const data = parseData(raw[col.data]);
-
-    if (importo === null || data === null) {
-      rowsSkippedInvalid.push(i + 2); // +2: header + 1-based index
-      continue;
+    if (source !== "generico") {
+      // Le categorie di crypto/intesa sono già normalizzate sul set fisso dei 12;
+      // se per qualche motivo mancano, non ne creiamo di nuove: fallback sicuro.
+      return categoriaDefaultId;
     }
 
-    const descrizione = col.descrizione ? raw[col.descrizione]?.trim() || null : null;
-    const categoriaNome = col.categoria ? raw[col.categoria]?.trim() : "";
-
-    let categoria_id: string | null = null;
-    if (categoriaNome) {
-      const key = categoriaNome.toLowerCase();
-      categoria_id = categoriaMap.get(key) ?? null;
-      if (!categoria_id) {
-        const { data: nuova, error: insertCatError } = await admin
-          .from("categorie")
-          .insert({ nome: categoriaNome })
-          .select("id")
-          .single();
-        if (insertCatError) {
-          return NextResponse.json({ error: insertCatError.message }, { status: 500 });
-        }
-        categoria_id = nuova.id;
-        categoriaMap.set(key, nuova.id);
-      }
-    }
-
-    candidateRows.push({
-      importo,
-      descrizione,
-      data,
-      settimana_riferimento: mondayOf(data),
-      categoria_id,
-      fonte: "csv_upload",
-    });
+    const { data: nuova, error: insertCatError } = await admin
+      .from("categorie")
+      .insert({ nome })
+      .select("id")
+      .single();
+    if (insertCatError) throw new Error(insertCatError.message);
+    categoriaMap.set(key, nuova.id);
+    return nuova.id;
   }
 
-  // Dedup: confronta con le spese già presenti nell'intervallo di date del CSV
-  // (stessa data + importo + descrizione + categoria => riga già caricata, la salto).
-  let inserted = 0;
-  let skippedDuplicates = 0;
+  let speseInsert: SpesaInsertRow[];
+  try {
+    speseInsert = await Promise.all(
+      result.spese.map(async (row: DraftSpesaRow) => ({
+        importo: row.importo,
+        titolo: row.titolo,
+        descrizione: row.descrizione,
+        categoria_id: await resolveCategoriaId(row.categoriaNome),
+        categoria_banca: row.categoria_banca,
+        data: row.data,
+        settimana_riferimento: mondayOf(row.data),
+        fonte: row.fonte,
+      }))
+    );
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+  }
 
-  if (candidateRows.length > 0) {
-    const dates = candidateRows.map((r) => r.data).sort();
+  const depositiInsert: DepositoInsertRow[] = result.depositi.map(
+    (row: DraftDepositoRow) => ({
+      importo: row.importo,
+      titolo: row.titolo,
+      descrizione: row.descrizione,
+      categoria_banca: row.categoria_banca,
+      data: row.data,
+      fonte: row.fonte,
+    })
+  );
+
+  const keyFn =
+    source === "generico" ? keyGenerico : source === "crypto" ? keyCrypto : keyIntesa;
+
+  let insertedSpese = 0;
+  let skippedDuplicatesSpese = 0;
+
+  if (speseInsert.length > 0) {
+    const dates = speseInsert.map((r) => r.data).sort();
     const { data: existing, error: existingError } = await admin
       .from("spese")
-      .select("data, importo, descrizione, categoria_id")
+      .select("data, importo, titolo, descrizione, categoria_id")
       .gte("data", dates[0])
       .lte("data", dates[dates.length - 1]);
-
     if (existingError) {
       return NextResponse.json({ error: existingError.message }, { status: 500 });
     }
 
     const existingKeys = new Set(
       (existing ?? []).map((r) =>
-        dedupKey({
+        keyFn({
           data: r.data,
           importo: Number(r.importo),
+          titolo: r.titolo,
           descrizione: r.descrizione,
           categoria_id: r.categoria_id,
         })
       )
     );
 
-    const toInsert: ParsedRow[] = [];
-    for (const row of candidateRows) {
-      const key = dedupKey(row);
+    const toInsert: SpesaInsertRow[] = [];
+    for (const row of speseInsert) {
+      const key = keyFn({
+        data: row.data,
+        importo: row.importo,
+        titolo: row.titolo,
+        descrizione: row.descrizione,
+        categoria_id: row.categoria_id,
+      });
       if (existingKeys.has(key)) {
-        skippedDuplicates++;
+        skippedDuplicatesSpese++;
         continue;
       }
-      existingKeys.add(key); // evita doppi anche all'interno dello stesso file
+      existingKeys.add(key);
       toInsert.push(row);
     }
 
@@ -160,7 +178,57 @@ export async function POST(request: Request) {
       if (insertError) {
         return NextResponse.json({ error: insertError.message }, { status: 500 });
       }
-      inserted = toInsert.length;
+      insertedSpese = toInsert.length;
+    }
+  }
+
+  let insertedDepositi = 0;
+  let skippedDuplicatesDepositi = 0;
+
+  if (depositiInsert.length > 0) {
+    const dates = depositiInsert.map((r) => r.data).sort();
+    const { data: existing, error: existingError } = await admin
+      .from("depositi")
+      .select("data, importo, titolo, descrizione")
+      .gte("data", dates[0])
+      .lte("data", dates[dates.length - 1]);
+    if (existingError) {
+      return NextResponse.json({ error: existingError.message }, { status: 500 });
+    }
+
+    const existingKeys = new Set(
+      (existing ?? []).map((r) =>
+        keyIntesa({
+          data: r.data,
+          importo: Number(r.importo),
+          titolo: r.titolo,
+          descrizione: r.descrizione,
+        })
+      )
+    );
+
+    const toInsert: DepositoInsertRow[] = [];
+    for (const row of depositiInsert) {
+      const key = keyIntesa({
+        data: row.data,
+        importo: row.importo,
+        titolo: row.titolo,
+        descrizione: row.descrizione,
+      });
+      if (existingKeys.has(key)) {
+        skippedDuplicatesDepositi++;
+        continue;
+      }
+      existingKeys.add(key);
+      toInsert.push(row);
+    }
+
+    if (toInsert.length > 0) {
+      const { error: insertError } = await admin.from("depositi").insert(toInsert);
+      if (insertError) {
+        return NextResponse.json({ error: insertError.message }, { status: 500 });
+      }
+      insertedDepositi = toInsert.length;
     }
   }
 
@@ -174,7 +242,6 @@ export async function POST(request: Request) {
     .from("spese")
     .select("importo, settimana_riferimento")
     .in("settimana_riferimento", [settimanaCorrente, settimanaPrecedente]);
-
   if (totaliError) {
     return NextResponse.json({ error: totaliError.message }, { status: 500 });
   }
@@ -187,9 +254,11 @@ export async function POST(request: Request) {
     .reduce((sum, r) => sum + Number(r.importo), 0);
 
   return NextResponse.json({
-    inserted,
-    skippedDuplicates,
-    skippedInvalidRows: rowsSkippedInvalid,
+    insertedSpese,
+    insertedDepositi,
+    skippedDuplicates: skippedDuplicatesSpese + skippedDuplicatesDepositi,
+    skippedIgnored: result.skippedIgnored,
+    skippedInvalidRows: result.skippedInvalidRows,
     totaleSettimanaCorrente,
     totaleSettimanaPrecedente,
   });

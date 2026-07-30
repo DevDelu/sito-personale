@@ -64,14 +64,3 @@ export function resolveColumn(
   }
   return null;
 }
-
-export function dedupKey(row: {
-  data: string;
-  importo: number;
-  descrizione: string | null;
-  categoria_id: string | null;
-}): string {
-  return `${row.data}|${row.importo.toFixed(2)}|${row.descrizione ?? ""}|${
-    row.categoria_id ?? ""
-  }`;
-}

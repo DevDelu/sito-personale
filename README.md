@@ -17,9 +17,12 @@ Next.js (App Router) + Supabase + Vercel.
 
 2. Crea un progetto su [supabase.com](https://supabase.com) (piano free).
 
-3. Nell'SQL Editor di Supabase, esegui lo script [`supabase/schema.sql`](supabase/schema.sql).
-   Crea le tabelle `categorie`, `spese`, `depositi`, la view `spese_con_categoria` e popola le
-   12 categorie iniziali (placeholder, rinominabili in qualsiasi momento).
+3. Nell'SQL Editor di Supabase, esegui in ordine:
+   - [`supabase/schema.sql`](supabase/schema.sql) — tabelle `categorie`, `spese`, `depositi`,
+     view `spese_con_categoria`.
+   - [`supabase/002_spese_v2.sql`](supabase/002_spese_v2.sql) — colonne `titolo`,
+     `categoria_banca`, `fonte` (su `depositi`), e le 12 categorie definitive (sostituiscono i
+     placeholder iniziali).
 
 4. In Supabase, vai su **Authentication > Users** e crea manualmente il tuo utente
    (email + password). Non esiste un flusso di registrazione pubblico: l'unico account
@@ -47,14 +50,28 @@ Next.js (App Router) + Supabase + Vercel.
 
 ## Modulo Spese
 
-- **Upload CSV** (`/spese/upload`): colonne attese `importo`, `data` (obbligatorie),
-  `descrizione`, `categoria` (opzionali; nomi alternativi accettati: `amount`, `date`).
-  Le categorie citate nel CSV ma non ancora presenti vengono create automaticamente.
-- **Dedup**: prima di inserire una riga, si controlla se esiste già una spesa con la stessa
-  combinazione data + importo + descrizione + categoria; in tal caso viene saltata. Ricaricare
-  lo stesso CSV (o uno che si sovrappone a un caricamento precedente) non duplica le righe.
-- **Dashboard** (`/spese`): andamento settimanale, ripartizione per categoria, confronto
-  settimana corrente vs precedente, saldo netto (depositi − spese), tabella spese filtrabile.
+`/spese/upload` supporta tre sorgenti, selezionabili nella pagina:
+
+- **CSV generico** — colonne `importo`, `data` (obbligatorie), `descrizione`, `categoria`
+  (opzionali; alias accettati: `amount`, `date`). Categorie non esistenti vengono create
+  automaticamente. Dedup su data + importo + descrizione + categoria.
+- **Crypto.com** — export CSV standard. Righe `EUR Deposit` e `Refund:` vengono escluse
+  (non sono spese reali); solo gli importi negativi diventano spese, categoria di default
+  "Da categorizzare". Dedup su Timestamp + Transaction Description + Amount.
+- **Intesa Sanpaolo** — export Excel "Lista Operazione". Cerca automaticamente la riga di
+  intestazione (non assume una posizione fissa). Giroconti e bonifici verso te stesso vengono
+  esclusi; le categorie della banca sono mappate sulle 12 categorie app (vedi
+  `lib/parsers/intesa.ts`, fallback "Da categorizzare" se non mappata); importi positivi vanno
+  in `depositi`, negativi in `spese`. Dedup su Data + Operazione + Dettagli + Importo.
+
+**Inserimento manuale (es. PayPal, contanti)**: non avviene dal sito — è previsto tramite un
+Project Claude dedicato (fuori da questa repo) con un tool collegato direttamente a Supabase.
+Le colonne `spese.titolo`/`spese.fonte` e `depositi.titolo`/`depositi.fonte` sono già pronte per
+riceverlo; la configurazione del Project/tool va fatta manualmente su claude.ai.
+
+**Dashboard** (`/spese`): entrate/uscite/saldo netto nel periodo, confronto settimana corrente
+vs precedente, andamento settimanale, entrate vs uscite mensili, ripartizione uscite per fonte,
+ripartizione per categoria, tabella spese filtrabile.
 
 ## Deploy su Vercel
 

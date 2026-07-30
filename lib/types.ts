@@ -7,10 +7,12 @@ export type Categoria = {
 export type Spesa = {
   id: string;
   importo: number;
+  titolo: string | null;
   descrizione: string | null;
   categoria_id: string | null;
   categoria_nome: string | null;
   categoria_colore: string | null;
+  categoria_banca: string | null;
   data: string;
   settimana_riferimento: string | null;
   fonte: string;
@@ -19,6 +21,9 @@ export type Spesa = {
 export type Deposito = {
   id: string;
   importo: number;
+  titolo: string | null;
   descrizione: string | null;
+  categoria_banca: string | null;
   data: string;
+  fonte: string;
 };

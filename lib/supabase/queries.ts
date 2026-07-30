@@ -23,7 +23,7 @@ export async function getDashboardData(): Promise<{
     admin.from("categorie").select("id, nome, colore").order("nome"),
     admin
       .from("depositi")
-      .select("id, importo, descrizione, data")
+      .select("id, importo, titolo, descrizione, categoria_banca, data, fonte")
       .gte("data", since)
       .order("data", { ascending: false }),
   ]);

@@ -1,27 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useIsDark } from "@/lib/use-is-dark";
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return document.documentElement.getAttribute("data-theme") === "dark";
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute(
-      "data-theme",
-      isDark ? "dark" : "light"
-    );
-  }, [isDark]);
+  const isDark = useIsDark();
 
   return (
     <button
       type="button"
       onClick={() => {
-        const next = !isDark;
-        setIsDark(next);
-        localStorage.setItem("theme", next ? "dark" : "light");
+        const next = isDark ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
       }}
       aria-label={isDark ? "Attiva tema chiaro" : "Attiva tema scuro"}
       className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-surface-hover"
