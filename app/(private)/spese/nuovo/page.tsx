@@ -1,4 +1,4 @@
-import { getCategorie } from "@/lib/supabase/queries";
+import { getCategorie } from "@/lib/spese/queries";
 import { AddTransactionForm } from "./add-transaction-form";
 
 export default async function NuovoMovimentoPage() {

@@ -1,8 +1,14 @@
 import { createElement } from "react";
 import { categoryColor, categoryIcon } from "@/lib/category-style";
 
-export function CategoryBadge({ nome }: { nome: string | null }) {
-  const color = categoryColor(nome);
+export function CategoryBadge({
+  nome,
+  colore,
+}: {
+  nome: string | null;
+  colore?: string | null;
+}) {
+  const color = colore || categoryColor(nome);
 
   return (
     <span

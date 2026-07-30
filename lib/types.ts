@@ -24,6 +24,21 @@ export type Spesa = {
   fonte: string;
 };
 
+export type Movimento = {
+  id: string;
+  tipo: TipoCategoria;
+  data: string;
+  importo: number;
+  titolo: string | null;
+  descrizione: string | null;
+  categoria_id: string | null;
+  categoria_nome: string | null;
+  categoria_colore: string | null;
+  nominativo: string | null;
+  dettaglio: string | null;
+  fonte: string;
+};
+
 export type Deposito = {
   id: string;
   importo: number;

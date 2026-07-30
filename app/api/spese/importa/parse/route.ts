@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/supabase/dal";
 import { parseImportExcel } from "@/lib/parsers/import-excel";
+import { flagDuplicates } from "@/lib/spese/dedup";
 
 export async function POST(request: Request) {
   const user = await getUser();
@@ -19,5 +20,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
-  return NextResponse.json({ righeValide: result.righeValide, errori: result.errori });
+  const righe = await flagDuplicates(result.righeValide);
+
+  return NextResponse.json({ righe, errori: result.errori });
 }

@@ -17,12 +17,10 @@ Next.js (App Router) + Supabase + Vercel.
 
 2. Crea un progetto su [supabase.com](https://supabase.com) (piano free).
 
-3. Nell'SQL Editor di Supabase, esegui in ordine:
-   - [`supabase/schema.sql`](supabase/schema.sql) — tabelle `categorie`, `spese`, `depositi`,
-     view `spese_con_categoria`.
-   - [`supabase/002_spese_v2.sql`](supabase/002_spese_v2.sql) — colonne `titolo`,
-     `categoria_banca`, `fonte` (su `depositi`), e le 12 categorie definitive (sostituiscono i
-     placeholder iniziali).
+3. Nell'SQL Editor di Supabase, esegui **in ordine** tutti i file in `supabase/`:
+   `schema.sql` → `002_spese_v2.sql` → `003_archivio_redesign.sql` →
+   `004_import_excel.sql` → `005_gestione_movimenti.sql`. Ogni file ha un commento in testa
+   che spiega cosa cambia; sono pensati per essere eseguiti una volta sola, in sequenza.
 
 4. In Supabase, vai su **Authentication > Users** e crea manualmente il tuo utente
    (email + password). Non esiste un flusso di registrazione pubblico: l'unico account
@@ -50,28 +48,30 @@ Next.js (App Router) + Supabase + Vercel.
 
 ## Modulo Spese
 
-`/spese/upload` supporta tre sorgenti, selezionabili nella pagina:
+Quattro pagine sotto `/spese`, tutte dietro login:
 
-- **CSV generico** — colonne `importo`, `data` (obbligatorie), `descrizione`, `categoria`
-  (opzionali; alias accettati: `amount`, `date`). Categorie non esistenti vengono create
-  automaticamente. Dedup su data + importo + descrizione + categoria.
-- **Crypto.com** — export CSV standard. Righe `EUR Deposit` e `Refund:` vengono escluse
-  (non sono spese reali); solo gli importi negativi diventano spese, categoria di default
-  "Da categorizzare". Dedup su Timestamp + Transaction Description + Amount.
-- **Intesa Sanpaolo** — export Excel "Lista Operazione". Cerca automaticamente la riga di
-  intestazione (non assume una posizione fissa). Giroconti e bonifici verso te stesso vengono
-  esclusi; le categorie della banca sono mappate sulle 12 categorie app (vedi
-  `lib/parsers/intesa.ts`, fallback "Da categorizzare" se non mappata); importi positivi vanno
-  in `depositi`, negativi in `spese`. Dedup su Data + Operazione + Dettagli + Importo.
+- **`/spese` — Overview**: solo aggregati. Card entrate/uscite del periodo + saldo cumulativo
+  da inizio tracciamento (non filtrato dal periodo), grafico ad area con l'andamento
+  giornaliero delle spese, grafico a torta per categoria. Un'unica `FilterBar` (preset
+  7/30 giorni/mese corrente + range personalizzato, più filtro categoria) è condivisa da
+  entrambi i grafici.
+- **`/spese/gestione` — Gestione**: tabella con ricerca testuale (titolo/descrizione), filtro
+  categoria/tipo/data, paginazione (50 righe/pagina), modifica (modale) ed eliminazione
+  (con conferma) per ogni movimento. Legge dalla view `movimenti_con_categoria` (spese +
+  depositi unificati in sola lettura); le modifiche scrivono sempre sulla tabella originale
+  tramite `/api/movimenti/[tipo]/[id]`.
+- **`/spese/importa` — Import Excel**: carica un file `.xlsx` con struttura fissa
+  (`tipo, data, importo, categoria, titolo, descrizione, nominativo, dettaglio, fonte`,
+  generato da una chat Claude dedicata fuori da questa repo, non dal sito). Le righe che non
+  rispettano le liste ammesse vengono segnalate riga per riga senza bloccare le altre. Le righe
+  già presenti in `spese`/`depositi` (stessa combinazione data+importo+titolo+fonte) sono
+  marcate "già presente" e deselezionate di default in anteprima, ma restano forzabili a mano.
+  Solo le righe selezionate vengono scritte, e solo al click su "Conferma e importa".
+- **`/spese/nuovo` — Aggiungi movimento**: form diretto (spesa o entrata) per inserimenti
+  manuali, `fonte = 'manuale'`.
 
-**Inserimento manuale (es. PayPal, contanti)**: non avviene dal sito — è previsto tramite un
-Project Claude dedicato (fuori da questa repo) con un tool collegato direttamente a Supabase.
-Le colonne `spese.titolo`/`spese.fonte` e `depositi.titolo`/`depositi.fonte` sono già pronte per
-riceverlo; la configurazione del Project/tool va fatta manualmente su claude.ai.
-
-**Dashboard** (`/spese`): entrate/uscite/saldo netto nel periodo, confronto settimana corrente
-vs precedente, andamento settimanale, entrate vs uscite mensili, ripartizione uscite per fonte,
-ripartizione per categoria, tabella spese filtrabile.
+`fonte` non è mai enfatizzata in Overview (compare solo, in piccolo, nella tabella Gestione):
+serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `manuale`).
 
 ## Deploy su Vercel
 
@@ -81,6 +81,38 @@ ripartizione per categoria, tabella spese filtrabile.
    `SUPABASE_SERVICE_ROLE_KEY`) per l'ambiente Production (e Preview, se lo usi).
 3. Deploy. Il piano Hobby di Vercel + il piano free di Supabase coprono questa fase a costo
    pressoché zero.
+
+## Decision log
+
+- **Split Overview/Gestione (invece di un'unica dashboard)**: la vista combinata rendeva la
+  pagina principale pesante e mischiava due compiti diversi ("quanto ho speso" vs "correggi
+  questa riga"). Overview resta sola lettura e leggera (nessuna tabella, solo aggregati);
+  Gestione è l'unico posto con CRUD completo, così le due responsabilità non si mischiano più
+  nello stesso componente.
+- **Import Excel pre-categorizzato (non più CSV grezzo + categorizzazione automatica)**: le
+  versioni precedenti importavano CSV grezzi di Crypto.com/Intesa Sanpaolo e provavano a
+  categorizzare automaticamente lato server (euristica a parole chiave). In pratica la
+  maggior parte delle righe finiva comunque in "Altro" (per Crypto.com sempre, non avendo
+  categoria bancaria). La categorizzazione è stata spostata in una chat Claude dedicata fuori
+  dal sito, che restituisce un file Excel già pronto in un formato fisso: il sito si limita a
+  validare e importare, senza più logica di categorizzazione lato server.
+- **La torta "spese per categoria" può mostrare quasi solo "Altro" anche a codice corretto**:
+  non è un bug di join né di mapping (verificato: `categoria_id` non è mai null, le 12
+  categorie esistono con nomi esatti, l'import rifiuta esplicitamente le righe con categoria
+  non riconosciuta invece di forzarle su "Altro"). La causa è che i dati attualmente in tabella
+  precedono il flusso di import Excel attuale — sono il risultato del remap della migrazione
+  003 da un set di 12 categorie generiche a quello attuale più corto, dove gran parte delle
+  vecchie categorie bancarie non ha equivalente diretto. Finché non si importa un file Excel
+  vero tramite `/spese/importa` (o si ricategorizzano le righe storiche da Gestione), la torta
+  riflette correttamente questo stato, non lo nasconde.
+- **Dedup sull'import (chiave data+importo+titolo+fonte)**: introdotto perché la chat di
+  categorizzazione esterna può ricevere in input export che si sovrappongono a import
+  precedenti (es. un nuovo estratto conto che riparte da una data già coperta). Deselezionare i
+  duplicati di default invece di bloccarli evita sia i doppioni silenziosi sia falsi positivi
+  bloccanti — l'utente vede cosa viene marcato come duplicato e decide riga per riga.
+- **`categorie.colore` come riferimento a variabile CSS** (`var(--cat-alimentari)` ecc.) e non
+  come hex fisso: mantiene i colori coerenti tra tema chiaro/scuro senza duplicare la palette
+  nel database.
 
 ## Cosa manca volutamente in questa fase
 

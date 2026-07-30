@@ -1,8 +1,7 @@
-import { getDashboardData } from "@/lib/supabase/queries";
-import { SpeseDashboard } from "./spese-dashboard";
+import { getAllTimeBalance, getOverviewData } from "@/lib/spese/queries";
+import { Overview } from "./overview";
 import { Toast } from "@/components/toast";
 
-const PRESET_DAYS: Record<string, number> = { "7": 7, "30": 30, "90": 90 };
 const DEFAULT_PRESET = "30";
 
 function todayIso(): string {
@@ -11,6 +10,17 @@ function todayIso(): string {
 
 function daysAgoIso(days: number): string {
   return new Date(Date.now() - (days - 1) * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+function firstOfMonthIso(): string {
+  const d = new Date();
+  return new Date(Date.UTC(d.getFullYear(), d.getMonth(), 1)).toISOString().slice(0, 10);
+}
+
+function presetRange(preset: string): { from: string; to: string } {
+  if (preset === "7") return { from: daysAgoIso(7), to: todayIso() };
+  if (preset === "mese") return { from: firstOfMonthIso(), to: todayIso() };
+  return { from: daysAgoIso(30), to: todayIso() };
 }
 
 export default async function SpesePage({
@@ -23,13 +33,12 @@ export default async function SpesePage({
   const range =
     from && to
       ? { from, to, preset: null }
-      : {
-          from: daysAgoIso(PRESET_DAYS[preset ?? ""] ?? PRESET_DAYS[DEFAULT_PRESET]),
-          to: todayIso(),
-          preset: preset && PRESET_DAYS[preset] ? preset : DEFAULT_PRESET,
-        };
+      : { ...presetRange(preset ?? DEFAULT_PRESET), preset: preset ?? DEFAULT_PRESET };
 
-  const { spese, categorie, depositi } = await getDashboardData(range.from, range.to);
+  const [{ spese, categorie, depositi }, saldoAllTime] = await Promise.all([
+    getOverviewData(range.from, range.to),
+    getAllTimeBalance(),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -38,7 +47,13 @@ export default async function SpesePage({
         <h1 className="font-display text-2xl font-semibold tracking-tight">Spese ed entrate</h1>
         <p className="text-sm text-muted">Panoramica di entrate, uscite e categorie di spesa.</p>
       </div>
-      <SpeseDashboard spese={spese} categorie={categorie} depositi={depositi} range={range} />
+      <Overview
+        spese={spese}
+        categorie={categorie}
+        depositi={depositi}
+        range={range}
+        saldoAllTime={saldoAllTime.saldo}
+      />
     </div>
   );
 }

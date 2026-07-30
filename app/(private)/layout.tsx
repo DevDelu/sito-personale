@@ -24,6 +24,12 @@ export default async function PrivateLayout({
             Spese
           </Link>
           <Link
+            href="/spese/gestione"
+            className="text-sm text-muted transition-colors hover:text-foreground"
+          >
+            Gestione
+          </Link>
+          <Link
             href="/spese/importa"
             className="text-sm text-muted transition-colors hover:text-foreground"
           >
