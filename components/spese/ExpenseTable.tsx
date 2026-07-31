@@ -15,6 +15,26 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
   const { updateExpense, deleteExpense, pending, error } = useExpenseMutations();
   const [editing, setEditing] = useState<Movimento | null>(null);
   const [deleting, setDeleting] = useState<Movimento | null>(null);
+  const [categorieList, setCategorieList] = useState(categorie);
+  const [prevCategorie, setPrevCategorie] = useState(categorie);
+
+  // Il server rifornisce `categorie` ad ogni router.refresh(): risincronizza
+  // lo stato locale così che una nuova categoria creata da un'altra sessione
+  // (o dopo il refresh post-salvataggio) resti coerente. Pattern "adjusting
+  // state when a prop changes" (react.dev/learn/you-might-not-need-an-effect),
+  // niente useEffect per evitare render a cascata.
+  if (categorie !== prevCategorie) {
+    setPrevCategorie(categorie);
+    setCategorieList(categorie);
+  }
+
+  function handleCategoriaCreata(nuova: Categoria) {
+    setCategorieList((prev) =>
+      prev.some((c) => c.id === nuova.id)
+        ? prev
+        : [...prev, nuova].sort((a, b) => a.nome.localeCompare(b.nome))
+    );
+  }
 
   async function handleSave(patch: MovimentoPatch) {
     if (!editing) return;
@@ -105,11 +125,12 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
       {editing && (
         <ExpenseEditModal
           movimento={editing}
-          categorie={categorie}
+          categorie={categorieList}
           pending={pending}
           error={error}
           onSave={handleSave}
           onCancel={() => setEditing(null)}
+          onCategoriaCreata={handleCategoriaCreata}
         />
       )}
 

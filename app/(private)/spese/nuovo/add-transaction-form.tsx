@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useState } from "react";
 import { useRouter } from "next/navigation";
 import { aggiungiMovimento, type AggiungiMovimentoState } from "../actions";
+import { CategoriaSelector } from "@/components/spese/CategoriaSelector";
 import type { Categoria } from "@/lib/types";
 
 const oggi = () => new Date().toISOString().slice(0, 10);
@@ -15,13 +16,17 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
   );
   const [tipo, setTipo] = useState<"spesa" | "entrata">("spesa");
   const [categoriaId, setCategoriaId] = useState("");
+  const [categorieList, setCategorieList] = useState(categorie);
 
-  const categorieFiltrate = useMemo(
-    () => categorie.filter((c) => c.tipo === tipo),
-    [categorie, tipo]
-  );
+  function handleCategoriaCreata(nuova: Categoria) {
+    setCategorieList((prev) =>
+      prev.some((c) => c.id === nuova.id)
+        ? prev
+        : [...prev, nuova].sort((a, b) => a.nome.localeCompare(b.nome))
+    );
+  }
 
-  const categoriaSelezionata = categorie.find((c) => c.id === categoriaId);
+  const categoriaSelezionata = categorieList.find((c) => c.id === categoriaId);
   const mostraNominativo = categoriaSelezionata?.nome === "Bonifici";
   const mostraDettaglio = categoriaSelezionata?.nome === "PayPal";
 
@@ -80,22 +85,15 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
       </div>
 
       <Field label="Categoria">
-        <select
-          name="categoria_id"
-          required
+        <CategoriaSelector
+          categorie={categorieList}
+          tipo={tipo}
           value={categoriaId}
-          onChange={(e) => setCategoriaId(e.target.value)}
-          className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
-        >
-          <option value="" disabled>
-            Seleziona categoria
-          </option>
-          {categorieFiltrate.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.nome}
-            </option>
-          ))}
-        </select>
+          onChange={setCategoriaId}
+          onCategoriaCreata={handleCategoriaCreata}
+          name="categoria_id"
+          sfondo="surface"
+        />
       </Field>
 
       {mostraNominativo && (

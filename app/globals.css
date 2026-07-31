@@ -21,6 +21,14 @@
   --cat-altro: #626b81;
   --cat-stipendio: #059669;
   --cat-rimborso: #0d9488;
+
+  /* Palette per categorie create dinamicamente dall'utente (Modifica 1) */
+  --cat-extra-1: #0e7490;
+  --cat-extra-2: #65a30d;
+  --cat-extra-3: #ca8a04;
+  --cat-extra-4: #4f46e5;
+  --cat-extra-5: #e11d48;
+  --cat-extra-6: #92400e;
 }
 
 [data-theme="dark"] {
@@ -44,6 +52,13 @@
   --cat-altro: #8a93a8;
   --cat-stipendio: #34d399;
   --cat-rimborso: #2dd4bf;
+
+  --cat-extra-1: #22d3ee;
+  --cat-extra-2: #a3e635;
+  --cat-extra-3: #facc15;
+  --cat-extra-4: #818cf8;
+  --cat-extra-5: #fb7185;
+  --cat-extra-6: #d6a35c;
 }
 
 @theme inline {

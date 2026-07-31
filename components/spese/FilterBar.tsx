@@ -6,7 +6,6 @@ import type { Categoria } from "@/lib/types";
 
 const PRESETS = [
   { id: "7", label: "7 giorni" },
-  { id: "30", label: "30 giorni" },
   { id: "mese", label: "Mese corrente" },
 ] as const;
 

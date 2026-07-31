@@ -1,23 +1,10 @@
 import { formatCurrency } from "@/lib/spese-utils";
 
-export function SummaryCards({
-  entrate,
-  uscite,
-  saldoAllTime,
-}: {
-  entrate: number;
-  uscite: number;
-  saldoAllTime: number;
-}) {
+export function SummaryCards({ entrate, uscite }: { entrate: number; uscite: number }) {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <Card label="Entrate nel periodo" value={entrate} colorVar="--entrata" />
-      <Card label="Uscite nel periodo" value={uscite} colorVar="--spesa" />
-      <Card
-        label="Saldo (dall'inizio)"
-        value={saldoAllTime}
-        colorVar={saldoAllTime >= 0 ? "--entrata" : "--spesa"}
-      />
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <Card label="Entrate" value={entrate} colorVar="--entrata" />
+      <Card label="Uscite" value={uscite} colorVar="--spesa" />
     </div>
   );
 }

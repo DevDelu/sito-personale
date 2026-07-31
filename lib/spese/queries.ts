@@ -52,26 +52,6 @@ export async function getOverviewData(
   };
 }
 
-// Saldo cumulativo su tutto lo storico, indipendente dal periodo filtrato
-// sui grafici della Overview.
-export async function getAllTimeBalance(): Promise<{
-  entrate: number;
-  spese: number;
-  saldo: number;
-}> {
-  const admin = createAdminClient();
-  const [speseRes, depositiRes] = await Promise.all([
-    admin.from("spese").select("importo"),
-    admin.from("depositi").select("importo"),
-  ]);
-  if (speseRes.error) throw new Error(speseRes.error.message);
-  if (depositiRes.error) throw new Error(depositiRes.error.message);
-
-  const spese = (speseRes.data ?? []).reduce((sum, r) => sum + Number(r.importo), 0);
-  const entrate = (depositiRes.data ?? []).reduce((sum, r) => sum + Number(r.importo), 0);
-  return { entrate, spese, saldo: entrate - spese };
-}
-
 export type MovimentiFiltri = {
   search?: string;
   categoria?: string;
