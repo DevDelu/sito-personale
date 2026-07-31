@@ -12,7 +12,12 @@ import {
 } from "recharts";
 import type { TooltipContentProps } from "recharts";
 import { resolveCategoryColor } from "@/lib/category-style";
-import { adaptiveTickInterval, formatCurrency } from "@/lib/spese-utils";
+import {
+  adaptiveTickInterval,
+  categorieOrdinatePerTotale,
+  formatCurrency,
+  type CategoriaTotale,
+} from "@/lib/spese-utils";
 import type { Spesa } from "@/lib/types";
 
 const axisTick = { fill: "var(--muted)", fontSize: 12, fontFamily: "var(--font-mono)" };
@@ -22,14 +27,13 @@ const axisTick = { fill: "var(--muted)", fontSize: 12, fontFamily: "var(--font-m
 // legenda): evita un grafico illeggibile con troppe linee sovrapposte.
 const MAX_VISIBILI_DEFAULT = 6;
 
-type CategoriaMeta = { nome: string; colore: string | null; totale: number };
 type PuntoGiorno = Record<string, string | number>;
 
 function buildSerie(
   spese: Spesa[],
   from: string,
   to: string
-): { data: PuntoGiorno[]; categorie: CategoriaMeta[] } {
+): { data: PuntoGiorno[]; categorie: CategoriaTotale[] } {
   const start = new Date(`${from}T00:00:00Z`);
   const end = new Date(`${to}T00:00:00Z`);
   const giorni: { data: string; label: string }[] = [];
@@ -38,24 +42,15 @@ function buildSerie(
     giorni.push({ data: key, label: d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" }) });
   }
 
-  const metaPerCategoria = new Map<string, { colore: string | null; totale: number }>();
-  const totalePerGiorno = new Map<string, Map<string, number>>();
+  const categorie = categorieOrdinatePerTotale(spese);
 
+  const totalePerGiorno = new Map<string, Map<string, number>>();
   for (const s of spese) {
     const nome = s.categoria_nome ?? "Senza categoria";
-
-    const meta = metaPerCategoria.get(nome) ?? { colore: s.categoria_colore, totale: 0 };
-    meta.totale += s.importo;
-    metaPerCategoria.set(nome, meta);
-
     const perGiorno = totalePerGiorno.get(s.data) ?? new Map<string, number>();
     perGiorno.set(nome, (perGiorno.get(nome) ?? 0) + s.importo);
     totalePerGiorno.set(s.data, perGiorno);
   }
-
-  const categorie = [...metaPerCategoria.entries()]
-    .map(([nome, meta]) => ({ nome, colore: meta.colore, totale: meta.totale }))
-    .sort((a, b) => b.totale - a.totale);
 
   const data = giorni.map((giorno) => {
     const perGiorno = totalePerGiorno.get(giorno.data);
@@ -67,7 +62,7 @@ function buildSerie(
   return { data, categorie };
 }
 
-function defaultNascoste(categorie: CategoriaMeta[]): Set<string> {
+function defaultNascoste(categorie: CategoriaTotale[]): Set<string> {
   if (categorie.length <= MAX_VISIBILI_DEFAULT) return new Set();
   return new Set(categorie.slice(MAX_VISIBILI_DEFAULT).map((c) => c.nome));
 }

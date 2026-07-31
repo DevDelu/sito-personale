@@ -6,7 +6,7 @@ import { CategoriaSelector } from "./CategoriaSelector";
 import type { BulkMovimentoPatch } from "@/hooks/useBulkMovimentoMutations";
 import type { Categoria, Movimento, TipoCategoria } from "@/lib/types";
 
-type CampoBulk = "categoria" | "tipo" | "descrizione" | "data" | "importo";
+type CampoBulk = "categoria" | "tipo" | "titolo" | "descrizione" | "data" | "importo";
 
 export function BulkEditModal({
   righeSelezionate,
@@ -29,6 +29,7 @@ export function BulkEditModal({
   const [campiAttivi, setCampiAttivi] = useState<Record<CampoBulk, boolean>>({
     categoria: false,
     tipo: false,
+    titolo: false,
     descrizione: false,
     data: false,
     importo: false,
@@ -36,6 +37,7 @@ export function BulkEditModal({
 
   const [categoriaId, setCategoriaId] = useState("");
   const [tipo, setTipo] = useState<TipoCategoria>("spesa");
+  const [titolo, setTitolo] = useState("");
   const [descrizione, setDescrizione] = useState("");
   const [data, setData] = useState("");
   const [importo, setImporto] = useState("");
@@ -76,6 +78,10 @@ export function BulkEditModal({
       setErroreCampi("Seleziona una categoria.");
       return;
     }
+    if (campiAttivi.titolo && !titolo.trim()) {
+      setErroreCampi("Inserisci un titolo.");
+      return;
+    }
     if (campiAttivi.data && !data) {
       setErroreCampi("Seleziona una data.");
       return;
@@ -95,6 +101,7 @@ export function BulkEditModal({
     const patch: BulkMovimentoPatch = {};
     if (campiAttivi.categoria) patch.categoria_id = categoriaId;
     if (campiAttivi.tipo) patch.tipo = tipo;
+    if (campiAttivi.titolo) patch.titolo = titolo.trim();
     if (campiAttivi.descrizione) patch.descrizione = descrizione || null;
     if (campiAttivi.data) patch.data = data;
     if (campiAttivi.importo) patch.importo = Number(importo.replace(",", "."));
@@ -105,6 +112,7 @@ export function BulkEditModal({
   const righeSummary: { label: string; valore: string }[] = [];
   if (campiAttivi.categoria) righeSummary.push({ label: "Categoria", valore: categoriaNome });
   if (campiAttivi.tipo) righeSummary.push({ label: "Tipo", valore: tipo === "entrata" ? "Entrata" : "Spesa" });
+  if (campiAttivi.titolo) righeSummary.push({ label: "Titolo", valore: titolo.trim() });
   if (campiAttivi.descrizione) {
     righeSummary.push({ label: "Descrizione", valore: descrizione || "(vuota)" });
   }
@@ -164,6 +172,15 @@ export function BulkEditModal({
                   </button>
                 ))}
               </div>
+            </CampoRiga>
+
+            <CampoRiga attivo={campiAttivi.titolo} onToggle={() => toggleCampo("titolo")} label="Titolo">
+              <input
+                value={titolo}
+                onChange={(e) => setTitolo(e.target.value)}
+                placeholder="Nuovo titolo"
+                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
+              />
             </CampoRiga>
 
             <CampoRiga

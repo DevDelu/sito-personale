@@ -7,6 +7,7 @@ type BulkItem = { id: string; tipo: Tipo };
 type BulkPatch = {
   categoria_id?: string;
   tipo?: Tipo;
+  titolo?: string;
   descrizione?: string | null;
   data?: string;
   importo?: number;
@@ -68,6 +69,10 @@ function parsePatch(body: unknown): BulkPatch | null {
   if ("tipo" in p) {
     if (p.tipo !== "spesa" && p.tipo !== "entrata") return null;
     patch.tipo = p.tipo;
+  }
+  if ("titolo" in p) {
+    if (typeof p.titolo !== "string" || !p.titolo.trim()) return null;
+    patch.titolo = p.titolo;
   }
   if ("descrizione" in p) {
     patch.descrizione = typeof p.descrizione === "string" ? p.descrizione : null;

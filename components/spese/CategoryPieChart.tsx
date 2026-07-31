@@ -4,26 +4,11 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { resolveCategoryColor } from "@/lib/category-style";
-import { formatCurrency } from "@/lib/spese-utils";
+import { categorieOrdinatePerTotale, formatCurrency } from "@/lib/spese-utils";
 import { TransactionList, spesaToItem, type TransactionListItem } from "./TransactionList";
 import { TransactionDetailModal } from "./TransactionDetailModal";
 import type { Categoria, Spesa } from "@/lib/types";
 import type { Range } from "./FilterBar";
-
-type CategorySlice = { nome: string; totale: number; colore: string | null };
-
-function breakdown(spese: Spesa[]): CategorySlice[] {
-  const totals = new Map<string, { totale: number; colore: string | null }>();
-  for (const s of spese) {
-    const nome = s.categoria_nome ?? "Senza categoria";
-    const entry = totals.get(nome) ?? { totale: 0, colore: s.categoria_colore };
-    entry.totale += s.importo;
-    totals.set(nome, entry);
-  }
-  return [...totals.entries()]
-    .map(([nome, { totale, colore }]) => ({ nome, totale, colore }))
-    .sort((a, b) => b.totale - a.totale);
-}
 
 function transactionsByCategory(spese: Spesa[]): Map<string, TransactionListItem[]> {
   const map = new Map<string, TransactionListItem[]>();
@@ -85,7 +70,7 @@ export function CategoryPieChart({
   onCategoriaCreata?: (categoria: Categoria) => void;
 }) {
   const router = useRouter();
-  const data = breakdown(spese);
+  const data = categorieOrdinatePerTotale(spese);
   const totale = data.reduce((s, d) => s + d.totale, 0);
   const transactions = useMemo(() => transactionsByCategory(spese), [spese]);
 
@@ -104,6 +89,12 @@ export function CategoryPieChart({
 
   const itemsSelezionati = categoriaSelezionata ? transactions.get(categoriaSelezionata) ?? [] : [];
   const gruppi = range.preset === "7" ? null : groupByWeek(itemsSelezionati);
+
+  const sliceSelezionata = categoriaSelezionata
+    ? data.find((d) => d.nome === categoriaSelezionata)
+    : undefined;
+  const totaleCentro = sliceSelezionata ? sliceSelezionata.totale : totale;
+  const etichettaCentro = sliceSelezionata ? sliceSelezionata.nome : "totale";
 
   return (
     <div className="flex flex-col gap-3">
@@ -141,8 +132,8 @@ export function CategoryPieChart({
               </PieChart>
             </ResponsiveContainer>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-10">
-              <span className="font-figures text-lg font-bold">{formatCurrency(totale)}</span>
-              <span className="text-xs text-muted">totale</span>
+              <span className="font-figures text-lg font-bold">{formatCurrency(totaleCentro)}</span>
+              <span className="max-w-[70%] truncate text-xs text-muted">{etichettaCentro}</span>
             </div>
           </>
         )}

@@ -25,12 +25,34 @@ export function categoryBreakdown(spese: Spesa[]): CategoryShare[] {
     .sort((a, b) => b.totale - a.totale);
 }
 
-// Densità dei tick dell'asse X in base al numero di punti (giorni) nel
-// periodo: sotto i 45 giorni mostra inizio/fine + tick intermedi di default,
-// oltre dirada progressivamente per restare leggibile (7gg/mese/personalizzato
-// lungo). Condivisa da DailyTrendChart e CategorySpendingTrendChart.
-export function adaptiveTickInterval(pointCount: number): number | "preserveStartEnd" {
-  return pointCount > 45 ? Math.ceil(pointCount / 12) : "preserveStartEnd";
+export type CategoriaTotale = { nome: string; colore: string | null; totale: number };
+
+// Fonte unica per "categorie con totale nel periodo, ordinate per importo
+// desc": usata dal grafico a torta, dal grafico multi-linea per categoria e
+// dal drill-down su singola categoria, per non ricalcolare/duplicare la
+// stessa aggregazione in tre punti diversi.
+export function categorieOrdinatePerTotale(spese: Spesa[]): CategoriaTotale[] {
+  const meta = new Map<string, { colore: string | null; totale: number }>();
+  for (const s of spese) {
+    const nome = s.categoria_nome ?? "Senza categoria";
+    const entry = meta.get(nome) ?? { colore: s.categoria_colore, totale: 0 };
+    entry.totale += s.importo;
+    meta.set(nome, entry);
+  }
+  return [...meta.entries()]
+    .map(([nome, { colore, totale }]) => ({ nome, colore, totale }))
+    .sort((a, b) => b.totale - a.totale);
+}
+
+// Densità dei tick dell'asse X: punta sempre a un numero massimo di etichette
+// visibili (~maxTicks), indipendentemente da quanti giorni copre il periodo,
+// così l'asse resta leggibile sia su 7gg che su un mese o un personalizzato
+// lungo (il vecchio "preserveStartEnd" sotto i 45 giorni lasciava sovrapporre
+// le etichette su periodi come "mese corrente"). Condivisa da
+// DailyTrendChart e CategorySpendingTrendChart.
+export function adaptiveTickInterval(pointCount: number, maxTicks = 8): number {
+  if (pointCount <= maxTicks) return 0;
+  return Math.ceil(pointCount / maxTicks) - 1;
 }
 
 export type DailyPoint = { data: string; label: string; entrate: number; uscite: number };

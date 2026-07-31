@@ -8,10 +8,11 @@ import {
   CartesianGrid,
   Legend,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import type { MouseHandlerDataParam } from "recharts";
+import type { MouseHandlerDataParam, TooltipContentProps } from "recharts";
 import { X } from "lucide-react";
 import {
   TransactionList,
@@ -20,7 +21,7 @@ import {
   type TransactionListItem,
 } from "./TransactionList";
 import { TransactionDetailModal } from "./TransactionDetailModal";
-import { adaptiveTickInterval } from "@/lib/spese-utils";
+import { adaptiveTickInterval, formatCurrency } from "@/lib/spese-utils";
 import type { Categoria, Deposito, Spesa } from "@/lib/types";
 
 const axisTick = { fill: "var(--muted)", fontSize: 12, fontFamily: "var(--font-mono)" };
@@ -73,6 +74,33 @@ function dayLabel(iso: string): string {
     day: "2-digit",
     month: "long",
   });
+}
+
+// Anteprima leggera on-hover (solo desktop, il touch non ha hover): valori
+// aggregati del giorno. Coesiste con il click, che apre la mini-lista/il
+// popup di dettaglio già esistenti — i due meccanismi sono indipendenti.
+function DailyHoverTooltip({ active, payload, label }: Partial<TooltipContentProps<number, string>>) {
+  if (!active || !payload || payload.length === 0) return null;
+  const uscite = payload.find((p) => p.dataKey === "uscite")?.value as number | undefined;
+  const entrate = payload.find((p) => p.dataKey === "entrate")?.value as number | undefined;
+
+  return (
+    <div className="rounded-xl border border-border bg-surface px-3 py-2 text-xs shadow-lg">
+      <div className="mb-1 font-display text-sm font-semibold capitalize">{label}</div>
+      {typeof uscite === "number" && (
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-spesa">Spese</span>
+          <span className="font-figures">{formatCurrency(uscite)}</span>
+        </div>
+      )}
+      {typeof entrate === "number" && (
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-entrata">Entrate</span>
+          <span className="font-figures">{formatCurrency(entrate)}</span>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function DailyTrendChart({
@@ -163,6 +191,7 @@ export function DailyTrendChart({
               interval={tickInterval}
             />
             <YAxis tick={axisTick} axisLine={false} tickLine={false} width={56} />
+            <Tooltip trigger="hover" content={<DailyHoverTooltip />} />
             <Legend wrapperStyle={{ color: "var(--muted)", fontSize: 12 }} />
             <Area
               type="monotone"

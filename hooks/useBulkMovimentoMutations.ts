@@ -8,6 +8,7 @@ export type BulkMovimentoItem = { id: string; tipo: TipoCategoria };
 export type BulkMovimentoPatch = {
   categoria_id?: string;
   tipo?: TipoCategoria;
+  titolo?: string;
   descrizione?: string | null;
   data?: string;
   importo?: number;
