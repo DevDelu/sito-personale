@@ -143,6 +143,7 @@ export function CategorySpendingTrendChart({
               >
                 <span className="h-2 w-2 rounded-full" style={{ backgroundColor: colore }} />
                 {cat.nome}
+                <span className="font-figures text-muted">{formatCurrency(cat.totale)}</span>
               </button>
             );
           })}
