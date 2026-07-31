@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { categoryColor } from "@/lib/category-style";
+import { resolveCategoryColor } from "@/lib/category-style";
 import { formatCurrency } from "@/lib/spese-utils";
 import { TransactionList, spesaToItem, type TransactionListItem } from "./TransactionList";
 import { TransactionDetailModal } from "./TransactionDetailModal";
@@ -130,7 +130,7 @@ export function CategoryPieChart({
                   {data.map((entry) => (
                     <Cell
                       key={entry.nome}
-                      fill={entry.colore || categoryColor(entry.nome)}
+                      fill={resolveCategoryColor(entry.nome, entry.colore)}
                       opacity={
                         categoriaSelezionata && categoriaSelezionata !== entry.nome ? 0.35 : 1
                       }

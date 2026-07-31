@@ -34,3 +34,14 @@ export function categoryIcon(nome: string | null | undefined): LucideIcon {
   const style = (nome && CATEGORY_STYLE[nome]) || DEFAULT_STYLE;
   return style.icon;
 }
+
+// Fonte unica del colore per categoria: preferisce il colore salvato in DB
+// (categorie.colore, vedi supabase/005_gestione_movimenti.sql) e ricade sulla
+// mappa statica solo se assente. Usata da CategoryPieChart e
+// CategorySpendingTrendChart per restare sempre allineati tra loro.
+export function resolveCategoryColor(
+  nome: string | null | undefined,
+  colore: string | null | undefined
+): string {
+  return colore || categoryColor(nome);
+}

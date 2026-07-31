@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { SummaryCards } from "@/components/spese/SummaryCards";
 import { FilterBar, type Range } from "@/components/spese/FilterBar";
 import { DailyTrendChart } from "@/components/spese/DailyTrendChart";
+import { CategorySpendingTrendChart } from "@/components/spese/CategorySpendingTrendChart";
 import { CategoryPieChart } from "@/components/spese/CategoryPieChart";
 import type { Categoria, Deposito, Spesa } from "@/lib/types";
 
@@ -77,6 +77,11 @@ export function Overview({
       </section>
 
       <section className="flex flex-col gap-3">
+        <h2 className="font-display text-sm font-medium text-muted">Andamento per categoria</h2>
+        <CategorySpendingTrendChart spese={spese} from={range.from} to={range.to} />
+      </section>
+
+      <section className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Spese per categoria</h2>
         <CategoryPieChart
           spese={speseFiltrate}
@@ -85,13 +90,6 @@ export function Overview({
           onCategoriaCreata={handleCategoriaCreata}
         />
       </section>
-
-      <Link
-        href="/spese/gestione"
-        className="self-start text-sm font-medium text-accent transition-opacity hover:opacity-80"
-      >
-        Vedi tutte le spese →
-      </Link>
     </div>
   );
 }

@@ -20,6 +20,7 @@ import {
   type TransactionListItem,
 } from "./TransactionList";
 import { TransactionDetailModal } from "./TransactionDetailModal";
+import { adaptiveTickInterval } from "@/lib/spese-utils";
 import type { Categoria, Deposito, Spesa } from "@/lib/types";
 
 const axisTick = { fill: "var(--muted)", fontSize: 12, fontFamily: "var(--font-mono)" };
@@ -91,7 +92,7 @@ export function DailyTrendChart({
 }) {
   const router = useRouter();
   const daily = dailyFlow(spese, depositi, from, to);
-  const tickInterval = daily.length > 45 ? Math.ceil(daily.length / 12) : "preserveStartEnd";
+  const tickInterval = adaptiveTickInterval(daily.length);
   const transactions = useMemo(() => transactionsByDay(spese, depositi), [spese, depositi]);
   const plotRef = useRef<HTMLDivElement>(null);
 

@@ -25,6 +25,14 @@ export function categoryBreakdown(spese: Spesa[]): CategoryShare[] {
     .sort((a, b) => b.totale - a.totale);
 }
 
+// Densità dei tick dell'asse X in base al numero di punti (giorni) nel
+// periodo: sotto i 45 giorni mostra inizio/fine + tick intermedi di default,
+// oltre dirada progressivamente per restare leggibile (7gg/mese/personalizzato
+// lungo). Condivisa da DailyTrendChart e CategorySpendingTrendChart.
+export function adaptiveTickInterval(pointCount: number): number | "preserveStartEnd" {
+  return pointCount > 45 ? Math.ceil(pointCount / 12) : "preserveStartEnd";
+}
+
 export type DailyPoint = { data: string; label: string; entrate: number; uscite: number };
 
 export function dailyFlow(spese: Flow[], depositi: Flow[], from: string, to: string): DailyPoint[] {
