@@ -31,7 +31,7 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
   const mostraDettaglio = categoriaSelezionata?.nome === "PayPal";
 
   return (
-    <form action={formAction} className="flex w-full max-w-lg flex-col gap-4">
+    <form action={formAction} className="flex w-full max-w-lg animate-slide-up flex-col gap-4">
       <div className="flex gap-2">
         {(["spesa", "entrata"] as const).map((t) => (
           <button
@@ -41,10 +41,10 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
               setTipo(t);
               setCategoriaId("");
             }}
-            className={`flex-1 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+            className={`flex-1 rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-95 ${
               tipo === t
-                ? "border-accent bg-accent text-accent-foreground"
-                : "border-border text-muted hover:text-foreground"
+                ? "border-accent bg-accent text-accent-foreground shadow-sm"
+                : "border-border text-muted hover:-translate-y-0.5 hover:text-foreground"
             }`}
           >
             {t === "spesa" ? "Spesa" : "Entrata"}
@@ -70,7 +70,7 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
             step="0.01"
             min="0.01"
             required
-            className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+            className="field-input bg-surface"
           />
         </Field>
         <Field label="Data">
@@ -79,7 +79,7 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
             type="date"
             required
             defaultValue={oggi()}
-            className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+            className="field-input bg-surface"
           />
         </Field>
       </div>
@@ -97,23 +97,19 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
       </Field>
 
       {mostraNominativo && (
-        <Field label="Nominativo">
-          <input
-            name="nominativo"
-            type="text"
-            className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
-          />
-        </Field>
+        <div className="animate-slide-down">
+          <Field label="Nominativo">
+            <input name="nominativo" type="text" className="field-input bg-surface" />
+          </Field>
+        </div>
       )}
 
       {mostraDettaglio && (
-        <Field label="Beneficiario / dettaglio">
-          <input
-            name="dettaglio"
-            type="text"
-            className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
-          />
-        </Field>
+        <div className="animate-slide-down">
+          <Field label="Beneficiario / dettaglio">
+            <input name="dettaglio" type="text" className="field-input bg-surface" />
+          </Field>
+        </div>
       )}
 
       <Field label="Descrizione (opzionale)">
@@ -131,18 +127,10 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
       )}
 
       <div className="flex gap-3">
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-full bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
-        >
+        <button type="submit" disabled={pending} className="btn-primary">
           {pending ? "Salvataggio..." : "Aggiungi"}
         </button>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="rounded-full border border-border px-4 py-2.5 text-sm text-muted hover:text-foreground"
-        >
+        <button type="button" onClick={() => router.back()} className="btn-secondary">
           Annulla
         </button>
       </div>

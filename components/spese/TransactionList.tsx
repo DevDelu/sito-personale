@@ -102,7 +102,7 @@ export function TransactionList({
               <button
                 type="button"
                 onClick={() => onItemClick(item)}
-                className="flex w-full items-center gap-2 rounded-lg px-1 py-0.5 text-left transition-colors hover:bg-surface-hover"
+                className="flex w-full items-center gap-2 rounded-lg px-1 py-1 text-left transition-all duration-150 ease-out hover:translate-x-0.5 hover:bg-surface-hover active:scale-[0.98]"
               >
                 {rowContent}
               </button>

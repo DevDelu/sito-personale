@@ -52,25 +52,20 @@ export function TransactionDetailModal({
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-      <div className="w-full max-w-md rounded-xl border border-border bg-surface p-5">
+    <div className="modal-overlay">
+      <div className="modal-panel w-full max-w-md p-5">
         {modalita === "dettaglio" ? (
           <div className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-2">
               <h2 className="font-display text-base font-semibold">
                 {transazione.titolo ?? transazione.descrizione ?? "Movimento"}
               </h2>
-              <button
-                type="button"
-                onClick={onClose}
-                aria-label="Chiudi"
-                className="rounded-full p-1 text-muted hover:text-foreground"
-              >
+              <button type="button" onClick={onClose} aria-label="Chiudi" className="btn-icon">
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <dl className="flex flex-col gap-2 text-sm">
+            <dl className="flex animate-fade-in flex-col gap-2 text-sm">
               <Row label="Data" value={<span className="capitalize">{dataLabel}</span>} />
               <Row
                 label="Importo"
@@ -105,23 +100,19 @@ export function TransactionDetailModal({
               <button
                 type="button"
                 onClick={() => setConfermaEliminazione(true)}
-                className="flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm text-muted hover:text-spesa"
+                className="btn-secondary hover:!text-spesa"
               >
                 <Trash2 className="h-4 w-4" />
                 Elimina
               </button>
-              <button
-                type="button"
-                onClick={() => setModalita("modifica")}
-                className="flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
-              >
+              <button type="button" onClick={() => setModalita("modifica")} className="btn-primary">
                 <Pencil className="h-4 w-4" />
                 Modifica
               </button>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSave} className="flex flex-col gap-4">
+          <form onSubmit={handleSave} className="flex animate-fade-in flex-col gap-4">
             <h2 className="font-display text-base font-semibold">Modifica movimento</h2>
 
             <MovimentoFormFields
@@ -138,18 +129,10 @@ export function TransactionDetailModal({
             )}
 
             <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setModalita("dettaglio")}
-                className="rounded-full border border-border px-4 py-2 text-sm text-muted hover:text-foreground"
-              >
+              <button type="button" onClick={() => setModalita("dettaglio")} className="btn-secondary">
                 Annulla
               </button>
-              <button
-                type="submit"
-                disabled={pending}
-                className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
-              >
+              <button type="submit" disabled={pending} className="btn-primary">
                 {pending ? "Salvataggio..." : "Salva"}
               </button>
             </div>

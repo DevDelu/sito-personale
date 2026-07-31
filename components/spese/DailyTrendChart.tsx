@@ -163,7 +163,7 @@ export function DailyTrendChart({
   }
 
   return (
-    <div className="h-72 w-full rounded-xl border border-border bg-surface p-4">
+    <div className="card card-hover h-72 w-full p-4">
       <div ref={plotRef} className="relative h-full w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
@@ -197,7 +197,9 @@ export function DailyTrendChart({
               type="monotone"
               dataKey="uscite"
               name="Spese"
-              isAnimationActive={false}
+              isAnimationActive
+              animationDuration={700}
+              animationEasing="ease-out"
               stroke="var(--spesa)"
               strokeWidth={2}
               fill="url(#usciteFill)"
@@ -208,7 +210,9 @@ export function DailyTrendChart({
               type="monotone"
               dataKey="entrate"
               name="Entrate"
-              isAnimationActive={false}
+              isAnimationActive
+              animationDuration={700}
+              animationEasing="ease-out"
               stroke="var(--entrata)"
               strokeWidth={2}
               fill="url(#entrateFill)"
@@ -220,19 +224,14 @@ export function DailyTrendChart({
 
         {miniLista && (
           <div
-            className="absolute z-10 rounded-xl border border-border bg-surface p-3 shadow-lg"
+            className="animate-scale-in absolute z-10 rounded-xl border border-border bg-surface p-3 shadow-xl"
             style={{ left: miniLista.left, top: miniLista.top, width: POPOVER_WIDTH }}
           >
             <div className="mb-2 flex items-center justify-between gap-2">
               <span className="font-display text-sm font-semibold capitalize">
                 {dayLabel(miniLista.giorno)}
               </span>
-              <button
-                type="button"
-                onClick={() => setMiniLista(null)}
-                aria-label="Chiudi"
-                className="rounded-full p-1 text-muted hover:text-foreground"
-              >
+              <button type="button" onClick={() => setMiniLista(null)} aria-label="Chiudi" className="btn-icon !p-1">
                 <X className="h-3.5 w-3.5" />
               </button>
             </div>

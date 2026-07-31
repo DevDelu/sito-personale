@@ -12,7 +12,7 @@ export function CategoryBadge({
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium"
+      className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium transition-transform duration-150 ease-out hover:scale-105"
       style={{ color, borderColor: color, backgroundColor: `color-mix(in srgb, ${color} 14%, transparent)` }}
     >
       {createElement(categoryIcon(nome), { className: "h-3 w-3", strokeWidth: 2 })}

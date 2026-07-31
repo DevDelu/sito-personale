@@ -17,8 +17,8 @@ export function DeleteConfirmDialog({
   const isBulk = typeof count === "number" && count > 1;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-      <div className="w-full max-w-sm rounded-xl border border-border bg-surface p-5">
+    <div className="modal-overlay">
+      <div className="modal-panel w-full max-w-sm p-5">
         <h2 className="font-display text-base font-semibold">
           {isBulk ? `Eliminare ${count} movimenti?` : "Eliminare questo movimento?"}
         </h2>
@@ -30,19 +30,10 @@ export function DeleteConfirmDialog({
           )}
         </p>
         <div className="mt-4 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-full border border-border px-4 py-2 text-sm text-muted hover:text-foreground"
-          >
+          <button type="button" onClick={onCancel} className="btn-secondary">
             Annulla
           </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            disabled={pending}
-            className="rounded-full bg-spesa px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
+          <button type="button" onClick={onConfirm} disabled={pending} className="btn-danger">
             {pending ? "Eliminazione..." : "Elimina"}
           </button>
         </div>

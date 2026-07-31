@@ -136,12 +136,15 @@ export function CategorySpendingTrendChart({
                 type="button"
                 onClick={() => toggleCategoria(cat.nome)}
                 aria-pressed={!nascosta}
-                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-opacity ${
+                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm active:scale-95 ${
                   nascosta ? "opacity-40" : ""
                 }`}
                 style={{ borderColor: colore }}
               >
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: colore }} />
+                <span
+                  className="h-2 w-2 rounded-full transition-transform duration-200"
+                  style={{ backgroundColor: colore, transform: nascosta ? "scale(0.7)" : "scale(1)" }}
+                />
                 {cat.nome}
                 <span className="font-figures text-muted">{formatCurrency(cat.totale)}</span>
               </button>
@@ -150,7 +153,7 @@ export function CategorySpendingTrendChart({
         </div>
       )}
 
-      <div className="h-72 w-full rounded-xl border border-border bg-surface p-4">
+      <div className="card card-hover h-72 w-full p-4">
         {categorie.length === 0 ? (
           <p className="flex h-full items-center justify-center text-sm text-muted">
             Nessuna spesa nel periodo selezionato.
@@ -179,7 +182,9 @@ export function CategorySpendingTrendChart({
                     stroke={resolveCategoryColor(cat.nome, cat.colore)}
                     strokeWidth={2}
                     dot={false}
-                    isAnimationActive={false}
+                    isAnimationActive
+                    animationDuration={700}
+                    animationEasing="ease-out"
                     activeDot={{ r: 3 }}
                   />
                 ))}

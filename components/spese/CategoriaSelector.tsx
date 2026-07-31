@@ -73,7 +73,7 @@ export function CategoriaSelector({
         required
         value={value}
         onChange={(e) => handleSelectChange(e.target.value)}
-        className={`rounded-xl border border-border px-3 py-2 text-foreground outline-none focus:border-accent ${
+        className={`rounded-xl border border-border px-3 py-2 text-foreground outline-none transition-all duration-150 ease-out focus:border-accent focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_15%,transparent)] ${
           sfondo === "surface" ? "bg-surface" : "bg-background"
         }`}
       >
@@ -91,7 +91,7 @@ export function CategoriaSelector({
       </select>
 
       {mostraInput && (
-        <div className="flex flex-col gap-2 rounded-xl border border-dashed border-border p-3">
+        <div className="animate-slide-down flex flex-col gap-2 rounded-xl border border-dashed border-border p-3">
           <div className="flex items-center gap-2">
             <input
               autoFocus
@@ -104,14 +104,9 @@ export function CategoriaSelector({
                 }
               }}
               placeholder="Nome nuova categoria"
-              className="flex-1 rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
+              className="field-input flex-1"
             />
-            <button
-              type="button"
-              onClick={handleCrea}
-              disabled={creandoCategoria}
-              className="rounded-full bg-accent px-3 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
-            >
+            <button type="button" onClick={handleCrea} disabled={creandoCategoria} className="btn-primary">
               {creandoCategoria ? "Salvataggio..." : "Salva"}
             </button>
             <button
@@ -121,7 +116,7 @@ export function CategoriaSelector({
                 setNuovaCategoriaNome("");
                 setNuovaCategoriaError(null);
               }}
-              className="rounded-full border border-border px-3 py-2 text-sm text-muted hover:text-foreground"
+              className="btn-secondary"
             >
               Annulla
             </button>

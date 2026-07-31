@@ -38,10 +38,10 @@ export function FilterBar({
               setShowCustom(false);
               router.push(`/spese?preset=${p.id}`);
             }}
-            className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+            className={`rounded-full border px-3 py-1.5 text-sm transition-all duration-200 ease-out active:scale-95 ${
               range.preset === p.id
-                ? "border-accent bg-accent text-accent-foreground"
-                : "border-border text-muted hover:text-foreground"
+                ? "border-accent bg-accent text-accent-foreground shadow-sm"
+                : "border-border text-muted hover:-translate-y-0.5 hover:text-foreground"
             }`}
           >
             {p.label}
@@ -50,17 +50,17 @@ export function FilterBar({
         <button
           type="button"
           onClick={() => setShowCustom((v) => !v)}
-          className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+          className={`rounded-full border px-3 py-1.5 text-sm transition-all duration-200 ease-out active:scale-95 ${
             range.preset === null
-              ? "border-accent bg-accent text-accent-foreground"
-              : "border-border text-muted hover:text-foreground"
+              ? "border-accent bg-accent text-accent-foreground shadow-sm"
+              : "border-border text-muted hover:-translate-y-0.5 hover:text-foreground"
           }`}
         >
           Personalizzato
         </button>
         {showCustom && (
           <form
-            className="flex items-center gap-2"
+            className="animate-slide-down flex items-center gap-2"
             onSubmit={(e) => {
               e.preventDefault();
               router.push(`/spese?from=${from}&to=${to}`);
@@ -70,19 +70,16 @@ export function FilterBar({
               type="date"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
-              className="rounded-xl border border-border bg-surface px-2 py-1.5 text-sm text-foreground"
+              className="field-input bg-surface px-2 py-1.5 text-sm"
             />
             <span className="text-muted">–</span>
             <input
               type="date"
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              className="rounded-xl border border-border bg-surface px-2 py-1.5 text-sm text-foreground"
+              className="field-input bg-surface px-2 py-1.5 text-sm"
             />
-            <button
-              type="submit"
-              className="rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-accent-foreground"
-            >
+            <button type="submit" className="btn-primary !px-3 !py-1.5">
               Applica
             </button>
           </form>
@@ -92,7 +89,7 @@ export function FilterBar({
       <select
         value={categoriaSelezionata}
         onChange={(e) => onCategoriaChange(e.target.value)}
-        className="w-fit rounded-xl border border-border bg-surface px-3 py-1.5 text-sm text-foreground"
+        className="field-input w-fit bg-surface px-3 py-1.5 text-sm"
       >
         <option value="tutte">Tutte le categorie</option>
         {categorie.map((c) => (

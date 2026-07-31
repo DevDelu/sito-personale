@@ -32,12 +32,12 @@ export function GestioneFilters({ categorie }: { categorie: Categoria[] }) {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Cerca per titolo o descrizione..."
-        className="w-56 rounded-xl border border-border bg-surface px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent"
+        className="field-input w-56 bg-surface px-3 py-1.5 text-sm"
       />
       <select
         defaultValue={searchParams.get("tipo") ?? ""}
         onChange={(e) => setParam("tipo", e.target.value)}
-        className="rounded-xl border border-border bg-surface px-3 py-1.5 text-sm text-foreground"
+        className="field-input bg-surface px-3 py-1.5 text-sm"
       >
         <option value="">Tutti i tipi</option>
         <option value="spesa">Spese</option>
@@ -46,7 +46,7 @@ export function GestioneFilters({ categorie }: { categorie: Categoria[] }) {
       <select
         defaultValue={searchParams.get("categoria") ?? ""}
         onChange={(e) => setParam("categoria", e.target.value)}
-        className="rounded-xl border border-border bg-surface px-3 py-1.5 text-sm text-foreground"
+        className="field-input bg-surface px-3 py-1.5 text-sm"
       >
         <option value="">Tutte le categorie</option>
         {categorie.map((c) => (
@@ -59,14 +59,14 @@ export function GestioneFilters({ categorie }: { categorie: Categoria[] }) {
         type="date"
         defaultValue={searchParams.get("from") ?? ""}
         onChange={(e) => setParam("from", e.target.value)}
-        className="rounded-xl border border-border bg-surface px-2 py-1.5 text-sm text-foreground"
+        className="field-input bg-surface px-2 py-1.5 text-sm"
       />
       <span className="text-muted">–</span>
       <input
         type="date"
         defaultValue={searchParams.get("to") ?? ""}
         onChange={(e) => setParam("to", e.target.value)}
-        className="rounded-xl border border-border bg-surface px-2 py-1.5 text-sm text-foreground"
+        className="field-input bg-surface px-2 py-1.5 text-sm"
       />
     </div>
   );

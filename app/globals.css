@@ -76,6 +76,66 @@
   --font-sans: var(--font-inter);
   --font-display: var(--font-fraunces);
   --font-mono: var(--font-jetbrains-mono);
+
+  /* Animazioni condivise (genera automaticamente le utility animate-*) */
+  --animate-fade-in: fade-in 0.25s ease-out both;
+  --animate-scale-in: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-slide-up: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-slide-down: slide-down 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-pop-in: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 body {
@@ -91,4 +151,92 @@ body {
 .font-figures {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
+}
+
+/* Transizione morbida di default per hover/tema, senza sovrascrivere le
+   utility Tailwind più specifiche (transition-*) già presenti sui singoli
+   elementi, che vincono per specificità/ordine. */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, box-shadow, opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+  background-clip: padding-box;
+}
+
+@layer components {
+  /* Pulsante primario (azioni principali: salva, conferma, aggiungi...) */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm;
+  }
+
+  /* Pulsante secondario (annulla, chiudi, azioni non distruttive) */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm text-muted transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:text-foreground hover:shadow-sm active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  /* Pulsante distruttivo (elimina) */
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full bg-spesa px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  /* Icona/pillola piccola (modifica/elimina riga, chip, badge) */
+  .btn-icon {
+    @apply rounded-full p-1.5 text-muted transition-all duration-150 ease-out hover:scale-110 hover:bg-surface-hover hover:text-foreground active:scale-95;
+  }
+
+  /* Superficie a carta (grafici, pannelli, modali) con lieve elevazione */
+  .card {
+    @apply rounded-xl border border-border bg-surface transition-all duration-300 ease-out;
+  }
+
+  .card-hover {
+    @apply hover:-translate-y-0.5 hover:border-accent/25 hover:shadow-lg;
+  }
+
+  /* Overlay + pannello per i modali, con animazione d'ingresso */
+  .modal-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-[2px] animate-fade-in;
+  }
+
+  .modal-panel {
+    @apply animate-scale-in rounded-xl border border-border bg-surface shadow-2xl;
+  }
+
+  /* Input di testo/data/numero/select condivisi da tutti i form */
+  .field-input {
+    @apply rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none transition-all duration-150 ease-out focus:border-accent focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_15%,transparent)];
+  }
 }

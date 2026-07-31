@@ -98,7 +98,7 @@ export function CategoryPieChart({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="relative h-72 w-full rounded-xl border border-border bg-surface p-4">
+      <div className="card relative h-72 w-full p-4">
         {data.length === 0 ? (
           <p className="flex h-full items-center justify-center text-sm text-muted">
             Nessuna spesa nel periodo selezionato.
@@ -111,7 +111,9 @@ export function CategoryPieChart({
                   data={data}
                   dataKey="totale"
                   nameKey="nome"
-                  isAnimationActive={false}
+                  isAnimationActive
+                  animationDuration={600}
+                  animationEasing="ease-out"
                   innerRadius={60}
                   outerRadius={100}
                   paddingAngle={2}
@@ -131,7 +133,10 @@ export function CategoryPieChart({
                 <Legend wrapperStyle={{ color: "var(--muted)", fontSize: 12 }} />
               </PieChart>
             </ResponsiveContainer>
-            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-10">
+            <div
+              key={etichettaCentro}
+              className="animate-pop-in pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-10"
+            >
               <span className="font-figures text-lg font-bold">{formatCurrency(totaleCentro)}</span>
               <span className="max-w-[70%] truncate text-xs text-muted">{etichettaCentro}</span>
             </div>
@@ -140,13 +145,13 @@ export function CategoryPieChart({
       </div>
 
       {categoriaSelezionata && (
-        <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4">
+        <div className="card animate-slide-down flex flex-col gap-3 p-4">
           <div className="flex items-center justify-between">
             <h3 className="font-display text-sm font-semibold">{categoriaSelezionata}</h3>
             <button
               type="button"
               onClick={() => setCategoriaSelezionata(null)}
-              className="text-xs text-muted hover:text-foreground"
+              className="rounded-full px-2 py-1 text-xs text-muted transition-colors hover:bg-surface-hover hover:text-foreground"
             >
               Chiudi
             </button>

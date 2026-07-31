@@ -90,7 +90,7 @@ export function ImportForm() {
           accept=".xlsx"
           onChange={handleFileChange}
           disabled={stato === "parsing" || stato === "importing"}
-          className="w-fit rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-foreground"
+          className="w-fit rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground transition-all duration-150 file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-foreground file:transition-opacity hover:file:opacity-90"
         />
         <p className="text-xs text-muted">
           Colonne attese, in ordine: tipo, data, importo, categoria, titolo, descrizione,
@@ -98,16 +98,24 @@ export function ImportForm() {
         </p>
       </div>
 
-      {stato === "parsing" && <p className="text-sm text-muted">Lettura del file in corso...</p>}
+      {stato === "parsing" && (
+        <p className="flex animate-fade-in items-center gap-2 text-sm text-muted">
+          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted border-t-accent" />
+          Lettura del file in corso...
+        </p>
+      )}
 
       {error && (
-        <p className="rounded-xl border border-spesa/30 bg-spesa/10 px-3 py-2 text-sm text-spesa" role="alert">
+        <p
+          className="animate-slide-down rounded-xl border border-spesa/30 bg-spesa/10 px-3 py-2 text-sm text-spesa"
+          role="alert"
+        >
           {error}
         </p>
       )}
 
       {(stato === "preview" || stato === "importing") && (
-        <>
+        <div className="flex animate-fade-in flex-col gap-3">
           {errori.length > 0 && (
             <div className="rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm">
               <p className="mb-1 font-medium text-accent">
@@ -148,7 +156,10 @@ export function ImportForm() {
                 </thead>
                 <tbody>
                   {righe.map((r, i) => (
-                    <tr key={i} className="border-b border-border last:border-0">
+                    <tr
+                      key={i}
+                      className="border-b border-border transition-colors duration-150 last:border-0 hover:bg-surface-hover"
+                    >
                       <td className="px-3 py-2">
                         <input
                           type="checkbox"
@@ -160,6 +171,7 @@ export function ImportForm() {
                               return next;
                             })
                           }
+                          className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
                         />
                       </td>
                       <td className="px-3 py-2 text-muted capitalize">{r.tipo}</td>
@@ -198,7 +210,7 @@ export function ImportForm() {
                 type="button"
                 onClick={handleConferma}
                 disabled={stato === "importing" || numeroSelezionate === 0}
-                className="self-start rounded-full bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="btn-primary self-start"
               >
                 {stato === "importing"
                   ? "Importazione in corso..."
@@ -206,11 +218,11 @@ export function ImportForm() {
               </button>
             )}
           </div>
-        </>
+        </div>
       )}
 
       {stato === "done" && risultato && (
-        <div className="rounded-xl border border-entrata/30 bg-entrata/10 px-4 py-3 text-sm">
+        <div className="animate-pop-in rounded-xl border border-entrata/30 bg-entrata/10 px-4 py-3 text-sm">
           <p className="font-medium text-entrata">
             Importate {risultato.insertedSpese} spese e {risultato.insertedDepositi} entrate.
           </p>

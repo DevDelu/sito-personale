@@ -127,8 +127,8 @@ export function BulkEditModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-      <div className="w-full max-w-md rounded-xl border border-border bg-surface p-5">
+    <div className="modal-overlay">
+      <div className="modal-panel w-full max-w-md p-5">
         {fase === "campi" ? (
           <form onSubmit={handleContinua} className="flex flex-col gap-4">
             <div>
@@ -162,10 +162,10 @@ export function BulkEditModal({
                     key={t}
                     type="button"
                     onClick={() => setTipo(t)}
-                    className={`flex-1 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                    className={`flex-1 rounded-full border px-3 py-1.5 text-sm font-medium transition-all duration-200 ease-out active:scale-95 ${
                       tipo === t
-                        ? "border-accent bg-accent text-accent-foreground"
-                        : "border-border text-muted hover:text-foreground"
+                        ? "border-accent bg-accent text-accent-foreground shadow-sm"
+                        : "border-border text-muted hover:-translate-y-0.5 hover:text-foreground"
                     }`}
                   >
                     {t === "spesa" ? "Spesa" : "Entrata"}
@@ -179,7 +179,7 @@ export function BulkEditModal({
                 value={titolo}
                 onChange={(e) => setTitolo(e.target.value)}
                 placeholder="Nuovo titolo"
-                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
+                className="field-input w-full"
               />
             </CampoRiga>
 
@@ -192,7 +192,7 @@ export function BulkEditModal({
                 value={descrizione}
                 onChange={(e) => setDescrizione(e.target.value)}
                 placeholder="Nuova descrizione"
-                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
+                className="field-input w-full"
               />
             </CampoRiga>
 
@@ -201,7 +201,7 @@ export function BulkEditModal({
                 type="date"
                 value={data}
                 onChange={(e) => setData(e.target.value)}
-                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
+                className="field-input w-full"
               />
             </CampoRiga>
 
@@ -212,7 +212,7 @@ export function BulkEditModal({
                 min="0.01"
                 value={importo}
                 onChange={(e) => setImporto(e.target.value)}
-                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
+                className="field-input w-full"
               />
             </CampoRiga>
 
@@ -223,23 +223,16 @@ export function BulkEditModal({
             )}
 
             <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={onCancel}
-                className="rounded-full border border-border px-4 py-2 text-sm text-muted hover:text-foreground"
-              >
+              <button type="button" onClick={onCancel} className="btn-secondary">
                 Annulla
               </button>
-              <button
-                type="submit"
-                className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
-              >
+              <button type="submit" className="btn-primary">
                 Continua
               </button>
             </div>
           </form>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex animate-fade-in flex-col gap-4">
             <h2 className="font-display text-base font-semibold">Confermi la modifica in blocco?</h2>
             <p className="text-sm text-muted">
               Stai per modificare <strong className="text-foreground">{count}</strong>{" "}
@@ -265,18 +258,14 @@ export function BulkEditModal({
             )}
 
             <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setFase("campi")}
-                className="rounded-full border border-border px-4 py-2 text-sm text-muted hover:text-foreground"
-              >
+              <button type="button" onClick={() => setFase("campi")} className="btn-secondary">
                 Indietro
               </button>
               <button
                 type="button"
                 disabled={pending}
                 onClick={() => onApply(buildPatch())}
-                className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="btn-primary"
               >
                 {pending ? "Applicazione..." : "Conferma"}
               </button>
@@ -304,19 +293,23 @@ function CampoRiga({
   hint?: string;
 }) {
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-border p-3">
-      <label className="flex items-center gap-2 text-sm font-medium">
+    <div
+      className={`flex flex-col gap-2 rounded-xl border p-3 transition-colors duration-200 ${
+        attivo && !disabled ? "border-accent/40 bg-accent/5" : "border-border"
+      }`}
+    >
+      <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
         <input
           type="checkbox"
           checked={attivo && !disabled}
           disabled={disabled}
           onChange={onToggle}
-          className="h-4 w-4 rounded border-border accent-[var(--accent)]"
+          className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
         />
         {label}
       </label>
       {hint && <p className="text-xs text-muted">{hint}</p>}
-      {attivo && !disabled && children}
+      {attivo && !disabled && <div className="animate-slide-down">{children}</div>}
     </div>
   );
 }

@@ -30,11 +30,8 @@ export function ExpenseEditModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-md flex-col gap-4 rounded-xl border border-border bg-surface p-5"
-      >
+    <div className="modal-overlay">
+      <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">Modifica movimento</h2>
 
         <MovimentoFormFields
@@ -51,18 +48,10 @@ export function ExpenseEditModal({
         )}
 
         <div className="flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-full border border-border px-4 py-2 text-sm text-muted hover:text-foreground"
-          >
+          <button type="button" onClick={onCancel} className="btn-secondary">
             Annulla
           </button>
-          <button
-            type="submit"
-            disabled={pending}
-            className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
+          <button type="submit" disabled={pending} className="btn-primary">
             {pending ? "Salvataggio..." : "Salva"}
           </button>
         </div>

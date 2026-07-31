@@ -11,7 +11,10 @@ export function SummaryCards({ entrate, uscite }: { entrate: number; uscite: num
 
 function Card({ label, value, colorVar }: { label: string; value: number; colorVar: string }) {
   return (
-    <div className="flex flex-col gap-1 rounded-xl border border-border bg-surface px-4 py-3">
+    <div
+      className="card card-hover animate-slide-up flex flex-col gap-1 border-l-4 px-4 py-3"
+      style={{ borderLeftColor: `var(${colorVar})` }}
+    >
       <span className="text-xs text-muted">{label}</span>
       <span className="font-figures text-2xl font-semibold" style={{ color: `var(${colorVar})` }}>
         {formatCurrency(value)}

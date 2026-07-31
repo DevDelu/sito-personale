@@ -16,22 +16,17 @@ export function Pagination({ page, totalPages }: { page: number; totalPages: num
 
   return (
     <div className="flex items-center justify-between text-sm text-muted">
-      <button
-        type="button"
-        onClick={() => goTo(page - 1)}
-        disabled={page <= 1}
-        className="rounded-full border border-border px-3 py-1.5 hover:text-foreground disabled:opacity-40"
-      >
+      <button type="button" onClick={() => goTo(page - 1)} disabled={page <= 1} className="btn-secondary">
         ← Precedente
       </button>
-      <span>
+      <span className="font-figures">
         Pagina {page} di {totalPages}
       </span>
       <button
         type="button"
         onClick={() => goTo(page + 1)}
         disabled={page >= totalPages}
-        className="rounded-full border border-border px-3 py-1.5 hover:text-foreground disabled:opacity-40"
+        className="btn-secondary"
       >
         Successiva →
       </button>

@@ -23,7 +23,7 @@ export function MovimentoFormFields({
           value={form.titolo}
           onChange={(e) => form.setTitolo(e.target.value)}
           required
-          className="rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
+          className="field-input"
         />
       </Field>
 
@@ -36,7 +36,7 @@ export function MovimentoFormFields({
             value={form.importo}
             onChange={(e) => form.setImporto(e.target.value)}
             required
-            className="rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
+            className="field-input"
           />
         </Field>
         <Field label="Data">
@@ -45,7 +45,7 @@ export function MovimentoFormFields({
             value={form.data}
             onChange={(e) => form.setData(e.target.value)}
             required
-            className="rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
+            className="field-input"
           />
         </Field>
       </div>
@@ -61,23 +61,27 @@ export function MovimentoFormFields({
       </Field>
 
       {form.mostraNominativo && (
-        <Field label="Nominativo">
-          <input
-            value={form.nominativo}
-            onChange={(e) => form.setNominativo(e.target.value)}
-            className="rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
-          />
-        </Field>
+        <div className="animate-slide-down">
+          <Field label="Nominativo">
+            <input
+              value={form.nominativo}
+              onChange={(e) => form.setNominativo(e.target.value)}
+              className="field-input"
+            />
+          </Field>
+        </div>
       )}
 
       {form.mostraDettaglio && (
-        <Field label="Beneficiario / dettaglio">
-          <input
-            value={form.dettaglio}
-            onChange={(e) => form.setDettaglio(e.target.value)}
-            className="rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
-          />
-        </Field>
+        <div className="animate-slide-down">
+          <Field label="Beneficiario / dettaglio">
+            <input
+              value={form.dettaglio}
+              onChange={(e) => form.setDettaglio(e.target.value)}
+              className="field-input"
+            />
+          </Field>
+        </div>
       )}
 
       <Field label="Descrizione (opzionale)">
@@ -85,7 +89,7 @@ export function MovimentoFormFields({
           value={form.descrizione}
           onChange={(e) => form.setDescrizione(e.target.value)}
           rows={2}
-          className="rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
+          className="field-input"
         />
       </Field>
     </>

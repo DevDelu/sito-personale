@@ -111,29 +111,25 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
   return (
     <>
       {righeSelezionate.length > 0 && (
-        <div className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5">
+        <div className="animate-slide-down mb-3 flex flex-wrap items-center gap-3 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 shadow-sm">
           <span className="text-sm font-medium">
             {righeSelezionate.length} {righeSelezionate.length === 1 ? "selezionato" : "selezionati"}
           </span>
           <div className="ml-auto flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setModificaBulk(true)}
-              className="rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
-            >
+            <button type="button" onClick={() => setModificaBulk(true)} className="btn-primary !px-3 !py-1.5">
               Modifica in blocco
             </button>
             <button
               type="button"
               onClick={() => setEliminaBulk(true)}
-              className="rounded-full border border-border px-3 py-1.5 text-sm text-muted hover:bg-surface-hover hover:text-spesa"
+              className="btn-secondary !px-3 !py-1.5 hover:!text-spesa"
             >
               Elimina selezionate
             </button>
             <button
               type="button"
               onClick={() => setSelezionati(new Set())}
-              className="rounded-full border border-border px-3 py-1.5 text-sm text-muted hover:text-foreground"
+              className="btn-secondary !px-3 !py-1.5"
             >
               Deseleziona
             </button>
@@ -141,7 +137,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-border">
+      <div className="overflow-x-auto rounded-xl border border-border shadow-sm">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-border text-muted">
             <tr>
@@ -151,7 +147,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
                   aria-label="Seleziona tutto"
                   checked={rows.length > 0 && selezionati.size === rows.length}
                   onChange={toggleTutte}
-                  className="h-4 w-4 rounded border-border accent-[var(--accent)]"
+                  className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
                 />
               </th>
               <th className="px-3 py-2 font-medium">Data</th>
@@ -172,15 +168,21 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
                     ? r.dettaglio
                     : null;
               const key = rowKey(r);
+              const selezionata = selezionati.has(key);
               return (
-                <tr key={key} className="border-b border-border last:border-0">
+                <tr
+                  key={key}
+                  className={`border-b border-border transition-colors duration-150 last:border-0 hover:bg-surface-hover ${
+                    selezionata ? "bg-accent/5" : ""
+                  }`}
+                >
                   <td className="px-3 py-2">
                     <input
                       type="checkbox"
                       aria-label="Seleziona riga"
-                      checked={selezionati.has(key)}
+                      checked={selezionata}
                       onChange={() => toggleRiga(r)}
-                      className="h-4 w-4 rounded border-border accent-[var(--accent)]"
+                      className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
                     />
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap text-muted">
@@ -202,7 +204,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
                         type="button"
                         onClick={() => setEditing(r)}
                         aria-label="Modifica"
-                        className="rounded-full p-1.5 text-muted hover:bg-surface-hover hover:text-foreground"
+                        className="btn-icon"
                       >
                         <Pencil className="h-4 w-4" />
                       </button>
@@ -210,7 +212,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
                         type="button"
                         onClick={() => setDeleting(r)}
                         aria-label="Elimina"
-                        className="rounded-full p-1.5 text-muted hover:bg-surface-hover hover:text-spesa"
+                        className="btn-icon hover:!text-spesa"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

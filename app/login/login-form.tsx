@@ -10,21 +10,14 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
   );
 
   return (
-    <form action={action} className="flex w-full max-w-sm flex-col gap-4">
+    <form action={action} className="flex w-full max-w-sm animate-slide-up flex-col gap-4">
       <input type="hidden" name="redirect" value={redirectTo} />
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="email" className="text-sm font-medium text-muted">
           Email
         </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
-        />
+        <input id="email" name="email" type="email" required autoComplete="email" className="field-input bg-surface" />
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -37,21 +30,17 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
           type="password"
           required
           autoComplete="current-password"
-          className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+          className="field-input bg-surface"
         />
       </div>
 
       {state?.error && (
-        <p className="text-sm text-spesa" role="alert">
+        <p className="animate-slide-down text-sm text-spesa" role="alert">
           {state.error}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="mt-2 rounded-full bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
-      >
+      <button type="submit" disabled={pending} className="btn-primary mt-2">
         {pending ? "Accesso in corso..." : "Accedi"}
       </button>
     </form>
