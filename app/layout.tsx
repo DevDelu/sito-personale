@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { InlineScript } from "@/components/inline-script";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const fraunces = Fraunces({
@@ -34,7 +35,7 @@ export default function RootLayout({
       lang="it"
       data-theme="light"
       suppressHydrationWarning
-      className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${fraunces.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <head>
         <InlineScript
