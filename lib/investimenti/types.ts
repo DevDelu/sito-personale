@@ -9,6 +9,8 @@ export type Asset = {
   nome: string;
   tipo: TipoAsset;
   valuta: string;
+  price_symbol: string | null;
+  coingecko_id: string | null;
 };
 
 export type Transazione = {

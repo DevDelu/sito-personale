@@ -15,6 +15,8 @@ function mapAsset(row: Record<string, unknown>): Asset {
     nome: row.nome as string,
     tipo: row.tipo as Asset["tipo"],
     valuta: row.valuta as string,
+    price_symbol: (row.price_symbol as string | null) ?? null,
+    coingecko_id: (row.coingecko_id as string | null) ?? null,
   };
 }
 
