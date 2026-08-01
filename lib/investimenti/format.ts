@@ -15,3 +15,10 @@ export const TIPO_ASSET_LABEL: Record<string, string> = {
   indice: "Indici",
   crypto: "Crypto",
 };
+
+export const TIPO_ASSET_COLOR_VAR: Record<string, string> = {
+  stock: "--invest-stock",
+  etf: "--invest-etf",
+  indice: "--invest-indice",
+  crypto: "--invest-crypto",
+};

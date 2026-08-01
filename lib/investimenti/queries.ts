@@ -17,6 +17,10 @@ function mapAsset(row: Record<string, unknown>): Asset {
     valuta: row.valuta as string,
     price_symbol: (row.price_symbol as string | null) ?? null,
     coingecko_id: (row.coingecko_id as string | null) ?? null,
+    quantita_riferimento_manuale:
+      row.quantita_riferimento_manuale === null || row.quantita_riferimento_manuale === undefined
+        ? null
+        : toNumber(row.quantita_riferimento_manuale),
   };
 }
 
@@ -123,11 +127,19 @@ export async function getPosizioniCorrenti(): Promise<Posizione[]> {
       }
     }
 
-    const valoreAttuale = prezzoAttuale !== null ? fifo.quantitaNetta * prezzoAttuale : null;
+    // Se lo storico transazioni è incompleto (asset.quantita_riferimento_manuale
+    // valorizzato e diverso dalla quantità netta calcolata), il valore di
+    // mercato usa il riferimento manuale — costo/plusvalenza restano invece
+    // sempre calcolati solo sulle transazioni note, e mai su questo dato.
+    const riferimento = asset.quantita_riferimento_manuale;
+    const datiIncompleti = riferimento !== null && Math.abs(riferimento - fifo.quantitaNetta) > 1e-9;
+    const quantitaValore = riferimento !== null ? riferimento : fifo.quantitaNetta;
+
+    const valoreAttuale = prezzoAttuale !== null ? quantitaValore * prezzoAttuale : null;
 
     let plusvalenzaAssoluta: number | null = null;
     let plusvalenzaPercentuale: number | null = null;
-    if (valoreAttuale !== null && fifo.quantitaCostoNoto > 1e-9 && prezzoAttuale !== null) {
+    if (fifo.quantitaCostoNoto > 1e-9 && prezzoAttuale !== null) {
       const valoreQuotaNota = fifo.quantitaCostoNoto * prezzoAttuale;
       plusvalenzaAssoluta = valoreQuotaNota - fifo.costoTotaleCarico;
       plusvalenzaPercentuale =
@@ -148,10 +160,43 @@ export async function getPosizioniCorrenti(): Promise<Posizione[]> {
       plusvalenzaPercentuale,
       hasStimato: fifo.hasStimato,
       hasSconosciuto: fifo.hasSconosciuto,
+      quantitaValore,
+      datiIncompleti,
     });
   }
 
   return posizioni.sort((a, b) => (b.valoreAttuale ?? 0) - (a.valoreAttuale ?? 0));
+}
+
+export type Riconciliazione = { asset: Asset; quantitaCalcolata: number; differenza: number };
+
+// Asset con una quantita_riferimento_manuale che diverge dalla somma delle
+// transazioni caricate: segnala uno storico incompleto in Gestione invece
+// di lasciarlo emergere solo silenziosamente nel valore di Overview.
+export async function getRiconciliazioneAsset(): Promise<Riconciliazione[]> {
+  const admin = createAdminClient();
+  const [assetsRes, transazioniRes] = await Promise.all([
+    admin.from("assets").select("*").not("quantita_riferimento_manuale", "is", null),
+    admin.from("transazioni").select("asset_id, tipo, quantita"),
+  ]);
+  if (assetsRes.error) throw new Error(assetsRes.error.message);
+  if (transazioniRes.error) throw new Error(transazioniRes.error.message);
+
+  const nettoPerAsset = new Map<string, number>();
+  for (const t of transazioniRes.data ?? []) {
+    const segno = t.tipo === "buy" ? 1 : -1;
+    nettoPerAsset.set(t.asset_id, (nettoPerAsset.get(t.asset_id) ?? 0) + segno * toNumber(t.quantita));
+  }
+
+  const risultato: Riconciliazione[] = [];
+  for (const row of assetsRes.data ?? []) {
+    const asset = mapAsset(row);
+    const quantitaCalcolata = nettoPerAsset.get(asset.id) ?? 0;
+    const riferimento = asset.quantita_riferimento_manuale as number;
+    const differenza = riferimento - quantitaCalcolata;
+    if (Math.abs(differenza) > 1e-9) risultato.push({ asset, quantitaCalcolata, differenza });
+  }
+  return risultato;
 }
 
 export async function getPortfolioSnapshots(): Promise<{ data: string; valore_totale: number }[]> {

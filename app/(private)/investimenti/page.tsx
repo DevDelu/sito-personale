@@ -1,11 +1,15 @@
-import { getPortfolioSnapshots, getPosizioniCorrenti } from "@/lib/investimenti/queries";
+import { getPortfolioSnapshots, getPosizioniCorrenti, getTransazioni } from "@/lib/investimenti/queries";
 import { SummaryCards } from "@/components/investimenti/SummaryCards";
 import { AllocationChart } from "@/components/investimenti/AllocationChart";
 import { PortfolioHistoryChart } from "@/components/investimenti/PortfolioHistoryChart";
 import { PositionsTable } from "@/components/investimenti/PositionsTable";
 
 export default async function InvestimentiPage() {
-  const [posizioni, snapshots] = await Promise.all([getPosizioniCorrenti(), getPortfolioSnapshots()]);
+  const [posizioni, snapshots, transazioni] = await Promise.all([
+    getPosizioniCorrenti(),
+    getPortfolioSnapshots(),
+    getTransazioni(),
+  ]);
 
   const totaleInvestito = posizioni.reduce((s, p) => s + p.costoTotaleCarico, 0);
   const valoreAttuale = posizioni.reduce((s, p) => s + (p.valoreAttuale ?? 0), 0);
@@ -45,7 +49,7 @@ export default async function InvestimentiPage() {
 
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Posizioni</h2>
-        <PositionsTable posizioni={posizioni} />
+        <PositionsTable posizioni={posizioni} transazioni={transazioni} />
       </section>
     </div>
   );

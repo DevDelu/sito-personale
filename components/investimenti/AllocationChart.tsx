@@ -1,15 +1,8 @@
 "use client";
 
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { formatCurrency, TIPO_ASSET_LABEL } from "@/lib/investimenti/format";
+import { formatCurrency, TIPO_ASSET_COLOR_VAR, TIPO_ASSET_LABEL } from "@/lib/investimenti/format";
 import type { Posizione } from "@/lib/investimenti/types";
-
-const TIPO_COLOR: Record<string, string> = {
-  stock: "var(--cat-alimentari)",
-  etf: "var(--accent)",
-  indice: "var(--cat-bonifici)",
-  crypto: "var(--cat-benzina)",
-};
 
 function allocationByTipo(posizioni: Posizione[]) {
   const totals = new Map<string, number>();
@@ -50,7 +43,10 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
             paddingAngle={2}
           >
             {data.map((entry) => (
-              <Cell key={entry.tipo} fill={TIPO_COLOR[entry.tipo] ?? "var(--muted)"} />
+              <Cell
+                key={entry.tipo}
+                fill={`var(${TIPO_ASSET_COLOR_VAR[entry.tipo] ?? "--muted"})`}
+              />
             ))}
           </Pie>
           <Legend wrapperStyle={{ color: "var(--muted)", fontSize: 12 }} />

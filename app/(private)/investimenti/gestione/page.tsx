@@ -1,8 +1,13 @@
-import { getAssets, getTransazioni } from "@/lib/investimenti/queries";
+import { getAssets, getRiconciliazioneAsset, getTransazioni } from "@/lib/investimenti/queries";
 import { TransazioneTable } from "@/components/investimenti/TransazioneTable";
+import { RiconciliazioneBanner } from "@/components/investimenti/RiconciliazioneBanner";
 
 export default async function InvestimentiGestionePage() {
-  const [transazioni, assets] = await Promise.all([getTransazioni(), getAssets()]);
+  const [transazioni, assets, riconciliazione] = await Promise.all([
+    getTransazioni(),
+    getAssets(),
+    getRiconciliazioneAsset(),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -13,6 +18,8 @@ export default async function InvestimentiGestionePage() {
           appena hai quelli reali.
         </p>
       </div>
+
+      <RiconciliazioneBanner righe={riconciliazione} />
 
       <TransazioneTable rows={transazioni} assets={assets} />
     </div>

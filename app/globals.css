@@ -29,6 +29,12 @@
   --cat-extra-4: #4f46e5;
   --cat-extra-5: #e11d48;
   --cat-extra-6: #92400e;
+
+  /* Investimenti: un colore per tipo asset, distinto dalle categorie Spese */
+  --invest-etf: #c25a1e;
+  --invest-crypto: #b8860b;
+  --invest-stock: #3b6e91;
+  --invest-indice: #7c5c9e;
 }
 
 [data-theme="dark"] {
@@ -59,6 +65,11 @@
   --cat-extra-4: #818cf8;
   --cat-extra-5: #fb7185;
   --cat-extra-6: #d6a35c;
+
+  --invest-etf: #e8792e;
+  --invest-crypto: #e5c158;
+  --invest-stock: #5b9bc4;
+  --invest-indice: #a98fc9;
 }
 
 @theme inline {

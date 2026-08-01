@@ -15,7 +15,7 @@ export function SummaryCards({
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <Card label="Totale investito" value={formatCurrency(totaleInvestito)} colorVar="--accent" />
+      <Card label="Totale investito" value={formatCurrency(totaleInvestito)} colorVar="--invest-stock" />
       <Card label="Valore attuale" value={formatCurrency(valoreAttuale)} colorVar="--accent" />
       <Card
         label="Plus/minusvalenza"

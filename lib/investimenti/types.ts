@@ -11,6 +11,7 @@ export type Asset = {
   valuta: string;
   price_symbol: string | null;
   coingecko_id: string | null;
+  quantita_riferimento_manuale: number | null;
 };
 
 export type Transazione = {
@@ -45,4 +46,11 @@ export type Posizione = {
   plusvalenzaPercentuale: number | null;
   hasStimato: boolean;
   hasSconosciuto: boolean;
+  // Quantità usata per il valore attuale: la quantitaNetta calcolata da FIFO
+  // sulle transazioni, a meno che l'asset non abbia una
+  // quantita_riferimento_manuale (storico transazioni incompleto) — in quel
+  // caso si usa quella per il valore di mercato, mentre costo/plusvalenza
+  // restano sempre calcolati solo sulle transazioni note.
+  quantitaValore: number;
+  datiIncompleti: boolean;
 };
