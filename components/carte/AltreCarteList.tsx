@@ -31,7 +31,7 @@ export function AltreCarteList({ carte }: { carte: CollectionCard[] }) {
 
         return (
           <div
-            key={c.id_product}
+            key={c.id}
             onMouseMove={(e) => handleMove(e, c)}
             onMouseLeave={() => setHover(null)}
             className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-sm transition-colors duration-150 last:border-0 hover:bg-surface-hover"
@@ -41,9 +41,16 @@ export function AltreCarteList({ carte }: { carte: CollectionCard[] }) {
               <span className="text-xs font-medium whitespace-nowrap" style={{ color: `var(${colorVar})` }}>
                 {formatVariazione(variazione)}
               </span>
-              <span className="font-figures w-20 text-right">
-                {c.current_price !== null ? formatCurrency(c.current_price) : "n/d"}
-              </span>
+              {c.current_price !== null ? (
+                <span className="font-figures w-20 text-right">{formatCurrency(c.current_price)}</span>
+              ) : (
+                <span
+                  className="w-20 shrink-0 truncate rounded-full border border-border px-2 py-0.5 text-right text-[10px] font-medium tracking-wide text-muted uppercase"
+                  title="Prezzo non disponibile"
+                >
+                  Prezzo n/d
+                </span>
+              )}
             </div>
           </div>
         );

@@ -8,8 +8,13 @@ function toNumberOrNull(v: unknown): number | null {
 
 function mapRow(row: Record<string, unknown>): CollectionCard {
   return {
-    id_product: Number(row.id_product),
+    id: Number(row.id),
+    card_id: Number(row.card_id),
     quantity: Number(row.quantity),
+    condition: (row.condition as CollectionCard["condition"]) ?? null,
+    is_foil: Boolean(row.is_foil),
+    purchase_price: toNumberOrNull(row.purchase_price),
+    id_product: row.id_product === null || row.id_product === undefined ? null : Number(row.id_product),
     name: row.name as string,
     product_type: row.product_type as CollectionCard["product_type"],
     image_url: (row.image_url as string | null) ?? null,

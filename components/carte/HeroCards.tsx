@@ -20,7 +20,7 @@ export function HeroCards({ carte }: { carte: CollectionCard[] }) {
         const colorVar = variazioneColorVar(variazione);
 
         return (
-          <div key={c.id_product} className="card card-hover animate-slide-up flex flex-col gap-3 p-4">
+          <div key={c.id} className="card card-hover animate-slide-up flex flex-col gap-3 p-4">
             <span className="w-fit rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-accent uppercase">
               {RANK_LABEL[i]}
             </span>
@@ -34,9 +34,13 @@ export function HeroCards({ carte }: { carte: CollectionCard[] }) {
             <div className="flex flex-col gap-0.5">
               <span className="font-display text-sm leading-tight font-semibold">{c.name}</span>
               <span className="text-xs text-muted">Prezzo attuale (trend)</span>
-              <span className="font-figures text-xl font-bold">
-                {c.current_price !== null ? formatCurrency(c.current_price) : "n/d"}
-              </span>
+              {c.current_price !== null ? (
+                <span className="font-figures text-xl font-bold">{formatCurrency(c.current_price)}</span>
+              ) : (
+                <span className="w-fit rounded-full border border-border px-2 py-0.5 text-[10px] font-medium tracking-wide text-muted uppercase">
+                  Prezzo non disponibile
+                </span>
+              )}
               <span className="text-xs font-medium" style={{ color: `var(${colorVar})` }}>
                 {formatVariazione(variazione)}
               </span>

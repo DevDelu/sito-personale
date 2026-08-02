@@ -41,6 +41,10 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     label: "Carte",
     icon: Layers,
     href: "/carte",
+    subsections: [
+      { href: "/carte", label: "Overview" },
+      { href: "/carte/nuova", label: "+ Aggiungi" },
+    ],
   },
   {
     id: "agenda",
