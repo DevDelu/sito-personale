@@ -38,11 +38,18 @@ export function AltreCarteList({ carte }: { carte: CollectionCard[] }) {
           >
             <span className="truncate">{c.name}</span>
             <div className="flex shrink-0 items-center gap-4">
-              <span className="text-xs font-medium whitespace-nowrap" style={{ color: `var(${colorVar})` }}>
-                {formatVariazione(variazione)}
-              </span>
               {c.current_price !== null ? (
-                <span className="font-figures w-20 text-right">{formatCurrency(c.current_price)}</span>
+                <>
+                  <span className="text-xs font-medium whitespace-nowrap" style={{ color: `var(${colorVar})` }}>
+                    {formatVariazione(variazione)}
+                  </span>
+                  <span className="font-figures w-20 text-right">{formatCurrency(c.current_price)}</span>
+                </>
+              ) : c.purchase_price !== null ? (
+                <>
+                  <span className="text-xs text-muted/70 whitespace-nowrap">acquisto</span>
+                  <span className="font-figures w-20 text-right">{formatCurrency(c.purchase_price)}</span>
+                </>
               ) : (
                 <span
                   className="w-20 shrink-0 truncate rounded-full border border-border px-2 py-0.5 text-right text-[10px] font-medium tracking-wide text-muted uppercase"

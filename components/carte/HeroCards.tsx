@@ -33,17 +33,25 @@ export function HeroCards({ carte }: { carte: CollectionCard[] }) {
 
             <div className="flex flex-col gap-0.5">
               <span className="font-display text-sm leading-tight font-semibold">{c.name}</span>
-              <span className="text-xs text-muted">Prezzo attuale (trend)</span>
               {c.current_price !== null ? (
-                <span className="font-figures text-xl font-bold">{formatCurrency(c.current_price)}</span>
+                <>
+                  <span className="text-xs text-muted">Prezzo attuale (trend)</span>
+                  <span className="font-figures text-xl font-bold">{formatCurrency(c.current_price)}</span>
+                  <span className="text-xs font-medium" style={{ color: `var(${colorVar})` }}>
+                    {formatVariazione(variazione)}
+                  </span>
+                </>
+              ) : c.purchase_price !== null ? (
+                <>
+                  <span className="text-xs text-muted">Prezzo di acquisto</span>
+                  <span className="font-figures text-xl font-bold">{formatCurrency(c.purchase_price)}</span>
+                  <span className="text-xs text-muted/70">prezzo di mercato non disponibile</span>
+                </>
               ) : (
-                <span className="w-fit rounded-full border border-border px-2 py-0.5 text-[10px] font-medium tracking-wide text-muted uppercase">
+                <span className="mt-0.5 w-fit rounded-full border border-border px-2 py-0.5 text-[10px] font-medium tracking-wide text-muted uppercase">
                   Prezzo non disponibile
                 </span>
               )}
-              <span className="text-xs font-medium" style={{ color: `var(${colorVar})` }}>
-                {formatVariazione(variazione)}
-              </span>
             </div>
           </div>
         );
