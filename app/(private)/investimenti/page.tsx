@@ -1,8 +1,13 @@
+import dynamic from "next/dynamic";
 import { getPortfolioSnapshots, getPosizioniCorrenti, getTransazioni } from "@/lib/investimenti/queries";
 import { SummaryCards } from "@/components/investimenti/SummaryCards";
-import { AllocationChart } from "@/components/investimenti/AllocationChart";
-import { PortfolioHistoryChart } from "@/components/investimenti/PortfolioHistoryChart";
 import { PositionsTable } from "@/components/investimenti/PositionsTable";
+
+// Un solo import dinamico per entrambi i grafici: recharts (~400KB) finisce
+// in un unico chunk separato dal bundle principale della route, invece di
+// duplicarsi per componente. Resta SSR (niente ssr:false, non supportato
+// nei Server Component).
+const ChartsSection = dynamic(() => import("@/components/investimenti/ChartsSection").then((m) => m.ChartsSection));
 
 export default async function InvestimentiPage() {
   const [posizioni, snapshots, transazioni] = await Promise.all([
@@ -35,17 +40,7 @@ export default async function InvestimentiPage() {
         plusvalenzaPercentuale={plusvalenzaPercentuale}
       />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <section className="flex flex-col gap-3">
-          <h2 className="font-display text-sm font-medium text-muted">Andamento portafoglio</h2>
-          <PortfolioHistoryChart snapshots={snapshots} />
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="font-display text-sm font-medium text-muted">Allocazione per tipo</h2>
-          <AllocationChart posizioni={posizioni} />
-        </section>
-      </div>
+      <ChartsSection posizioni={posizioni} snapshots={snapshots} />
 
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Posizioni</h2>

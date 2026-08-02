@@ -11,20 +11,6 @@ export function formatCurrency(n: number): string {
   return currencyFormatter.format(n);
 }
 
-export type CategoryShare = { nome: string; totale: number };
-
-export function categoryBreakdown(spese: Spesa[]): CategoryShare[] {
-  const totals = new Map<string, number>();
-  for (const s of spese) {
-    const nome = s.categoria_nome ?? "Senza categoria";
-    totals.set(nome, (totals.get(nome) ?? 0) + s.importo);
-  }
-
-  return [...totals.entries()]
-    .map(([nome, totale]) => ({ nome, totale }))
-    .sort((a, b) => b.totale - a.totale);
-}
-
 export type CategoriaTotale = { nome: string; colore: string | null; totale: number };
 
 // Fonte unica per "categorie con totale nel periodo, ordinate per importo

@@ -1,12 +1,29 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { SummaryCards } from "@/components/spese/SummaryCards";
 import { FilterBar, type Range } from "@/components/spese/FilterBar";
-import { DailyTrendChart } from "@/components/spese/DailyTrendChart";
-import { CategorySpendingTrendChart } from "@/components/spese/CategorySpendingTrendChart";
-import { CategoryPieChart } from "@/components/spese/CategoryPieChart";
 import type { Categoria, Deposito, Spesa } from "@/lib/types";
+
+// Un solo boundary per i tre grafici (non uno a componente): recharts pesa
+// ~400KB e deve finire in un unico chunk separato dal bundle principale
+// della route, non triplicato. ChartsSkeleton mantiene l'altezza indicativa
+// per evitare layout shift durante il caricamento.
+const ChartsSection = dynamic(() => import("@/components/spese/ChartsSection").then((m) => m.ChartsSection), {
+  ssr: false,
+  loading: ChartsSkeleton,
+});
+
+function ChartsSkeleton() {
+  return (
+    <>
+      <div className="card h-72 w-full animate-pulse" />
+      <div className="card h-72 w-full animate-pulse" />
+      <div className="card h-72 w-full animate-pulse" />
+    </>
+  );
+}
 
 export function Overview({
   spese,
@@ -64,32 +81,14 @@ export function Overview({
 
       <SummaryCards entrate={totaleEntrate} uscite={totaleSpese} />
 
-      <section className="flex flex-col gap-3">
-        <h2 className="font-display text-sm font-medium text-muted">Andamento giornaliero</h2>
-        <DailyTrendChart
-          spese={speseFiltrate}
-          depositi={depositi}
-          from={range.from}
-          to={range.to}
-          categorie={categorieList}
-          onCategoriaCreata={handleCategoriaCreata}
-        />
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="font-display text-sm font-medium text-muted">Andamento per categoria</h2>
-        <CategorySpendingTrendChart spese={spese} from={range.from} to={range.to} />
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="font-display text-sm font-medium text-muted">Spese per categoria</h2>
-        <CategoryPieChart
-          spese={speseFiltrate}
-          categorie={categorieList}
-          range={range}
-          onCategoriaCreata={handleCategoriaCreata}
-        />
-      </section>
+      <ChartsSection
+        spese={spese}
+        speseFiltrate={speseFiltrate}
+        categorieList={categorieList}
+        depositi={depositi}
+        range={range}
+        onCategoriaCreata={handleCategoriaCreata}
+      />
     </div>
   );
 }
