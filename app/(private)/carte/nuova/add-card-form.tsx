@@ -23,23 +23,23 @@ export function AddCardForm() {
   const [state, formAction, pending] = useActionState<AggiungiCartaState, FormData>(aggiungiCarta, undefined);
 
   return (
-    <form action={formAction} className="flex w-full max-w-lg animate-slide-up flex-col gap-4">
+    <form action={formAction} encType="multipart/form-data" className="flex w-full max-w-lg animate-slide-up flex-col gap-4">
       <Field label="Nome carta">
         <input name="name" type="text" required className="field-input bg-surface" />
-      </Field>
-
-      <Field label="ID Cardmarket" hint="Opzionale — serve per gli aggiornamenti prezzo automatici.">
-        <input name="id_product" type="number" min="1" step="1" className="field-input bg-surface" />
       </Field>
 
       <div className="grid grid-cols-2 gap-4">
         <Field label="Codice set" hint="Es. FB10">
           <input name="set_code" type="text" className="field-input bg-surface" />
         </Field>
-        <Field label="Numero carta" hint="Es. FB10-070">
-          <input name="card_number" type="text" className="field-input bg-surface" />
+        <Field label="Numero carta" hint="Es. FB10-070 — insieme al codice set serve a ricavare l'ID Cardmarket per gli aggiornamenti prezzo.">
+          <input name="card_number" type="text" required className="field-input bg-surface" />
         </Field>
       </div>
+
+      <Field label="Immagine" hint="Opzionale — foto della carta.">
+        <input name="image" type="file" accept="image/*" className="field-input bg-surface file:mr-3 file:rounded-md file:border-0 file:bg-[var(--accent)]/15 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent" />
+      </Field>
 
       <Field label="Tipo prodotto">
         <select name="product_type" defaultValue="carta" className="field-input bg-surface">
