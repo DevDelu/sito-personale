@@ -1,22 +1,33 @@
 "use client";
 
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { formatCurrency, TIPO_ASSET_COLOR_VAR, TIPO_ASSET_LABEL } from "@/lib/investimenti/format";
+import { formatCurrency } from "@/lib/investimenti/format";
 import type { Posizione } from "@/lib/investimenti/types";
 
-function allocationByTipo(posizioni: Posizione[]) {
-  const totals = new Map<string, number>();
+type Gruppo = "crypto" | "etf";
+
+const GRUPPO_LABEL: Record<Gruppo, string> = { crypto: "Crypto", etf: "ETF" };
+const GRUPPO_COLOR_VAR: Record<Gruppo, string> = {
+  crypto: "--invest-pie-crypto",
+  etf: "--invest-pie-etf",
+};
+
+// Solo 2 categorie in questo grafico (crypto vs tutto il resto): la
+// suddivisione per singolo tipo/asset resta nella tabella Posizioni.
+function allocationByGruppo(posizioni: Posizione[]) {
+  const totals = new Map<Gruppo, number>();
   for (const p of posizioni) {
+    const gruppo: Gruppo = p.asset.tipo === "crypto" ? "crypto" : "etf";
     const valore = p.valoreAttuale ?? p.costoTotaleCarico;
-    totals.set(p.asset.tipo, (totals.get(p.asset.tipo) ?? 0) + valore);
+    totals.set(gruppo, (totals.get(gruppo) ?? 0) + valore);
   }
   return [...totals.entries()]
-    .map(([tipo, totale]) => ({ tipo, nome: TIPO_ASSET_LABEL[tipo] ?? tipo, totale }))
+    .map(([gruppo, totale]) => ({ gruppo, nome: GRUPPO_LABEL[gruppo], totale }))
     .sort((a, b) => b.totale - a.totale);
 }
 
 export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
-  const data = allocationByTipo(posizioni);
+  const data = allocationByGruppo(posizioni);
   const totale = data.reduce((s, d) => s + d.totale, 0);
 
   if (data.length === 0) {
@@ -28,33 +39,29 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
   }
 
   return (
-    <div className="card relative h-72 w-full p-4">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={data}
-            dataKey="totale"
-            nameKey="nome"
-            isAnimationActive
-            animationDuration={600}
-            animationEasing="ease-out"
-            innerRadius={60}
-            outerRadius={100}
-            paddingAngle={2}
-          >
-            {data.map((entry) => (
-              <Cell
-                key={entry.tipo}
-                fill={`var(${TIPO_ASSET_COLOR_VAR[entry.tipo] ?? "--muted"})`}
-              />
-            ))}
-          </Pie>
-          <Legend wrapperStyle={{ color: "var(--muted)", fontSize: 12 }} />
-        </PieChart>
-      </ResponsiveContainer>
-      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-10">
-        <span className="font-figures text-lg font-bold">{formatCurrency(totale)}</span>
-        <span className="text-xs text-muted">allocazione</span>
+    <div className="card flex h-72 w-full flex-col gap-1 p-4">
+      <span className="font-figures text-lg font-bold">{formatCurrency(totale)}</span>
+      <div className="min-h-0 flex-1">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="totale"
+              nameKey="nome"
+              isAnimationActive
+              animationDuration={600}
+              animationEasing="ease-out"
+              innerRadius={60}
+              outerRadius={100}
+              paddingAngle={2}
+            >
+              {data.map((entry) => (
+                <Cell key={entry.gruppo} fill={`var(${GRUPPO_COLOR_VAR[entry.gruppo]})`} />
+              ))}
+            </Pie>
+            <Legend wrapperStyle={{ color: "var(--muted)", fontSize: 12 }} />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
