@@ -91,9 +91,10 @@ export function ImportForm() {
           className="w-fit rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground transition-all duration-150 file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-foreground file:transition-opacity hover:file:opacity-90"
         />
         <p className="text-xs text-muted">
-          Colonne attese, in ordine: ticker, tipo (buy/sell), quantita, prezzo_unitario, data
-          (YYYY-MM-DD), costo_tipo (verificato/stimato/sconosciuto), note. Il ticker deve
-          corrispondere a un asset già esistente.
+          Formato atteso: export Fineco &ldquo;Movimenti Dossier Titoli&rdquo; (.xlsx), così com&apos;è
+          scaricato dal sito, senza modifiche. L&apos;Isin di ogni riga deve corrispondere a un asset
+          già esistente in Gestione; le transazioni importate sono sempre segnate come
+          &ldquo;verificato&rdquo;.
         </p>
       </div>
 
@@ -144,7 +145,6 @@ export function ImportForm() {
                     <th className="px-3 py-2 font-medium">Tipo</th>
                     <th className="px-3 py-2 text-right font-medium">Quantità</th>
                     <th className="px-3 py-2 text-right font-medium">Prezzo</th>
-                    <th className="px-3 py-2 font-medium">Costo</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -176,12 +176,11 @@ export function ImportForm() {
                       <td className="px-3 py-2 text-right font-figures">
                         {r.prezzo_unitario === null ? "n/d" : formatCurrency(r.prezzo_unitario)}
                       </td>
-                      <td className="px-3 py-2 text-muted">{r.costo_tipo}</td>
                     </tr>
                   ))}
                   {righe.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-3 py-6 text-center text-muted">
+                      <td colSpan={6} className="px-3 py-6 text-center text-muted">
                         Nessuna riga valida in questo file.
                       </td>
                     </tr>

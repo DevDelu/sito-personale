@@ -8,7 +8,6 @@ type ConfirmRow = {
   quantita: number;
   prezzo_unitario: number | null;
   data: string;
-  costo_tipo: "verificato" | "stimato" | "sconosciuto";
   note: string | null;
 };
 
@@ -22,13 +21,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Nessuna riga da importare." }, { status: 400 });
   }
 
+  // L'export Fineco è un movimento titoli reale: costo_tipo resta sempre
+  // 'verificato' (default della colonna), mai da una scelta dell'utente.
   const insert = righe.map((r) => ({
     asset_id: r.asset_id,
     tipo: r.tipo,
     quantita: r.quantita,
     prezzo_unitario: r.prezzo_unitario,
     data: r.data,
-    costo_tipo: r.costo_tipo,
     note: r.note,
   }));
 

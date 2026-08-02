@@ -17,17 +17,20 @@ export async function POST(request: Request) {
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 });
 
   const admin = createAdminClient();
-  const { data: assets, error } = await admin.from("assets").select("id, ticker, nome");
+  const { data: assets, error } = await admin.from("assets").select("id, isin, nome");
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const assetMap = new Map((assets ?? []).map((a) => [a.ticker.toUpperCase(), a]));
+  const assetMap = new Map((assets ?? []).filter((a) => a.isin).map((a) => [a.isin!.toUpperCase(), a]));
   const errori = [...result.errori];
   const righe = [];
 
-  for (const [i, riga] of result.righeValide.entries()) {
-    const asset = assetMap.get(riga.ticker);
+  for (const riga of result.righeValide) {
+    const asset = assetMap.get(riga.isin);
     if (!asset) {
-      errori.push({ riga: i + 2, messaggio: `ticker "${riga.ticker}" non trovato tra gli asset esistenti.` });
+      errori.push({
+        riga: riga.riga,
+        messaggio: `Isin "${riga.isin}" (${riga.titolo || "titolo sconosciuto"}) non trovato tra gli asset esistenti: crealo prima in Gestione.`,
+      });
       continue;
     }
     righe.push({ ...riga, asset_id: asset.id, asset_nome: asset.nome });
