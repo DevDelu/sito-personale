@@ -28,14 +28,9 @@ export function AddCardForm() {
         <input name="name" type="text" required className="field-input bg-surface" />
       </Field>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Codice set" hint="Es. FB10">
-          <input name="set_code" type="text" className="field-input bg-surface" />
-        </Field>
-        <Field label="Numero carta" hint="Es. FB10-070 — insieme al codice set serve a ricavare l'ID Cardmarket per gli aggiornamenti prezzo.">
-          <input name="card_number" type="text" required className="field-input bg-surface" />
-        </Field>
-      </div>
+      <Field label="Numero carta" hint="Es. FB10-070">
+        <input name="card_number" type="text" required className="field-input bg-surface" />
+      </Field>
 
       <Field label="Immagine" hint="Opzionale — foto della carta.">
         <input name="image" type="file" accept="image/*" className="field-input bg-surface file:mr-3 file:rounded-md file:border-0 file:bg-[var(--accent)]/15 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent" />

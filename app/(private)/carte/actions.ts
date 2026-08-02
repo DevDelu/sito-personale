@@ -28,7 +28,6 @@ export async function aggiungiCarta(
   await requireUser();
 
   const name = String(formData.get("name") ?? "").trim();
-  const setCode = String(formData.get("set_code") ?? "").trim() || null;
   const cardNumber = String(formData.get("card_number") ?? "").trim();
   const productTypeRaw = String(formData.get("product_type") ?? "carta").trim();
   const productType: ProductType = isProductType(productTypeRaw) ? productTypeRaw : "carta";
@@ -55,8 +54,8 @@ export async function aggiungiCarta(
   const admin = createAdminClient();
 
   // L'ID Cardmarket non si inserisce più a mano: si ricava in un secondo
-  // momento (flusso manuale via chat) da codice set + numero carta e viene
-  // scritto direttamente su fusion_world_cards.id_product via SQL.
+  // momento (flusso manuale via chat) dal numero carta e viene scritto
+  // direttamente su fusion_world_cards.id_product via SQL.
   let imageUrl: string | null = null;
   if (imageFile instanceof File && imageFile.size > 0) {
     const ext = imageFile.name.split(".").pop()?.toLowerCase() || "jpg";
@@ -72,7 +71,6 @@ export async function aggiungiCarta(
     .from("fusion_world_cards")
     .insert({
       name,
-      set_code: setCode,
       card_number: cardNumber,
       product_type: productType,
       source: "manuale",
