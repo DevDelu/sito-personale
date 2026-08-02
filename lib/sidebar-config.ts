@@ -40,9 +40,7 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     id: "carte",
     label: "Carte",
     icon: Layers,
-    href: "#",
-    disabled: true,
-    badge: "presto",
+    href: "/carte",
   },
   {
     id: "agenda",
