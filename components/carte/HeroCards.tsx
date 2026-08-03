@@ -1,10 +1,21 @@
+"use client";
+
+import { Pencil, Trash2 } from "lucide-react";
 import { CardPlaceholder } from "./CardPlaceholder";
 import { formatCurrency, formatVariazione, variazioneColorVar, variazionePercentuale } from "@/lib/carte/format";
 import type { CollectionCard } from "@/lib/carte/types";
 
 const RANK_LABEL = ["N.1 PER VALORE", "N.2 PER VALORE", "N.3 PER VALORE"];
 
-export function HeroCards({ carte }: { carte: CollectionCard[] }) {
+export function HeroCards({
+  carte,
+  onEdit,
+  onDelete,
+}: {
+  carte: CollectionCard[];
+  onEdit: (carta: CollectionCard) => void;
+  onDelete: (carta: CollectionCard) => void;
+}) {
   if (carte.length === 0) {
     return (
       <div className="card flex items-center justify-center p-8">
@@ -21,9 +32,24 @@ export function HeroCards({ carte }: { carte: CollectionCard[] }) {
 
         return (
           <div key={c.id} className="card card-hover animate-slide-up flex flex-col gap-3 p-4">
-            <span className="w-fit rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-accent uppercase">
-              {RANK_LABEL[i]}
-            </span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="w-fit rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-accent uppercase">
+                {RANK_LABEL[i]}
+              </span>
+              <div className="flex items-center gap-1">
+                <button type="button" onClick={() => onEdit(c)} aria-label="Modifica" className="btn-icon">
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDelete(c)}
+                  aria-label="Elimina"
+                  className="btn-icon hover:!text-spesa"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
 
             <CardPlaceholder
               name={c.name}
@@ -35,11 +61,17 @@ export function HeroCards({ carte }: { carte: CollectionCard[] }) {
               <span className="font-display text-sm leading-tight font-semibold">{c.name}</span>
               {c.current_price !== null ? (
                 <>
-                  <span className="text-xs text-muted">Prezzo attuale (trend)</span>
-                  <span className="font-figures text-xl font-bold">{formatCurrency(c.current_price)}</span>
-                  <span className="text-xs font-medium" style={{ color: `var(${colorVar})` }}>
-                    {formatVariazione(variazione)}
+                  <span className="text-xs text-muted">
+                    {c.is_manual_price ? "Prezzo attuale (manuale)" : "Prezzo attuale (trend)"}
                   </span>
+                  <span className="font-figures text-xl font-bold">{formatCurrency(c.current_price)}</span>
+                  {c.is_manual_price ? (
+                    <span className="text-xs text-muted/70">impostato a mano</span>
+                  ) : (
+                    <span className="text-xs font-medium" style={{ color: `var(${colorVar})` }}>
+                      {formatVariazione(variazione)}
+                    </span>
+                  )}
                 </>
               ) : c.purchase_price !== null ? (
                 <>

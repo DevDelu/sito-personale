@@ -12,7 +12,7 @@ import {
   type BulkMovimentoPatch,
 } from "@/hooks/useBulkMovimentoMutations";
 import { ExpenseEditModal } from "./ExpenseEditModal";
-import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
+import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { BulkEditModal } from "./BulkEditModal";
 import type { Categoria, Movimento } from "@/lib/types";
 

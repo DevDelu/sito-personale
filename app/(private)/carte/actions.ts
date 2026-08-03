@@ -39,6 +39,8 @@ export async function aggiungiCarta(
   const isFoil = formData.get("is_foil") === "on";
   const purchasePriceRaw = String(formData.get("purchase_price") ?? "").replace(",", ".").trim();
   const purchasePrice = purchasePriceRaw ? Number(purchasePriceRaw) : null;
+  const manualPriceRaw = String(formData.get("manual_price") ?? "").replace(",", ".").trim();
+  const manualPrice = manualPriceRaw ? Number(manualPriceRaw) : null;
   const notes = String(formData.get("notes") ?? "").trim() || null;
   const imageFile = formData.get("image");
 
@@ -49,6 +51,9 @@ export async function aggiungiCarta(
   }
   if (purchasePriceRaw && (!Number.isFinite(purchasePrice) || (purchasePrice as number) < 0)) {
     return { error: "Il prezzo di acquisto deve essere un numero valido." };
+  }
+  if (manualPriceRaw && (!Number.isFinite(manualPrice) || (manualPrice as number) < 0)) {
+    return { error: "Il prezzo attuale manuale deve essere un numero valido." };
   }
 
   const admin = createAdminClient();
@@ -88,10 +93,66 @@ export async function aggiungiCarta(
     language,
     is_foil: isFoil,
     purchase_price: purchasePrice,
+    manual_price: manualPrice,
     notes,
   });
   if (collectionError) return { error: collectionError.message };
 
   revalidatePath("/carte");
   redirect("/carte?added=1");
+}
+
+export type ModificaCartaPatch = {
+  quantity: number;
+  condition: CardCondition;
+  language: string;
+  is_foil: boolean;
+  purchase_price: number | null;
+  manual_price: number | null;
+  notes: string | null;
+};
+
+export type CarteActionResult = { error?: string };
+
+export async function modificaCarta(id: number, patch: ModificaCartaPatch): Promise<CarteActionResult> {
+  await requireUser();
+
+  if (!Number.isFinite(patch.quantity) || patch.quantity <= 0) {
+    return { error: "La quantità deve essere un numero positivo." };
+  }
+  if (patch.purchase_price !== null && (!Number.isFinite(patch.purchase_price) || patch.purchase_price < 0)) {
+    return { error: "Il prezzo di acquisto deve essere un numero valido." };
+  }
+  if (patch.manual_price !== null && (!Number.isFinite(patch.manual_price) || patch.manual_price < 0)) {
+    return { error: "Il prezzo attuale manuale deve essere un numero valido." };
+  }
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("my_collection")
+    .update({
+      quantity: patch.quantity,
+      condition: patch.condition,
+      language: patch.language,
+      is_foil: patch.is_foil,
+      purchase_price: patch.purchase_price,
+      manual_price: patch.manual_price,
+      notes: patch.notes,
+    })
+    .eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/carte");
+  return {};
+}
+
+export async function eliminaCarta(id: number): Promise<CarteActionResult> {
+  await requireUser();
+
+  const admin = createAdminClient();
+  const { error } = await admin.from("my_collection").delete().eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/carte");
+  return {};
 }

@@ -7,7 +7,7 @@ import { formatCurrency } from "@/lib/spese-utils";
 import { useExpenseMutations } from "@/hooks/useExpenseMutations";
 import { useMovimentoForm } from "@/hooks/useMovimentoForm";
 import { MovimentoFormFields } from "./MovimentoFormFields";
-import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
+import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import type { TransactionListItem } from "./TransactionList";
 import type { Categoria } from "@/lib/types";
 

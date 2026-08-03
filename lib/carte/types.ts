@@ -6,13 +6,17 @@ export type CollectionCard = {
   card_id: number;
   quantity: number;
   condition: CardCondition | null;
+  language: string;
   is_foil: boolean;
   purchase_price: number | null;
+  manual_price: number | null;
+  notes: string | null;
   id_product: number | null;
   name: string;
   product_type: ProductType;
   image_url: string | null;
   current_price: number | null;
+  is_manual_price: boolean;
   avg30: number | null;
   snapshot_date: string | null;
 };

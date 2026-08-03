@@ -8,7 +8,7 @@ import { useTransazioneMutations, type TransazionePatch } from "@/hooks/useTrans
 import { useBulkTransazioneMutations } from "@/hooks/useBulkTransazioneMutations";
 import { TransazioneFormModal } from "./TransazioneFormModal";
 import { BulkCostoTipoModal } from "./BulkCostoTipoModal";
-import { DeleteConfirmDialog } from "@/components/spese/DeleteConfirmDialog";
+import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import type { Asset, CostoTipo, TransazioneConAsset } from "@/lib/investimenti/types";
 
 const COSTO_TIPO_LABEL: Record<CostoTipo, string> = {

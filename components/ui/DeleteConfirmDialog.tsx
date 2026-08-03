@@ -6,6 +6,8 @@ export function DeleteConfirmDialog({
   pending,
   onConfirm,
   onCancel,
+  title,
+  description,
 }: {
   titolo: string;
   // Se >1, mostra il testo per l'eliminazione in blocco invece del singolo movimento.
@@ -13,6 +15,10 @@ export function DeleteConfirmDialog({
   pending: boolean;
   onConfirm: () => void;
   onCancel: () => void;
+  // Override per contesti diversi da "movimento" (es. Carte): il default è
+  // pensato per Spese/Investimenti, dove questo dialog è nato.
+  title?: string;
+  description?: React.ReactNode;
 }) {
   const isBulk = typeof count === "number" && count > 1;
 
@@ -20,14 +26,15 @@ export function DeleteConfirmDialog({
     <div className="modal-overlay">
       <div className="modal-panel w-full max-w-sm p-5">
         <h2 className="font-display text-base font-semibold">
-          {isBulk ? `Eliminare ${count} movimenti?` : "Eliminare questo movimento?"}
+          {title ?? (isBulk ? `Eliminare ${count} movimenti?` : "Eliminare questo movimento?")}
         </h2>
         <p className="mt-1 text-sm text-muted">
-          {isBulk ? (
-            `Le ${count} righe selezionate verranno rimosse definitivamente. L'operazione non è reversibile.`
-          ) : (
-            <>&ldquo;{titolo}&rdquo; verrà rimosso definitivamente. L&apos;operazione non è reversibile.</>
-          )}
+          {description ??
+            (isBulk ? (
+              `Le ${count} righe selezionate verranno rimosse definitivamente. L'operazione non è reversibile.`
+            ) : (
+              <>&ldquo;{titolo}&rdquo; verrà rimosso definitivamente. L&apos;operazione non è reversibile.</>
+            ))}
         </p>
         <div className="mt-4 flex justify-end gap-3">
           <button type="button" onClick={onCancel} className="btn-secondary">
