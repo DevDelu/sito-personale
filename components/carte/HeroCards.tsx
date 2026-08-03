@@ -2,7 +2,7 @@
 
 import { Pencil, Trash2 } from "lucide-react";
 import { CardPlaceholder } from "./CardPlaceholder";
-import { formatCurrency, formatVariazione, variazioneColorVar, variazionePercentuale } from "@/lib/carte/format";
+import { formatCurrency } from "@/lib/carte/format";
 import type { CollectionCard } from "@/lib/carte/types";
 
 const RANK_LABEL = ["N.1 PER VALORE", "N.2 PER VALORE", "N.3 PER VALORE"];
@@ -29,9 +29,6 @@ export function HeroCards({
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       {carte.map((c, i) => {
-        const variazione = variazionePercentuale(c.current_price, c.avg30);
-        const colorVar = variazioneColorVar(variazione);
-
         return (
           <div
             key={c.id}
@@ -81,9 +78,6 @@ export function HeroCards({
                 <>
                   <span className="text-xs text-muted">Prezzo attuale</span>
                   <span className="font-figures text-xl font-bold">{formatCurrency(c.current_price)}</span>
-                  <span className="text-xs font-medium" style={{ color: `var(${colorVar})` }}>
-                    {formatVariazione(variazione)}
-                  </span>
                 </>
               ) : c.purchase_price !== null ? (
                 <>
