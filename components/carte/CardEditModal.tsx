@@ -28,7 +28,6 @@ export function CardEditModal({
   const [quantity, setQuantity] = useState(String(carta.quantity));
   const [condition, setCondition] = useState<CardCondition>(carta.condition ?? "NM");
   const [language, setLanguage] = useState(carta.language);
-  const [isFoil, setIsFoil] = useState(carta.is_foil);
   const [purchasePrice, setPurchasePrice] = useState(
     carta.purchase_price !== null ? String(carta.purchase_price) : ""
   );
@@ -60,7 +59,6 @@ export function CardEditModal({
       quantity: quantityNum,
       condition,
       language,
-      is_foil: isFoil,
       purchase_price: purchasePriceNum,
       manual_price: manualPriceNum,
       notes: notes.trim() || null,
@@ -134,16 +132,6 @@ export function CardEditModal({
             className="field-input"
           />
         </Field>
-
-        <label className="flex items-center gap-2 text-sm text-muted">
-          <input
-            type="checkbox"
-            checked={isFoil}
-            onChange={(e) => setIsFoil(e.target.checked)}
-            className="h-4 w-4 rounded border-border accent-[var(--accent)]"
-          />
-          Foil
-        </label>
 
         <Field label="Note (opzionale)">
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="field-input" />

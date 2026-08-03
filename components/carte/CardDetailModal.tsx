@@ -43,11 +43,11 @@ export function CardDetailModal({
         />
 
         <dl className="flex animate-fade-in flex-col gap-2 text-sm">
+          {carta.card_number && <Row label="Codice carta" value={<span className="font-figures">{carta.card_number}</span>} />}
           <Row label="Tipo" value={PRODUCT_TYPE_LABEL[carta.product_type]} />
           <Row label="Quantità" value={String(carta.quantity)} />
           <Row label="Condizione" value={carta.condition ?? "n/d"} />
           <Row label="Lingua" value={LANGUAGE_LABEL[carta.language] ?? carta.language} />
-          <Row label="Foil" value={carta.is_foil ? "Sì" : "No"} />
           {carta.purchase_price !== null && (
             <Row label="Prezzo di acquisto" value={formatCurrency(carta.purchase_price)} />
           )}

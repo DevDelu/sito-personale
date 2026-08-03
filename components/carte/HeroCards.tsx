@@ -76,6 +76,7 @@ export function HeroCards({
 
             <div className="flex flex-col gap-0.5">
               <span className="font-display text-sm leading-tight font-semibold">{c.name}</span>
+              {c.card_number && <span className="font-figures text-xs text-muted/70">{c.card_number}</span>}
               {c.current_price !== null ? (
                 <>
                   <span className="text-xs text-muted">

@@ -83,11 +83,6 @@ export function AddCardForm() {
         <input name="manual_price" type="number" min="0" step="0.01" className="field-input bg-surface" />
       </Field>
 
-      <label className="flex items-center gap-2 text-sm text-muted">
-        <input name="is_foil" type="checkbox" className="h-4 w-4 rounded border-border accent-[var(--accent)]" />
-        Foil
-      </label>
-
       <Field label="Note (opzionale)">
         <textarea name="notes" rows={2} className="field-input bg-surface" />
       </Field>

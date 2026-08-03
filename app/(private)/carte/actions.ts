@@ -36,7 +36,6 @@ export async function aggiungiCarta(
   const conditionRaw = String(formData.get("condition") ?? "NM").trim();
   const condition: CardCondition = isCondition(conditionRaw) ? conditionRaw : "NM";
   const language = String(formData.get("language") ?? "EN").trim() || "EN";
-  const isFoil = formData.get("is_foil") === "on";
   const purchasePriceRaw = String(formData.get("purchase_price") ?? "").replace(",", ".").trim();
   const purchasePrice = purchasePriceRaw ? Number(purchasePriceRaw) : null;
   const manualPriceRaw = String(formData.get("manual_price") ?? "").replace(",", ".").trim();
@@ -91,7 +90,6 @@ export async function aggiungiCarta(
     quantity,
     condition,
     language,
-    is_foil: isFoil,
     purchase_price: purchasePrice,
     manual_price: manualPrice,
     notes,
@@ -106,7 +104,6 @@ export type ModificaCartaPatch = {
   quantity: number;
   condition: CardCondition;
   language: string;
-  is_foil: boolean;
   purchase_price: number | null;
   manual_price: number | null;
   notes: string | null;
@@ -134,7 +131,6 @@ export async function modificaCarta(id: number, patch: ModificaCartaPatch): Prom
       quantity: patch.quantity,
       condition: patch.condition,
       language: patch.language,
-      is_foil: patch.is_foil,
       purchase_price: patch.purchase_price,
       manual_price: patch.manual_price,
       notes: patch.notes,

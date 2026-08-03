@@ -48,7 +48,10 @@ export function AltreCarteList({
             onClick={() => onView(c)}
             className="flex cursor-pointer items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-sm transition-colors duration-150 last:border-0 hover:bg-surface-hover"
           >
-            <span className="truncate">{c.name}</span>
+            <div className="flex min-w-0 flex-col">
+              <span className="truncate">{c.name}</span>
+              {c.card_number && <span className="font-figures truncate text-xs text-muted/70">{c.card_number}</span>}
+            </div>
             <div className="flex shrink-0 items-center gap-4">
               {c.current_price !== null ? (
                 <>

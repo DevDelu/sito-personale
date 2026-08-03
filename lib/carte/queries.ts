@@ -19,6 +19,7 @@ function mapRow(row: Record<string, unknown>): CollectionCard {
     notes: (row.notes as string | null) ?? null,
     id_product: row.id_product === null || row.id_product === undefined ? null : Number(row.id_product),
     name: row.name as string,
+    card_number: (row.card_number as string | null) ?? null,
     product_type: row.product_type as CollectionCard["product_type"],
     image_url: (row.image_url as string | null) ?? null,
     current_price: toNumberOrNull(row.current_price),

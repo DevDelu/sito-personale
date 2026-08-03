@@ -13,6 +13,7 @@ export type CollectionCard = {
   notes: string | null;
   id_product: number | null;
   name: string;
+  card_number: string | null;
   product_type: ProductType;
   image_url: string | null;
   current_price: number | null;
