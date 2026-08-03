@@ -1,4 +1,18 @@
+import type { ProductType } from "./types";
+
 export { formatCurrency } from "@/lib/spese-utils";
+
+export const PRODUCT_TYPE_LABEL: Record<ProductType, string> = {
+  carta: "Carta",
+  energy_marker: "Energy Marker",
+  sigillato: "Sigillato",
+};
+
+export const LANGUAGE_LABEL: Record<string, string> = {
+  EN: "Inglese",
+  IT: "Italiano",
+  JP: "Giapponese",
+};
 
 export function variazionePercentuale(current: number | null, avg30: number | null): number | null {
   if (current === null || avg30 === null || avg30 === 0) return null;

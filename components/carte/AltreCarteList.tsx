@@ -11,10 +11,12 @@ const TOOLTIP_WIDTH = 168;
 
 export function AltreCarteList({
   carte,
+  onView,
   onEdit,
   onDelete,
 }: {
   carte: CollectionCard[];
+  onView: (carta: CollectionCard) => void;
   onEdit: (carta: CollectionCard) => void;
   onDelete: (carta: CollectionCard) => void;
 }) {
@@ -43,7 +45,8 @@ export function AltreCarteList({
             key={c.id}
             onMouseMove={(e) => handleMove(e, c)}
             onMouseLeave={() => setHover(null)}
-            className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-sm transition-colors duration-150 last:border-0 hover:bg-surface-hover"
+            onClick={() => onView(c)}
+            className="flex cursor-pointer items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-sm transition-colors duration-150 last:border-0 hover:bg-surface-hover"
           >
             <span className="truncate">{c.name}</span>
             <div className="flex shrink-0 items-center gap-4">
@@ -71,12 +74,23 @@ export function AltreCarteList({
                 </span>
               )}
               <div className="flex items-center gap-1">
-                <button type="button" onClick={() => onEdit(c)} aria-label="Modifica" className="btn-icon">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(c);
+                  }}
+                  aria-label="Modifica"
+                  className="btn-icon"
+                >
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
                 <button
                   type="button"
-                  onClick={() => onDelete(c)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(c);
+                  }}
                   aria-label="Elimina"
                   className="btn-icon hover:!text-spesa"
                 >

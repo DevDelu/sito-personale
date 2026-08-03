@@ -9,10 +9,12 @@ const RANK_LABEL = ["N.1 PER VALORE", "N.2 PER VALORE", "N.3 PER VALORE"];
 
 export function HeroCards({
   carte,
+  onView,
   onEdit,
   onDelete,
 }: {
   carte: CollectionCard[];
+  onView: (carta: CollectionCard) => void;
   onEdit: (carta: CollectionCard) => void;
   onDelete: (carta: CollectionCard) => void;
 }) {
@@ -31,18 +33,33 @@ export function HeroCards({
         const colorVar = variazioneColorVar(variazione);
 
         return (
-          <div key={c.id} className="card card-hover animate-slide-up flex flex-col gap-3 p-4">
+          <div
+            key={c.id}
+            onClick={() => onView(c)}
+            className="card card-hover animate-slide-up flex cursor-pointer flex-col gap-3 p-4"
+          >
             <div className="flex items-center justify-between gap-2">
               <span className="w-fit rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-accent uppercase">
                 {RANK_LABEL[i]}
               </span>
               <div className="flex items-center gap-1">
-                <button type="button" onClick={() => onEdit(c)} aria-label="Modifica" className="btn-icon">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(c);
+                  }}
+                  aria-label="Modifica"
+                  className="btn-icon"
+                >
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
                 <button
                   type="button"
-                  onClick={() => onDelete(c)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(c);
+                  }}
                   aria-label="Elimina"
                   className="btn-icon hover:!text-spesa"
                 >

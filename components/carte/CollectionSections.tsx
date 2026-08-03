@@ -5,6 +5,7 @@ import { useState } from "react";
 import { HeroCards } from "./HeroCards";
 import { AltreCarteList } from "./AltreCarteList";
 import { CardEditModal } from "./CardEditModal";
+import { CardDetailModal } from "./CardDetailModal";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { useCarteMutations } from "@/hooks/useCarteMutations";
 import type { ModificaCartaPatch } from "@/app/(private)/carte/actions";
@@ -21,6 +22,7 @@ export function CollectionSections({
 }) {
   const router = useRouter();
   const { updateCarta, deleteCarta, pending, error } = useCarteMutations();
+  const [viewing, setViewing] = useState<CollectionCard | null>(null);
   const [editing, setEditing] = useState<CollectionCard | null>(null);
   const [deleting, setDeleting] = useState<CollectionCard | null>(null);
 
@@ -42,15 +44,30 @@ export function CollectionSections({
     <>
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Le tue carte di valore</h2>
-        <HeroCards carte={hero} onEdit={setEditing} onDelete={setDeleting} />
+        <HeroCards carte={hero} onView={setViewing} onEdit={setEditing} onDelete={setDeleting} />
       </section>
 
       {metricsSlot}
 
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Altre carte</h2>
-        <AltreCarteList carte={resto} onEdit={setEditing} onDelete={setDeleting} />
+        <AltreCarteList carte={resto} onView={setViewing} onEdit={setEditing} onDelete={setDeleting} />
       </section>
+
+      {viewing && (
+        <CardDetailModal
+          carta={viewing}
+          onClose={() => setViewing(null)}
+          onEdit={() => {
+            setEditing(viewing);
+            setViewing(null);
+          }}
+          onDelete={() => {
+            setDeleting(viewing);
+            setViewing(null);
+          }}
+        />
+      )}
 
       {editing && (
         <CardEditModal
