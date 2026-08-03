@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { CardPlaceholder } from "./CardPlaceholder";
+import { aggiornaImmagineCarta } from "@/app/(private)/carte/actions";
 import type { CardCondition, CollectionCard } from "@/lib/carte/types";
 import type { ModificaCartaPatch } from "@/app/(private)/carte/actions";
 
@@ -33,9 +35,15 @@ export function CardEditModal({
   );
   const [manualPrice, setManualPrice] = useState(carta.manual_price !== null ? String(carta.manual_price) : "");
   const [notes, setNotes] = useState(carta.notes ?? "");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePending, setImagePending] = useState(false);
   const [erroreForm, setErroreForm] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  // Object URL derivato al render, non in un effetto: la revoca esplicita
+  // non serve, il blob viene liberato alla chiusura del modale/navigazione.
+  const imagePreviewUrl = useMemo(() => (imageFile ? URL.createObjectURL(imageFile) : null), [imageFile]);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const quantityNum = Number(quantity);
@@ -55,6 +63,19 @@ export function CardEditModal({
     }
 
     setErroreForm(null);
+
+    if (imageFile) {
+      setImagePending(true);
+      const fd = new FormData();
+      fd.set("image", imageFile);
+      const res = await aggiornaImmagineCarta(carta.card_id, fd);
+      setImagePending(false);
+      if (res?.error) {
+        setErroreForm(res.error);
+        return;
+      }
+    }
+
     onSave({
       quantity: quantityNum,
       condition,
@@ -69,6 +90,22 @@ export function CardEditModal({
     <div className="modal-overlay">
       <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">Modifica {carta.name}</h2>
+
+        <div className="flex items-center gap-4">
+          <CardPlaceholder
+            name={carta.name}
+            imageUrl={imagePreviewUrl ?? carta.image_url}
+            className="aspect-[5/7] w-16 shrink-0 rounded-lg"
+          />
+          <Field label="Immagine" hint="Opzionale — sostituisce quella attuale.">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+              className="field-input file:mr-3 file:rounded-md file:border-0 file:bg-[var(--accent)]/15 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent"
+            />
+          </Field>
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="Quantità">
@@ -147,8 +184,8 @@ export function CardEditModal({
           <button type="button" onClick={onCancel} className="btn-secondary">
             Annulla
           </button>
-          <button type="submit" disabled={pending} className="btn-primary">
-            {pending ? "Salvataggio..." : "Salva"}
+          <button type="submit" disabled={pending || imagePending} className="btn-primary">
+            {imagePending ? "Caricamento immagine..." : pending ? "Salvataggio..." : "Salva"}
           </button>
         </div>
       </form>

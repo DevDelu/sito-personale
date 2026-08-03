@@ -47,6 +47,19 @@ async function salvaPrezzoManualeOggi(
     );
 }
 
+async function caricaImmagine(
+  admin: ReturnType<typeof createAdminClient>,
+  imageFile: File
+): Promise<{ url: string } | { error: string }> {
+  const ext = imageFile.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `${crypto.randomUUID()}.${ext}`;
+  const { error: uploadError } = await admin.storage
+    .from(IMAGE_BUCKET)
+    .upload(path, imageFile, { contentType: imageFile.type || undefined });
+  if (uploadError) return { error: uploadError.message };
+  return { url: admin.storage.from(IMAGE_BUCKET).getPublicUrl(path).data.publicUrl };
+}
+
 export async function aggiungiCarta(
   _prevState: AggiungiCartaState,
   formData: FormData
@@ -88,13 +101,9 @@ export async function aggiungiCarta(
   // direttamente su fusion_world_cards.id_product via SQL.
   let imageUrl: string | null = null;
   if (imageFile instanceof File && imageFile.size > 0) {
-    const ext = imageFile.name.split(".").pop()?.toLowerCase() || "jpg";
-    const path = `${crypto.randomUUID()}.${ext}`;
-    const { error: uploadError } = await admin.storage
-      .from(IMAGE_BUCKET)
-      .upload(path, imageFile, { contentType: imageFile.type || undefined });
-    if (uploadError) return { error: uploadError.message };
-    imageUrl = admin.storage.from(IMAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+    const uploaded = await caricaImmagine(admin, imageFile);
+    if ("error" in uploaded) return { error: uploaded.error };
+    imageUrl = uploaded.url;
   }
 
   const { data: cardRow, error: cardError } = await admin
@@ -173,6 +182,25 @@ export async function modificaCarta(id: number, patch: ModificaCartaPatch): Prom
 
   const { error: priceError } = await salvaPrezzoManualeOggi(admin, id, patch.manual_price);
   if (priceError) return { error: priceError.message };
+
+  revalidatePath("/carte");
+  return {};
+}
+
+export async function aggiornaImmagineCarta(cardId: number, formData: FormData): Promise<CarteActionResult> {
+  await requireUser();
+
+  const imageFile = formData.get("image");
+  if (!(imageFile instanceof File) || imageFile.size === 0) {
+    return { error: "Seleziona un'immagine." };
+  }
+
+  const admin = createAdminClient();
+  const uploaded = await caricaImmagine(admin, imageFile);
+  if ("error" in uploaded) return { error: uploaded.error };
+
+  const { error } = await admin.from("fusion_world_cards").update({ image_url: uploaded.url }).eq("id", cardId);
+  if (error) return { error: error.message };
 
   revalidatePath("/carte");
   return {};

@@ -79,17 +79,11 @@ export function HeroCards({
               {c.card_number && <span className="font-figures text-xs text-muted/70">{c.card_number}</span>}
               {c.current_price !== null ? (
                 <>
-                  <span className="text-xs text-muted">
-                    {c.is_manual_price ? "Prezzo attuale (manuale)" : "Prezzo attuale (trend)"}
-                  </span>
+                  <span className="text-xs text-muted">Prezzo attuale</span>
                   <span className="font-figures text-xl font-bold">{formatCurrency(c.current_price)}</span>
-                  {c.is_manual_price ? (
-                    <span className="text-xs text-muted/70">impostato a mano</span>
-                  ) : (
-                    <span className="text-xs font-medium" style={{ color: `var(${colorVar})` }}>
-                      {formatVariazione(variazione)}
-                    </span>
-                  )}
+                  <span className="text-xs font-medium" style={{ color: `var(${colorVar})` }}>
+                    {formatVariazione(variazione)}
+                  </span>
                 </>
               ) : c.purchase_price !== null ? (
                 <>

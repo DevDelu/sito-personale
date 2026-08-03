@@ -85,7 +85,7 @@ export function CardDetailModal({
             <Row label="Prezzo di acquisto" value={formatCurrency(carta.purchase_price)} />
           )}
           <Row
-            label={carta.is_manual_price ? "Prezzo attuale (manuale)" : "Prezzo attuale (trend)"}
+            label="Prezzo attuale"
             value={carta.current_price !== null ? formatCurrency(carta.current_price) : "n/d"}
           />
           {!carta.is_manual_price && carta.current_price !== null && (
