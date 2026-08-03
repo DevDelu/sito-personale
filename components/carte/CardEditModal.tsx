@@ -121,7 +121,7 @@ export function CardEditModal({
 
         <Field
           label="Prezzo attuale manuale (€)"
-          hint="Se compilato, sovrascrive il prezzo automatico da Cardmarket."
+          hint="Registrato come prezzo di oggi: modificandolo più volte nei giorni successivi costruisci l'andamento nel grafico."
         >
           <input
             type="number"

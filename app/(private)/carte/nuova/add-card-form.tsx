@@ -78,7 +78,7 @@ export function AddCardForm() {
 
       <Field
         label="Prezzo attuale manuale (€)"
-        hint="Se compilato, sovrascrive il prezzo automatico da Cardmarket — utile per Energy Marker o carte senza storico prezzo."
+        hint="Se compilato, sovrascrive il prezzo automatico da Cardmarket e viene registrato come prezzo di oggi — utile per Energy Marker o carte senza storico prezzo."
       >
         <input name="manual_price" type="number" min="0" step="0.01" className="field-input bg-surface" />
       </Field>

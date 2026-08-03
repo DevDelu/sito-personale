@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireUser } from "@/lib/supabase/dal";
+import { getPriceHistory, type PricePoint } from "@/lib/carte/queries";
 import type { CardCondition, ProductType } from "@/lib/carte/types";
 
 export type AggiungiCartaState = { error?: string } | undefined;
@@ -20,6 +21,31 @@ function isCondition(v: string): v is CardCondition {
 }
 
 const IMAGE_BUCKET = "card-images";
+
+// Il prezzo manuale non sovrascrive più un singolo valore: ogni salvataggio
+// scrive (o aggiorna) lo snapshot di oggi in manual_price_snapshots, così lo
+// storico resta disponibile per il grafico. Svuotare il campo cancella solo
+// lo snapshot odierno, non l'intero storico.
+async function salvaPrezzoManualeOggi(
+  admin: ReturnType<typeof createAdminClient>,
+  collectionId: number,
+  manualPrice: number | null
+) {
+  const today = new Date().toISOString().slice(0, 10);
+  if (manualPrice === null) {
+    return admin
+      .from("manual_price_snapshots")
+      .delete()
+      .eq("collection_id", collectionId)
+      .eq("snapshot_date", today);
+  }
+  return admin
+    .from("manual_price_snapshots")
+    .upsert(
+      { collection_id: collectionId, snapshot_date: today, price: manualPrice },
+      { onConflict: "collection_id,snapshot_date" }
+    );
+}
 
 export async function aggiungiCarta(
   _prevState: AggiungiCartaState,
@@ -85,16 +111,24 @@ export async function aggiungiCarta(
   if (cardError) return { error: cardError.message };
   const cardId = cardRow.id as number;
 
-  const { error: collectionError } = await admin.from("my_collection").insert({
-    card_id: cardId,
-    quantity,
-    condition,
-    language,
-    purchase_price: purchasePrice,
-    manual_price: manualPrice,
-    notes,
-  });
+  const { data: collectionRow, error: collectionError } = await admin
+    .from("my_collection")
+    .insert({
+      card_id: cardId,
+      quantity,
+      condition,
+      language,
+      purchase_price: purchasePrice,
+      notes,
+    })
+    .select("id")
+    .single();
   if (collectionError) return { error: collectionError.message };
+
+  if (manualPrice !== null) {
+    const { error: priceError } = await salvaPrezzoManualeOggi(admin, collectionRow.id as number, manualPrice);
+    if (priceError) return { error: priceError.message };
+  }
 
   revalidatePath("/carte");
   redirect("/carte?added=1");
@@ -132,14 +166,21 @@ export async function modificaCarta(id: number, patch: ModificaCartaPatch): Prom
       condition: patch.condition,
       language: patch.language,
       purchase_price: patch.purchase_price,
-      manual_price: patch.manual_price,
       notes: patch.notes,
     })
     .eq("id", id);
   if (error) return { error: error.message };
 
+  const { error: priceError } = await salvaPrezzoManualeOggi(admin, id, patch.manual_price);
+  if (priceError) return { error: priceError.message };
+
   revalidatePath("/carte");
   return {};
+}
+
+export async function getStoricoPrezzo(collectionId: number, idProduct: number | null): Promise<PricePoint[]> {
+  await requireUser();
+  return getPriceHistory(collectionId, idProduct);
 }
 
 export async function eliminaCarta(id: number): Promise<CarteActionResult> {

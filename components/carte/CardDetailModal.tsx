@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { Pencil, Trash2, X } from "lucide-react";
 import { CardPlaceholder } from "./CardPlaceholder";
 import {
@@ -10,7 +12,16 @@ import {
   PRODUCT_TYPE_LABEL,
   LANGUAGE_LABEL,
 } from "@/lib/carte/format";
+import { getStoricoPrezzo } from "@/app/(private)/carte/actions";
+import type { PricePoint } from "@/lib/carte/queries";
 import type { CollectionCard } from "@/lib/carte/types";
+
+// recharts (~400KB) resta fuori dal bundle principale di /carte: il grafico
+// serve solo quando il popup di dettaglio è aperto, non al caricamento pagina.
+const CardPriceChart = dynamic(() => import("./CardPriceChart").then((m) => m.CardPriceChart), {
+  ssr: false,
+  loading: () => <div className="h-24 w-full animate-pulse rounded-lg bg-surface-hover" />,
+});
 
 export function CardDetailModal({
   carta,
@@ -25,6 +36,22 @@ export function CardDetailModal({
 }) {
   const variazione = variazionePercentuale(carta.current_price, carta.avg30);
   const colorVar = variazioneColorVar(variazione);
+
+  const [history, setHistory] = useState<PricePoint[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getStoricoPrezzo(carta.id, carta.id_product)
+      .then((data) => {
+        if (!cancelled) setHistory(data);
+      })
+      .catch(() => {
+        if (!cancelled) setHistory([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [carta.id, carta.id_product]);
 
   return (
     <div className="modal-overlay">
@@ -41,6 +68,12 @@ export function CardDetailModal({
           imageUrl={carta.image_url}
           className="aspect-[5/7] w-full max-w-[220px] self-center rounded-lg"
         />
+
+        {history === null ? (
+          <div className="h-24 w-full animate-pulse rounded-lg bg-surface-hover" />
+        ) : (
+          <CardPriceChart history={history} />
+        )}
 
         <dl className="flex animate-fade-in flex-col gap-2 text-sm">
           {carta.card_number && <Row label="Codice carta" value={<span className="font-figures">{carta.card_number}</span>} />}

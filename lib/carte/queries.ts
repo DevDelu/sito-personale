@@ -55,3 +55,38 @@ export async function getCollectionOverview(): Promise<CollectionOverview> {
 
   return { hero, resto, valoreTotale, numeroCarte };
 }
+
+export type PricePoint = { date: string; price: number };
+
+// Serie storica per il grafico nel popup di dettaglio: unisce lo storico
+// Cardmarket (prices, se la carta ha un id_product) con lo storico dei
+// prezzi manuali (manual_price_snapshots). Se una data ha entrambi, vince il
+// prezzo manuale — stessa priorità del coalesce usato in v_collection_current.
+export async function getPriceHistory(collectionId: number, idProduct: number | null): Promise<PricePoint[]> {
+  const admin = createAdminClient();
+  const byDate = new Map<string, number>();
+
+  if (idProduct !== null) {
+    const { data, error } = await admin
+      .from("prices")
+      .select("snapshot_date, trend")
+      .eq("id_product", idProduct)
+      .order("snapshot_date", { ascending: true });
+    if (error) throw new Error(error.message);
+    for (const row of data ?? []) {
+      if (row.trend !== null && Number(row.trend) > 0) byDate.set(row.snapshot_date as string, Number(row.trend));
+    }
+  }
+
+  const { data: manualData, error: manualError } = await admin
+    .from("manual_price_snapshots")
+    .select("snapshot_date, price")
+    .eq("collection_id", collectionId)
+    .order("snapshot_date", { ascending: true });
+  if (manualError) throw new Error(manualError.message);
+  for (const row of manualData ?? []) {
+    byDate.set(row.snapshot_date as string, Number(row.price));
+  }
+
+  return [...byDate.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, price]) => ({ date, price }));
+}
