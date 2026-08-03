@@ -22,7 +22,7 @@ export default async function PrivateLayout({
   );
 
   return (
-    <div className="flex min-h-full flex-1">
+    <div className="flex min-h-full flex-1 flex-col md:flex-row">
       <Sidebar accountSlot={accountSlot} />
       <div className="flex flex-1 flex-col px-4 py-6 sm:px-6 animate-fade-in">{children}</div>
     </div>
