@@ -23,9 +23,12 @@ create index manual_price_snapshots_collection_id_idx on manual_price_snapshots 
 
 alter table manual_price_snapshots enable row level security;
 
+-- La view va droppata PRIMA di rimuovere la colonna che referenzia,
+-- altrimenti Postgres rifiuta l'alter (dipendenza esplicita).
+drop view if exists v_collection_current;
+
 alter table my_collection drop column manual_price;
 
-drop view if exists v_collection_current;
 create view v_collection_current as
 select
   mc.id,
