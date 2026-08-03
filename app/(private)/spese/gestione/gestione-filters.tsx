@@ -32,7 +32,7 @@ export function GestioneFilters({ categorie }: { categorie: Categoria[] }) {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Cerca per titolo o descrizione..."
-        className="field-input w-56 bg-surface px-3 py-1.5 text-sm"
+        className="field-input w-full bg-surface px-3 py-1.5 text-sm sm:w-56"
       />
       <select
         defaultValue={searchParams.get("tipo") ?? ""}

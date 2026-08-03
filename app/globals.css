@@ -270,13 +270,16 @@ body {
     @apply hover:-translate-y-0.5 hover:border-accent/25 hover:shadow-lg;
   }
 
-  /* Overlay + pannello per i modali, con animazione d'ingresso */
+  /* Overlay + pannello per i modali, con animazione d'ingresso. overflow-y-auto
+     + items-start sul mobile evitano che un form con molti campi (es. modifica
+     in blocco) finisca fuori schermo senza modo di scorrere fino al pulsante
+     di conferma; da sm in su torna centrato come prima. */
   .modal-overlay {
-    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-[2px] animate-fade-in;
+    @apply fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-[2px] animate-fade-in sm:items-center sm:py-4;
   }
 
   .modal-panel {
-    @apply animate-scale-in rounded-xl border border-border bg-surface shadow-2xl;
+    @apply animate-scale-in max-h-[calc(100vh-3rem)] overflow-y-auto rounded-xl border border-border bg-surface shadow-2xl sm:max-h-[calc(100vh-2rem)];
   }
 
   /* Input di testo/data/numero/select condivisi da tutti i form */
