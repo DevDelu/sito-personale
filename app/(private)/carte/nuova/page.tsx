@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { AddCardForm } from "./add-card-form";
+
+export const metadata: Metadata = { title: "Carte · Nuova carta" };
 
 export default function NuovaCartaPage() {
   return (

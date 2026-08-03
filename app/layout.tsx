@@ -21,8 +21,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Archivio personale",
-  description: "Archivio personale — spese, collezione e agenda.",
+  title: "Bussola",
+  description: "Bussola — spese, investimenti, collezione e agenda personali.",
 };
 
 export default function RootLayout({

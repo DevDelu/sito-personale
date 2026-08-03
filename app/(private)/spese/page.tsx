@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { getOverviewData } from "@/lib/spese/queries";
 import { Overview } from "./overview";
 import { Toast } from "@/components/toast";
+
+export const metadata: Metadata = { title: "Spese" };
 
 const DEFAULT_PRESET = "mese";
 

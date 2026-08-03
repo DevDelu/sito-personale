@@ -46,7 +46,7 @@ export function AltreCarteList({
             onMouseMove={(e) => handleMove(e, c)}
             onMouseLeave={() => setHover(null)}
             onClick={() => onView(c)}
-            className="flex cursor-pointer items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-sm transition-colors duration-150 last:border-0 hover:bg-surface-hover"
+            className="animate-fade-in flex cursor-pointer items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-sm transition-colors duration-150 last:border-0 hover:bg-surface-hover"
           >
             <div className="flex min-w-0 items-center gap-2">
               <span className="font-figures shrink-0 text-xs text-muted whitespace-nowrap">×{c.quantity}</span>

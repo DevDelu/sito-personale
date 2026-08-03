@@ -1,7 +1,10 @@
 import dynamic from "next/dynamic";
+import type { Metadata } from "next";
 import { getPortfolioSnapshots, getPosizioniCorrenti, getTransazioni } from "@/lib/investimenti/queries";
 import { SummaryCards } from "@/components/investimenti/SummaryCards";
 import { PositionsTable } from "@/components/investimenti/PositionsTable";
+
+export const metadata: Metadata = { title: "Investimenti" };
 
 // Un solo import dinamico per entrambi i grafici: recharts (~400KB) finisce
 // in un unico chunk separato dal bundle principale della route, invece di

@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { getCategorie } from "@/lib/spese/queries";
 import { AddTransactionForm } from "./add-transaction-form";
+
+export const metadata: Metadata = { title: "Spese · Nuovo movimento" };
 
 export default async function NuovoMovimentoPage() {
   const categorie = await getCategorie();

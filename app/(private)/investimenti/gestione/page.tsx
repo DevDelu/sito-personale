@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { getAssets, getRiconciliazioneAsset, getTransazioni } from "@/lib/investimenti/queries";
 import { TransazioneTable } from "@/components/investimenti/TransazioneTable";
 import { RiconciliazioneBanner } from "@/components/investimenti/RiconciliazioneBanner";
+
+export const metadata: Metadata = { title: "Investimenti · Gestione" };
 
 export default async function InvestimentiGestionePage() {
   const [transazioni, assets, riconciliazione] = await Promise.all([

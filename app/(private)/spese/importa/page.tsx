@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { ImportForm } from "./import-form";
+
+export const metadata: Metadata = { title: "Spese · Importa" };
 
 export default function ImportaPage() {
   return (

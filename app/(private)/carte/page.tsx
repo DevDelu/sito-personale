@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { getCollectionOverview } from "@/lib/carte/queries";
 import { formatCurrency } from "@/lib/carte/format";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { CollectionSections } from "@/components/carte/CollectionSections";
+
+export const metadata: Metadata = { title: "Carte" };
 
 export default async function CartePage() {
   const { hero, resto, valoreTotale, numeroCarte } = await getCollectionOverview();

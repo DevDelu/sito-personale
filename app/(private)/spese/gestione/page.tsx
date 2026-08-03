@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { getCategorie, getMovimenti } from "@/lib/spese/queries";
 import { ExpenseTable } from "@/components/spese/ExpenseTable";
 import { GestioneFilters } from "./gestione-filters";
 import { Pagination } from "./pagination";
+
+export const metadata: Metadata = { title: "Spese · Gestione" };
 
 const PAGE_SIZE = 50;
 

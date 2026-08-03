@@ -22,7 +22,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           onClick={onNavigate}
           className="font-display text-base font-semibold tracking-tight"
         >
-          Personal HQ
+          Bussola
         </Link>
       </div>
 
@@ -107,7 +107,7 @@ export function Sidebar({ accountSlot }: { accountSlot: React.ReactNode }) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <span className="font-display text-sm font-semibold">Personal HQ</span>
+        <span className="font-display text-sm font-semibold">Bussola</span>
         {accountSlot}
       </div>
 
