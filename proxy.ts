@@ -3,20 +3,24 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 import { updateSession } from "@/lib/supabase/proxy";
 
-const PRIVATE_PREFIXES = ["/spese", "/investimenti", "/carte"];
-const UNPREFIXED_EXACT_ROUTES = ["/login"];
+// Rotte non sotto app/[locale]/ (private, login, api, e /progetti che ha il
+// suo design system dedicato non ancora integrato con next-intl): restano
+// gestite da updateSession() esattamente come prima, senza passare dal
+// middleware next-intl.
+const UNLOCALIZED_PREFIXES = ["/spese", "/investimenti", "/carte", "/progetti"];
+const UNLOCALIZED_EXACT_ROUTES = ["/login"];
 
 const intlMiddleware = createMiddleware(routing);
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const isAuthRoute =
-    PRIVATE_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)) ||
-    UNPREFIXED_EXACT_ROUTES.includes(pathname) ||
+  const isUnlocalized =
+    UNLOCALIZED_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)) ||
+    UNLOCALIZED_EXACT_ROUTES.includes(pathname) ||
     pathname.startsWith("/api/");
 
-  if (isAuthRoute) {
+  if (isUnlocalized) {
     return updateSession(request);
   }
 
