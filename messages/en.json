@@ -1,0 +1,12 @@
+{
+  "Hero": {
+    "headline": "I train even when no one's watching.",
+    "subtitle": "Personal projects and portfolio, built one commit at a time.",
+    "linkedin": "LinkedIn"
+  },
+  "PublicNav": {
+    "privateArea": "Private area",
+    "switchToEnglish": "Switch to English",
+    "switchToItalian": "Switch to Italian"
+  }
+}
