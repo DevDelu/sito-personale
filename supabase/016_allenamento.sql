@@ -113,98 +113,98 @@ insert into scheda_esercizi (
   riposo_sec, rounds, lavoro_sec, pausa_sec, zona_corporea, note
 )
 select (select id from schede where nome = 'Full body casa'), id, 'Riscaldamento', 1, 'normale',
-  1, null, null, null, 120, null, null, null, null, null, null
+  1, null::int, null::int, null::numeric, 120, null::int, null::int, null::int, null::int, null::text, null::text
 from esercizi where nome = 'Jumping jack'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Riscaldamento', 2, 'normale',
-  1, 15, 15, null, null, null, null, null, null, null, null
+  1, 15, 15, null::numeric, null::int, null::int, null::int, null::int, null::int, null::text, null::text
 from esercizi where nome = 'Squat corpo libero'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Riscaldamento', 3, 'normale',
-  2, null, null, null, 30, null, null, null, null, null, null
+  2, null::int, null::int, null::numeric, 30, null::int, null::int, null::int, null::int, null::text, null::text
 from esercizi where nome = 'Circonduzioni braccia'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Riscaldamento', 4, 'normale',
-  1, 10, 10, null, null, null, null, null, null, null, 'per gamba'
+  1, 10, 10, null::numeric, null::int, null::int, null::int, null::int, null::int, null::text, 'per gamba'
 from esercizi where nome = 'Affondi in cammino'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Riscaldamento', 5, 'normale',
-  1, null, null, null, 30, null, null, null, null, null, null
+  1, null::int, null::int, null::numeric, 30, null::int, null::int, null::int, null::int, null::text, null::text
 from esercizi where nome = 'Plank'
 
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Corda', 6, 'circuito',
-  null, null, null, null, null, null, 8, 40, 15, null, null
+  null::int, null::int, null::int, null::numeric, null::int, null::int, 8, 40, 15, null::text, null::text
 from esercizi where nome = 'Corda'
 
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Blocco 1 - Trazioni/Dip', 7, 'normale',
-  4, null, null, null, null, 100, null, null, null, null, 'ripetizioni massime (max reps)'
+  4, null::int, null::int, null::numeric, null::int, 100, null::int, null::int, null::int, null::text, 'ripetizioni massime (max reps)'
 from esercizi where nome = 'Trazioni'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Blocco 1 - Trazioni/Dip', 8, 'normale',
-  4, 8, 12, null, null, 100, null, null, null, null, null
+  4, 8, 12, null::numeric, null::int, 100, null::int, null::int, null::int, null::text, null::text
 from esercizi where nome = 'Dip'
 
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Blocco 2 - Push-up/Dead hang', 9, 'normale',
-  3, 12, 15, null, null, 75, null, null, null, null, null
+  3, 12, 15, null::numeric, null::int, 75, null::int, null::int, null::int, null::text, null::text
 from esercizi where nome = 'Push up'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Blocco 2 - Push-up/Dead hang', 10, 'normale',
-  3, null, null, null, 30, 75, null, null, null, null, 'range 30-40s, punta al massimo'
+  3, null::int, null::int, null::numeric, 30, 75, null::int, null::int, null::int, null::text, 'range 30-40s, punta al massimo'
 from esercizi where nome = 'Dead hang'
 
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Blocco 3 - Squat/Shoulder press', 11, 'normale',
-  4, 12, 12, null, null, 90, null, null, null, null, null
+  4, 12, 12, null::numeric, null::int, 90, null::int, null::int, null::int, null::text, null::text
 from esercizi where nome = 'Goblet squat'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Blocco 3 - Squat/Shoulder press', 12, 'normale',
-  4, 10, 10, null, null, 90, null, null, null, null, null
+  4, 10, 10, null::numeric, null::int, 90, null::int, null::int, null::int, null::text, null::text
 from esercizi where nome = 'Shoulder press'
 
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Blocco 4 - Affondi/Alzate', 13, 'normale',
-  3, 10, 10, null, null, 75, null, null, null, null, 'per gamba'
+  3, 10, 10, null::numeric, null::int, 75, null::int, null::int, null::int, null::text, 'per gamba'
 from esercizi where nome = 'Affondi'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Blocco 4 - Affondi/Alzate', 14, 'normale',
-  3, 12, 12, null, null, 75, null, null, null, null, null
+  3, 12, 12, null::numeric, null::int, 75, null::int, null::int, null::int, null::text, null::text
 from esercizi where nome = 'Alzate laterali/frontali'
 
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Addome (2 giri)', 15, 'normale',
-  2, 20, 20, null, null, null, null, null, null, null, 'Parte del giro addome (Crunch → Leg raise → Russian twist → Plank), riposo solo dopo Plank'
+  2, 20, 20, null::numeric, null::int, null::int, null::int, null::int, null::int, null::text, 'Parte del giro addome (Crunch → Leg raise → Russian twist → Plank), riposo solo dopo Plank'
 from esercizi where nome = 'Crunch'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Addome (2 giri)', 16, 'normale',
-  2, 15, 15, null, null, null, null, null, null, null, 'Parte del giro addome (Crunch → Leg raise → Russian twist → Plank), riposo solo dopo Plank'
+  2, 15, 15, null::numeric, null::int, null::int, null::int, null::int, null::int, null::text, 'Parte del giro addome (Crunch → Leg raise → Russian twist → Plank), riposo solo dopo Plank'
 from esercizi where nome = 'Leg raise'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Addome (2 giri)', 17, 'normale',
-  2, 20, 20, null, null, null, null, null, null, null, 'Parte del giro addome (Crunch → Leg raise → Russian twist → Plank), riposo solo dopo Plank'
+  2, 20, 20, null::numeric, null::int, null::int, null::int, null::int, null::int, null::text, 'Parte del giro addome (Crunch → Leg raise → Russian twist → Plank), riposo solo dopo Plank'
 from esercizi where nome = 'Russian twist'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Addome (2 giri)', 18, 'normale',
-  2, null, null, null, 60, 45, null, null, null, null, 'Parte del giro addome, riposo di 45s dopo ogni giro completo'
+  2, null::int, null::int, null::numeric, 60, 45, null::int, null::int, null::int, null::text, 'Parte del giro addome, riposo di 45s dopo ogni giro completo'
 from esercizi where nome = 'Plank'
 
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Stretching', 19, 'stretching',
-  null, null, null, null, 28, null, null, null, null, 'Gambe', null
+  null::int, null::int, null::int, null::numeric, 28, null::int, null::int, null::int, null::int, 'Gambe', null::text
 from esercizi where nome = 'Stretching'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Stretching', 20, 'stretching',
-  null, null, null, null, 28, null, null, null, null, 'Petto', null
+  null::int, null::int, null::int, null::numeric, 28, null::int, null::int, null::int, null::int, 'Petto', null::text
 from esercizi where nome = 'Stretching'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Stretching', 21, 'stretching',
-  null, null, null, null, 28, null, null, null, null, 'Spalle', null
+  null::int, null::int, null::int, null::numeric, 28, null::int, null::int, null::int, null::int, 'Spalle', null::text
 from esercizi where nome = 'Stretching'
 union all
 select (select id from schede where nome = 'Full body casa'), id, 'Stretching', 22, 'stretching',
-  null, null, null, null, 28, null, null, null, null, 'Schiena', null
+  null::int, null::int, null::int, null::numeric, 28, null::int, null::int, null::int, null::int, 'Schiena', null::text
 from esercizi where nome = 'Stretching';
 
 -- Nessuna riga in impegni_fissi: i giorni per boxe/nuoto non sono ancora
