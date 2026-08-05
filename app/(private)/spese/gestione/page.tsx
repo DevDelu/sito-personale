@@ -6,7 +6,13 @@ import { Pagination } from "./pagination";
 
 export const metadata: Metadata = { title: "Spese · Gestione" };
 
-const PAGE_SIZE = 50;
+const DEFAULT_PAGE_SIZE = 50;
+const ALLOWED_PAGE_SIZES = [25, 50, 100, 250, 500];
+
+function parsePageSize(raw: string | undefined): number {
+  const n = Number(raw);
+  return ALLOWED_PAGE_SIZES.includes(n) ? n : DEFAULT_PAGE_SIZE;
+}
 
 export default async function GestionePage({
   searchParams,
@@ -18,10 +24,12 @@ export default async function GestionePage({
     from?: string;
     to?: string;
     page?: string;
+    pageSize?: string;
   }>;
 }) {
-  const { search, categoria, tipo, from, to, page } = await searchParams;
+  const { search, categoria, tipo, from, to, page, pageSize: pageSizeRaw } = await searchParams;
   const currentPage = Math.max(1, Number(page) || 1);
+  const pageSize = parsePageSize(pageSizeRaw);
 
   const [{ rows, total }, categorie] = await Promise.all([
     getMovimenti({
@@ -31,12 +39,12 @@ export default async function GestionePage({
       from,
       to,
       page: currentPage,
-      pageSize: PAGE_SIZE,
+      pageSize,
     }),
     getCategorie(),
   ]);
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
     <div className="flex flex-col gap-6">
@@ -49,7 +57,7 @@ export default async function GestionePage({
 
       <GestioneFilters categorie={categorie} />
       <ExpenseTable rows={rows} categorie={categorie} />
-      <Pagination page={currentPage} totalPages={totalPages} />
+      <Pagination page={currentPage} totalPages={totalPages} pageSize={pageSize} />
     </div>
   );
 }
