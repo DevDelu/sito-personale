@@ -1,4 +1,4 @@
-import { Calendar, Layers, TrendingUp, Wallet, type LucideIcon } from "lucide-react";
+import { Calendar, Dumbbell, Layers, TrendingUp, Wallet, type LucideIcon } from "lucide-react";
 
 export type SidebarSubsection = { href: string; label: string };
 
@@ -44,6 +44,16 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     subsections: [
       { href: "/carte", label: "Overview" },
       { href: "/carte/nuova", label: "+ Aggiungi" },
+    ],
+  },
+  {
+    id: "allenamenti",
+    label: "Allenamento",
+    icon: Dumbbell,
+    href: "/allenamenti",
+    subsections: [
+      { href: "/allenamenti", label: "Overview" },
+      { href: "/allenamenti/storico", label: "Storico" },
     ],
   },
   {
