@@ -199,12 +199,115 @@ export async function getRiconciliazioneAsset(): Promise<Riconciliazione[]> {
   return risultato;
 }
 
-export async function getPortfolioSnapshots(): Promise<{ data: string; valore_totale: number }[]> {
+export type GruppoStorico = { chiave: string; label: string };
+export type PuntoPortafoglio = { data: string; totale: number } & Record<string, number | string>;
+
+// "etf" = tutti i tipi non-crypto, un gruppo per ticker per ogni crypto
+// (oggi solo BTC) — stessa suddivisione usata da AllocationChart.
+function gruppoDiAsset(asset: Asset): GruppoStorico {
+  if (asset.tipo === "crypto") return { chiave: asset.ticker.toLowerCase(), label: asset.ticker };
+  return { chiave: "etf", label: "ETF" };
+}
+
+// Storico valore portafoglio dalla prima transazione reale (non da quando
+// gira il cron): niente nuove tabelle, le transazioni + prezzi_storico
+// restano l'unica fonte di verità. Per ogni giorno calcola la quantità netta
+// per asset (somma cumulata buy/sell) e il prezzo (ultimo noto <= giorno,
+// forward-fill), poi somma per gruppo. Se `from` è passato, filtra i punti
+// restituiti ma il calcolo della quantità parte comunque dall'inizio reale,
+// altrimenti la quantità di partenza sarebbe sbagliata.
+export async function getPortfolioHistoryByAsset(
+  from?: string,
+  to?: string
+): Promise<{ punti: PuntoPortafoglio[]; gruppi: GruppoStorico[] }> {
   const admin = createAdminClient();
-  const { data, error } = await admin
-    .from("portfolio_snapshot")
-    .select("data, valore_totale")
-    .order("data", { ascending: true });
-  if (error) throw new Error(error.message);
-  return (data ?? []).map((r) => ({ data: r.data, valore_totale: toNumber(r.valore_totale) }));
+  const [assetsRes, transazioniRes, prezziRes] = await Promise.all([
+    admin.from("assets").select("*").order("nome"),
+    admin.from("transazioni").select("*").order("data", { ascending: true }),
+    admin.from("prezzi_storico").select("asset_id, data, prezzo").order("data", { ascending: true }),
+  ]);
+  if (assetsRes.error) throw new Error(assetsRes.error.message);
+  if (transazioniRes.error) throw new Error(transazioniRes.error.message);
+  if (prezziRes.error) throw new Error(prezziRes.error.message);
+
+  const assets = (assetsRes.data ?? []).map(mapAsset);
+  const transazioni = (transazioniRes.data ?? []).map(mapTransazione);
+  if (transazioni.length === 0) return { punti: [], gruppi: [] };
+
+  const primaData = transazioni[0].data;
+  const oggi = new Date().toISOString().slice(0, 10);
+  const dataFine = to && to < oggi ? to : oggi; // niente punti nel futuro
+  if (primaData > dataFine) return { punti: [], gruppi: [] };
+
+  const gruppoPerAsset = new Map<string, GruppoStorico>();
+  const gruppi = new Map<string, GruppoStorico>();
+  for (const asset of assets) {
+    const g = gruppoDiAsset(asset);
+    gruppoPerAsset.set(asset.id, g);
+    if (!gruppi.has(g.chiave)) gruppi.set(g.chiave, g);
+  }
+
+  const transazioniPerAsset = new Map<string, Transazione[]>();
+  for (const t of transazioni) {
+    const list = transazioniPerAsset.get(t.asset_id) ?? [];
+    list.push(t);
+    transazioniPerAsset.set(t.asset_id, list);
+  }
+
+  const prezziPerAsset = new Map<string, { data: string; prezzo: number }[]>();
+  for (const p of prezziRes.data ?? []) {
+    const list = prezziPerAsset.get(p.asset_id as string) ?? [];
+    list.push({ data: p.data as string, prezzo: toNumber(p.prezzo) });
+    prezziPerAsset.set(p.asset_id as string, list);
+  }
+
+  // Stato incrementale per asset, avanzato giorno per giorno: indice della
+  // prossima transazione/prezzo da applicare, quantità corrente, ultimo
+  // prezzo noto.
+  const stato = new Map<string, { txIdx: number; prezzoIdx: number; quantita: number; prezzo: number | null }>();
+  for (const asset of assets) stato.set(asset.id, { txIdx: 0, prezzoIdx: 0, quantita: 0, prezzo: null });
+
+  const punti: PuntoPortafoglio[] = [];
+  const giornoMs = 24 * 60 * 60 * 1000;
+  const inizio = new Date(`${primaData}T00:00:00Z`).getTime();
+  const fine = new Date(`${dataFine}T00:00:00Z`).getTime();
+
+  for (let t = inizio; t <= fine; t += giornoMs) {
+    const giorno = new Date(t).toISOString().slice(0, 10);
+    const valorePerGruppo = new Map<string, number>();
+
+    for (const asset of assets) {
+      const s = stato.get(asset.id)!;
+      const transazioniAsset = transazioniPerAsset.get(asset.id) ?? [];
+      while (s.txIdx < transazioniAsset.length && transazioniAsset[s.txIdx].data <= giorno) {
+        const tx = transazioniAsset[s.txIdx];
+        s.quantita += tx.tipo === "buy" ? tx.quantita : -tx.quantita;
+        s.txIdx++;
+      }
+
+      const prezziAsset = prezziPerAsset.get(asset.id) ?? [];
+      while (s.prezzoIdx < prezziAsset.length && prezziAsset[s.prezzoIdx].data <= giorno) {
+        s.prezzo = prezziAsset[s.prezzoIdx].prezzo;
+        s.prezzoIdx++;
+      }
+
+      if (s.quantita <= 1e-9 || s.prezzo === null) continue;
+      const valore = s.quantita * s.prezzo;
+      const g = gruppoPerAsset.get(asset.id)!;
+      valorePerGruppo.set(g.chiave, (valorePerGruppo.get(g.chiave) ?? 0) + valore);
+    }
+
+    let totale = 0;
+    const punto: PuntoPortafoglio = { data: giorno, totale: 0 };
+    for (const [chiave, valore] of valorePerGruppo) {
+      punto[chiave] = valore;
+      totale += valore;
+    }
+    punto.totale = totale;
+    punti.push(punto);
+  }
+
+  const puntiFiltrati = from && from > primaData ? punti.filter((p) => p.data >= from) : punti;
+
+  return { punti: puntiFiltrati, gruppi: [...gruppi.values()] };
 }

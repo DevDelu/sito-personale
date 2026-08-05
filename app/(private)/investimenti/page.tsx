@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 import type { Metadata } from "next";
-import { getPortfolioSnapshots, getPosizioniCorrenti, getTransazioni } from "@/lib/investimenti/queries";
+import { getPortfolioHistoryByAsset, getPosizioniCorrenti, getTransazioni } from "@/lib/investimenti/queries";
 import { SummaryCards } from "@/components/investimenti/SummaryCards";
 import { PositionsTable } from "@/components/investimenti/PositionsTable";
 
@@ -12,10 +12,16 @@ export const metadata: Metadata = { title: "Investimenti" };
 // nei Server Component).
 const ChartsSection = dynamic(() => import("@/components/investimenti/ChartsSection").then((m) => m.ChartsSection));
 
-export default async function InvestimentiPage() {
-  const [posizioni, snapshots, transazioni] = await Promise.all([
+export default async function InvestimentiPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string; to?: string }>;
+}) {
+  const { from, to } = await searchParams;
+
+  const [posizioni, storico, transazioni] = await Promise.all([
     getPosizioniCorrenti(),
-    getPortfolioSnapshots(),
+    getPortfolioHistoryByAsset(from, to),
     getTransazioni(),
   ]);
 
@@ -43,7 +49,7 @@ export default async function InvestimentiPage() {
         plusvalenzaPercentuale={plusvalenzaPercentuale}
       />
 
-      <ChartsSection posizioni={posizioni} snapshots={snapshots} />
+      <ChartsSection posizioni={posizioni} punti={storico.punti} gruppi={storico.gruppi} />
 
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Posizioni</h2>
