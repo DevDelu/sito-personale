@@ -7,10 +7,10 @@ export function useCarteMutations() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function updateCarta(id: number, patch: ModificaCartaPatch) {
+  async function updateCarta(id: number, cardId: number, patch: ModificaCartaPatch) {
     setPending(true);
     setError(null);
-    const res = await modificaCarta(id, patch);
+    const res = await modificaCarta(id, cardId, patch);
     setPending(false);
     if (res?.error) {
       setError(res.error);

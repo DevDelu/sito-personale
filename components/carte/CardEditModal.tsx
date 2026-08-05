@@ -27,6 +27,8 @@ export function CardEditModal({
   onSave: (patch: ModificaCartaPatch) => void;
   onCancel: () => void;
 }) {
+  const [name, setName] = useState(carta.name);
+  const [cardNumber, setCardNumber] = useState(carta.card_number ?? "");
   const [quantity, setQuantity] = useState(String(carta.quantity));
   const [condition, setCondition] = useState<CardCondition>(carta.condition ?? "NM");
   const [language, setLanguage] = useState(carta.language);
@@ -46,6 +48,14 @@ export function CardEditModal({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    if (!name.trim()) {
+      setErroreForm("Il titolo della carta è obbligatorio.");
+      return;
+    }
+    if (!cardNumber.trim()) {
+      setErroreForm("Il codice carta è obbligatorio.");
+      return;
+    }
     const quantityNum = Number(quantity);
     if (!Number.isFinite(quantityNum) || quantityNum <= 0) {
       setErroreForm("La quantità deve essere un numero positivo.");
@@ -77,6 +87,8 @@ export function CardEditModal({
     }
 
     onSave({
+      name: name.trim(),
+      card_number: cardNumber.trim(),
       quantity: quantityNum,
       condition,
       language,
@@ -103,6 +115,28 @@ export function CardEditModal({
               accept="image/*"
               onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
               className="field-input file:mr-3 file:rounded-md file:border-0 file:bg-[var(--accent)]/15 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent"
+            />
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Titolo carta">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="field-input"
+            />
+          </Field>
+          <Field label="Codice carta">
+            <input
+              type="text"
+              value={cardNumber}
+              onChange={(e) => setCardNumber(e.target.value)}
+              placeholder="es. E-111"
+              required
+              className="field-input"
             />
           </Field>
         </div>

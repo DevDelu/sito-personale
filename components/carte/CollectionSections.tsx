@@ -28,7 +28,7 @@ export function CollectionSections({
 
   async function handleSave(patch: ModificaCartaPatch) {
     if (!editing) return;
-    await updateCarta(editing.id, patch);
+    await updateCarta(editing.id, editing.card_id, patch);
     setEditing(null);
     router.refresh();
   }

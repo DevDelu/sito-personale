@@ -144,6 +144,8 @@ export async function aggiungiCarta(
 }
 
 export type ModificaCartaPatch = {
+  name: string;
+  card_number: string;
   quantity: number;
   condition: CardCondition;
   language: string;
@@ -154,9 +156,23 @@ export type ModificaCartaPatch = {
 
 export type CarteActionResult = { error?: string };
 
-export async function modificaCarta(id: number, patch: ModificaCartaPatch): Promise<CarteActionResult> {
+// `cardId` (fusion_world_cards) è separato da `id` (my_collection): nome e
+// codice vivono sull'anagrafica condivisa, quantità/condizione/prezzi sul
+// posseduto. Se la stessa carta è posseduta più volte, aggiornare
+// nome/codice da una qualsiasi riga aggiorna l'anagrafica per tutte.
+export async function modificaCarta(
+  id: number,
+  cardId: number,
+  patch: ModificaCartaPatch
+): Promise<CarteActionResult> {
   await requireUser();
 
+  if (!patch.name.trim()) {
+    return { error: "Il titolo della carta è obbligatorio." };
+  }
+  if (!patch.card_number.trim()) {
+    return { error: "Il codice carta è obbligatorio." };
+  }
   if (!Number.isFinite(patch.quantity) || patch.quantity <= 0) {
     return { error: "La quantità deve essere un numero positivo." };
   }
@@ -168,6 +184,13 @@ export async function modificaCarta(id: number, patch: ModificaCartaPatch): Prom
   }
 
   const admin = createAdminClient();
+
+  const { error: cardError } = await admin
+    .from("fusion_world_cards")
+    .update({ name: patch.name.trim(), card_number: patch.card_number.trim() })
+    .eq("id", cardId);
+  if (cardError) return { error: cardError.message };
+
   const { error } = await admin
     .from("my_collection")
     .update({
