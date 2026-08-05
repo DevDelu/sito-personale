@@ -11,10 +11,3 @@ export const DEFAULT_ACCENT: ProjectAccentColors = {
 export function getAccentColors(accent?: ProjectAccentColors): ProjectAccentColors {
   return accent ?? DEFAULT_ACCENT;
 }
-
-export const CATEGORY_LABELS: Record<string, string> = {
-  thesis: "Tesi di laurea",
-  personal: "Progetto personale",
-  work: "Lavoro",
-  hackathon: "Hackathon",
-};

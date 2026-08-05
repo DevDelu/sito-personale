@@ -1,16 +1,24 @@
 import Image from "next/image";
-import Link from "next/link";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type { CSSProperties } from "react";
 import type { Project } from "@/types/project";
-import { CATEGORY_LABELS, getAccentColors } from "@/lib/progetti-theme";
+import { getAccentColors } from "@/lib/progetti-theme";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 import { StatNumber } from "@/components/progetti/stat-number";
 import { MdxH2, MdxP, MdxUl } from "@/components/progetti/mdx-elements";
+import { Link } from "@/i18n/navigation";
 
 const mdxComponents = { h2: MdxH2, p: MdxP, ul: MdxUl };
 
-export function CaseStudyLayout({ project }: { project: Project }) {
+export function CaseStudyLayout({
+  project,
+  categoryLabel,
+  backLinkLabel,
+}: {
+  project: Project;
+  categoryLabel: string;
+  backLinkLabel: string;
+}) {
   const accent = getAccentColors(project.accentColors);
 
   return (
@@ -21,13 +29,13 @@ export function CaseStudyLayout({ project }: { project: Project }) {
             href="/progetti"
             className="font-mono text-sm text-[#5c5546] transition-colors hover:text-[#221f19]"
           >
-            ← Tutti i progetti
+            ← {backLinkLabel}
           </Link>
         </RevealItem>
 
         <RevealItem className="mt-8">
           <span className="font-mono text-xs uppercase tracking-wide" style={{ color: accent.primary }}>
-            {CATEGORY_LABELS[project.category] ?? project.category} · {project.year}
+            {categoryLabel} · {project.year}
           </span>
         </RevealItem>
 

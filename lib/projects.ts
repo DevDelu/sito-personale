@@ -4,9 +4,14 @@ import matter from "gray-matter";
 import type { Project } from "@/types/project";
 
 const PROJECTS_DIR = path.join(process.cwd(), "content", "projects");
+const DEFAULT_LOCALE = "it";
 
-function readProjectFile(filename: string): Project {
-  const slug = filename.replace(/\.mdx$/, "");
+// File senza suffisso di lingua (`slug.mdx`) = italiano, la lingua di
+// default. Una traduzione è un file separato `slug.<locale>.mdx` accanto
+// all'originale — se manca per una lingua non di default, si ricade
+// sull'italiano invece di un 404: meglio un case study non tradotto che
+// assente.
+function readProjectFile(slug: string, filename: string): Project {
   const raw = fs.readFileSync(path.join(PROJECTS_DIR, filename), "utf8");
   const { data, content } = matter(raw);
 
@@ -28,22 +33,41 @@ function readProjectFile(filename: string): Project {
   };
 }
 
-export function getProjects(): Project[] {
-  const filenames = fs
-    .readdirSync(PROJECTS_DIR)
-    .filter((filename) => filename.endsWith(".mdx"));
+function resolveFilename(slug: string, locale: string): string | undefined {
+  if (locale !== DEFAULT_LOCALE) {
+    const localized = `${slug}.${locale}.mdx`;
+    if (fs.existsSync(path.join(PROJECTS_DIR, localized))) return localized;
+  }
+  const base = `${slug}.mdx`;
+  return fs.existsSync(path.join(PROJECTS_DIR, base)) ? base : undefined;
+}
 
-  return filenames
-    .map(readProjectFile)
+// Slug canonici: solo i file base (`slug.mdx`), non le varianti di lingua
+// (`slug.en.mdx`) — altrimenti una traduzione conterebbe come progetto a sé.
+function listSlugs(): string[] {
+  return fs
+    .readdirSync(PROJECTS_DIR)
+    .filter((filename) => /^[^.]+\.mdx$/.test(filename))
+    .map((filename) => filename.replace(/\.mdx$/, ""));
+}
+
+export function getProjects(locale: string = DEFAULT_LOCALE): Project[] {
+  return listSlugs()
+    .map((slug) => {
+      const filename = resolveFilename(slug, locale);
+      return filename ? readProjectFile(slug, filename) : undefined;
+    })
+    .filter((project): project is Project => project !== undefined)
     .sort((a, b) => b.year - a.year);
 }
 
-export function getProjectBySlug(slug: string): Project | undefined {
-  const filename = `${slug}.mdx`;
+export function getFeaturedProjects(locale: string = DEFAULT_LOCALE, limit = 3): Project[] {
+  return getProjects(locale)
+    .filter((project) => project.featured)
+    .slice(0, limit);
+}
 
-  if (!fs.existsSync(path.join(PROJECTS_DIR, filename))) {
-    return undefined;
-  }
-
-  return readProjectFile(filename);
+export function getProjectBySlug(slug: string, locale: string = DEFAULT_LOCALE): Project | undefined {
+  const filename = resolveFilename(slug, locale);
+  return filename ? readProjectFile(slug, filename) : undefined;
 }

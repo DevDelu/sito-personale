@@ -3,11 +3,10 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 import { updateSession } from "@/lib/supabase/proxy";
 
-// Rotte non sotto app/[locale]/ (private, login, api, e /progetti che ha il
-// suo design system dedicato non ancora integrato con next-intl): restano
-// gestite da updateSession() esattamente come prima, senza passare dal
-// middleware next-intl.
-const UNLOCALIZED_PREFIXES = ["/spese", "/investimenti", "/carte", "/progetti"];
+// Rotte non sotto app/[locale]/ (area privata, login, api): restano gestite
+// da updateSession() esattamente come prima, senza passare dal middleware
+// next-intl. /progetti è invece sotto app/[locale]/progetti (bilingue).
+const UNLOCALIZED_PREFIXES = ["/spese", "/investimenti", "/carte", "/allenamenti"];
 const UNLOCALIZED_EXACT_ROUTES = ["/login"];
 
 const intlMiddleware = createMiddleware(routing);

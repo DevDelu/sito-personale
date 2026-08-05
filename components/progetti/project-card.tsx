@@ -1,9 +1,8 @@
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { Project } from "@/types/project";
-import { CATEGORY_LABELS } from "@/lib/progetti-theme";
 
-export function ProjectCard({ project }: { project: Project }) {
+export function ProjectCard({ project, categoryLabel }: { project: Project; categoryLabel: string }) {
   return (
     <Link
       href={`/progetti/${project.slug}`}
@@ -22,9 +21,7 @@ export function ProjectCard({ project }: { project: Project }) {
       ) : null}
 
       <div className="flex flex-col gap-2 p-5">
-        <span className="font-mono text-xs uppercase tracking-wide text-[#8a8272]">
-          {CATEGORY_LABELS[project.category] ?? project.category}
-        </span>
+        <span className="font-mono text-xs uppercase tracking-wide text-[#8a8272]">{categoryLabel}</span>
 
         <h3 className="font-display text-xl font-medium italic text-[#221f19]">{project.title}</h3>
 

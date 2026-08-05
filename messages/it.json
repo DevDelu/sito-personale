@@ -1,8 +1,27 @@
 {
   "Hero": {
     "headline": "Mi alleno anche quando nessuno guarda.",
-    "subtitle": "Portfolio e progetti personali, costruiti un commit alla volta.",
+    "subtitle": "PMO in Aeonvis S.p.A. (cliente Credit Agricole Auto Bank), in cammino verso l'AI Product Engineering.",
+    "ctaContact": "Contattami",
+    "ctaCv": "Scarica CV",
     "linkedin": "LinkedIn"
+  },
+  "FeaturedProjects": {
+    "title": "Progetti in evidenza",
+    "viewAll": "Vedi tutti"
+  },
+  "ProjectCategory": {
+    "thesis": "Tesi di laurea",
+    "personal": "Progetto personale",
+    "work": "Lavoro",
+    "hackathon": "Hackathon"
+  },
+  "Progetti": {
+    "title": "Progetti",
+    "description": "Una selezione di case study: tesi, progetti personali e lavoro."
+  },
+  "CaseStudy": {
+    "backLink": "Tutti i progetti"
   },
   "PublicNav": {
     "privateArea": "Area privata",
