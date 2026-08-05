@@ -4,20 +4,24 @@ import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { formatCurrency } from "@/lib/investimenti/format";
 import type { Posizione } from "@/lib/investimenti/types";
 
-type Gruppo = "crypto" | "etf";
+type Gruppo = "crypto" | "etf" | "etc";
 
-const GRUPPO_LABEL: Record<Gruppo, string> = { crypto: "Crypto", etf: "ETF" };
+const GRUPPO_LABEL: Record<Gruppo, string> = { crypto: "Crypto", etf: "ETF", etc: "ETC" };
 const GRUPPO_COLOR_VAR: Record<Gruppo, string> = {
   crypto: "--invest-pie-crypto",
   etf: "--invest-pie-etf",
+  etc: "--invest-pie-etc",
 };
 
-// Solo 2 categorie in questo grafico (crypto vs tutto il resto): la
-// suddivisione per singolo tipo/asset resta nella tabella Posizioni.
+// 3 categorie in questo grafico: ETF ed ETC (es. oro fisico) separati da
+// quando 'etc' esiste come tipo asset a sé, crypto a parte. Le azioni/indici
+// restano dentro "etf" come raggruppamento generico — la suddivisione per
+// singolo tipo/asset resta nella tabella Posizioni.
 function allocationByGruppo(posizioni: Posizione[]) {
   const totals = new Map<Gruppo, number>();
   for (const p of posizioni) {
-    const gruppo: Gruppo = p.asset.tipo === "crypto" ? "crypto" : "etf";
+    const gruppo: Gruppo =
+      p.asset.tipo === "crypto" ? "crypto" : p.asset.tipo === "etc" ? "etc" : "etf";
     const valore = p.valoreAttuale ?? p.costoTotaleCarico;
     totals.set(gruppo, (totals.get(gruppo) ?? 0) + valore);
   }

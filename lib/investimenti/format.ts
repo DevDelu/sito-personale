@@ -11,7 +11,8 @@ export function formatQuantita(n: number): string {
 
 export const TIPO_ASSET_LABEL: Record<string, string> = {
   stock: "Azioni",
-  etf: "ETF/ETC",
+  etf: "ETF",
+  etc: "ETC",
   indice: "Indici",
   crypto: "Crypto",
 };
@@ -19,6 +20,7 @@ export const TIPO_ASSET_LABEL: Record<string, string> = {
 export const TIPO_ASSET_COLOR_VAR: Record<string, string> = {
   stock: "--invest-stock",
   etf: "--invest-etf",
+  etc: "--invest-etc",
   indice: "--invest-indice",
   crypto: "--invest-crypto",
 };

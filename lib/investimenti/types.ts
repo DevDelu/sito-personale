@@ -1,4 +1,4 @@
-export type TipoAsset = "stock" | "etf" | "indice" | "crypto";
+export type TipoAsset = "stock" | "etf" | "etc" | "indice" | "crypto";
 export type TipoTransazione = "buy" | "sell";
 export type CostoTipo = "verificato" | "stimato" | "sconosciuto";
 

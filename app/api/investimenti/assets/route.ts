@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getUser } from "@/lib/supabase/dal";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-const TIPI_ASSET = new Set(["stock", "etf", "indice", "crypto"]);
+const TIPI_ASSET = new Set(["stock", "etf", "etc", "indice", "crypto"]);
 
 export async function POST(request: Request) {
   const user = await getUser();

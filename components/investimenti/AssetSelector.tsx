@@ -7,7 +7,8 @@ import type { Asset, TipoAsset } from "@/lib/investimenti/types";
 const NUOVO_ASSET = "__nuovo__";
 
 const TIPI: { value: TipoAsset; label: string }[] = [
-  { value: "etf", label: "ETF/ETC" },
+  { value: "etf", label: "ETF" },
+  { value: "etc", label: "ETC" },
   { value: "stock", label: "Azione" },
   { value: "indice", label: "Indice" },
   { value: "crypto", label: "Crypto" },

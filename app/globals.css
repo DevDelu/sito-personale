@@ -32,6 +32,7 @@
 
   /* Investimenti: un colore per tipo asset, distinto dalle categorie Spese */
   --invest-etf: #c25a1e;
+  --invest-etc: #3f8f6a;
   --invest-crypto: #b8860b;
   --invest-stock: #3b6e91;
   --invest-indice: #7c5c9e;
@@ -39,6 +40,7 @@
   /* Solo per il grafico a torta di allocazione: dedicati, lontani da accent
      (ambra) e dai colori semantici plus/minus (verde/rosso). */
   --invest-pie-etf: #5b7fde;
+  --invest-pie-etc: #3fae6b;
   --invest-pie-crypto: #d6528f;
 }
 
@@ -72,11 +74,13 @@
   --cat-extra-6: #d6a35c;
 
   --invest-etf: #e8792e;
+  --invest-etc: #56b58d;
   --invest-crypto: #e5c158;
   --invest-stock: #5b9bc4;
   --invest-indice: #a98fc9;
 
   --invest-pie-etf: #5b7fde;
+  --invest-pie-etc: #3fae6b;
   --invest-pie-crypto: #d6528f;
 }
 
