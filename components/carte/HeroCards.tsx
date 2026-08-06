@@ -5,7 +5,7 @@ import { CardPlaceholder } from "./CardPlaceholder";
 import { formatCurrency } from "@/lib/carte/format";
 import type { CollectionCard } from "@/lib/carte/types";
 
-const RANK_LABEL = ["N.1 PER VALORE", "N.2 PER VALORE", "N.3 PER VALORE"];
+const RANK_LABEL = ["N.1", "N.2", "N.3"];
 
 export function HeroCards({
   carte,
@@ -27,19 +27,19 @@ export function HeroCards({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div className="grid justify-center gap-4 [grid-template-columns:repeat(auto-fill,176px)]">
       {carte.map((c, i) => {
         return (
           <div
             key={c.id}
             onClick={() => onView(c)}
-            className="card card-hover animate-slide-up mx-auto flex w-full max-w-[240px] cursor-pointer flex-col gap-3 p-4 sm:max-w-none"
+            className="card card-hover animate-slide-up flex w-44 cursor-pointer flex-col gap-3 p-4"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="w-fit rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-accent uppercase">
                 {RANK_LABEL[i]}
               </span>
-              <div className="flex items-center gap-1">
+              <div className="flex shrink-0 items-center gap-1">
                 <button
                   type="button"
                   onClick={(e) => {

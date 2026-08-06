@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import { requireUser } from "@/lib/supabase/dal";
 import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -13,6 +15,10 @@ export default async function PrivateLayout({
   const accountSlot = (
     <div className="flex items-center gap-2">
       <ThemeToggle />
+      <Link href="/" aria-label="Area pubblica" className="btn-secondary flex items-center gap-1.5 !px-3 !py-1.5">
+        <ExternalLink className="h-3.5 w-3.5" />
+        <span className="hidden sm:inline">Area pubblica</span>
+      </Link>
       <form action={logout}>
         <button type="submit" className="btn-secondary !px-3 !py-1.5">
           Esci

@@ -1,7 +1,6 @@
 "use client";
 
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { formatCurrency } from "@/lib/investimenti/format";
 import type { Posizione } from "@/lib/investimenti/types";
 
 type Gruppo = "crypto" | "etf" | "etc";
@@ -32,7 +31,6 @@ function allocationByGruppo(posizioni: Posizione[]) {
 
 export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
   const data = allocationByGruppo(posizioni);
-  const totale = data.reduce((s, d) => s + d.totale, 0);
 
   if (data.length === 0) {
     return (
@@ -44,7 +42,6 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
 
   return (
     <div className="card flex h-72 w-full flex-col gap-1 p-4">
-      <span className="font-figures text-lg font-bold">{formatCurrency(totale)}</span>
       <div className="min-h-0 flex-1">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
