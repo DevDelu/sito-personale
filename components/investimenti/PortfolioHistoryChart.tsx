@@ -4,7 +4,9 @@ import { useMemo, useState } from "react";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { TooltipContentProps } from "recharts";
 import { formatCurrency } from "@/lib/investimenti/format";
+import { adaptiveTickInterval } from "@/lib/spese-utils";
 import type { GruppoStorico, PuntoPortafoglio } from "@/lib/investimenti/queries";
+import { PortfolioDateRangeFilter } from "@/components/investimenti/PortfolioDateRangeFilter";
 
 const axisTick = { fill: "var(--muted)", fontSize: 12, fontFamily: "var(--font-mono)" };
 
@@ -16,19 +18,14 @@ const GRANULARITA: { value: Granularita; label: string }[] = [
   { value: "mese", label: "Mese" },
 ];
 
-// Palette per le linee di dettaglio: "etf" ha sempre lo stesso colore, ogni
-// gruppo crypto (oggi solo BTC) prende il successivo in ordine, ciclando se
-// in futuro ce ne fossero più di 3.
-const GRUPPO_PALETTE = ["--invest-crypto", "--invest-stock", "--invest-indice"];
-
-function colorePerGruppo(chiave: string, gruppi: GruppoStorico[]): string {
-  if (chiave === "etf") return "var(--invest-etf)";
-  const altri = gruppi.filter((g) => g.chiave !== "etf");
-  const idx = Math.max(
-    0,
-    altri.findIndex((g) => g.chiave === chiave)
-  );
-  return `var(${GRUPPO_PALETTE[idx % GRUPPO_PALETTE.length]})`;
+// Stessi colori del grafico a torta (AllocationChart): "etf"/"etc" fissi,
+// ogni gruppo crypto (oggi solo BTC) sull'unica var crypto disponibile — se
+// in futuro serviranno più crypto separate, aggiungere nuove var
+// --invest-pie-* seguendo la stessa convenzione, non colori improvvisati.
+function colorePerGruppo(chiave: string): string {
+  if (chiave === "etf") return "var(--invest-pie-etf)";
+  if (chiave === "etc") return "var(--invest-pie-etc)";
+  return "var(--invest-pie-crypto)";
 }
 
 function chiaveAggregazione(dataIso: string, granularita: Granularita): string {
@@ -96,35 +93,38 @@ export function PortfolioHistoryChart({
 
   return (
     <div className="card flex h-72 w-full flex-col p-4">
-      <div className="mb-2 flex flex-wrap items-center justify-end gap-1">
-        {gruppi.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setDettaglioAttivo((v) => !v)}
-            aria-pressed={dettaglioAttivo}
-            className={`mr-auto rounded-full border px-2.5 py-1 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
-              dettaglioAttivo
-                ? "border-accent bg-accent text-accent-foreground shadow-sm"
-                : "border-border text-muted hover:text-foreground"
-            }`}
-          >
-            Dettaglio per asset
-          </button>
-        )}
-        {GRANULARITA.map((g) => (
-          <button
-            key={g.value}
-            type="button"
-            onClick={() => setGranularita(g.value)}
-            className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
-              granularita === g.value
-                ? "border-accent bg-accent text-accent-foreground shadow-sm"
-                : "border-border text-muted hover:text-foreground"
-            }`}
-          >
-            {g.label}
-          </button>
-        ))}
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <PortfolioDateRangeFilter />
+        <div className="flex flex-wrap items-center gap-1">
+          {gruppi.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setDettaglioAttivo((v) => !v)}
+              aria-pressed={dettaglioAttivo}
+              className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
+                dettaglioAttivo
+                  ? "border-accent bg-accent text-accent-foreground shadow-sm"
+                  : "border-border text-muted hover:text-foreground"
+              }`}
+            >
+              Dettaglio per asset
+            </button>
+          )}
+          {GRANULARITA.map((g) => (
+            <button
+              key={g.value}
+              type="button"
+              onClick={() => setGranularita(g.value)}
+              className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
+                granularita === g.value
+                  ? "border-accent bg-accent text-accent-foreground shadow-sm"
+                  : "border-border text-muted hover:text-foreground"
+              }`}
+            >
+              {g.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {punti.length === 0 ? (
@@ -138,7 +138,13 @@ export function PortfolioHistoryChart({
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid vertical={false} stroke="var(--border)" strokeWidth={1} />
-            <XAxis dataKey="label" tick={axisTick} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+            <XAxis
+              dataKey="label"
+              tick={axisTick}
+              axisLine={{ stroke: "var(--border)" }}
+              tickLine={false}
+              interval={adaptiveTickInterval(data.length)}
+            />
             <YAxis tick={axisTick} axisLine={false} tickLine={false} width={64} />
             <Tooltip content={<HistoryTooltip />} />
             {dettaglioAttivo && <Legend wrapperStyle={{ color: "var(--muted)", fontSize: 12 }} />}
@@ -164,7 +170,7 @@ export function PortfolioHistoryChart({
                   isAnimationActive
                   animationDuration={700}
                   animationEasing="ease-out"
-                  stroke={colorePerGruppo(g.chiave, gruppi)}
+                  stroke={colorePerGruppo(g.chiave)}
                   strokeWidth={1.5}
                   strokeDasharray="4 3"
                   dot={false}

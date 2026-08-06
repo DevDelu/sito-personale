@@ -202,10 +202,12 @@ export async function getRiconciliazioneAsset(): Promise<Riconciliazione[]> {
 export type GruppoStorico = { chiave: string; label: string };
 export type PuntoPortafoglio = { data: string; totale: number } & Record<string, number | string>;
 
-// "etf" = tutti i tipi non-crypto, un gruppo per ticker per ogni crypto
-// (oggi solo BTC) — stessa suddivisione usata da AllocationChart.
+// "etf"/"etc" per i rispettivi tipi asset, un gruppo per ticker per ogni
+// crypto (oggi solo BTC) — stessa suddivisione a 3 vie usata da
+// AllocationChart (dopo l'introduzione del tipo 'etc').
 function gruppoDiAsset(asset: Asset): GruppoStorico {
   if (asset.tipo === "crypto") return { chiave: asset.ticker.toLowerCase(), label: asset.ticker };
+  if (asset.tipo === "etc") return { chiave: "etc", label: "ETC" };
   return { chiave: "etf", label: "ETF" };
 }
 
