@@ -53,6 +53,7 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     href: "/allenamenti",
     subsections: [
       { href: "/allenamenti", label: "Overview" },
+      { href: "/allenamenti/scheda", label: "Gestione scheda" },
       { href: "/allenamenti/storico", label: "Storico" },
     ],
   },

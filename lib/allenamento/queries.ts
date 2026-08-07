@@ -7,6 +7,7 @@ import type {
   SchedaEsercizioConNome,
   Sessione,
   SessioneLog,
+  TipoMetrica,
 } from "./types";
 
 function toNumber(v: unknown): number | null {
@@ -34,6 +35,16 @@ export async function getSchedaFullBodyCasa(): Promise<Scheda | null> {
     .maybeSingle();
   if (error) throw new Error(error.message);
   return data ?? null;
+}
+
+// Catalogo esercizi riusabile tra schede diverse (oggi solo "Full body
+// casa"): l'editor di gestione scheda lo usa per proporre esercizi già
+// esistenti invece di farne creare uno nuovo ogni volta.
+export async function getEsercizi(): Promise<Esercizio[]> {
+  const admin = createAdminClient();
+  const { data, error } = await admin.from("esercizi").select("*").order("nome");
+  if (error) throw new Error(error.message);
+  return data ?? [];
 }
 
 export async function getScheda(schedaId: string): Promise<Scheda | null> {
@@ -184,4 +195,59 @@ export async function getLogPerSessione(sessioneId: string): Promise<SessioneLog
     .eq("sessione_id", sessioneId);
   if (error) throw new Error(error.message);
   return (data ?? []).map((row) => ({ ...row, peso_effettivo: toNumber(row.peso_effettivo) }));
+}
+
+export type SessioneLogConNome = SessioneLog & {
+  esercizio_nome: string;
+  tipo_metrica: TipoMetrica;
+  blocco: string;
+  ordine: number;
+};
+
+// Dettaglio di una sessione passata (gestione storico): stesso join di
+// getUltimeSessioniConLog ma per una sola sessione e con l'id di riga
+// preservato, necessario per poter modificare/eliminare la singola serie.
+export async function getLogPerSessioneConNome(sessioneId: string): Promise<SessioneLogConNome[]> {
+  const admin = createAdminClient();
+  const [logRes, schedaEsRes, eserciziRes] = await Promise.all([
+    admin.from("sessioni_log").select("*").eq("sessione_id", sessioneId),
+    admin.from("scheda_esercizi").select("id, esercizio_id, blocco, ordine"),
+    admin.from("esercizi").select("id, nome, tipo_metrica"),
+  ]);
+  if (logRes.error) throw new Error(logRes.error.message);
+  if (schedaEsRes.error) throw new Error(schedaEsRes.error.message);
+  if (eserciziRes.error) throw new Error(eserciziRes.error.message);
+
+  const schedaEsMap = new Map(
+    (schedaEsRes.data ?? []).map((r) => [
+      r.id as string,
+      r as { esercizio_id: string; blocco: string; ordine: number },
+    ])
+  );
+  const eserciziMap = new Map(
+    (eserciziRes.data ?? []).map((e) => [e.id as string, e as { nome: string; tipo_metrica: string }])
+  );
+
+  const righe = (logRes.data ?? []).map((row) => {
+    const schedaEs = schedaEsMap.get(row.scheda_esercizio_id);
+    const esercizio = schedaEs ? eserciziMap.get(schedaEs.esercizio_id) : undefined;
+    return {
+      id: row.id,
+      sessione_id: row.sessione_id,
+      scheda_esercizio_id: row.scheda_esercizio_id,
+      serie_effettive: row.serie_effettive,
+      rip_effettive: row.rip_effettive,
+      peso_effettivo: toNumber(row.peso_effettivo),
+      tempo_effettivo_sec: row.tempo_effettivo_sec,
+      esercizio_nome: esercizio?.nome ?? "Esercizio",
+      tipo_metrica: (esercizio?.tipo_metrica as TipoMetrica) ?? "serie_rip",
+      blocco: schedaEs?.blocco ?? "",
+      ordine: schedaEs?.ordine ?? 0,
+    };
+  });
+
+  // Stesso ordine della scheda (non l'ordine di inserimento in DB, che non è
+  // garantito): riflette la sequenza reale dell'allenamento svolto.
+  righe.sort((a, b) => a.ordine - b.ordine);
+  return righe;
 }

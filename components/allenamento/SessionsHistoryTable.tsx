@@ -1,6 +1,11 @@
 "use client";
 
-import { Download } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Download, Trash2 } from "lucide-react";
+import { useStoricoMutations } from "@/hooks/useStoricoMutations";
+import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import type { Sessione } from "@/lib/allenamento/types";
 
 const SENSAZIONE_LABEL = ["😞", "🙁", "😐", "🙂", "💪"];
@@ -40,6 +45,17 @@ function esportaCsv(sessioni: Sessione[]) {
 }
 
 export function SessionsHistoryTable({ sessioni }: { sessioni: Sessione[] }) {
+  const router = useRouter();
+  const { eliminaSessione, pending } = useStoricoMutations();
+  const [eliminando, setEliminando] = useState<Sessione | null>(null);
+
+  async function handleElimina() {
+    if (!eliminando) return;
+    await eliminaSessione(eliminando.id);
+    setEliminando(null);
+    router.refresh();
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
@@ -68,22 +84,48 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: Sessione[] }) {
                 <th className="px-4 py-2 font-medium">Durata</th>
                 <th className="px-4 py-2 font-medium">Sensazione</th>
                 <th className="px-4 py-2 font-medium">Note</th>
+                <th className="px-4 py-2 font-medium"></th>
               </tr>
             </thead>
             <tbody>
               {sessioni.map((s) => (
                 <tr key={s.id} className="border-b border-border last:border-0">
-                  <td className="px-4 py-2 whitespace-nowrap capitalize">{formatData(s.data)}</td>
+                  <td className="px-4 py-2 whitespace-nowrap capitalize">
+                    <Link href={`/allenamenti/storico/${s.id}`} className="hover:text-accent hover:underline">
+                      {formatData(s.data)}
+                    </Link>
+                  </td>
                   <td className="font-figures px-4 py-2 whitespace-nowrap">
                     {s.durata_min != null ? `${s.durata_min} min` : "—"}
                   </td>
                   <td className="px-4 py-2">{s.sensazione != null ? SENSAZIONE_LABEL[s.sensazione - 1] : "—"}</td>
                   <td className="max-w-xs truncate px-4 py-2 text-muted">{s.note ?? "—"}</td>
+                  <td className="px-4 py-2">
+                    <button
+                      type="button"
+                      onClick={() => setEliminando(s)}
+                      aria-label="Elimina sessione"
+                      className="btn-icon hover:!text-spesa"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {eliminando && (
+        <DeleteConfirmDialog
+          titolo={formatData(eliminando.data)}
+          title="Eliminare questa sessione?"
+          description="Tutte le serie registrate in questa sessione verranno rimosse definitivamente. L'operazione non è reversibile."
+          pending={pending}
+          onConfirm={handleElimina}
+          onCancel={() => setEliminando(null)}
+        />
       )}
     </div>
   );
