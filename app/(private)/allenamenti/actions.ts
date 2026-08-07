@@ -183,6 +183,48 @@ export async function eliminaSessioneLog(logId: string): Promise<AllenamentoActi
   return {};
 }
 
+export type BulkSessionePatch = {
+  durata_min?: number | null;
+  sensazione?: number | null;
+  note?: string | null;
+};
+
+// Un'unica update batch (`.in('id', [...])`), mai un giro di chiamate per
+// sessione selezionata — stesso principio già seguito da Spese/Investimenti.
+export async function aggiornaSessioniBulk(
+  ids: string[],
+  patch: BulkSessionePatch
+): Promise<AllenamentoActionResult> {
+  await requireUser();
+  if (ids.length === 0) return { error: "Nessuna sessione selezionata." };
+
+  const columnPatch: Record<string, unknown> = {};
+  if ("durata_min" in patch) columnPatch.durata_min = patch.durata_min;
+  if ("sensazione" in patch) columnPatch.sensazione = patch.sensazione;
+  if ("note" in patch) columnPatch.note = patch.note?.trim() || null;
+  if (Object.keys(columnPatch).length === 0) return { error: "Nessun campo da aggiornare." };
+
+  const admin = createAdminClient();
+  const { error } = await admin.from("sessioni").update(columnPatch).in("id", ids);
+  if (error) return { error: error.message };
+
+  revalidatePath("/allenamenti/storico");
+  return {};
+}
+
+export async function eliminaSessioniBulk(ids: string[]): Promise<AllenamentoActionResult> {
+  await requireUser();
+  if (ids.length === 0) return { error: "Nessuna sessione selezionata." };
+
+  const admin = createAdminClient();
+  // Cascade su sessioni_log gestito dalla FK "on delete cascade" (migration 016).
+  const { error } = await admin.from("sessioni").delete().in("id", ids);
+  if (error) return { error: error.message };
+
+  revalidatePath("/allenamenti/storico");
+  return {};
+}
+
 // ---------------------------------------------------------------------------
 // Gestione scheda (FIX 9): CRUD su blocchi/esercizi della scheda, letta a
 // runtime dalla sessione live (getSchedaEsercizi) — una modifica qui si

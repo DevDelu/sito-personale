@@ -4,8 +4,11 @@ import { useState } from "react";
 import {
   aggiornaSessione,
   aggiornaSessioneLog,
+  aggiornaSessioniBulk,
   eliminaSessione,
   eliminaSessioneLog,
+  eliminaSessioniBulk,
+  type BulkSessionePatch,
   type FineSessionePatch,
   type LogSeriePatch,
 } from "@/app/(private)/allenamenti/actions";
@@ -31,6 +34,8 @@ export function useStoricoMutations() {
     aggiornaLog: (id: string, patch: Omit<LogSeriePatch, "scheda_esercizio_id">) =>
       run(() => aggiornaSessioneLog(id, patch)),
     eliminaLog: (id: string) => run(() => eliminaSessioneLog(id)),
+    bulkAggiorna: (ids: string[], patch: BulkSessionePatch) => run(() => aggiornaSessioniBulk(ids, patch)),
+    bulkElimina: (ids: string[]) => run(() => eliminaSessioniBulk(ids)),
     pending,
     error,
   };
