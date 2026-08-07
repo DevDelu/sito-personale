@@ -5,7 +5,6 @@ import {
   Area,
   CartesianGrid,
   ComposedChart,
-  Legend,
   Line,
   ResponsiveContainer,
   Tooltip,
@@ -19,6 +18,9 @@ import type { GruppoStorico, PuntoPortafoglio } from "@/lib/investimenti/queries
 import { PortfolioDateRangeFilter } from "@/components/investimenti/PortfolioDateRangeFilter";
 
 const axisTick = { fill: "var(--muted)", fontSize: 11, fontFamily: "var(--font-mono)" };
+
+const TOTALE_CHIAVE = "totale";
+const TOTALE_COLORE = "var(--accent)";
 
 type Granularita = "giorno" | "settimana" | "mese";
 
@@ -63,8 +65,8 @@ function formatLabel(dataIso: string, granularita: Granularita): string {
 }
 
 // Formato compatto per l'asse prezzo (in stile trading: "12,5k €" invece di
-// "12.500,00 €"), altrimenti le etichette dell'asse destro sono troppo
-// larghe e affollate su valori a 4-5 cifre.
+// "12.500,00 €"), altrimenti le etichette dell'asse sono troppo larghe e
+// affollate su valori a 4-5 cifre.
 function formatAxisValue(v: number): string {
   if (Math.abs(v) >= 1000) {
     return `${(v / 1000).toLocaleString("it-IT", { maximumFractionDigits: 1 })}k €`;
@@ -92,6 +94,44 @@ function HistoryTooltip({ active, payload, label }: Partial<TooltipContentProps<
   );
 }
 
+// Chip cliccabile per mostrare/nascondere una singola serie (Totale incluso):
+// funziona da legenda interattiva, sostituisce il vecchio toggle unico
+// "Dettaglio per asset" — tap target largo per restare comodo anche su
+// mobile.
+function SerieToggle({
+  attivo,
+  onClick,
+  colore,
+  label,
+}: {
+  attivo: boolean;
+  onClick: () => void;
+  colore: string;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={attivo}
+      className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
+        attivo ? "border-transparent shadow-sm" : "border-border text-muted hover:text-foreground"
+      }`}
+      style={
+        attivo
+          ? { backgroundColor: `color-mix(in srgb, ${colore} 16%, transparent)`, color: colore }
+          : undefined
+      }
+    >
+      <span
+        className="h-2 w-2 shrink-0 rounded-full transition-opacity duration-150"
+        style={{ backgroundColor: colore, opacity: attivo ? 1 : 0.35 }}
+      />
+      {label}
+    </button>
+  );
+}
+
 export function PortfolioHistoryChart({
   punti,
   gruppi,
@@ -100,7 +140,18 @@ export function PortfolioHistoryChart({
   gruppi: GruppoStorico[];
 }) {
   const [granularita, setGranularita] = useState<Granularita>("giorno");
-  const [dettaglioAttivo, setDettaglioAttivo] = useState(false);
+  const [serieVisibili, setSerieVisibili] = useState<Set<string>>(
+    () => new Set([TOTALE_CHIAVE, ...gruppi.map((g) => g.chiave)])
+  );
+
+  function toggleSerie(chiave: string) {
+    setSerieVisibili((prev) => {
+      const next = new Set(prev);
+      if (next.has(chiave)) next.delete(chiave);
+      else next.add(chiave);
+      return next;
+    });
+  }
 
   const data = useMemo(
     () =>
@@ -113,37 +164,42 @@ export function PortfolioHistoryChart({
 
   return (
     <div className="card flex h-80 w-full flex-col p-4">
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+      <div className="mb-3 flex flex-col gap-2">
         <PortfolioDateRangeFilter />
-        <div className="flex flex-wrap items-center gap-1">
-          {gruppi.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setDettaglioAttivo((v) => !v)}
-              aria-pressed={dettaglioAttivo}
-              className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
-                dettaglioAttivo
-                  ? "border-accent bg-accent text-accent-foreground shadow-sm"
-                  : "border-border text-muted hover:text-foreground"
-              }`}
-            >
-              Dettaglio per asset
-            </button>
-          )}
-          {GRANULARITA.map((g) => (
-            <button
-              key={g.value}
-              type="button"
-              onClick={() => setGranularita(g.value)}
-              className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
-                granularita === g.value
-                  ? "border-accent bg-accent text-accent-foreground shadow-sm"
-                  : "border-border text-muted hover:text-foreground"
-              }`}
-            >
-              {g.label}
-            </button>
-          ))}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <SerieToggle
+              attivo={serieVisibili.has(TOTALE_CHIAVE)}
+              onClick={() => toggleSerie(TOTALE_CHIAVE)}
+              colore={TOTALE_COLORE}
+              label="Totale"
+            />
+            {gruppi.map((g) => (
+              <SerieToggle
+                key={g.chiave}
+                attivo={serieVisibili.has(g.chiave)}
+                onClick={() => toggleSerie(g.chiave)}
+                colore={colorePerGruppo(g.chiave)}
+                label={g.label}
+              />
+            ))}
+          </div>
+          <div className="flex w-fit items-center gap-0.5 rounded-full border border-border p-0.5">
+            {GRANULARITA.map((g) => (
+              <button
+                key={g.value}
+                type="button"
+                onClick={() => setGranularita(g.value)}
+                className={`rounded-full px-2.5 py-1.5 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
+                  granularita === g.value
+                    ? "bg-accent text-accent-foreground shadow-sm"
+                    : "text-muted hover:text-foreground"
+                }`}
+              >
+                {g.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -181,23 +237,25 @@ export function PortfolioHistoryChart({
               domain={["auto", "auto"]}
             />
             <Tooltip content={<HistoryTooltip />} cursor={{ stroke: "var(--muted)", strokeDasharray: "3 3" }} />
-            {dettaglioAttivo && <Legend wrapperStyle={{ color: "var(--muted)", fontSize: 12 }} />}
-            <Area
-              type="linear"
-              dataKey="totale"
-              name="Totale"
-              isAnimationActive
-              animationDuration={700}
-              animationEasing="ease-out"
-              stroke="var(--accent)"
-              strokeWidth={2}
-              fill="url(#portfolioTotaleGradient)"
-              fillOpacity={1}
-              dot={false}
-              activeDot={{ r: 4, strokeWidth: 0 }}
-            />
-            {dettaglioAttivo &&
-              gruppi.map((g) => (
+            {serieVisibili.has(TOTALE_CHIAVE) && (
+              <Area
+                type="linear"
+                dataKey="totale"
+                name="Totale"
+                isAnimationActive
+                animationDuration={700}
+                animationEasing="ease-out"
+                stroke="var(--accent)"
+                strokeWidth={2}
+                fill="url(#portfolioTotaleGradient)"
+                fillOpacity={1}
+                dot={false}
+                activeDot={{ r: 4, strokeWidth: 0 }}
+              />
+            )}
+            {gruppi
+              .filter((g) => serieVisibili.has(g.chiave))
+              .map((g) => (
                 <Line
                   key={g.chiave}
                   type="linear"

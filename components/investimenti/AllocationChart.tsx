@@ -94,7 +94,7 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
   const totaleValore = data.reduce((s, d) => s + d.totale, 0);
 
   return (
-    <div className="card flex h-72 w-full flex-col gap-1 p-4">
+    <div className="card flex h-80 w-full flex-col gap-1 p-4">
       <div className="min-h-0 flex-1">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -105,8 +105,8 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
               isAnimationActive
               animationDuration={600}
               animationEasing="ease-out"
-              innerRadius={60}
-              outerRadius={100}
+              innerRadius={66}
+              outerRadius={108}
               paddingAngle={2}
               stroke="var(--surface)"
               strokeWidth={2}
@@ -123,7 +123,7 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
               textAnchor="middle"
               dominantBaseline="middle"
               fill="currentColor"
-              className="font-figures text-foreground text-xl font-bold"
+              className="font-figures text-foreground text-base font-bold tracking-tight"
             >
               {formatCurrency(totaleValore)}
             </text>

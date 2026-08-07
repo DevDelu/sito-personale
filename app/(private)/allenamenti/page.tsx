@@ -9,34 +9,25 @@ export default async function AllenamentoPage() {
   const scheda = await getSchedaFullBodyCasa();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
       <div className="flex flex-col gap-1">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Allenamento</h1>
-        <p className="text-sm text-muted">Avvia la sessione di calisthenics e segui la scheda corrente.</p>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">
+          {scheda?.nome ?? "Allenamento"}
+        </h1>
+        {scheda?.descrizione && <p className="max-w-sm text-sm text-muted">{scheda.descrizione}</p>}
       </div>
 
-      <div className="flex flex-col gap-3">
-        <h2 className="font-display text-sm font-medium text-muted">Avvia allenamento</h2>
-        {scheda ? (
-          <div className="card flex flex-wrap items-center justify-between gap-3 p-4">
-            <div className="flex flex-col gap-0.5">
-              <span className="font-display text-sm font-semibold">{scheda.nome}</span>
-              {scheda.descrizione && <span className="text-xs text-muted">{scheda.descrizione}</span>}
-            </div>
-            <Link
-              href={`/allenamenti/sessione/nuova?scheda=${scheda.id}`}
-              className="btn-primary flex items-center gap-1.5"
-            >
-              <Play className="h-3.5 w-3.5" />
-              Avvia sessione
-            </Link>
-          </div>
-        ) : (
-          <div className="card flex items-center justify-center p-6">
-            <p className="text-sm text-muted">Nessuna scheda configurata.</p>
-          </div>
-        )}
-      </div>
+      {scheda ? (
+        <Link
+          href={`/allenamenti/sessione/nuova?scheda=${scheda.id}`}
+          className="btn-primary flex items-center gap-2 !px-6 !py-3 text-base"
+        >
+          <Play className="h-4 w-4" />
+          Avvia sessione
+        </Link>
+      ) : (
+        <p className="text-sm text-muted">Nessuna scheda configurata.</p>
+      )}
     </div>
   );
 }
