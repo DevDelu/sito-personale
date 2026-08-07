@@ -38,8 +38,21 @@ export async function POST() {
       let quotes: { prezzo: number; data: string }[] = [];
       let fonte: "yahoo" | "coingecko" = "yahoo";
       if (asset.coingecko_id) {
-        quotes = await fetchCoinGeckoHistory(asset.coingecko_id, primaTransazione.data);
-        fonte = "coingecko";
+        try {
+          quotes = await fetchCoinGeckoHistory(asset.coingecko_id, primaTransazione.data);
+          fonte = "coingecko";
+        } catch (coingeckoError) {
+          // Il piano gratuito di CoinGecko richiede una API key per lo storico
+          // (/market_chart/range), a differenza del prezzo live usato dal cron
+          // (/simple/price, resta invariato): se l'asset ha anche un ticker
+          // Yahoo (es. BTC-EUR), usalo come fallback solo per il backfill.
+          if (asset.price_symbol) {
+            quotes = await fetchYahooHistory(asset.price_symbol, primaTransazione.data);
+            fonte = "yahoo";
+          } else {
+            throw coingeckoError;
+          }
+        }
       } else if (asset.price_symbol) {
         quotes = await fetchYahooHistory(asset.price_symbol, primaTransazione.data);
         fonte = "yahoo";
