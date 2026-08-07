@@ -1,7 +1,7 @@
 "use client";
 
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import type { PieLabelRenderProps, TooltipContentProps } from "recharts";
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
+import type { PieLabelRenderProps } from "recharts";
 import { formatCurrency } from "@/lib/investimenti/format";
 import type { Posizione } from "@/lib/investimenti/types";
 
@@ -41,7 +41,9 @@ function allocationByGruppo(posizioni: Posizione[]): Fetta[] {
 
 // Etichetta percentuale nella fascia della ciambella (non fuori, per non
 // dover gestire label line su fette anche molto piccole dopo il FIX 4): sotto
-// il 4% si nasconde, resterebbe illeggibile/sovrapposta.
+// il 4% si nasconde, resterebbe illeggibile/sovrapposta. Stroke scuro dietro
+// il fill bianco (paintOrder="stroke") per restare leggibile su qualsiasi
+// colore di fetta, non solo sui più scuri.
 function renderPercentLabel(props: PieLabelRenderProps) {
   const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props;
   if (
@@ -66,33 +68,15 @@ function renderPercentLabel(props: PieLabelRenderProps) {
       textAnchor="middle"
       dominantBaseline="central"
       fill="#fff"
-      fontSize={12}
-      fontWeight={600}
+      stroke="rgba(0,0,0,0.35)"
+      strokeWidth={3}
+      paintOrder="stroke"
+      fontSize={13}
+      fontWeight={700}
       className="font-figures pointer-events-none"
     >
       {`${Math.round(percent * 100)}%`}
     </text>
-  );
-}
-
-function AllocationTooltip({ active, payload }: Partial<TooltipContentProps<number, string>>) {
-  if (!active || !payload || payload.length === 0) return null;
-  const fetta = payload[0].payload as Fetta;
-  return (
-    <div className="rounded-xl border border-border bg-surface px-3 py-2 text-xs shadow-lg">
-      <div className="mb-1 flex items-center gap-1.5 font-display text-sm font-semibold">
-        <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: payload[0].color }} />
-        {fetta.nome}
-      </div>
-      <div className="flex items-center justify-between gap-4">
-        <span className="text-muted">Valore</span>
-        <span className="font-figures">{formatCurrency(fetta.totale)}</span>
-      </div>
-      <div className="flex items-center justify-between gap-4">
-        <span className="text-muted">Quota</span>
-        <span className="font-figures">{fetta.percentuale.toFixed(1)}%</span>
-      </div>
-    </div>
   );
 }
 
@@ -124,6 +108,8 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
               innerRadius={60}
               outerRadius={100}
               paddingAngle={2}
+              stroke="var(--surface)"
+              strokeWidth={2}
               label={renderPercentLabel}
               labelLine={false}
             >
@@ -137,7 +123,7 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
               textAnchor="middle"
               dominantBaseline="middle"
               fill="currentColor"
-              className="font-figures text-foreground text-lg font-semibold"
+              className="font-figures text-foreground text-xl font-bold"
             >
               {formatCurrency(totaleValore)}
             </text>
@@ -151,7 +137,6 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
             >
               Valore attuale
             </text>
-            <Tooltip content={<AllocationTooltip />} />
             <Legend wrapperStyle={{ color: "var(--muted)", fontSize: 12 }} />
           </PieChart>
         </ResponsiveContainer>

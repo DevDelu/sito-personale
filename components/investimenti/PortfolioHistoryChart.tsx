@@ -7,7 +7,6 @@ import {
   ComposedChart,
   Legend,
   Line,
-  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -112,8 +111,6 @@ export function PortfolioHistoryChart({
     [punti, granularita]
   );
 
-  const ultimoValore = data.length > 0 ? (data[data.length - 1].totale as number) : null;
-
   return (
     <div className="card flex h-80 w-full flex-col p-4">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
@@ -159,7 +156,7 @@ export function PortfolioHistoryChart({
         </div>
       ) : (
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={data} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
+          <ComposedChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="portfolioTotaleGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.32} />
@@ -176,32 +173,15 @@ export function PortfolioHistoryChart({
               minTickGap={24}
             />
             <YAxis
-              orientation="right"
               tick={axisTick}
               axisLine={false}
               tickLine={false}
-              width={68}
+              width={60}
               tickFormatter={formatAxisValue}
               domain={["auto", "auto"]}
             />
             <Tooltip content={<HistoryTooltip />} cursor={{ stroke: "var(--muted)", strokeDasharray: "3 3" }} />
             {dettaglioAttivo && <Legend wrapperStyle={{ color: "var(--muted)", fontSize: 12 }} />}
-            {ultimoValore != null && (
-              <ReferenceLine
-                y={ultimoValore}
-                stroke="var(--accent)"
-                strokeOpacity={0.5}
-                strokeDasharray="4 4"
-                ifOverflow="extendDomain"
-                label={{
-                  value: formatAxisValue(ultimoValore),
-                  position: "right",
-                  fill: "var(--accent)",
-                  fontSize: 11,
-                  fontFamily: "var(--font-mono)",
-                }}
-              />
-            )}
             <Area
               type="linear"
               dataKey="totale"
