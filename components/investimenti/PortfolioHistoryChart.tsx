@@ -1,14 +1,25 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  CartesianGrid,
+  ComposedChart,
+  Legend,
+  Line,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import type { TooltipContentProps } from "recharts";
 import { formatCurrency } from "@/lib/investimenti/format";
 import { adaptiveTickInterval } from "@/lib/spese-utils";
 import type { GruppoStorico, PuntoPortafoglio } from "@/lib/investimenti/queries";
 import { PortfolioDateRangeFilter } from "@/components/investimenti/PortfolioDateRangeFilter";
 
-const axisTick = { fill: "var(--muted)", fontSize: 12, fontFamily: "var(--font-mono)" };
+const axisTick = { fill: "var(--muted)", fontSize: 11, fontFamily: "var(--font-mono)" };
 
 type Granularita = "giorno" | "settimana" | "mese";
 
@@ -52,6 +63,16 @@ function formatLabel(dataIso: string, granularita: Granularita): string {
   return d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "2-digit" });
 }
 
+// Formato compatto per l'asse prezzo (in stile trading: "12,5k €" invece di
+// "12.500,00 €"), altrimenti le etichette dell'asse destro sono troppo
+// larghe e affollate su valori a 4-5 cifre.
+function formatAxisValue(v: number): string {
+  if (Math.abs(v) >= 1000) {
+    return `${(v / 1000).toLocaleString("it-IT", { maximumFractionDigits: 1 })}k €`;
+  }
+  return `${Math.round(v)} €`;
+}
+
 function HistoryTooltip({ active, payload, label }: Partial<TooltipContentProps<number, string>>) {
   if (!active || !payload || payload.length === 0) return null;
   return (
@@ -91,8 +112,10 @@ export function PortfolioHistoryChart({
     [punti, granularita]
   );
 
+  const ultimoValore = data.length > 0 ? (data[data.length - 1].totale as number) : null;
+
   return (
-    <div className="card flex h-72 w-full flex-col p-4">
+    <div className="card flex h-80 w-full flex-col p-4">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <PortfolioDateRangeFilter />
         <div className="flex flex-wrap items-center gap-1">
@@ -136,20 +159,51 @@ export function PortfolioHistoryChart({
         </div>
       ) : (
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-            <CartesianGrid vertical={false} stroke="var(--border)" strokeWidth={1} />
+          <ComposedChart data={data} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="portfolioTotaleGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.32} />
+                <stop offset="95%" stopColor="var(--accent)" stopOpacity={0.02} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.6} strokeDasharray="3 3" />
             <XAxis
               dataKey="label"
               tick={axisTick}
               axisLine={{ stroke: "var(--border)" }}
               tickLine={false}
               interval={adaptiveTickInterval(data.length)}
+              minTickGap={24}
             />
-            <YAxis tick={axisTick} axisLine={false} tickLine={false} width={64} />
-            <Tooltip content={<HistoryTooltip />} />
+            <YAxis
+              orientation="right"
+              tick={axisTick}
+              axisLine={false}
+              tickLine={false}
+              width={68}
+              tickFormatter={formatAxisValue}
+              domain={["auto", "auto"]}
+            />
+            <Tooltip content={<HistoryTooltip />} cursor={{ stroke: "var(--muted)", strokeDasharray: "3 3" }} />
             {dettaglioAttivo && <Legend wrapperStyle={{ color: "var(--muted)", fontSize: 12 }} />}
-            <Line
-              type="monotone"
+            {ultimoValore != null && (
+              <ReferenceLine
+                y={ultimoValore}
+                stroke="var(--accent)"
+                strokeOpacity={0.5}
+                strokeDasharray="4 4"
+                ifOverflow="extendDomain"
+                label={{
+                  value: formatAxisValue(ultimoValore),
+                  position: "right",
+                  fill: "var(--accent)",
+                  fontSize: 11,
+                  fontFamily: "var(--font-mono)",
+                }}
+              />
+            )}
+            <Area
+              type="linear"
               dataKey="totale"
               name="Totale"
               isAnimationActive
@@ -157,14 +211,16 @@ export function PortfolioHistoryChart({
               animationEasing="ease-out"
               stroke="var(--accent)"
               strokeWidth={2}
+              fill="url(#portfolioTotaleGradient)"
+              fillOpacity={1}
               dot={false}
-              activeDot={{ r: 4 }}
+              activeDot={{ r: 4, strokeWidth: 0 }}
             />
             {dettaglioAttivo &&
               gruppi.map((g) => (
                 <Line
                   key={g.chiave}
-                  type="monotone"
+                  type="linear"
                   dataKey={g.chiave}
                   name={g.label}
                   isAnimationActive
@@ -177,7 +233,7 @@ export function PortfolioHistoryChart({
                   activeDot={{ r: 3 }}
                 />
               ))}
-          </LineChart>
+          </ComposedChart>
         </ResponsiveContainer>
       )}
     </div>
