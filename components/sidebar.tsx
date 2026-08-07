@@ -92,7 +92,17 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-export function Sidebar({ accountSlot }: { accountSlot: React.ReactNode }) {
+export function Sidebar({
+  accountSlot,
+  logoutSlot,
+}: {
+  // Usato per intero nella topbar sticky mobile (tema + area pubblica + esci
+  // insieme, non c'è spazio per separarli). Su desktop invece la barra in
+  // alto a destra (tema + area pubblica) vive fuori da Sidebar, in
+  // app/(private)/layout.tsx: qui in fondo alla sidebar resta solo `logoutSlot`.
+  accountSlot: React.ReactNode;
+  logoutSlot: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -139,7 +149,7 @@ export function Sidebar({ accountSlot }: { accountSlot: React.ReactNode }) {
         <div className="flex-1 overflow-y-auto">
           <SidebarContent />
         </div>
-        <div className="border-t border-border p-3">{accountSlot}</div>
+        <div className="border-t border-border p-3">{logoutSlot}</div>
       </aside>
     </>
   );
