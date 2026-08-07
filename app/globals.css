@@ -42,6 +42,12 @@
   --invest-pie-etf: #5b7fde;
   --invest-pie-etc: #3fae6b;
   --invest-pie-crypto: #d6528f;
+
+  /* Agenda: una per categoria evento (ferie/visita/scadenza/personale) */
+  --agenda-ferie: #059669;
+  --agenda-visita: #2563eb;
+  --agenda-scadenza: #dc2626;
+  --agenda-personale: #c25a1e; /* stesso hue dell'accent light */
 }
 
 [data-theme="dark"] {
@@ -82,6 +88,11 @@
   --invest-pie-etf: #5b7fde;
   --invest-pie-etc: #3fae6b;
   --invest-pie-crypto: #d6528f;
+
+  --agenda-ferie: #34d399;
+  --agenda-visita: #60a5fa;
+  --agenda-scadenza: #f87171;
+  --agenda-personale: #e8792e; /* stesso hue dell'accent dark */
 }
 
 @theme inline {
@@ -290,4 +301,62 @@ body {
   .field-input {
     @apply rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none transition-all duration-150 ease-out focus:border-accent focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_15%,transparent)];
   }
+}
+
+/* Tema FullCalendar (modulo Agenda): la libreria espone le sue variabili
+   CSS (--fc-*) invece di richiedere override per-classe, quindi basta
+   mapparle sui token esistenti del progetto per seguire light/dark senza
+   duplicare colori. Scoped a .agenda-calendar per non toccare altri usi. */
+.agenda-calendar {
+  --fc-border-color: var(--border);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: var(--surface-hover);
+  --fc-list-event-hover-bg-color: var(--surface-hover);
+  --fc-today-bg-color: color-mix(in srgb, var(--accent) 10%, transparent);
+  --fc-event-border-color: transparent;
+  --fc-event-text-color: var(--accent-foreground);
+  --fc-button-bg-color: var(--surface);
+  --fc-button-border-color: var(--border);
+  --fc-button-text-color: var(--foreground);
+  --fc-button-hover-bg-color: var(--surface-hover);
+  --fc-button-hover-border-color: var(--accent);
+  --fc-button-active-bg-color: var(--accent);
+  --fc-button-active-border-color: var(--accent);
+  --fc-small-font-size: 0.75rem;
+  color: var(--foreground);
+}
+
+.agenda-calendar .fc {
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+.agenda-calendar .fc-toolbar-title {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.agenda-calendar .fc-button {
+  text-transform: none;
+  box-shadow: none !important;
+  font-weight: 500;
+}
+
+.agenda-calendar .fc-button-primary:not(:disabled).fc-button-active {
+  color: var(--accent-foreground);
+}
+
+.agenda-calendar a {
+  color: inherit;
+}
+
+.agenda-calendar .fc-daygrid-day-number,
+.agenda-calendar .fc-col-header-cell-cushion {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.agenda-calendar .fc-day-today .fc-daygrid-day-number {
+  color: var(--accent);
+  font-weight: 600;
 }

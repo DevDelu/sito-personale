@@ -61,8 +61,7 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     id: "agenda",
     label: "Agenda",
     icon: Calendar,
-    href: "#",
-    disabled: true,
-    badge: "presto",
+    href: "/agenda",
+    subsections: [{ href: "/agenda", label: "Calendario" }],
   },
 ];
