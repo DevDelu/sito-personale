@@ -27,13 +27,13 @@ export function HeroCards({
   }
 
   return (
-    <div className="grid justify-center gap-4 [grid-template-columns:repeat(auto-fill,176px)]">
+    <div className="grid justify-center gap-4 [grid-template-columns:repeat(auto-fit,192px)]">
       {carte.map((c, i) => {
         return (
           <div
             key={c.id}
             onClick={() => onView(c)}
-            className="card card-hover animate-slide-up flex w-44 cursor-pointer flex-col gap-3 p-4"
+            className="card card-hover animate-slide-up flex w-48 cursor-pointer flex-col gap-3 p-4"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="w-fit rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-accent uppercase">
