@@ -10,7 +10,9 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const righe: ImportRow[] = Array.isArray(body?.righe) ? body.righe : [];
+  const righe: (ImportRow & { categoriaSuggerita?: string | null })[] = Array.isArray(body?.righe)
+    ? body.righe
+    : [];
   if (righe.length === 0) {
     return NextResponse.json({ error: "Nessuna riga da importare." }, { status: 400 });
   }
@@ -49,6 +51,7 @@ export async function POST(request: Request) {
       dettaglio: riga.dettaglio,
       data: riga.data,
       fonte: riga.fonte,
+      categoria_suggerita: riga.categoriaSuggerita ?? null,
     };
 
     if (riga.tipo === "spesa") speseInsert.push(row);
