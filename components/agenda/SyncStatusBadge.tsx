@@ -35,7 +35,16 @@ export function SyncStatusBadge({ integrazione }: { integrazione: IntegrazioneGo
       const res = await fetch("/api/agenda/sync", { method: "POST" });
       const json = await res.json();
       if (!res.ok) {
-        setErrore(json.error ?? "Sincronizzazione fallita.");
+        if (json.reauth_required) {
+          // La route ha già aggiornato `integrazione_google.stato` a "scaduto"
+          // lato server: risincronizza il badge con quella verità invece di
+          // lasciare `stato` (prop, invariata dall'ultimo render) su
+          // "connesso" mentre sotto compare un errore di scadenza — le due
+          // fonti finivano per contraddirsi a video.
+          router.refresh();
+        } else {
+          setErrore(json.error ?? "Sincronizzazione fallita.");
+        }
         return;
       }
       router.refresh();
