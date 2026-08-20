@@ -17,9 +17,6 @@ export async function Hero() {
             {t("headline")}
           </h1>
         </RevealItem>
-        <RevealItem>
-          <p className="max-w-md text-muted">{t("subtitle")}</p>
-        </RevealItem>
         <RevealItem className="flex flex-wrap items-center justify-center gap-3">
           <a
             href="#contatti"
@@ -28,19 +25,19 @@ export async function Hero() {
             {t("ctaContact")}
           </a>
           <a
-            href={CV_URL}
-            download
-            className="rounded-full border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover hover:shadow-sm"
-          >
-            {t("ctaCv")}
-          </a>
-          <a
             href={LINKEDIN_URL}
             target="_blank"
             rel="noreferrer"
             className="rounded-full border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover hover:shadow-sm"
           >
             {t("linkedin")}
+          </a>
+          <a
+            href={CV_URL}
+            download
+            className="rounded-full border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover hover:shadow-sm"
+          >
+            {t("ctaCv")}
           </a>
         </RevealItem>
       </RevealGroup>

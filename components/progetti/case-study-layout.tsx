@@ -26,7 +26,7 @@ export function CaseStudyLayout({
       <RevealGroup className="flex flex-col">
         <RevealItem>
           <Link
-            href="/progetti"
+            href="/"
             className="font-mono text-sm text-[#5c5546] transition-colors hover:text-[#221f19]"
           >
             ← {backLinkLabel}

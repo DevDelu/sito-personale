@@ -1,5 +1,7 @@
+import { createElement } from "react";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { projectCategoryIcon } from "@/lib/project-style";
 import type { Project } from "@/types/project";
 
 export function ProjectCard({ project, categoryLabel }: { project: Project; categoryLabel: string }) {
@@ -21,7 +23,13 @@ export function ProjectCard({ project, categoryLabel }: { project: Project; cate
       ) : null}
 
       <div className="flex flex-col gap-2 p-5">
-        <span className="font-mono text-xs uppercase tracking-wide text-[#8a8272]">{categoryLabel}</span>
+        <span className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-wide text-[#8a8272]">
+          {createElement(projectCategoryIcon(project.category), {
+            className: "h-3.5 w-3.5 text-accent",
+            strokeWidth: 2,
+          })}
+          {categoryLabel}
+        </span>
 
         <h3 className="font-display text-xl font-medium italic text-[#221f19]">{project.title}</h3>
 
