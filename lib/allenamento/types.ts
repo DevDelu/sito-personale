@@ -21,6 +21,9 @@ export type Scheda = {
   id: string;
   nome: string;
   descrizione: string | null;
+  created_at: string;
+  updated_at: string;
+  is_archiviata: boolean;
 };
 
 export type SchedaEsercizio = {
@@ -55,6 +58,7 @@ export type Sessione = {
   durata_min: number | null;
   sensazione: number | null;
   note: string | null;
+  scheda_snapshot: SchedaEsercizioConNome[] | null;
 };
 
 export type SessioneLog = {

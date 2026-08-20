@@ -24,17 +24,62 @@ export async function getImpegniFissi(): Promise<ImpegnoFisso[]> {
   return data ?? [];
 }
 
-// La scheda "Full body casa" non è legata a un giorno fisso: si avvia da un
-// pulsante sempre visibile, non da una cella della griglia settimanale.
-export async function getSchedaFullBodyCasa(): Promise<Scheda | null> {
+export async function getSchede(opts?: { includeArchiviate?: boolean }): Promise<Scheda[]> {
   const admin = createAdminClient();
-  const { data, error } = await admin
-    .from("schede")
-    .select("*")
-    .eq("nome", "Full body casa")
-    .maybeSingle();
+  let query = admin.from("schede").select("*").order("nome");
+  if (!opts?.includeArchiviate) query = query.eq("is_archiviata", false);
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
-  return data ?? null;
+  return data ?? [];
+}
+
+export type SchedaConMeta = Scheda & {
+  numBlocchi: number;
+  numEsercizi: number;
+  ultimoUtilizzo: string | null;
+};
+
+// Elenco per la pagina "Le mie schede" e per la selezione all'avvio
+// allenamento: numero blocchi/esercizi e data ultimo utilizzo (max data tra
+// le sessioni collegate) calcolati qui in JS, nessuna vista SQL dedicata
+// (stesso principio di getUltimeSessioniConLog).
+export async function getSchedeConMeta(opts?: { includeArchiviate?: boolean }): Promise<SchedaConMeta[]> {
+  const admin = createAdminClient();
+  const schede = await getSchede(opts);
+  if (schede.length === 0) return [];
+
+  const schedaIds = schede.map((s) => s.id);
+  const [righeRes, sessioniRes] = await Promise.all([
+    admin.from("scheda_esercizi").select("scheda_id, blocco").in("scheda_id", schedaIds),
+    admin.from("sessioni").select("scheda_id, data").in("scheda_id", schedaIds),
+  ]);
+  if (righeRes.error) throw new Error(righeRes.error.message);
+  if (sessioniRes.error) throw new Error(sessioniRes.error.message);
+
+  const blocchiPerScheda = new Map<string, Set<string>>();
+  const eserciziPerScheda = new Map<string, number>();
+  for (const r of righeRes.data ?? []) {
+    const schedaId = r.scheda_id as string;
+    eserciziPerScheda.set(schedaId, (eserciziPerScheda.get(schedaId) ?? 0) + 1);
+    const blocchi = blocchiPerScheda.get(schedaId) ?? new Set<string>();
+    blocchi.add(r.blocco as string);
+    blocchiPerScheda.set(schedaId, blocchi);
+  }
+
+  const ultimoUtilizzoPerScheda = new Map<string, string>();
+  for (const s of sessioniRes.data ?? []) {
+    const schedaId = s.scheda_id as string;
+    const data = s.data as string;
+    const attuale = ultimoUtilizzoPerScheda.get(schedaId);
+    if (!attuale || data > attuale) ultimoUtilizzoPerScheda.set(schedaId, data);
+  }
+
+  return schede.map((scheda) => ({
+    ...scheda,
+    numBlocchi: blocchiPerScheda.get(scheda.id)?.size ?? 0,
+    numEsercizi: eserciziPerScheda.get(scheda.id) ?? 0,
+    ultimoUtilizzo: ultimoUtilizzoPerScheda.get(scheda.id) ?? null,
+  }));
 }
 
 // Catalogo esercizi riusabile tra schede diverse (oggi solo "Full body
@@ -168,9 +213,30 @@ export async function getUltimeSessioniConLog(
   const eserciziMap = new Map<string, { nome: string; tipo_metrica: string }>(
     (eserciziRes.data ?? []).map((e) => [e.id as string, { nome: e.nome, tipo_metrica: e.tipo_metrica }])
   );
+  // Snapshot per sessione (storicità): se la sessione ha uno snapshot, il
+  // nome/metrica dell'esercizio per quella riga vengono da lì, non dal
+  // catalogo/scheda live che potrebbe essere cambiato nel frattempo.
+  const snapshotPerSessione = new Map<string, Map<string, SchedaEsercizioConNome>>();
+  for (const s of sessioni) {
+    if (!s.scheda_snapshot) continue;
+    const righeSnapshot: SchedaEsercizioConNome[] = s.scheda_snapshot;
+    snapshotPerSessione.set(s.id, new Map(righeSnapshot.map((r) => [r.id, r])));
+  }
 
   const log: LogConNome[] = [];
   for (const row of logRes.data ?? []) {
+    const snap = snapshotPerSessione.get(row.sessione_id)?.get(row.scheda_esercizio_id);
+    if (snap) {
+      log.push({
+        sessione_id: row.sessione_id,
+        esercizio_nome: snap.esercizio_nome,
+        tipo_metrica: snap.tipo_metrica,
+        rip_effettive: row.rip_effettive,
+        peso_effettivo: toNumber(row.peso_effettivo),
+        tempo_effettivo_sec: row.tempo_effettivo_sec,
+      });
+      continue;
+    }
     const esercizioId = schedaEsercizioToEsercizio.get(row.scheda_esercizio_id);
     const esercizio = esercizioId ? eserciziMap.get(esercizioId) : undefined;
     if (!esercizio) continue;
@@ -207,12 +273,21 @@ export type SessioneLogConNome = SessioneLog & {
 // Dettaglio di una sessione passata (gestione storico): stesso join di
 // getUltimeSessioniConLog ma per una sola sessione e con l'id di riga
 // preservato, necessario per poter modificare/eliminare la singola serie.
-export async function getLogPerSessioneConNome(sessioneId: string): Promise<SessioneLogConNome[]> {
+// Risolve nome/blocco/ordine/metrica dallo snapshot della sessione quando
+// presente (storicità: una scheda modificata dopo non altera sessioni già
+// registrate), col join live come fallback per le sessioni pre-snapshot.
+export async function getLogPerSessioneConNome(sessione: Sessione): Promise<SessioneLogConNome[]> {
   const admin = createAdminClient();
+  const snapshotMap = new Map((sessione.scheda_snapshot ?? []).map((r) => [r.id, r]));
+
   const [logRes, schedaEsRes, eserciziRes] = await Promise.all([
-    admin.from("sessioni_log").select("*").eq("sessione_id", sessioneId),
-    admin.from("scheda_esercizi").select("id, esercizio_id, blocco, ordine"),
-    admin.from("esercizi").select("id, nome, tipo_metrica"),
+    admin.from("sessioni_log").select("*").eq("sessione_id", sessione.id),
+    snapshotMap.size > 0
+      ? Promise.resolve({ data: [], error: null })
+      : admin.from("scheda_esercizi").select("id, esercizio_id, blocco, ordine"),
+    snapshotMap.size > 0
+      ? Promise.resolve({ data: [], error: null })
+      : admin.from("esercizi").select("id, nome, tipo_metrica"),
   ]);
   if (logRes.error) throw new Error(logRes.error.message);
   if (schedaEsRes.error) throw new Error(schedaEsRes.error.message);
@@ -229,6 +304,22 @@ export async function getLogPerSessioneConNome(sessioneId: string): Promise<Sess
   );
 
   const righe = (logRes.data ?? []).map((row) => {
+    const snap = snapshotMap.get(row.scheda_esercizio_id);
+    if (snap) {
+      return {
+        id: row.id,
+        sessione_id: row.sessione_id,
+        scheda_esercizio_id: row.scheda_esercizio_id,
+        serie_effettive: row.serie_effettive,
+        rip_effettive: row.rip_effettive,
+        peso_effettivo: toNumber(row.peso_effettivo),
+        tempo_effettivo_sec: row.tempo_effettivo_sec,
+        esercizio_nome: snap.esercizio_nome,
+        tipo_metrica: snap.tipo_metrica,
+        blocco: snap.blocco,
+        ordine: snap.ordine,
+      };
+    }
     const schedaEs = schedaEsMap.get(row.scheda_esercizio_id);
     const esercizio = schedaEs ? eserciziMap.get(schedaEs.esercizio_id) : undefined;
     return {

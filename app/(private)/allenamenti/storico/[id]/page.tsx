@@ -11,7 +11,7 @@ export default async function SessioneDettaglioPage({ params }: { params: Promis
   const sessione = await getSessione(id);
   if (!sessione) notFound();
 
-  const log = await getLogPerSessioneConNome(id);
+  const log = await getLogPerSessioneConNome(sessione);
 
   return <SessionDetailEditor sessione={sessione} log={log} />;
 }

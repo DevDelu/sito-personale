@@ -2,7 +2,24 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronUp, Pencil, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { ArrowLeft, ChevronDown, ChevronUp, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { useSchedaMutations } from "@/hooks/useSchedaMutations";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { SchedaEsercizioModal } from "./SchedaEsercizioModal";
@@ -63,6 +80,11 @@ export function SchedaEditor({
   const blocchi = useMemo(() => raggruppaPerBlocco(righe), [righe]);
   const nomiBlocchi = useMemo(() => blocchi.map((b) => b.nome), [blocchi]);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
   const [modaleAperto, setModaleAperto] = useState<
     { modo: "nuovo"; blocco?: string } | { modo: "modifica"; riga: SchedaEsercizioConNome } | null
   >(null);
@@ -75,13 +97,17 @@ export function SchedaEditor({
     return nuoviBlocchi.flatMap((b) => b.esercizi.map((e) => e.id));
   }
 
+  async function applicaRiordino(nuoviBlocchi: Blocco[]) {
+    await riordina(flattenIds(nuoviBlocchi));
+    router.refresh();
+  }
+
   async function spostaBlocco(index: number, direzione: -1 | 1) {
     const target = index + direzione;
     if (target < 0 || target >= blocchi.length) return;
     const copia = blocchi.slice();
     [copia[index], copia[target]] = [copia[target], copia[index]];
-    await riordina(flattenIds(copia));
-    router.refresh();
+    await applicaRiordino(copia);
   }
 
   async function spostaEsercizio(bloccoIndex: number, esIndex: number, direzione: -1 | 1) {
@@ -92,8 +118,28 @@ export function SchedaEditor({
     [esercizi[esIndex], esercizi[target]] = [esercizi[target], esercizi[esIndex]];
     const copia = blocchi.slice();
     copia[bloccoIndex] = { ...blocco, esercizi };
-    await riordina(flattenIds(copia));
-    router.refresh();
+    await applicaRiordino(copia);
+  }
+
+  function handleBloccoDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = blocchi.findIndex((b) => b.nome === active.id);
+    const newIndex = blocchi.findIndex((b) => b.nome === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    applicaRiordino(arrayMove(blocchi, oldIndex, newIndex));
+  }
+
+  function handleEsercizioDragEnd(bloccoIndex: number, event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const blocco = blocchi[bloccoIndex];
+    const oldIndex = blocco.esercizi.findIndex((e) => e.id === active.id);
+    const newIndex = blocco.esercizi.findIndex((e) => e.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const copia = blocchi.slice();
+    copia[bloccoIndex] = { ...blocco, esercizi: arrayMove(blocco.esercizi, oldIndex, newIndex) };
+    applicaRiordino(copia);
   }
 
   async function handleSalvaModale(fields: CampiModale) {
@@ -137,6 +183,14 @@ export function SchedaEditor({
 
   return (
     <div className="flex flex-col gap-4">
+      <Link
+        href="/allenamenti/schede"
+        className="flex w-fit items-center gap-1 text-sm text-muted hover:text-foreground"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" />
+        Le mie schede
+      </Link>
+
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-0.5">
           <h1 className="font-display text-2xl font-semibold tracking-tight">Gestione scheda</h1>
@@ -158,111 +212,119 @@ export function SchedaEditor({
         </p>
       )}
 
-      <div className="flex flex-col gap-4">
-        {blocchi.map((blocco, bloccoIndex) => (
-          <div key={blocco.nome} className="card flex flex-col gap-3 p-4">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <div className="flex flex-col">
-                  <button type="button" onClick={() => spostaBlocco(bloccoIndex, -1)} disabled={bloccoIndex === 0} className="btn-icon !h-5 !w-5 disabled:opacity-30">
-                    <ChevronUp className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => spostaBlocco(bloccoIndex, 1)}
-                    disabled={bloccoIndex === blocchi.length - 1}
-                    className="btn-icon !h-5 !w-5 disabled:opacity-30"
-                  >
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-                <span className="font-display text-sm font-semibold">{blocco.nome}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRinominandoBlocco(blocco.nome);
-                    setNuovoNomeBlocco(blocco.nome);
-                  }}
-                  aria-label="Rinomina blocco"
-                  className="btn-icon !h-6 !w-6"
-                >
-                  <Pencil className="h-3 w-3" />
-                </button>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setModaleAperto({ modo: "nuovo", blocco: blocco.nome })}
-                  className="btn-secondary flex items-center gap-1 !px-2 !py-1 text-xs"
-                >
-                  <Plus className="h-3 w-3" />
-                  Esercizio
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEliminandoBlocco(blocco.nome)}
-                  aria-label="Elimina blocco"
-                  className="btn-icon hover:!text-spesa"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </div>
-
-            <ul className="flex flex-col gap-1.5">
-              {blocco.esercizi.map((r, esIndex) => (
-                <li
-                  key={r.id}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm"
-                >
-                  <div className="flex min-w-0 items-center gap-2">
+      <DndContext sensors={sensors} onDragEnd={handleBloccoDragEnd}>
+        <SortableContext items={nomiBlocchi} strategy={verticalListSortingStrategy}>
+          <div className="flex flex-col gap-4">
+            {blocchi.map((blocco, bloccoIndex) => (
+              <SortableBlocco key={blocco.nome} id={blocco.nome}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
                     <div className="flex flex-col">
-                      <button
-                        type="button"
-                        onClick={() => spostaEsercizio(bloccoIndex, esIndex, -1)}
-                        disabled={esIndex === 0}
-                        className="btn-icon !h-4 !w-4 disabled:opacity-30"
-                      >
-                        <ChevronUp className="h-3 w-3" />
+                      <button type="button" onClick={() => spostaBlocco(bloccoIndex, -1)} disabled={bloccoIndex === 0} className="btn-icon !h-5 !w-5 disabled:opacity-30">
+                        <ChevronUp className="h-3.5 w-3.5" />
                       </button>
                       <button
                         type="button"
-                        onClick={() => spostaEsercizio(bloccoIndex, esIndex, 1)}
-                        disabled={esIndex === blocco.esercizi.length - 1}
-                        className="btn-icon !h-4 !w-4 disabled:opacity-30"
+                        onClick={() => spostaBlocco(bloccoIndex, 1)}
+                        disabled={bloccoIndex === blocchi.length - 1}
+                        className="btn-icon !h-5 !w-5 disabled:opacity-30"
                       >
-                        <ChevronDown className="h-3 w-3" />
+                        <ChevronDown className="h-3.5 w-3.5" />
                       </button>
                     </div>
-                    <div className="flex min-w-0 flex-col">
-                      <span className="truncate font-medium">{r.esercizio_nome}</span>
-                      <span className="truncate font-figures text-xs text-muted">{targetLabel(r)}</span>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1">
+                    <span className="font-display text-sm font-semibold">{blocco.nome}</span>
                     <button
                       type="button"
-                      onClick={() => setModaleAperto({ modo: "modifica", riga: r })}
-                      aria-label="Modifica esercizio"
-                      className="btn-icon"
+                      onClick={() => {
+                        setRinominandoBlocco(blocco.nome);
+                        setNuovoNomeBlocco(blocco.nome);
+                      }}
+                      aria-label="Rinomina blocco"
+                      className="btn-icon !h-6 !w-6"
                     >
-                      <Pencil className="h-3.5 w-3.5" />
+                      <Pencil className="h-3 w-3" />
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setModaleAperto({ modo: "nuovo", blocco: blocco.nome })}
+                      className="btn-secondary flex items-center gap-1 !px-2 !py-1 text-xs"
+                    >
+                      <Plus className="h-3 w-3" />
+                      Esercizio
                     </button>
                     <button
                       type="button"
-                      onClick={() => setEliminandoRiga(r)}
-                      aria-label="Elimina esercizio"
+                      onClick={() => setEliminandoBlocco(blocco.nome)}
+                      aria-label="Elimina blocco"
                       className="btn-icon hover:!text-spesa"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                </li>
-              ))}
-            </ul>
+                </div>
+
+                <DndContext sensors={sensors} onDragEnd={(e) => handleEsercizioDragEnd(bloccoIndex, e)}>
+                  <SortableContext
+                    items={blocco.esercizi.map((e) => e.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <ul className="flex flex-col gap-1.5">
+                      {blocco.esercizi.map((r, esIndex) => (
+                        <SortableEsercizioRow key={r.id} id={r.id}>
+                          <div className="flex min-w-0 items-center gap-2">
+                            <div className="flex flex-col">
+                              <button
+                                type="button"
+                                onClick={() => spostaEsercizio(bloccoIndex, esIndex, -1)}
+                                disabled={esIndex === 0}
+                                className="btn-icon !h-4 !w-4 disabled:opacity-30"
+                              >
+                                <ChevronUp className="h-3 w-3" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => spostaEsercizio(bloccoIndex, esIndex, 1)}
+                                disabled={esIndex === blocco.esercizi.length - 1}
+                                className="btn-icon !h-4 !w-4 disabled:opacity-30"
+                              >
+                                <ChevronDown className="h-3 w-3" />
+                              </button>
+                            </div>
+                            <div className="flex min-w-0 flex-col">
+                              <span className="truncate font-medium">{r.esercizio_nome}</span>
+                              <span className="truncate font-figures text-xs text-muted">{targetLabel(r)}</span>
+                            </div>
+                          </div>
+                          <div className="flex shrink-0 items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setModaleAperto({ modo: "modifica", riga: r })}
+                              aria-label="Modifica esercizio"
+                              className="btn-icon"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEliminandoRiga(r)}
+                              aria-label="Elimina esercizio"
+                              className="btn-icon hover:!text-spesa"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </SortableEsercizioRow>
+                      ))}
+                    </ul>
+                  </SortableContext>
+                </DndContext>
+              </SortableBlocco>
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
 
       {modaleAperto && (
         <SchedaEsercizioModal
@@ -335,5 +397,56 @@ export function SchedaEditor({
         </div>
       )}
     </div>
+  );
+}
+
+// Wrapper drag&drop per un blocco intero (header + lista esercizi): il
+// bottone su/giù resta come alternativa accessibile (tastiera/screen
+// reader), il grip è solo un secondo modo di fare la stessa azione.
+function SortableBlocco({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 }}
+      className="card flex flex-col gap-3 p-4"
+    >
+      <div className="flex items-start gap-2">
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          aria-label="Trascina per riordinare il blocco"
+          className="btn-icon !h-6 !w-6 shrink-0 cursor-grab touch-none active:cursor-grabbing"
+        >
+          <GripVertical className="h-3.5 w-3.5" />
+        </button>
+        <div className="flex-1">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function SortableEsercizioRow({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  return (
+    <li
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 }}
+      className="flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm"
+    >
+      <div className="flex min-w-0 items-center gap-2">
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          aria-label="Trascina per riordinare l'esercizio"
+          className="btn-icon !h-5 !w-5 shrink-0 cursor-grab touch-none active:cursor-grabbing"
+        >
+          <GripVertical className="h-3 w-3" />
+        </button>
+      </div>
+      {children}
+    </li>
   );
 }

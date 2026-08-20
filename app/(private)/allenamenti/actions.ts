@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireUser } from "@/lib/supabase/dal";
+import { getSchedaEsercizi } from "@/lib/allenamento/queries";
 import type { TipoMetrica, TipoRiga } from "@/lib/allenamento/types";
 
 export type AllenamentoActionResult = { error?: string };
@@ -48,15 +49,20 @@ export async function eliminaImpegnoFisso(id: string): Promise<AllenamentoAction
 
 // La riga `sessioni` va creata subito all'avvio (non a fine sessione): serve
 // il suo id per tutta la durata, per salvare ogni serie incrementalmente in
-// sessioni_log man mano che viene completata.
+// sessioni_log man mano che viene completata. Lo snapshot della struttura
+// scheda (blocchi/esercizi/target) viene congelato qui: se la scheda viene
+// modificata dopo, questa sessione resta invariata (vedi 019_allenamento_schede.sql).
 export async function creaSessione(schedaId: string): Promise<{ id: string } | { error: string }> {
   await requireUser();
+
+  const righe = await getSchedaEsercizi(schedaId);
+  if (righe.length === 0) return { error: "Questa scheda non ha ancora esercizi: aggiungine almeno uno." };
 
   const admin = createAdminClient();
   const oggi = new Date().toISOString().slice(0, 10);
   const { data, error } = await admin
     .from("sessioni")
-    .insert({ data: oggi, scheda_id: schedaId })
+    .insert({ data: oggi, scheda_id: schedaId, scheda_snapshot: righe })
     .select("id")
     .single();
   if (error) return { error: error.message };
@@ -289,7 +295,8 @@ export async function aggiornaSchedaEsercizio(
     .eq("id", id);
   if (error) return { error: error.message };
 
-  revalidatePath("/allenamenti/scheda");
+  revalidatePath("/allenamenti/scheda/[id]", "page");
+  revalidatePath("/allenamenti/schede");
   revalidatePath("/allenamenti");
   return {};
 }
@@ -301,7 +308,8 @@ export async function eliminaSchedaEsercizio(id: string): Promise<AllenamentoAct
   const { error } = await admin.from("scheda_esercizi").delete().eq("id", id);
   if (error) return { error: error.message };
 
-  revalidatePath("/allenamenti/scheda");
+  revalidatePath("/allenamenti/scheda/[id]", "page");
+  revalidatePath("/allenamenti/schede");
   revalidatePath("/allenamenti");
   return {};
 }
@@ -348,7 +356,8 @@ export async function aggiungiSchedaEsercizio(
   });
   if (error) return { error: error.message };
 
-  revalidatePath("/allenamenti/scheda");
+  revalidatePath("/allenamenti/scheda/[id]", "page");
+  revalidatePath("/allenamenti/schede");
   revalidatePath("/allenamenti");
   return {};
 }
@@ -367,7 +376,8 @@ export async function riordinaSchedaEsercizi(idsInOrdine: string[]): Promise<All
   const fallito = risultati.find((r) => r.error);
   if (fallito?.error) return { error: fallito.error.message };
 
-  revalidatePath("/allenamenti/scheda");
+  revalidatePath("/allenamenti/scheda/[id]", "page");
+  revalidatePath("/allenamenti/schede");
   revalidatePath("/allenamenti");
   return {};
 }
@@ -388,7 +398,8 @@ export async function rinominaBlocco(
     .eq("blocco", vecchioNome);
   if (error) return { error: error.message };
 
-  revalidatePath("/allenamenti/scheda");
+  revalidatePath("/allenamenti/scheda/[id]", "page");
+  revalidatePath("/allenamenti/schede");
   revalidatePath("/allenamenti");
   return {};
 }
@@ -400,7 +411,136 @@ export async function eliminaBlocco(schedaId: string, nome: string): Promise<All
   const { error } = await admin.from("scheda_esercizi").delete().eq("scheda_id", schedaId).eq("blocco", nome);
   if (error) return { error: error.message };
 
-  revalidatePath("/allenamenti/scheda");
+  revalidatePath("/allenamenti/scheda/[id]", "page");
+  revalidatePath("/allenamenti/schede");
   revalidatePath("/allenamenti");
   return {};
+}
+
+// ---------------------------------------------------------------------------
+// Gestione schede (CRUD): "Le mie schede" (elenco/creazione/duplicazione/
+// eliminazione/archiviazione), indipendente dall'editor blocchi/esercizi
+// sopra, che opera su una scheda già esistente.
+// ---------------------------------------------------------------------------
+
+export type SchedaPatch = { nome: string; descrizione: string | null };
+
+export async function creaScheda(patch: SchedaPatch): Promise<{ id: string } | { error: string }> {
+  await requireUser();
+  if (!patch.nome.trim()) return { error: "Il nome della scheda è obbligatorio." };
+
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("schede")
+    .insert({ nome: patch.nome.trim(), descrizione: patch.descrizione?.trim() || null })
+    .select("id")
+    .single();
+  if (error) return { error: error.message };
+
+  revalidatePath("/allenamenti/schede");
+  revalidatePath("/allenamenti");
+  return { id: data.id as string };
+}
+
+export async function aggiornaScheda(id: string, patch: SchedaPatch): Promise<AllenamentoActionResult> {
+  await requireUser();
+  if (!patch.nome.trim()) return { error: "Il nome della scheda è obbligatorio." };
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("schede")
+    .update({ nome: patch.nome.trim(), descrizione: patch.descrizione?.trim() || null })
+    .eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/allenamenti/schede");
+  revalidatePath("/allenamenti/scheda/[id]", "page");
+  revalidatePath("/allenamenti");
+  return {};
+}
+
+export async function archiviaScheda(id: string, archiviata: boolean): Promise<AllenamentoActionResult> {
+  await requireUser();
+
+  const admin = createAdminClient();
+  const { error } = await admin.from("schede").update({ is_archiviata: archiviata }).eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/allenamenti/schede");
+  revalidatePath("/allenamenti");
+  return {};
+}
+
+export async function eliminaScheda(id: string): Promise<AllenamentoActionResult> {
+  await requireUser();
+
+  const admin = createAdminClient();
+  // Cascade su scheda_esercizi gestito dalla FK "on delete cascade"
+  // (migration 016); le sessioni collegate restano (scheda_id passa a null,
+  // vedi 019_allenamento_schede.sql) perché già autosufficienti via snapshot.
+  const { error } = await admin.from("schede").delete().eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/allenamenti/schede");
+  revalidatePath("/allenamenti");
+  revalidatePath("/allenamenti/storico");
+  return {};
+}
+
+// Copia profonda: nuova riga in `schede` + copia di tutte le righe
+// scheda_esercizi collegate (stesso esercizio_id, che resta condiviso dal
+// catalogo globale). Le sessioni passate della scheda originale non vengono
+// toccate né copiate.
+export async function duplicaScheda(id: string): Promise<{ id: string } | { error: string }> {
+  await requireUser();
+
+  const admin = createAdminClient();
+  const { data: originale, error: schedaErr } = await admin
+    .from("schede")
+    .select("nome, descrizione")
+    .eq("id", id)
+    .maybeSingle();
+  if (schedaErr) return { error: schedaErr.message };
+  if (!originale) return { error: "Scheda non trovata." };
+
+  const { data: nuova, error: insErr } = await admin
+    .from("schede")
+    .insert({ nome: `${originale.nome} (copia)`, descrizione: originale.descrizione })
+    .select("id")
+    .single();
+  if (insErr) return { error: insErr.message };
+
+  const { data: righe, error: righeErr } = await admin
+    .from("scheda_esercizi")
+    .select("*")
+    .eq("scheda_id", id)
+    .order("ordine");
+  if (righeErr) return { error: righeErr.message };
+
+  if (righe && righe.length > 0) {
+    const copie = righe.map((r) => ({
+      scheda_id: nuova.id,
+      esercizio_id: r.esercizio_id,
+      blocco: r.blocco,
+      ordine: r.ordine,
+      tipo_riga: r.tipo_riga,
+      target_serie: r.target_serie,
+      target_rip_min: r.target_rip_min,
+      target_rip_max: r.target_rip_max,
+      target_peso: r.target_peso,
+      target_tempo_sec: r.target_tempo_sec,
+      riposo_sec: r.riposo_sec,
+      rounds: r.rounds,
+      lavoro_sec: r.lavoro_sec,
+      pausa_sec: r.pausa_sec,
+      zona_corporea: r.zona_corporea,
+      note: r.note,
+    }));
+    const { error: copiaErr } = await admin.from("scheda_esercizi").insert(copie);
+    if (copiaErr) return { error: copiaErr.message };
+  }
+
+  revalidatePath("/allenamenti/schede");
+  revalidatePath("/allenamenti");
+  return { id: nuova.id as string };
 }
