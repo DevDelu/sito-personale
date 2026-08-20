@@ -1,34 +1,72 @@
 ---
 slug: "piattaforma-aperitivi"
-title: "Piattaforma Aperitivi"
-subtitle: "Tesi di laurea"
+title: "Una piattaforma per gli aperitivi"
+subtitle: "Tesi di laurea triennale — UX/UI Design"
 category: "thesis"
-cover: ""
-tags: ["Tesi", "Full-stack", "UX"]
+cover: "/images/projects/aperitivo-cover.png"
+tags: ["UX Research", "UI Design", "Figma", "User Testing", "Mobile App"]
 year: 2024
 featured: true
-role: "Design & sviluppo full-stack"
-summary: "Contenuto placeholder: sostituire con il sommario reale del case study."
-accentColors:
-  primary: "#EE7222"
-  secondary: "#FBBB1A"
-  tertiary: "#1E6E70"
-stats:
-  - value: 0
-    label: "Placeholder metrica 1"
-  - value: 0
-    label: "Placeholder metrica 2"
-  - value: 0
-    label: "Placeholder metrica 3"
-links: []
+role: "UX Researcher & UI Designer"
+summary: "Progettazione UX/UI di un'app mobile per scoprire, prenotare e organizzare aperitivi, basata su una ricerca utente con 134 risposte. Dalla teoria del design alla prototipazione ad alta fedeltà su Figma."
+links:
+  - label: "PDF Tesi completa"
+    url: "#"
+  - label: "Prototipo Figma"
+    url: "#"
 ---
 
-{/* Contenuto placeholder — sostituire con il case study reale */}
+## Il contesto
+
+In un momento in cui il bisogno di aggregazione tra i giovani è sempre più centrale, l'aperitivo si conferma una delle abitudini di socialità più diffuse: informale, accessibile, ricorrente. Ma organizzarne uno bene — capire dove andare, cosa costa, come coordinare un gruppo — resta un'operazione frammentata tra recensioni sparse, chat e telefonate.
+
+Questa tesi (Università degli Studi di Torino, Facoltà di Cultura, Politiche e Società, relatrice Prof.ssa Fabiana Vernero, correlatore Prof. Fabio Zanchetta) parte da lì: progettare, dal punto di vista UX/UI, una piattaforma digitale dedicata agli aperitivi che renda l'intera esperienza — dalla scoperta del locale alla prenotazione — semplice e naturale quanto l'aperitivo stesso.
+
+Il lavoro si muove su tre livelli: teoria del design (differenze tra UX e UI, usabilità, metodologie di prototipazione a bassa e alta fedeltà), ricerca utenti (un questionario quantitativo per capire chi sono davvero gli utenti e cosa cercano) e progettazione vera e propria (architettura dell'informazione, flussi, wireframe, prototipo ad alta fedeltà).
 
 ## Il problema
 
-Testo placeholder. Sostituire con la descrizione reale del problema affrontato dalla tesi.
+Le soluzioni già sul mercato — app di prenotazione ristoranti, piattaforme di recensioni, social network — coprono solo pezzi del percorso: o sono pensate per la ristorazione formale, o si fermano alla scoperta del locale senza arrivare alla prenotazione. Nessuna integra scoperta, informazioni, prenotazione e condivisione in un'unica esperienza pensata specificamente per l'aperitivo.
 
-## La soluzione
+## Ricerca
 
-Testo placeholder. Sostituire con la descrizione reale della soluzione progettata.
+Per capire chi sono davvero gli utenti e cosa li frustra, ho condotto una ricerca quantitativa tramite un questionario su Google Moduli — 19 domande, in gran parte a risposta chiusa per tenere basso l'onere cognitivo e alta la qualità delle risposte. Diffuso tramite gruppi universitari, passaparola e QR code cartacei in biblioteche e aule studio, ha raccolto **134 risposte**.
+
+Alcuni risultati hanno guidato direttamente le scelte di prodotto:
+
+- Il target si è confermato coerente con l'ipotesi iniziale: il **64,9%** degli intervistati ha tra 18 e 24 anni, un altro **27,6%** tra 25 e 34 — insieme, oltre il 92% rientra nella fascia 18-34.
+- Il **prezzo** è il criterio più citato nella scelta di un locale (**73,9%**), seguito da vicino da qualità del cibo (**65,7%**) e delle bevande (**61,9%**) → prezzi e menu dovevano essere visibili subito, non nascosti in fondo alla scheda del locale.
+- Le **raccomandazioni di amici** guidano la scelta del locale per l'**85,8%** degli utenti, molto più di recensioni online (32,8%), offerte (32,8%) o pubblicità (9%) → priorità a una condivisione semplice via link diretto, non a un feed social.
+- Il **59%** trova difficile scoprire nuovi locali a seconda della zona in cui si trova (e un altro 18,7% fatica sempre) → giustifica una vista mappa con geolocalizzazione come funzione centrale, non accessoria.
+- Interpellati direttamente su cosa vorrebbero nell'app, gli utenti hanno messo in cima informazioni su menu e prezzi (**88,8%**) e recensioni/valutazioni (**84,1%**), seguite da una mappa dei locali vicini (74,8%) e dalla possibilità di prenotare un tavolo (56,1%).
+- Il **67,3%** vorrebbe poter condividere le proprie preferenze e ricevere consigli personalizzati sui locali — soprattutto in base a cosa si vuole fare durante l'aperitivo: chiacchierare (indicato dal 97,8% degli intervistati), guardare il panorama (35,1%) o giocare a giochi da tavolo (20,9%).
+
+## Le persone dietro i dati
+
+Dalla ricerca sono nate due user personas, usate poi per validare ogni decisione di design attraverso scenari concreti.
+
+**Gaia**, 21 anni, studia Economia e Statistica a Torino ma è originaria di Rimini. Vive in un appartamento condiviso a San Salvario e per lei l'aperitivo è soprattutto un modo per costruirsi una rete sociale in una città che non è la sua. Cerca locali con una buona proposta di cocktail e un'atmosfera accogliente, ed è a suo agio con la tecnologia: vuole un'app veloce, che le faccia trovare un tavolo senza troppi passaggi.
+
+**Lorenzo**, 30 anni, ingegnere informatico trasferito da Firenze per lavoro, vive a Porta Palazzo. Per lui l'aperitivo settimanale con colleghi è un rito consolidato: cerca efficienza, vuole poter prenotare rapidamente un locale con una buona carta vini, e si scoraggia quando, nei giorni di maggiore affluenza, non trova posto.
+
+## Dalla ricerca al prodotto
+
+**Architettura dell'informazione.** I contenuti partono dalla home, da cui si diramano ricerca locali, mappa e locali salvati; ogni locale espone bevande, cibo, recensioni e contatti, con la prenotazione sempre raggiungibile come azione finale.
+
+**Flowchart, task flow, user flow.** Prima di disegnare le schermate ho mappato la logica: il flowchart di registrazione/login copre ogni ramo decisionale (email già esistente, password errata, campi incompleti); il task flow isola il percorso di prenotazione — locale, data, orario, persone, riepilogo, conferma; lo user flow, costruito sullo scenario di Gaia, verifica che quel percorso funzioni per una persona reale con un obiettivo reale, non solo sulla carta.
+
+**Wireframe.** Partito da sketch cartacei a bassa fedeltà, sono passato a wireframe digitali su Figma in scala di grigi — niente colore, niente testi definitivi, solo gerarchia e flusso. Questo ha permesso di iterare rapidamente prima di investire tempo nel dettaglio visivo.
+
+**Prototipo ad alta fedeltà.** Il passaggio finale ha portato contenuti reali, colori e microinterazioni: dalla schermata di caricamento al login (email/password o social), dall'onboarding con richiesta di posizione e preferenze fino alla home con i locali consigliati, alla scheda locale con carosello immagini e tab per bevande/cibo/recensioni/contatti, fino al flusso di prenotazione completo — data, orario, persone, riepilogo con note per allergie o richieste, conferma. Ho aggiunto anche una sezione "le mie prenotazioni", con prenotazioni attive e storico, così l'utente ritrova facilmente i locali già visitati.
+
+## Design system
+
+Font **Sen**, sans-serif leggibile pensato per restare pulito anche su schermi piccoli. Spaziature costruite su incrementi di 8px (ridotti a 4px dove serve), per un layout coerente e prevedibile.
+
+La palette — giallo `#FBBB1A`, arancione `#EE7222`, blu `#42ABAE` — non è decorativa ma funzionale: il giallo per le icone secondarie, l'arancione per richiamare l'attenzione sulle azioni prioritarie (come il pulsante "Prenota"), il blu riservato allo stato "selezionato", così l'utente ha sempre un feedback visivo chiaro su dove si trova e cosa può fare. Anche il logo — un bicchiere bianco con un liquido giallo-arancio su sfondo azzurro — riprende questi stessi colori, evocando freschezza e un'atmosfera rilassata.
+
+## Cosa ho imparato
+
+Il vincolo più utile di tutto il progetto è stato il questionario da 134 risposte: ha trasformato scelte che sarebbero state intuizioni personali (che colore usare, cosa mostrare per primo) in decisioni verificabili contro dati reali. Quando dati e intuizione sono andati in disaccordo — ad esempio sull'importanza della mappa rispetto alla ricerca testuale — hanno vinto i dati.
+
+Il prototipo dimostra la fattibilità del concept e regge a un test di usabilità end-to-end, ma resta un prototipo: mancano un secondo ciclo di test con utenti reali e la validazione tecnica necessaria prima di poter parlare di prodotto pronto per il mercato. È il limite dichiarato del lavoro — ed è anche esattamente il tipo di iterazione che, con lo stack che uso oggi (Next.js, Supabase), avrebbe senso affrontare per primo se questo progetto diventasse reale.
