@@ -36,7 +36,6 @@ export function Overview({
   depositi: Deposito[];
   range: Range;
 }) {
-  const [categoriaFiltro, setCategoriaFiltro] = useState("tutte");
   const [categorieList, setCategorieList] = useState(categorie);
   const [prevCategorie, setPrevCategorie] = useState(categorie);
 
@@ -57,33 +56,17 @@ export function Overview({
     );
   }
 
-  const categorieSpesa = useMemo(() => categorieList.filter((c) => c.tipo === "spesa"), [categorieList]);
-
-  const speseFiltrate = useMemo(
-    () =>
-      categoriaFiltro === "tutte"
-        ? spese
-        : spese.filter((s) => s.categoria_nome === categoriaFiltro),
-    [spese, categoriaFiltro]
-  );
-
-  const totaleSpese = useMemo(() => speseFiltrate.reduce((s, r) => s + r.importo, 0), [speseFiltrate]);
+  const totaleSpese = useMemo(() => spese.reduce((s, r) => s + r.importo, 0), [spese]);
   const totaleEntrate = useMemo(() => depositi.reduce((s, r) => s + r.importo, 0), [depositi]);
 
   return (
     <div className="flex flex-col gap-8">
-      <FilterBar
-        range={range}
-        categorie={categorieSpesa}
-        categoriaSelezionata={categoriaFiltro}
-        onCategoriaChange={setCategoriaFiltro}
-      />
+      <FilterBar range={range} />
 
       <SummaryCards entrate={totaleEntrate} uscite={totaleSpese} />
 
       <ChartsSection
         spese={spese}
-        speseFiltrate={speseFiltrate}
         categorieList={categorieList}
         depositi={depositi}
         range={range}

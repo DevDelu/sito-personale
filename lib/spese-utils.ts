@@ -1,5 +1,3 @@
-import type { Spesa } from "@/lib/types";
-
 type Flow = { data: string; importo: number };
 
 export const currencyFormatter = new Intl.NumberFormat("it-IT", {
@@ -13,21 +11,38 @@ export function formatCurrency(n: number): string {
 
 export type CategoriaTotale = { nome: string; colore: string | null; totale: number };
 
+type ConCategoriaEImporto = {
+  categoria_nome: string | null;
+  categoria_colore: string | null;
+  importo: number;
+};
+
 // Fonte unica per "categorie con totale nel periodo, ordinate per importo
 // desc": usata dal grafico a torta, dal grafico multi-linea per categoria e
 // dal drill-down su singola categoria, per non ricalcolare/duplicare la
-// stessa aggregazione in tre punti diversi.
-export function categorieOrdinatePerTotale(spese: Spesa[]): CategoriaTotale[] {
+// stessa aggregazione in tre punti diversi. Accetta sia Spesa[] che
+// Deposito[] (o un mix delle due) grazie alla forma strutturale del tipo.
+export function categorieOrdinatePerTotale(righe: ConCategoriaEImporto[]): CategoriaTotale[] {
   const meta = new Map<string, { colore: string | null; totale: number }>();
-  for (const s of spese) {
-    const nome = s.categoria_nome ?? "Senza categoria";
-    const entry = meta.get(nome) ?? { colore: s.categoria_colore, totale: 0 };
-    entry.totale += s.importo;
+  for (const r of righe) {
+    const nome = r.categoria_nome ?? "Senza categoria";
+    const entry = meta.get(nome) ?? { colore: r.categoria_colore, totale: 0 };
+    entry.totale += r.importo;
     meta.set(nome, entry);
   }
   return [...meta.entries()]
     .map(([nome, { colore, totale }]) => ({ nome, colore, totale }))
     .sort((a, b) => b.totale - a.totale);
+}
+
+const FONTE_LABEL: Record<string, string> = {
+  crypto: "Crypto.com",
+  intesa: "Intesa Sanpaolo",
+  manuale: "Manuale",
+};
+
+export function formatFonte(fonte: string): string {
+  return FONTE_LABEL[fonte] ?? fonte;
 }
 
 // Densità dei tick dell'asse X: punta sempre a un numero massimo di etichette

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Categoria } from "@/lib/types";
 
 const PRESETS = [
   { id: "7", label: "7 giorni" },
@@ -11,17 +10,7 @@ const PRESETS = [
 
 export type Range = { from: string; to: string; preset: string | null };
 
-export function FilterBar({
-  range,
-  categorie,
-  categoriaSelezionata,
-  onCategoriaChange,
-}: {
-  range: Range;
-  categorie: Categoria[];
-  categoriaSelezionata: string;
-  onCategoriaChange: (v: string) => void;
-}) {
+export function FilterBar({ range }: { range: Range }) {
   const router = useRouter();
   const [showCustom, setShowCustom] = useState(range.preset === null);
   const [from, setFrom] = useState(range.from);
@@ -85,19 +74,6 @@ export function FilterBar({
           </form>
         )}
       </div>
-
-      <select
-        value={categoriaSelezionata}
-        onChange={(e) => onCategoriaChange(e.target.value)}
-        className="field-input w-fit bg-surface px-3 py-1.5 text-sm"
-      >
-        <option value="tutte">Tutte le categorie</option>
-        {categorie.map((c) => (
-          <option key={c.id} value={c.nome}>
-            {c.nome}
-          </option>
-        ))}
-      </select>
     </div>
   );
 }

@@ -15,6 +15,7 @@ export type TransactionListItem = {
   nota: string | null;
   nominativo: string | null;
   dettaglio: string | null;
+  fonte: string;
 };
 
 export function spesaToItem(s: Spesa): TransactionListItem {
@@ -31,6 +32,7 @@ export function spesaToItem(s: Spesa): TransactionListItem {
     nota: s.note,
     nominativo: s.nominativo,
     dettaglio: s.dettaglio,
+    fonte: s.fonte,
   };
 }
 
@@ -48,6 +50,7 @@ export function depositoToItem(d: Deposito): TransactionListItem {
     nota: d.note,
     nominativo: d.nominativo,
     dettaglio: d.dettaglio,
+    fonte: d.fonte,
   };
 }
 

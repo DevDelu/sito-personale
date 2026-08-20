@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Area,
@@ -13,20 +13,12 @@ import {
   YAxis,
 } from "recharts";
 import type { MouseHandlerDataParam, TooltipContentProps } from "recharts";
-import { X } from "lucide-react";
-import {
-  TransactionList,
-  depositoToItem,
-  spesaToItem,
-  type TransactionListItem,
-} from "./TransactionList";
-import { TransactionDetailModal } from "./TransactionDetailModal";
+import { depositoToItem, spesaToItem, type TransactionListItem } from "./TransactionList";
+import { DayDetailModal } from "./DayDetailModal";
 import { adaptiveTickInterval, formatCurrency } from "@/lib/spese-utils";
 import type { Categoria, Deposito, Spesa } from "@/lib/types";
 
 const axisTick = { fill: "var(--muted)", fontSize: 12, fontFamily: "var(--font-mono)" };
-
-const POPOVER_WIDTH = 256;
 
 type DailyPoint = { data: string; label: string; uscite: number; entrate: number };
 
@@ -68,17 +60,9 @@ function transactionsByDay(spese: Spesa[], depositi: Deposito[]): Map<string, Tr
   return map;
 }
 
-function dayLabel(iso: string): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("it-IT", {
-    weekday: "short",
-    day: "2-digit",
-    month: "long",
-  });
-}
-
 // Anteprima leggera on-hover (solo desktop, il touch non ha hover): valori
-// aggregati del giorno. Coesiste con il click, che apre la mini-lista/il
-// popup di dettaglio già esistenti — i due meccanismi sono indipendenti.
+// aggregati del giorno. Coesiste con il click, che apre il modale di
+// dettaglio giorno — i due meccanismi sono indipendenti.
 function DailyHoverTooltip({ active, payload, label }: Partial<TooltipContentProps<number, string>>) {
   if (!active || !payload || payload.length === 0) return null;
   const uscite = payload.find((p) => p.dataKey === "uscite")?.value as number | undefined;
@@ -122,40 +106,15 @@ export function DailyTrendChart({
   const daily = dailyFlow(spese, depositi, from, to);
   const tickInterval = adaptiveTickInterval(daily.length);
   const transactions = useMemo(() => transactionsByDay(spese, depositi), [spese, depositi]);
-  const plotRef = useRef<HTMLDivElement>(null);
 
-  const [miniLista, setMiniLista] = useState<{ giorno: string; left: number; top: number } | null>(
-    null
-  );
-  const [dettaglio, setDettaglio] = useState<TransactionListItem | null>(null);
+  const [giornoSelezionato, setGiornoSelezionato] = useState<string | null>(null);
 
   function handleChartClick(state: MouseHandlerDataParam) {
     const index = typeof state.activeTooltipIndex === "number" ? state.activeTooltipIndex : null;
     if (index === null) return;
     const point = daily[index];
     if (!point) return;
-
-    const items = transactions.get(point.data) ?? [];
-    if (items.length === 0) return;
-
-    if (items.length === 1) {
-      setMiniLista(null);
-      setDettaglio(items[0]);
-      return;
-    }
-
-    setMiniLista((prev) => {
-      if (prev?.giorno === point.data) return null;
-      const plotWidth = plotRef.current?.clientWidth ?? 400;
-      const plotHeight = plotRef.current?.clientHeight ?? 288;
-      const rawX = state.activeCoordinate?.x ?? plotWidth / 2;
-      const rawY = state.activeCoordinate?.y ?? 0;
-      return {
-        giorno: point.data,
-        left: Math.min(Math.max(rawX - POPOVER_WIDTH / 2, 0), Math.max(plotWidth - POPOVER_WIDTH, 0)),
-        top: Math.min(rawY + 16, Math.max(plotHeight - 160, 0)),
-      };
-    });
+    setGiornoSelezionato(point.data);
   }
 
   function handleChanged() {
@@ -164,7 +123,7 @@ export function DailyTrendChart({
 
   return (
     <div className="card card-hover h-72 w-full p-4">
-      <div ref={plotRef} className="relative h-full w-full">
+      <div className="relative h-full w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={daily}
@@ -221,36 +180,14 @@ export function DailyTrendChart({
             />
           </AreaChart>
         </ResponsiveContainer>
-
-        {miniLista && (
-          <div
-            className="animate-scale-in absolute z-10 rounded-xl border border-border bg-surface p-3 shadow-xl"
-            style={{ left: miniLista.left, top: miniLista.top, width: POPOVER_WIDTH }}
-          >
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <span className="font-display text-sm font-semibold capitalize">
-                {dayLabel(miniLista.giorno)}
-              </span>
-              <button type="button" onClick={() => setMiniLista(null)} aria-label="Chiudi" className="btn-icon !p-1">
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-            <TransactionList
-              items={transactions.get(miniLista.giorno) ?? []}
-              onItemClick={(item) => {
-                setDettaglio(item);
-                setMiniLista(null);
-              }}
-            />
-          </div>
-        )}
       </div>
 
-      {dettaglio && (
-        <TransactionDetailModal
-          transazione={dettaglio}
+      {giornoSelezionato && (
+        <DayDetailModal
+          giorno={giornoSelezionato}
+          items={transactions.get(giornoSelezionato) ?? []}
           categorie={categorie}
-          onClose={() => setDettaglio(null)}
+          onClose={() => setGiornoSelezionato(null)}
           onCategoriaCreata={onCategoriaCreata}
           onChanged={handleChanged}
         />

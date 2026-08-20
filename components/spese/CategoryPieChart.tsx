@@ -4,18 +4,32 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { resolveCategoryColor } from "@/lib/category-style";
-import { categorieOrdinatePerTotale, formatCurrency } from "@/lib/spese-utils";
-import { TransactionList, spesaToItem, type TransactionListItem } from "./TransactionList";
+import { categorieOrdinatePerTotale, formatCurrency, type CategoriaTotale } from "@/lib/spese-utils";
+import {
+  TransactionList,
+  depositoToItem,
+  spesaToItem,
+  type TransactionListItem,
+} from "./TransactionList";
 import { TransactionDetailModal } from "./TransactionDetailModal";
-import type { Categoria, Spesa } from "@/lib/types";
+import { CategoryMultiSelect } from "./CategoryMultiSelect";
+import type { Categoria, Deposito, Spesa } from "@/lib/types";
 import type { Range } from "./FilterBar";
 
-function transactionsByCategory(spese: Spesa[]): Map<string, TransactionListItem[]> {
+type TipoFiltro = "spesa" | "entrata" | "entrambi";
+
+const TIPO_OPTIONS: { id: TipoFiltro; label: string }[] = [
+  { id: "spesa", label: "Uscite" },
+  { id: "entrata", label: "Entrate" },
+  { id: "entrambi", label: "Entrambi" },
+];
+
+function transactionsByCategory(items: TransactionListItem[]): Map<string, TransactionListItem[]> {
   const map = new Map<string, TransactionListItem[]>();
-  for (const s of spese) {
-    const nome = s.categoria_nome ?? "Senza categoria";
+  for (const item of items) {
+    const nome = item.categoria_nome ?? "Senza categoria";
     const list = map.get(nome) ?? [];
-    list.push(spesaToItem(s));
+    list.push(item);
     map.set(nome, list);
   }
   return map;
@@ -58,24 +72,87 @@ function groupByWeek(items: TransactionListItem[]): { label: string; items: Tran
     }));
 }
 
+function CategorySummaryTable({ data, totale }: { data: CategoriaTotale[]; totale: number }) {
+  if (data.length === 0) {
+    return <p className="text-sm text-muted">Nessun movimento nel periodo selezionato.</p>;
+  }
+  return (
+    <table className="w-full text-sm">
+      <thead>
+        <tr className="text-left text-xs text-muted">
+          <th className="pb-2 font-medium">Categoria</th>
+          <th className="pb-2 text-right font-medium">Totale</th>
+          <th className="pb-2 text-right font-medium">%</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((c) => (
+          <tr key={c.nome} className="border-t border-border/60">
+            <td className="flex items-center gap-2 py-1.5">
+              <span
+                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                style={{ backgroundColor: resolveCategoryColor(c.nome, c.colore) }}
+              />
+              <span className="truncate">{c.nome}</span>
+            </td>
+            <td className="font-figures py-1.5 text-right">{formatCurrency(c.totale)}</td>
+            <td className="font-figures py-1.5 text-right text-muted">
+              {totale > 0 ? `${((c.totale / totale) * 100).toFixed(1)}%` : "—"}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 export function CategoryPieChart({
   spese,
+  depositi,
   categorie,
   range,
   onCategoriaCreata,
 }: {
   spese: Spesa[];
+  depositi: Deposito[];
   categorie: Categoria[];
   range: Range;
   onCategoriaCreata?: (categoria: Categoria) => void;
 }) {
   const router = useRouter();
-  const data = categorieOrdinatePerTotale(spese);
-  const totale = data.reduce((s, d) => s + d.totale, 0);
-  const transactions = useMemo(() => transactionsByCategory(spese), [spese]);
-
+  const [tipoFiltro, setTipoFiltro] = useState<TipoFiltro>("spesa");
+  const [categorieSelezionate, setCategorieSelezionate] = useState<string[]>([]);
   const [categoriaSelezionata, setCategoriaSelezionata] = useState<string | null>(null);
   const [dettaglio, setDettaglio] = useState<TransactionListItem | null>(null);
+
+  const itemsTutti = useMemo(
+    () => [...spese.map(spesaToItem), ...depositi.map(depositoToItem)],
+    [spese, depositi]
+  );
+
+  const itemsTipoFiltrati = useMemo(
+    () => (tipoFiltro === "entrambi" ? itemsTutti : itemsTutti.filter((i) => i.tipo === tipoFiltro)),
+    [itemsTutti, tipoFiltro]
+  );
+
+  const opzioniCategorie = useMemo(
+    () => categorieOrdinatePerTotale(itemsTipoFiltrati),
+    [itemsTipoFiltrati]
+  );
+
+  const items = useMemo(
+    () =>
+      categorieSelezionate.length === 0
+        ? itemsTipoFiltrati
+        : itemsTipoFiltrati.filter((i) =>
+            categorieSelezionate.includes(i.categoria_nome ?? "Senza categoria")
+          ),
+    [itemsTipoFiltrati, categorieSelezionate]
+  );
+
+  const data = useMemo(() => categorieOrdinatePerTotale(items), [items]);
+  const totale = data.reduce((s, d) => s + d.totale, 0);
+  const transactions = useMemo(() => transactionsByCategory(items), [items]);
 
   function handleSliceClick(index: number) {
     const entry = data[index];
@@ -98,10 +175,34 @@ export function CategoryPieChart({
 
   return (
     <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <CategoryMultiSelect
+          options={opzioniCategorie}
+          selected={categorieSelezionate}
+          onChange={setCategorieSelezionate}
+        />
+        <div className="flex items-center gap-1 rounded-full border border-border p-0.5">
+          {TIPO_OPTIONS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setTipoFiltro(t.id)}
+              className={`rounded-full px-3 py-1 text-sm transition-all duration-200 ease-out active:scale-95 ${
+                tipoFiltro === t.id
+                  ? "bg-accent text-accent-foreground shadow-sm"
+                  : "text-muted hover:text-foreground"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="card relative h-72 w-full p-4">
         {data.length === 0 ? (
           <p className="flex h-full items-center justify-center text-sm text-muted">
-            Nessuna spesa nel periodo selezionato.
+            Nessun movimento nel periodo selezionato.
           </p>
         ) : (
           <>
@@ -142,6 +243,10 @@ export function CategoryPieChart({
             </div>
           </>
         )}
+      </div>
+
+      <div className="card p-4">
+        <CategorySummaryTable data={data} totale={totale} />
       </div>
 
       {categoriaSelezionata && (

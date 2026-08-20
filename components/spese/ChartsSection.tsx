@@ -9,14 +9,12 @@ import type { Range } from "@/components/spese/FilterBar";
 // della route, senza duplicarlo tre volte.
 export function ChartsSection({
   spese,
-  speseFiltrate,
   categorieList,
   depositi,
   range,
   onCategoriaCreata,
 }: {
   spese: Spesa[];
-  speseFiltrate: Spesa[];
   categorieList: Categoria[];
   depositi: Deposito[];
   range: Range;
@@ -27,7 +25,7 @@ export function ChartsSection({
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Andamento giornaliero</h2>
         <DailyTrendChart
-          spese={speseFiltrate}
+          spese={spese}
           depositi={depositi}
           from={range.from}
           to={range.to}
@@ -42,9 +40,10 @@ export function ChartsSection({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-display text-sm font-medium text-muted">Spese per categoria</h2>
+        <h2 className="font-display text-sm font-medium text-muted">Movimenti per categoria</h2>
         <CategoryPieChart
-          spese={speseFiltrate}
+          spese={spese}
+          depositi={depositi}
           categorie={categorieList}
           range={range}
           onCategoriaCreata={onCategoriaCreata}
