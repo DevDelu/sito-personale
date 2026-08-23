@@ -41,6 +41,10 @@ Alcuni risultati hanno guidato direttamente le scelte di prodotto:
 - Interpellati direttamente su cosa vorrebbero nell'app, gli utenti hanno messo in cima informazioni su menu e prezzi (**88,8%**) e recensioni/valutazioni (**84,1%**), seguite da una mappa dei locali vicini (74,8%) e dalla possibilità di prenotare un tavolo (56,1%).
 - Il **67,3%** vorrebbe poter condividere le proprie preferenze e ricevere consigli personalizzati sui locali — soprattutto in base a cosa si vuole fare durante l'aperitivo: chiacchierare (indicato dal 97,8% degli intervistati), guardare il panorama (35,1%) o giocare a giochi da tavolo (20,9%).
 
+![Distribuzione per età degli intervistati: 64,9% ha tra 18 e 24 anni, 27,6% tra 25 e 34](/images/projects/aperitivo-ricerca-eta.png "Distribuzione per età — questionario, 134 risposte")
+
+![Funzionalità ritenute più utili: informazioni su menù e prezzi 88,8%, recensioni e valutazioni 84,1%, mappa dei locali vicini 74,8%, possibilità di prenotare un tavolo 56,1%](/images/projects/aperitivo-ricerca-funzionalita.png "Funzionalità richieste dagli utenti — questionario")
+
 ## Le persone dietro i dati
 
 Dalla ricerca sono nate due user personas, usate poi per validare ogni decisione di design attraverso scenari concreti.
@@ -55,15 +59,29 @@ Dalla ricerca sono nate due user personas, usate poi per validare ogni decisione
 
 **Flowchart, task flow, user flow.** Prima di disegnare le schermate ho mappato la logica: il flowchart di registrazione/login copre ogni ramo decisionale (email già esistente, password errata, campi incompleti); il task flow isola il percorso di prenotazione — locale, data, orario, persone, riepilogo, conferma; lo user flow, costruito sullo scenario di Gaia, verifica che quel percorso funzioni per una persona reale con un obiettivo reale, non solo sulla carta.
 
+![Flowchart del flusso di login e registrazione, con gestione degli errori per email inesistente, password errata e campi incompleti](/images/projects/aperitivo-flowchart-login.png "Flowchart — login e registrazione")
+
+![Task flow del percorso di prenotazione: dalla home alla conferma, passando per data, orario e numero di persone](/images/projects/aperitivo-taskflow-prenotazione.png "Task flow — percorso di prenotazione")
+
 **Wireframe.** Partito da sketch cartacei a bassa fedeltà, sono passato a wireframe digitali su Figma in scala di grigi — niente colore, niente testi definitivi, solo gerarchia e flusso. Questo ha permesso di iterare rapidamente prima di investire tempo nel dettaglio visivo.
 
+![Sketch cartacei a bassa fedeltà delle schermate principali dell'app](/images/projects/aperitivo-wireframe-sketch.png "Wireframe — sketch cartacei a bassa fedeltà")
+
+![Wireframe digitali in scala di grigi su Figma delle schermate home e locale](/images/projects/aperitivo-wireframe-digitale.png "Wireframe — digitale in scala di grigi")
+
 **Prototipo ad alta fedeltà.** Il passaggio finale ha portato contenuti reali, colori e microinterazioni: dalla schermata di caricamento al login (email/password o social), dall'onboarding con richiesta di posizione e preferenze fino alla home con i locali consigliati, alla scheda locale con carosello immagini e tab per bevande/cibo/recensioni/contatti, fino al flusso di prenotazione completo — data, orario, persone, riepilogo con note per allergie o richieste, conferma. Ho aggiunto anche una sezione "le mie prenotazioni", con prenotazioni attive e storico, così l'utente ritrova facilmente i locali già visitati.
+
+![Schermate del prototipo ad alta fedeltà: flusso di prenotazione con selezione data, orario, numero di persone e conferma](/images/projects/aperitivo-prototipo-prenotazione.png "Prototipo — flusso di prenotazione")
+
+![Schermata "Le mie prenotazioni" del prototipo, con prenotazioni attive e storico](/images/projects/aperitivo-prototipo-storico.png "Prototipo — le mie prenotazioni")
 
 ## Design system
 
 Font **Sen**, sans-serif leggibile pensato per restare pulito anche su schermi piccoli. Spaziature costruite su incrementi di 8px (ridotti a 4px dove serve), per un layout coerente e prevedibile.
 
 La palette — giallo `#FBBB1A`, arancione `#EE7222`, blu `#42ABAE` — non è decorativa ma funzionale: il giallo per le icone secondarie, l'arancione per richiamare l'attenzione sulle azioni prioritarie (come il pulsante "Prenota"), il blu riservato allo stato "selezionato", così l'utente ha sempre un feedback visivo chiaro su dove si trova e cosa può fare. Anche il logo — un bicchiere bianco con un liquido giallo-arancio su sfondo azzurro — riprende questi stessi colori, evocando freschezza e un'atmosfera rilassata.
+
+![Logo dell'app: un bicchiere bianco con liquido giallo-arancio su sfondo azzurro](/images/projects/aperitivo-logo.png "Il logo dell'app")
 
 ## Cosa ho imparato
 

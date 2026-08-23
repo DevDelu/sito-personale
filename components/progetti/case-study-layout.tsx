@@ -5,10 +5,10 @@ import type { Project } from "@/types/project";
 import { getAccentColors } from "@/lib/progetti-theme";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 import { StatNumber } from "@/components/progetti/stat-number";
-import { MdxH2, MdxP, MdxUl } from "@/components/progetti/mdx-elements";
+import { MdxH2, MdxImg, MdxP, MdxUl } from "@/components/progetti/mdx-elements";
 import { Link } from "@/i18n/navigation";
 
-const mdxComponents = { h2: MdxH2, p: MdxP, ul: MdxUl };
+const mdxComponents = { h2: MdxH2, p: MdxP, ul: MdxUl, img: MdxImg };
 
 export function CaseStudyLayout({
   project,
@@ -27,7 +27,7 @@ export function CaseStudyLayout({
         <RevealItem>
           <Link
             href="/"
-            className="font-mono text-sm text-[#5c5546] transition-colors hover:text-[#221f19]"
+            className="font-mono text-sm text-muted transition-colors hover:text-foreground"
           >
             ← {backLinkLabel}
           </Link>
@@ -40,23 +40,23 @@ export function CaseStudyLayout({
         </RevealItem>
 
         <RevealItem className="mt-3">
-          <h1 className="font-display text-4xl font-medium italic text-[#221f19]">{project.title}</h1>
+          <h1 className="font-display text-4xl font-medium italic text-foreground">{project.title}</h1>
         </RevealItem>
 
         <RevealItem className="mt-4">
-          <p className="max-w-[44ch] text-base leading-relaxed text-[#5c5546]">{project.summary}</p>
+          <p className="max-w-[44ch] text-base leading-relaxed text-muted">{project.summary}</p>
         </RevealItem>
 
         {project.cover ? (
           <RevealItem className="mt-8">
-            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md bg-[#e5ddc9]">
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md bg-surface-hover">
               <Image src={project.cover} alt={project.title} fill sizes="100vw" className="object-cover" />
             </div>
           </RevealItem>
         ) : null}
 
         {project.stats && project.stats.length > 0 ? (
-          <RevealItem className="mt-10 grid grid-cols-3 gap-6 border-y border-[#e5ddc9] py-6">
+          <RevealItem className="mt-10 grid grid-cols-3 gap-6 border-y border-border py-6">
             {project.stats.map((stat, index) => {
               const colors = [accent.primary, accent.secondary, accent.tertiary];
               return (
@@ -67,7 +67,7 @@ export function CaseStudyLayout({
                   >
                     <StatNumber value={stat.value} suffix={stat.suffix} />
                   </span>
-                  <span className="font-sans text-xs text-[#8a8272]">{stat.label}</span>
+                  <span className="font-sans text-xs text-muted">{stat.label}</span>
                 </div>
               );
             })}
@@ -88,7 +88,7 @@ export function CaseStudyLayout({
       </div>
 
       {project.links && project.links.length > 0 ? (
-        <div className="mt-12 flex flex-wrap gap-4 border-t border-[#e5ddc9] pt-8">
+        <div className="mt-12 flex flex-wrap gap-4 border-t border-border pt-8">
           {project.links.map((link) => (
             <a
               key={link.url}
