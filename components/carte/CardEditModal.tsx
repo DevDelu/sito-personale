@@ -119,7 +119,7 @@ export function CardEditModal({
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Titolo carta">
             <input
               type="text"
@@ -141,7 +141,7 @@ export function CardEditModal({
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Quantità">
             <input
               type="number"
@@ -168,7 +168,7 @@ export function CardEditModal({
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Lingua">
             <select value={language} onChange={(e) => setLanguage(e.target.value)} className="field-input">
               {LANGUAGES.map((l) => (

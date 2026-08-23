@@ -94,13 +94,16 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
 export function Sidebar({
   accountSlot,
+  drawerFooterSlot,
   logoutSlot,
 }: {
-  // Usato per intero nella topbar sticky mobile (tema + area pubblica + esci
-  // insieme, non c'è spazio per separarli). Su desktop invece la barra in
+  // accountSlot: topbar sticky mobile, tenuto leggero (solo tema) per non
+  // affollare una barra stretta. drawerFooterSlot: area pubblica + esci,
+  // in fondo al drawer mobile (qui c'è spazio). Su desktop la barra in
   // alto a destra (tema + area pubblica) vive fuori da Sidebar, in
-  // app/(private)/layout.tsx: qui in fondo alla sidebar resta solo `logoutSlot`.
+  // app/(private)/layout.tsx: in fondo alla sidebar desktop resta `logoutSlot`.
   accountSlot: React.ReactNode;
+  drawerFooterSlot: React.ReactNode;
   logoutSlot: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -128,7 +131,7 @@ export function Sidebar({
             className="modal-overlay !bg-black/50 !px-0 !justify-start"
             onClick={() => setOpen(false)}
           />
-          <div className="animate-slide-up fixed inset-y-0 left-0 z-50 w-72 border-r border-border bg-surface">
+          <div className="animate-slide-up fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col border-r border-border bg-surface">
             <div className="flex items-center justify-end p-2">
               <button
                 type="button"
@@ -139,7 +142,10 @@ export function Sidebar({
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <SidebarContent onNavigate={() => setOpen(false)} />
+            <div className="flex-1 overflow-y-auto">
+              <SidebarContent onNavigate={() => setOpen(false)} />
+            </div>
+            <div className="border-t border-border p-3">{drawerFooterSlot}</div>
           </div>
         </div>
       )}

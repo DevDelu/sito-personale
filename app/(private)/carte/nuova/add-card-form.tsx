@@ -46,7 +46,7 @@ export function AddCardForm() {
         </select>
       </Field>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Quantità">
           <input name="quantity" type="number" min="1" step="1" required defaultValue={1} className="field-input bg-surface" />
         </Field>
@@ -61,7 +61,7 @@ export function AddCardForm() {
         </Field>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Lingua">
           <select name="language" defaultValue="EN" className="field-input bg-surface">
             {LANGUAGES.map((l) => (

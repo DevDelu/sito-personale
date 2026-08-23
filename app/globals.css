@@ -275,6 +275,18 @@ body {
   .btn-icon {
     @apply rounded-full p-1.5 text-muted transition-all duration-150 ease-out hover:scale-110 hover:bg-surface-hover hover:text-foreground active:scale-95;
   }
+}
+
+/* Su touch (non mouse) il target di .btn-icon cresce un po': la densità delle
+   tabelle resta invariata per chi usa il mouse, ma su schermi touch il tap
+   diventa più comodo senza dover ridisegnare ogni tabella/riga. */
+@media (pointer: coarse) {
+  .btn-icon {
+    padding: 0.625rem;
+  }
+}
+
+@layer components {
 
   /* Superficie a carta (grafici, pannelli, modali) con lieve elevazione */
   .card {
@@ -359,4 +371,11 @@ body {
 .agenda-calendar .fc-day-today .fc-daygrid-day-number {
   color: var(--accent);
   font-weight: 600;
+}
+
+/* headerToolbar ha 3 gruppi (nav, titolo, viste): su schermi stretti vanno
+   a capo invece di stringersi/andare in overflow orizzontale. */
+.agenda-calendar .fc-header-toolbar {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
 }

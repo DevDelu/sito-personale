@@ -115,7 +115,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
           <span className="text-sm font-medium">
             {righeSelezionate.length} {righeSelezionate.length === 1 ? "selezionato" : "selezionati"}
           </span>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
             <button type="button" onClick={() => setModificaBulk(true)} className="btn-primary !px-3 !py-1.5">
               Modifica in blocco
             </button>

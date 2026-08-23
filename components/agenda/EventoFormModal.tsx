@@ -104,7 +104,7 @@ export function EventoFormModal({
           Tutto il giorno
         </label>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Inizio">
             <input
               type={tuttoIlGiorno ? "date" : "datetime-local"}

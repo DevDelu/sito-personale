@@ -27,7 +27,7 @@ export function CaseStudyLayout({
         <RevealItem>
           <Link
             href="/"
-            className="font-mono text-sm text-muted transition-colors hover:text-foreground"
+            className="inline-block py-2 font-mono text-sm text-muted transition-colors hover:text-foreground"
           >
             ← {backLinkLabel}
           </Link>
@@ -40,7 +40,7 @@ export function CaseStudyLayout({
         </RevealItem>
 
         <RevealItem className="mt-3">
-          <h1 className="font-display text-4xl font-medium italic text-foreground">{project.title}</h1>
+          <h1 className="font-display text-3xl font-medium italic text-foreground sm:text-4xl">{project.title}</h1>
         </RevealItem>
 
         <RevealItem className="mt-4">
@@ -56,7 +56,7 @@ export function CaseStudyLayout({
         ) : null}
 
         {project.stats && project.stats.length > 0 ? (
-          <RevealItem className="mt-10 grid grid-cols-3 gap-6 border-y border-border py-6">
+          <RevealItem className="mt-10 grid grid-cols-3 gap-3 border-y border-border py-6 sm:gap-6">
             {project.stats.map((stat, index) => {
               const colors = [accent.primary, accent.secondary, accent.tertiary];
               return (

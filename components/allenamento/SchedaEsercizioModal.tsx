@@ -147,7 +147,7 @@ export function SchedaEsercizioModal({
           {riga ? `Modifica ${riga.esercizio_nome}` : "Aggiungi esercizio"}
         </h2>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Blocco">
             <select
               value={form.blocco}
@@ -211,7 +211,7 @@ export function SchedaEsercizioModal({
         </Field>
 
         {mostraEsercizioNuovo && (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Nome nuovo esercizio">
               <input
                 autoFocus
@@ -240,7 +240,7 @@ export function SchedaEsercizioModal({
 
         {form.tipoRiga === "normale" && (
           <>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <Field label="Serie target">
                 <input
                   type="number"
@@ -269,7 +269,7 @@ export function SchedaEsercizioModal({
                 />
               </Field>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <Field label="Peso (kg)" hint="se l'esercizio lo prevede">
                 <input
                   type="number"
@@ -303,7 +303,7 @@ export function SchedaEsercizioModal({
         )}
 
         {form.tipoRiga === "circuito" && (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             <Field label="Round">
               <input
                 type="number"
@@ -335,7 +335,7 @@ export function SchedaEsercizioModal({
         )}
 
         {form.tipoRiga === "stretching" && (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Tempo (sec)">
               <input
                 type="number"

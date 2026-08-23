@@ -220,16 +220,16 @@ export function SchedaEditor({
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <div className="flex flex-col">
-                      <button type="button" onClick={() => spostaBlocco(bloccoIndex, -1)} disabled={bloccoIndex === 0} className="btn-icon !h-5 !w-5 disabled:opacity-30">
-                        <ChevronUp className="h-3.5 w-3.5" />
+                      <button type="button" onClick={() => spostaBlocco(bloccoIndex, -1)} disabled={bloccoIndex === 0} className="btn-icon !h-8 !w-8 disabled:opacity-30">
+                        <ChevronUp className="h-4 w-4" />
                       </button>
                       <button
                         type="button"
                         onClick={() => spostaBlocco(bloccoIndex, 1)}
                         disabled={bloccoIndex === blocchi.length - 1}
-                        className="btn-icon !h-5 !w-5 disabled:opacity-30"
+                        className="btn-icon !h-8 !w-8 disabled:opacity-30"
                       >
-                        <ChevronDown className="h-3.5 w-3.5" />
+                        <ChevronDown className="h-4 w-4" />
                       </button>
                     </div>
                     <span className="font-display text-sm font-semibold">{blocco.nome}</span>
@@ -279,17 +279,17 @@ export function SchedaEditor({
                                 type="button"
                                 onClick={() => spostaEsercizio(bloccoIndex, esIndex, -1)}
                                 disabled={esIndex === 0}
-                                className="btn-icon !h-4 !w-4 disabled:opacity-30"
+                                className="btn-icon !h-8 !w-8 disabled:opacity-30"
                               >
-                                <ChevronUp className="h-3 w-3" />
+                                <ChevronUp className="h-3.5 w-3.5" />
                               </button>
                               <button
                                 type="button"
                                 onClick={() => spostaEsercizio(bloccoIndex, esIndex, 1)}
                                 disabled={esIndex === blocco.esercizi.length - 1}
-                                className="btn-icon !h-4 !w-4 disabled:opacity-30"
+                                className="btn-icon !h-8 !w-8 disabled:opacity-30"
                               >
-                                <ChevronDown className="h-3 w-3" />
+                                <ChevronDown className="h-3.5 w-3.5" />
                               </button>
                             </div>
                             <div className="flex min-w-0 flex-col">

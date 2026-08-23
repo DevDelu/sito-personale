@@ -90,7 +90,7 @@ export function MdxImg({ src, alt, title }: { src?: string; alt?: string; title?
       viewport={{ once: true }}
       variants={variants}
     >
-      <div className="relative h-64 w-full overflow-hidden rounded-md border border-border bg-surface-hover sm:h-80">
+      <div className="relative h-48 w-full overflow-hidden rounded-md border border-border bg-surface-hover sm:h-72 md:h-80">
         <Image
           src={src}
           alt={alt ?? ""}

@@ -27,13 +27,16 @@ export default async function PrivateLayout({
     </form>
   );
 
-  // Su mobile tutto resta insieme nella topbar sticky (accountSlot, dentro
-  // Sidebar). Su desktop invece tema + area pubblica vanno in una barra
-  // sticky in alto a destra sopra il contenuto (non più in fondo alla
-  // sidebar): "Esci" da solo resta in fondo alla sidebar.
-  const accountSlot = (
-    <div className="flex items-center gap-2">
-      <ThemeToggle />
+  // Su mobile la topbar sticky resta leggera (solo il toggle tema): area
+  // pubblica ed esci vivono nel footer del drawer, per non affollare una
+  // barra stretta su schermi piccoli. Su desktop invece tema + area
+  // pubblica vanno in una barra sticky in alto a destra sopra il contenuto
+  // (non più in fondo alla sidebar): "Esci" da solo resta in fondo alla
+  // sidebar.
+  const accountSlot = <ThemeToggle />;
+
+  const drawerFooterSlot = (
+    <div className="flex flex-col gap-2">
       {areaPubblicaLink}
       {logoutForm}
     </div>
@@ -41,7 +44,7 @@ export default async function PrivateLayout({
 
   return (
     <div className="flex min-h-full flex-1 flex-col md:flex-row">
-      <Sidebar accountSlot={accountSlot} logoutSlot={logoutForm} />
+      <Sidebar accountSlot={accountSlot} drawerFooterSlot={drawerFooterSlot} logoutSlot={logoutForm} />
       <div className="flex flex-1 flex-col">
         <div className="sticky top-0 z-20 hidden items-center justify-end gap-2 border-b border-border bg-surface/80 px-4 py-3 backdrop-blur-md sm:px-6 md:flex">
           <ThemeToggle />
