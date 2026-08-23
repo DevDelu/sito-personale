@@ -95,22 +95,6 @@
   --agenda-personale: #e8792e; /* stesso hue dell'accent dark */
 }
 
-/* Portfolio pubblico (/progetti): tema chiaro fisso, indipendente dal
-   toggle dark/light del resto del sito (vedi app/[locale]/progetti/layout.tsx).
-   Ridefinisce i token colore ai valori light così i componenti del case
-   study possono usare le stesse utility bg-surface/text-muted/ecc. degli
-   altri e restare comunque coerenti anche se altrove è attiva la dark mode. */
-.progetti-theme {
-  --background: #faf6ee;
-  --surface: #fffdf8;
-  --surface-hover: #f1ead9;
-  --border: #e6dcc4;
-  --foreground: #191512;
-  --muted: #756d5c;
-  --accent: #c25a1e;
-  --accent-foreground: #fffdf8;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
