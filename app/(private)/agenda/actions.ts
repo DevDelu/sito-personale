@@ -17,6 +17,7 @@ export type EventoPatch = {
   data_fine: string;
   tutto_il_giorno: boolean;
   categoria: CategoriaEvento;
+  colore: string | null;
 };
 
 export async function creaEvento(patch: EventoPatch): Promise<AgendaActionResult> {
@@ -32,6 +33,7 @@ export async function creaEvento(patch: EventoPatch): Promise<AgendaActionResult
     data_fine: patch.data_fine,
     tutto_il_giorno: patch.tutto_il_giorno,
     categoria: patch.categoria,
+    colore: patch.colore,
     source: "manuale",
     sync_status: "pending_push",
   });
@@ -56,6 +58,7 @@ export async function aggiornaEvento(id: string, patch: Partial<EventoPatch>): P
   if (patch.data_fine !== undefined) columnPatch.data_fine = patch.data_fine;
   if (patch.tutto_il_giorno !== undefined) columnPatch.tutto_il_giorno = patch.tutto_il_giorno;
   if (patch.categoria !== undefined) columnPatch.categoria = patch.categoria;
+  if (patch.colore !== undefined) columnPatch.colore = patch.colore;
 
   const admin = createAdminClient();
   const { error } = await admin.from("eventi").update(columnPatch).eq("id", id);

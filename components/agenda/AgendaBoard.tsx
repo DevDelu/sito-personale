@@ -1,15 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { CalendarDays } from "lucide-react";
 import { CalendarView } from "./CalendarView";
-import { MiniCalendarSidebar } from "./MiniCalendarSidebar";
 import { DayPanel } from "./DayPanel";
 import { QuickAddBar } from "./QuickAddBar";
 import type { Evento, NotaGiorno } from "@/lib/agenda/types";
 
 // Orchestratore client: tiene lo stato del giorno selezionato (aperto dal
-// calendario principale, dal mini-calendario o da un evento) e lo passa al
-// pannello laterale. page.tsx resta un server component puro, tutta
+// calendario o da un evento) e lo passa al pannello sotto. Il calendario è
+// l'unico riquadro di navigazione (il mini-calendario separato è stato
+// assorbito qui: FullCalendar già mostra mese/settimana/lista e naviga da
+// solo, il giorno scelto resta evidenziato — vedi CalendarView), il
+// pannello giorno vive a piena larghezza sotto invece che in una colonna
+// laterale stretta. page.tsx resta un server component puro, tutta
 // l'interattività vive qui.
 export function AgendaBoard({ eventi, note }: { eventi: Evento[]; note: NotaGiorno[] }) {
   const [giornoSelezionato, setGiornoSelezionato] = useState<string | null>(null);
@@ -29,21 +33,26 @@ export function AgendaBoard({ eventi, note }: { eventi: Evento[]; note: NotaGior
     <div className="flex flex-col gap-4">
       <QuickAddBar />
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <CalendarView eventi={eventi} onSelectDate={setGiornoSelezionato} onSelectEvent={apriEvento} />
+      <CalendarView
+        eventi={eventi}
+        selezionata={giornoSelezionato}
+        onSelectDate={setGiornoSelezionato}
+        onSelectEvent={apriEvento}
+      />
 
-        <div className="flex flex-col gap-4">
-          <MiniCalendarSidebar eventi={eventi} selezionata={giornoSelezionato} onSelectDate={setGiornoSelezionato} />
-          {giornoSelezionato && (
-            <DayPanel
-              data={giornoSelezionato}
-              eventi={eventiDelGiorno}
-              notaIniziale={notaDelGiorno}
-              onClose={() => setGiornoSelezionato(null)}
-            />
-          )}
+      {giornoSelezionato ? (
+        <DayPanel
+          data={giornoSelezionato}
+          eventi={eventiDelGiorno}
+          notaIniziale={notaDelGiorno}
+          onClose={() => setGiornoSelezionato(null)}
+        />
+      ) : (
+        <div className="card flex flex-col items-center gap-2 p-8 text-center text-sm text-muted">
+          <CalendarDays className="h-5 w-5" />
+          Seleziona un giorno nel calendario per vedere eventi, note e posta.
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -11,15 +11,14 @@ import type { EventClickArg, EventDropArg } from "@fullcalendar/core";
 import type { DateClickArg, EventResizeDoneArg } from "@fullcalendar/interaction";
 import { Undo2 } from "lucide-react";
 import { useAgendaMutations } from "@/hooks/useAgendaMutations";
-import type { CategoriaEvento, Evento } from "@/lib/agenda/types";
+import { coloreEvento } from "@/lib/agenda/colori";
+import type { Evento } from "@/lib/agenda/types";
 
-const CATEGORIA_COLORE: Record<CategoriaEvento, string> = {
-  ferie: "var(--agenda-ferie)",
-  visita: "var(--agenda-visita)",
-  scadenza: "var(--agenda-scadenza)",
-  personale: "var(--agenda-personale)",
-  altro: "var(--muted)",
-};
+// Stesso formato di FullCalendar per dateStr/dateClick (data locale, non
+// UTC): usato per confrontare la cella del giorno col giorno selezionato.
+function dataLocale(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 type SpostamentoUndo = {
   id: string;
@@ -29,10 +28,12 @@ type SpostamentoUndo = {
 
 export function CalendarView({
   eventi,
+  selezionata,
   onSelectDate,
   onSelectEvent,
 }: {
   eventi: Evento[];
+  selezionata: string | null;
   onSelectDate: (data: string) => void;
   onSelectEvent: (evento: Evento) => void;
 }) {
@@ -47,8 +48,8 @@ export function CalendarView({
     start: e.data_inizio,
     end: e.data_fine,
     allDay: e.tutto_il_giorno,
-    backgroundColor: CATEGORIA_COLORE[e.categoria] ?? "var(--accent)",
-    borderColor: CATEGORIA_COLORE[e.categoria] ?? "var(--accent)",
+    backgroundColor: coloreEvento(e),
+    borderColor: coloreEvento(e),
   }));
 
   function mostraUndo(id: string, titolo: string, precedente: { data_inizio: string; data_fine: string }) {
@@ -106,6 +107,7 @@ export function CalendarView({
           locale="it"
           firstDay={1}
           buttonText={{ today: "Oggi", month: "Mese", week: "Settimana", list: "Lista" }}
+          dayCellClassNames={(arg) => (dataLocale(arg.date) === selezionata ? ["agenda-day-selezionato"] : [])}
           dateClick={(info: DateClickArg) => onSelectDate(info.dateStr)}
           eventClick={(info: EventClickArg) => {
             const evento = eventi.find((e) => e.id === info.event.id);

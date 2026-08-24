@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ExternalLink, Pencil, Plus, Trash2, X } from "lucide-react";
+import { CalendarDays, ExternalLink, Mail, Pencil, Plus, StickyNote, Trash2, X } from "lucide-react";
 import { useAgendaMutations } from "@/hooks/useAgendaMutations";
 import { EventoFormModal } from "./EventoFormModal";
 import { NotaModal } from "./NotaModal";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
+import { coloreEvento } from "@/lib/agenda/colori";
 import type { EventoPatch } from "@/app/(private)/agenda/actions";
 import type { Evento, NotaGiorno } from "@/lib/agenda/types";
 
@@ -14,11 +15,7 @@ type Tab = "eventi" | "note" | "posta";
 type MailMessage = { id: string; da: string; a: string; oggetto: string; snippet: string; data: string };
 type MailRisposta = { ricevute: MailMessage[]; inviate: MailMessage[] };
 
-const TABS: { value: Tab; label: string }[] = [
-  { value: "eventi", label: "Eventi" },
-  { value: "note", label: "Note" },
-  { value: "posta", label: "Posta" },
-];
+const ICONA_TAB = { eventi: CalendarDays, note: StickyNote, posta: Mail } as const;
 
 function formatDataLunga(data: string): string {
   return new Date(`${data}T00:00:00Z`).toLocaleDateString("it-IT", {
@@ -68,6 +65,10 @@ export function DayPanel({
   const [nota, setNota] = useState(notaIniziale?.contenuto ?? "");
   const [salvandoNota, setSalvandoNota] = useState(false);
   const [notaModaleAperta, setNotaModaleAperta] = useState(false);
+  // Il contenuto è HTML (editor rich-text): "vuoto" può comunque contenere
+  // markup residuo (es. "<br>"), quindi si spoglia dai tag prima di decidere
+  // se mostrare badge/anteprima.
+  const notaHaContenuto = nota.replace(/<[^>]*>/g, "").trim().length > 0;
 
   const [mail, setMail] = useState<MailRisposta | null>(null);
   const [mailCaricamento, setMailCaricamento] = useState(false);
@@ -154,18 +155,37 @@ export function DayPanel({
       </div>
 
       <div className="flex w-fit items-center gap-0.5 rounded-full border border-border p-0.5">
-        {TABS.map((t) => (
-          <button
-            key={t.value}
-            type="button"
-            onClick={() => handleTabClick(t.value)}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-150 ease-out ${
-              tab === t.value ? "bg-accent text-accent-foreground shadow-sm" : "text-muted hover:text-foreground"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+        {(
+          [
+            { value: "eventi", label: "Eventi", conteggio: eventi.length },
+            { value: "note", label: "Note", conteggio: notaHaContenuto ? 1 : 0 },
+            { value: "posta", label: "Posta", conteggio: mail ? mail.ricevute.length + mail.inviate.length : null },
+          ] as const
+        ).map((t) => {
+          const Icona = ICONA_TAB[t.value];
+          return (
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => handleTabClick(t.value)}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-150 ease-out ${
+                tab === t.value ? "bg-accent text-accent-foreground shadow-sm" : "text-muted hover:text-foreground"
+              }`}
+            >
+              <Icona className="h-3.5 w-3.5" />
+              {t.label}
+              {t.conteggio !== null && t.conteggio > 0 && (
+                <span
+                  className={`flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold ${
+                    tab === t.value ? "bg-accent-foreground/20" : "bg-accent/15 text-accent"
+                  }`}
+                >
+                  {t.conteggio}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {tab === "eventi" && (
@@ -188,10 +208,18 @@ export function DayPanel({
             <ul className="flex flex-col gap-2">
               {eventi.map((e) => (
                 <li key={e.id} className="flex items-start justify-between gap-2 rounded-xl border border-border p-3">
-                  <div className="flex min-w-0 flex-col gap-0.5">
-                    <span className="font-medium">{e.titolo}</span>
-                    <span className="font-figures text-xs text-muted">{formatOra(e.data_inizio, e.tutto_il_giorno)}</span>
-                    {e.luogo && <span className="text-xs text-muted">{e.luogo}</span>}
+                  <div className="flex min-w-0 items-start gap-2">
+                    <span
+                      className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: coloreEvento(e) }}
+                    />
+                    <div className="flex min-w-0 flex-col gap-0.5">
+                      <span className="font-medium">{e.titolo}</span>
+                      <span className="font-figures text-xs text-muted">
+                        {formatOra(e.data_inizio, e.tutto_il_giorno)}
+                      </span>
+                      {e.luogo && <span className="text-xs text-muted">{e.luogo}</span>}
+                    </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
                     <button
@@ -223,7 +251,7 @@ export function DayPanel({
 
       {tab === "note" && (
         <div className="flex flex-col gap-3">
-          {nota ? (
+          {notaHaContenuto ? (
             <div
               className="field-input text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
               dangerouslySetInnerHTML={{ __html: nota }}
@@ -236,8 +264,8 @@ export function DayPanel({
             onClick={() => setNotaModaleAperta(true)}
             className="btn-secondary flex w-fit items-center gap-1.5"
           >
-            {nota ? <Pencil className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-            {nota ? "Modifica nota" : "Scrivi una nota"}
+            {notaHaContenuto ? <Pencil className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+            {notaHaContenuto ? "Modifica nota" : "Scrivi una nota"}
           </button>
         </div>
       )}

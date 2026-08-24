@@ -56,6 +56,7 @@ export function QuickAddBar() {
         data_fine: fine.toISOString(),
         tutto_il_giorno: tuttoIlGiorno,
         categoria: "personale",
+        colore: null,
       });
       setTesto("");
       router.refresh();

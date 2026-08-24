@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { EventoPatch } from "@/app/(private)/agenda/actions";
+import { PALETTE_COLORI_EVENTO } from "@/lib/agenda/colori";
 import type { CategoriaEvento, Evento } from "@/lib/agenda/types";
 
 const CATEGORIE: { value: CategoriaEvento; label: string }[] = [
@@ -41,6 +42,7 @@ export function EventoFormModal({
   const [descrizione, setDescrizione] = useState(evento?.descrizione ?? "");
   const [luogo, setLuogo] = useState(evento?.luogo ?? "");
   const [categoria, setCategoria] = useState<CategoriaEvento>(evento?.categoria ?? "personale");
+  const [colore, setColore] = useState<string | null>(evento?.colore ?? null);
   const [tuttoIlGiorno, setTuttoIlGiorno] = useState(evento?.tutto_il_giorno ?? false);
 
   const dataDefault = dataIniziale?.data ?? new Date().toISOString().slice(0, 10);
@@ -76,6 +78,7 @@ export function EventoFormModal({
       data_fine: fine,
       tutto_il_giorno: tuttoIlGiorno,
       categoria,
+      colore,
     });
   }
 
@@ -137,6 +140,35 @@ export function EventoFormModal({
               </option>
             ))}
           </select>
+        </Field>
+
+        <Field label="Colore (opzionale)">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setColore(null)}
+              aria-label="Usa il colore della categoria"
+              title="Colore della categoria"
+              className={`flex h-7 w-7 items-center justify-center rounded-full border-2 transition-transform ${
+                colore === null ? "border-foreground" : "border-border hover:scale-110"
+              }`}
+            >
+              <span className="h-4 w-4 rounded-full border border-dashed border-muted" />
+            </button>
+            {PALETTE_COLORI_EVENTO.map((c) => (
+              <button
+                key={c.valore}
+                type="button"
+                onClick={() => setColore(c.valore)}
+                aria-label={c.nome}
+                title={c.nome}
+                style={{ backgroundColor: c.valore }}
+                className={`h-7 w-7 rounded-full border-2 transition-transform ${
+                  colore === c.valore ? "border-foreground scale-110" : "border-transparent hover:scale-110"
+                }`}
+              />
+            ))}
+          </div>
         </Field>
 
         <Field label="Luogo (opzionale)">

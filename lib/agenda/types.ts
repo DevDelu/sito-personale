@@ -12,6 +12,7 @@ export type Evento = {
   data_fine: string;
   tutto_il_giorno: boolean;
   categoria: CategoriaEvento;
+  colore: string | null;
   google_event_id: string | null;
   source: SourceEvento;
   sync_status: SyncStatus;
