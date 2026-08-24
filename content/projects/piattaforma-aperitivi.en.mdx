@@ -1,34 +1,89 @@
 ---
 slug: "piattaforma-aperitivi"
-title: "Aperitivi Platform"
-subtitle: "Thesis"
+title: "A Platform for Aperitivo"
+subtitle: "Bachelor's thesis — UX/UI Design"
 category: "thesis"
-cover: ""
-tags: ["Thesis", "Full-stack", "UX"]
+cover: "/images/projects/aperitivo-cover.png"
+tags: ["UX Research", "UI Design", "Figma", "User Testing", "Mobile App"]
 year: 2024
 featured: true
-role: "Design & full-stack development"
-summary: "Placeholder content: replace with the real case study summary."
+role: "UX Researcher & UI Designer"
+summary: "UX/UI design of a mobile app to discover, book and organize aperitivo outings, grounded in user research with 134 responses. From design theory to a high-fidelity prototype in Figma."
 accentColors:
   primary: "#EE7222"
   secondary: "#FBBB1A"
   tertiary: "#1E6E70"
-stats:
-  - value: 0
-    label: "Placeholder metric 1"
-  - value: 0
-    label: "Placeholder metric 2"
-  - value: 0
-    label: "Placeholder metric 3"
-links: []
 ---
 
-{/* Placeholder content — replace with the real case study */}
+## The context
+
+At a time when the need for social connection among young people is more central than ever, aperitivo remains one of the most common social habits: informal, accessible, recurring. But organizing one well — figuring out where to go, what it costs, how to coordinate a group — is still a fragmented process split across scattered reviews, chats and phone calls.
+
+This thesis (University of Turin, Department of Culture, Politics and Society, supervisor Prof. Fabiana Vernero, co-supervisor Prof. Fabio Zanchetta) starts from there: designing, from a UX/UI perspective, a digital platform dedicated to aperitivo that makes the whole experience — from discovering a venue to booking it — as simple and natural as the aperitivo itself.
+
+The work moves across three levels: design theory (the differences between UX and UI, usability, low- and high-fidelity prototyping methods), user research (a quantitative survey to understand who the users really are and what they're looking for), and the actual design work (information architecture, flows, wireframes, high-fidelity prototype).
 
 ## The problem
 
-Placeholder text. Replace with the real description of the problem addressed by the thesis.
+Solutions already on the market — restaurant booking apps, review platforms, social networks — each cover only part of the journey: they're either built for formal dining, or they stop at venue discovery without going all the way to booking. None of them integrate discovery, information, booking and sharing into a single experience designed specifically for aperitivo.
 
-## The solution
+## Research
 
-Placeholder text. Replace with the real description of the designed solution.
+To understand who the users really are and what frustrates them, I ran quantitative research through a Google Forms survey — 19 questions, mostly closed-ended to keep cognitive load low and answer quality high. Distributed through university groups, word of mouth and paper QR codes in libraries and study rooms, it collected **134 responses**.
+
+Some results directly guided product decisions:
+
+- The target audience matched the initial hypothesis: **64.9%** of respondents were between 18 and 24, another **27.6%** between 25 and 34 — together, over 92% fall within the 18-34 range.
+- **Price** is the most cited criterion when choosing a venue (**73.9%**), closely followed by food quality (**65.7%**) and drink quality (**61.9%**) → prices and menus needed to be visible immediately, not buried at the bottom of the venue page.
+- **Friend recommendations** drive venue choice for **85.8%** of users, far more than online reviews (32.8%), promotions (32.8%) or ads (9%) → priority given to simple sharing via direct link, not a social feed.
+- **59%** find it hard to discover new venues depending on where they are (and another 18.7% always struggle) → justifies a map view with geolocation as a core feature, not an accessory.
+- Asked directly what they'd want in the app, users ranked menu and pricing information (**88.8%**) and reviews/ratings (**84.1%**) at the top, followed by a map of nearby venues (74.8%) and the ability to book a table (56.1%).
+- **67.3%** would like to share their preferences and get personalized venue recommendations — especially based on what they want to do during the aperitivo: chatting (cited by 97.8% of respondents), enjoying the view (35.1%) or playing board games (20.9%).
+
+![Age distribution of respondents: 64.9% between 18 and 24, 27.6% between 25 and 34](/images/projects/aperitivo-ricerca-eta.png "Age distribution — survey, 134 responses")
+
+![Features rated most useful: menu and pricing info 88.8%, reviews and ratings 84.1%, map of nearby venues 74.8%, table booking 56.1%](/images/projects/aperitivo-ricerca-funzionalita.png "Features requested by users — survey")
+
+## The people behind the data
+
+The research produced two user personas, later used to validate every design decision against concrete scenarios.
+
+**Gaia**, 21, studies Economics and Statistics in Turin but is originally from Rimini. She lives in a shared apartment in San Salvario, and for her aperitivo is mainly a way to build a social network in a city that isn't her own. She looks for venues with a good cocktail selection and a welcoming atmosphere, and is comfortable with technology: she wants a fast app that gets her a table without too many steps.
+
+**Lorenzo**, 30, a software engineer who relocated from Florence for work, lives in Porta Palazzo. For him, the weekly aperitivo with colleagues is an established ritual: he wants efficiency, the ability to quickly book a venue with a good wine list, and gets discouraged when, on busier days, he can't find a spot.
+
+## From research to product
+
+**Information architecture.** Content branches out from the home screen into venue search, map and saved venues; every venue page exposes drinks, food, reviews and contact info, with booking always reachable as the final action.
+
+**Flowchart, task flow, user flow.** Before drawing any screen, I mapped out the logic: the sign-up/login flowchart covers every decision branch (existing email, wrong password, incomplete fields); the task flow isolates the booking journey — venue, date, time, party size, summary, confirmation; the user flow, built on Gaia's scenario, verifies that journey works for a real person with a real goal, not just on paper.
+
+![Login and sign-up flowchart, with error handling for non-existent email, wrong password and incomplete fields](/images/projects/aperitivo-flowchart-login.png "Flowchart — login and sign-up")
+
+![Booking task flow: from home to confirmation, through date, time and party size](/images/projects/aperitivo-taskflow-prenotazione.png "Task flow — booking journey")
+
+**Wireframes.** Starting from low-fidelity paper sketches, I moved to digital grayscale wireframes in Figma — no color, no final copy, just hierarchy and flow. This allowed for fast iteration before investing time in visual detail.
+
+![Low-fidelity paper sketches of the app's main screens](/images/projects/aperitivo-wireframe-sketch.png "Wireframes — low-fidelity paper sketches")
+
+![Digital grayscale wireframes in Figma for the home and venue screens](/images/projects/aperitivo-wireframe-digitale.png "Wireframes — digital grayscale")
+
+**High-fidelity prototype.** The final step brought in real content, colors and micro-interactions: from the loading screen to login (email/password or social), from onboarding with location and preference requests to the home screen with recommended venues, to the venue page with an image carousel and tabs for drinks/food/reviews/contacts, all the way to the complete booking flow — date, time, party size, summary with notes for allergies or requests, confirmation. I also added a "my bookings" section, with active bookings and history, so users can easily find venues they've already visited.
+
+![High-fidelity prototype screens: booking flow with date, time, party size selection and confirmation](/images/projects/aperitivo-prototipo-prenotazione.png "Prototype — booking flow")
+
+![Prototype "My bookings" screen, with active bookings and history](/images/projects/aperitivo-prototipo-storico.png "Prototype — my bookings")
+
+## Design system
+
+**Sen**, a readable sans-serif typeface chosen to stay clean even on small screens. Spacing built on 8px increments (reduced to 4px where needed), for a consistent, predictable layout.
+
+The palette — yellow `#FBBB1A`, orange `#EE7222`, blue `#42ABAE` — isn't decorative but functional: yellow for secondary icons, orange to draw attention to priority actions (like the "Book" button), blue reserved for the "selected" state, so users always get clear visual feedback on where they are and what they can do. Even the logo — a white glass with a yellow-orange liquid on a light blue background — echoes these same colors, evoking freshness and a relaxed atmosphere.
+
+![App logo: a white glass with yellow-orange liquid on a light blue background](/images/projects/aperitivo-logo.png "The app's logo")
+
+## What I learned
+
+The most useful constraint of the whole project was the 134-response survey: it turned choices that would have been personal intuitions (which color to use, what to show first) into decisions verifiable against real data. When data and intuition disagreed — for example on the importance of the map versus text search — the data won.
+
+The prototype demonstrates the feasibility of the concept and holds up under end-to-end usability testing, but it remains a prototype: a second round of testing with real users and the technical validation needed before calling it a market-ready product are still missing. That's the work's stated limitation — and it's also exactly the kind of iteration that, with the stack I use today (Next.js, Supabase), would make sense to tackle first if this project ever became real.

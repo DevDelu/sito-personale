@@ -1,8 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 
-// TODO(Lorenzo): sostituisci con l'URL reale del tuo profilo LinkedIn.
-const LINKEDIN_URL = "https://linkedin.com";
+const LINKEDIN_URL = "https://www.linkedin.com/in/lorenzo-de-luca-83819a277/";
 // TODO(Lorenzo): carica il CV in public/ e aggiorna questo percorso.
 const CV_URL = "/cv.pdf";
 

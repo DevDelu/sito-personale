@@ -6,6 +6,28 @@
     "ctaCv": "Download CV",
     "linkedin": "LinkedIn"
   },
+  "About": {
+    "title": "About me",
+    "p1": "I'm Lorenzo, PMO at Aeonvis S.p.A. on the Credit Agricole Auto Bank account: I coordinate projects, people and deadlines where process meets technology. Before that, a UX/UI design thesis taught me to always start from real data and real people before designing a solution.",
+    "p2": "Right now I'm shifting toward AI Product Engineering: studying and building tools that combine product thinking, design and development — this site included, built from scratch with Next.js and Supabase more as an ongoing training ground than a business card."
+  },
+  "Skills": {
+    "title": "Skills",
+    "groups": [
+      {
+        "title": "Product & Delivery",
+        "items": ["Project management", "Stakeholder management", "Planning & reporting", "Agile methodologies"]
+      },
+      {
+        "title": "Design & Research",
+        "items": ["UX Research", "UI Design", "Figma", "Prototyping", "User testing"]
+      },
+      {
+        "title": "AI & Development",
+        "items": ["Next.js", "TypeScript", "Supabase", "SQL", "Prompt engineering"]
+      }
+    ]
+  },
   "FeaturedProjects": {
     "title": "Featured projects",
     "viewAll": "View all"
@@ -16,6 +38,37 @@
     "work": "Work",
     "hackathon": "Hackathon"
   },
+  "Hobbies": {
+    "title": "Hobbies",
+    "items": [
+      {
+        "title": "Training",
+        "description": "Gym and consistency: I track workouts and progress with the same discipline I bring to work."
+      },
+      {
+        "title": "Trading cards",
+        "description": "I collect Pokémon cards, between hunting missing pieces and curating the collection."
+      },
+      {
+        "title": "Investing",
+        "description": "I follow ETFs and markets as an exercise in patience and long-term data reading."
+      },
+      {
+        "title": "Side projects",
+        "description": "I build small tools for myself — this site is the latest one — to learn by doing."
+      }
+    ]
+  },
+  "Contact": {
+    "title": "Contact",
+    "subtitle": "For job opportunities, collaborations, or just to say hi.",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "messageLabel": "Message",
+    "send": "Send message",
+    "sending": "Sending...",
+    "success": "Message sent, thank you! I'll get back to you as soon as possible."
+  },
   "Progetti": {
     "title": "Projects",
     "description": "A selection of case studies: thesis, personal projects and work."
@@ -24,7 +77,6 @@
     "backLink": "Home"
   },
   "PublicNav": {
-    "privateArea": "Private area",
     "switchToEnglish": "Switch to English",
     "switchToItalian": "Switch to Italian"
   }

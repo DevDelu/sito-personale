@@ -6,6 +6,28 @@
     "ctaCv": "Scarica CV",
     "linkedin": "LinkedIn"
   },
+  "About": {
+    "title": "Chi sono",
+    "p1": "Sono Lorenzo, PMO in Aeonvis S.p.A. sul cliente Credit Agricole Auto Bank: coordino progetti, persone e scadenze dove processo e tecnologia si incontrano. Prima ancora, una tesi triennale in UX/UI design mi ha insegnato a partire sempre dai dati e dalle persone reali prima di disegnare una soluzione.",
+    "p2": "Oggi sto spostando il baricentro verso l'AI Product Engineering: studio e costruisco strumenti che uniscono product thinking, design e sviluppo, questo sito compreso — costruito da zero con Next.js e Supabase come palestra continua più che come biglietto da visita."
+  },
+  "Skills": {
+    "title": "Competenze",
+    "groups": [
+      {
+        "title": "Product & Delivery",
+        "items": ["Project management", "Gestione stakeholder", "Pianificazione & reporting", "Metodologie Agile"]
+      },
+      {
+        "title": "Design & Ricerca",
+        "items": ["UX Research", "UI Design", "Figma", "Prototipazione", "User testing"]
+      },
+      {
+        "title": "AI & Sviluppo",
+        "items": ["Next.js", "TypeScript", "Supabase", "SQL", "Prompt engineering"]
+      }
+    ]
+  },
   "FeaturedProjects": {
     "title": "Progetti in evidenza",
     "viewAll": "Vedi tutti"
@@ -16,6 +38,37 @@
     "work": "Lavoro",
     "hackathon": "Hackathon"
   },
+  "Hobbies": {
+    "title": "Passioni",
+    "items": [
+      {
+        "title": "Allenamento",
+        "description": "Palestra e costanza: tengo traccia di schede e progressi con la stessa disciplina che metto nel lavoro."
+      },
+      {
+        "title": "Carte collezionabili",
+        "description": "Colleziono carte Pokémon, tra ricerca dei pezzi mancanti e cura della collezione."
+      },
+      {
+        "title": "Investimenti",
+        "description": "Seguo ETF e mercati come esercizio di pazienza e di lettura dei dati nel lungo periodo."
+      },
+      {
+        "title": "Side project",
+        "description": "Costruisco piccoli strumenti per me stesso — questo sito è il più recente — per imparare facendo."
+      }
+    ]
+  },
+  "Contact": {
+    "title": "Contatti",
+    "subtitle": "Per proposte di lavoro, collaborazioni o solo per dire ciao.",
+    "nameLabel": "Nome",
+    "emailLabel": "Email",
+    "messageLabel": "Messaggio",
+    "send": "Invia messaggio",
+    "sending": "Invio in corso...",
+    "success": "Messaggio inviato, grazie! Ti risponderò il prima possibile."
+  },
   "Progetti": {
     "title": "Progetti",
     "description": "Una selezione di case study: tesi, progetti personali e lavoro."
@@ -24,7 +77,6 @@
     "backLink": "Home"
   },
   "PublicNav": {
-    "privateArea": "Area privata",
     "switchToEnglish": "Passa all'inglese",
     "switchToItalian": "Passa all'italiano"
   }
