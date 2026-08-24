@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pause, Play, SkipForward, Square } from "lucide-react";
+import { Pause, Play, SkipForward, Square, Wrench } from "lucide-react";
 import { useSessionAudio } from "@/hooks/useSessionAudio";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { salvaLogSerie, terminaSessione, type LogSeriePatch } from "@/app/(private)/allenamenti/actions";
+import { setSessionNavGuard } from "@/lib/allenamento/session-guard";
 import { SessionRowNormale } from "./SessionRowNormale";
 import { SessionRowCircuito } from "./SessionRowCircuito";
 import { SessionRowStretching } from "./SessionRowStretching";
@@ -79,6 +80,24 @@ function turnoSuperset(
   return totale % 2 === 0 ? rowA : rowB;
 }
 
+function righeStep(step: Step): SchedaEsercizioConNome[] {
+  return step.kind === "superset" ? [step.rowA, step.rowB] : [step.row];
+}
+
+function nomeStep(step: Step): string {
+  return righeStep(step)
+    .map((r) => r.esercizio_nome)
+    .join(" + ");
+}
+
+function attrezzaturaStep(step: Step): string[] {
+  const viste = new Set<string>();
+  for (const r of righeStep(step)) {
+    if (r.attrezzatura) viste.add(r.attrezzatura);
+  }
+  return [...viste];
+}
+
 export function SessionRunner({
   sessione,
   scheda,
@@ -104,11 +123,36 @@ export function SessionRunner({
   const [avviato, setAvviato] = useState(false);
   const [pausaGlobale, setPausaGlobale] = useState(false);
   const [mostraFine, setMostraFine] = useState(false);
+  const [confermaTermina, setConfermaTermina] = useState(false);
+  const [navigazionePendente, setNavigazionePendente] = useState<string | null>(null);
+  const [terminandoENavigando, setTerminandoENavigando] = useState(false);
   const startedAtRef = useRef<number | null>(null);
 
   useWakeLock(avviato);
 
+  // Mentre l'allenamento è in corso, la sidebar intercetta i click sui link
+  // di navigazione e li passa qui invece di navigare subito (vedi
+  // lib/allenamento/session-guard.ts): si sgancia da sola quando la sessione
+  // finisce o il componente viene smontato.
+  useEffect(() => {
+    if (!avviato || mostraFine) return;
+    setSessionNavGuard((href) => setNavigazionePendente(href));
+    return () => setSessionNavGuard(null);
+  }, [avviato, mostraFine]);
+
+  async function terminaENaviga() {
+    setTerminandoENavigando(true);
+    const startedAt = startedAtRef.current;
+    const durataMin = startedAt ? Math.max(1, Math.round((Date.now() - startedAt) / 60000)) : null;
+    await terminaSessione(sessione.id, { durata_min: durataMin, sensazione: null, note: null });
+    setTerminandoENavigando(false);
+    const href = navigazionePendente;
+    setNavigazionePendente(null);
+    if (href) router.push(href);
+  }
+
   const stepCorrente = stepIndex < steps.length ? steps[stepIndex] : null;
+  const prossimoStep = stepIndex + 1 < steps.length ? steps[stepIndex + 1] : null;
 
   // Unico punto che fa avanzare lo step: reagisce a `completate` cambiando
   // (pattern "adjust state during render", non un useEffect: qui la
@@ -190,6 +234,19 @@ export function SessionRunner({
         onSetAdvance={avanzaSerie}
       />
 
+      {prossimoStep && (
+        <div className="rounded-xl border border-border bg-surface/60 p-3">
+          <span className="text-xs font-medium uppercase tracking-wide text-muted">Prossimo</span>
+          <p className="mt-1 text-sm font-medium">{nomeStep(prossimoStep)}</p>
+          {attrezzaturaStep(prossimoStep).length > 0 && (
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-amber-500 dark:text-amber-400">
+              <Wrench className="h-3.5 w-3.5 shrink-0" />
+              Prepara: {attrezzaturaStep(prossimoStep).join(", ")}
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-center gap-2 border-t border-border bg-surface/95 p-3 backdrop-blur-md">
         <button
           type="button"
@@ -207,7 +264,7 @@ export function SessionRunner({
           <Pause className="h-3.5 w-3.5" />
           {pausaGlobale ? "Riprendi" : "Pausa"}
         </button>
-        <button type="button" onClick={() => setMostraFine(true)} className="btn-danger flex items-center gap-1.5">
+        <button type="button" onClick={() => setConfermaTermina(true)} className="btn-danger flex items-center gap-1.5">
           <Square className="h-3.5 w-3.5" />
           Termina
         </button>
@@ -223,6 +280,67 @@ export function SessionRunner({
           </div>
         </div>
       )}
+
+      {confermaTermina && (
+        <ConfermaDialog
+          titolo="Terminare l'allenamento?"
+          messaggio="Stai per uscire dallo step corrente e passare al riepilogo finale."
+          confermaLabel="Termina"
+          annullaLabel="Continua allenamento"
+          onConferma={() => {
+            setConfermaTermina(false);
+            setMostraFine(true);
+          }}
+          onAnnulla={() => setConfermaTermina(false)}
+        />
+      )}
+
+      {navigazionePendente && (
+        <ConfermaDialog
+          titolo="Terminare l'allenamento?"
+          messaggio="Stai uscendo da questa sezione mentre l'allenamento è in corso. Vuoi terminarlo?"
+          confermaLabel={terminandoENavigando ? "Terminazione..." : "Termina allenamento"}
+          annullaLabel="No, resta qui"
+          confermaDisabled={terminandoENavigando}
+          onConferma={terminaENaviga}
+          onAnnulla={() => setNavigazionePendente(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+function ConfermaDialog({
+  titolo,
+  messaggio,
+  confermaLabel,
+  annullaLabel,
+  confermaDisabled,
+  onConferma,
+  onAnnulla,
+}: {
+  titolo: string;
+  messaggio: string;
+  confermaLabel: string;
+  annullaLabel: string;
+  confermaDisabled?: boolean;
+  onConferma: () => void;
+  onAnnulla: () => void;
+}) {
+  return (
+    <div className="modal-overlay">
+      <div className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5 text-center">
+        <h2 className="font-display text-base font-semibold">{titolo}</h2>
+        <p className="text-sm text-muted">{messaggio}</p>
+        <div className="flex justify-center gap-3">
+          <button type="button" onClick={onAnnulla} className="btn-secondary">
+            {annullaLabel}
+          </button>
+          <button type="button" onClick={onConferma} disabled={confermaDisabled} className="btn-danger">
+            {confermaLabel}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

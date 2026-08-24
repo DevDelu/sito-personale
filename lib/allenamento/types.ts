@@ -15,6 +15,7 @@ export type Esercizio = {
   nome: string;
   tipo_metrica: TipoMetrica;
   note: string | null;
+  attrezzatura: string | null;
 };
 
 export type Scheda = {
@@ -49,6 +50,7 @@ export type SchedaEsercizio = {
 export type SchedaEsercizioConNome = SchedaEsercizio & {
   esercizio_nome: string;
   tipo_metrica: TipoMetrica;
+  attrezzatura: string | null;
 };
 
 export type Sessione = {

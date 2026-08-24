@@ -260,6 +260,7 @@ export type NuovoSchedaEsercizioInput = SchedaEsercizioFields & {
   esercizio_id?: string;
   nuovo_esercizio_nome?: string;
   nuovo_esercizio_tipo_metrica?: TipoMetrica;
+  nuovo_esercizio_attrezzatura?: string | null;
 };
 
 function schedaEsercizioColumns(fields: SchedaEsercizioFields) {
@@ -328,7 +329,11 @@ export async function aggiungiSchedaEsercizio(
     if (!nome) return { error: "Seleziona un esercizio dal catalogo o inseriscine uno nuovo." };
     const { data: nuovoEsercizio, error: eserError } = await admin
       .from("esercizi")
-      .insert({ nome, tipo_metrica: input.nuovo_esercizio_tipo_metrica ?? "serie_rip" })
+      .insert({
+        nome,
+        tipo_metrica: input.nuovo_esercizio_tipo_metrica ?? "serie_rip",
+        attrezzatura: input.nuovo_esercizio_attrezzatura?.trim() || null,
+      })
       .select("id")
       .single();
     if (eserError) return { error: eserError.message };

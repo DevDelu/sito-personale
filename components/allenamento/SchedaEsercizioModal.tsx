@@ -32,6 +32,7 @@ type FormState = {
   esercizioId: string;
   esercizioNuovoNome: string;
   esercizioNuovoTipoMetrica: TipoMetrica;
+  esercizioNuovoAttrezzatura: string;
   tipoRiga: TipoRiga;
   targetSerie: string;
   targetRipMin: string;
@@ -53,6 +54,7 @@ function statoIniziale(riga: SchedaEsercizioConNome | null, bloccoPreselezionato
     esercizioId: riga?.esercizio_id ?? "",
     esercizioNuovoNome: "",
     esercizioNuovoTipoMetrica: "serie_rip",
+    esercizioNuovoAttrezzatura: "",
     tipoRiga: riga?.tipo_riga ?? "normale",
     targetSerie: riga?.target_serie != null ? String(riga.target_serie) : "",
     targetRipMin: riga?.target_rip_min != null ? String(riga.target_rip_min) : "",
@@ -85,7 +87,13 @@ export function SchedaEsercizioModal({
   bloccoPreselezionato?: string;
   pending: boolean;
   error: string | null;
-  onSave: (fields: SchedaEsercizioFields & Pick<NuovoSchedaEsercizioInput, "esercizio_id" | "nuovo_esercizio_nome" | "nuovo_esercizio_tipo_metrica">) => void;
+  onSave: (
+    fields: SchedaEsercizioFields &
+      Pick<
+        NuovoSchedaEsercizioInput,
+        "esercizio_id" | "nuovo_esercizio_nome" | "nuovo_esercizio_tipo_metrica" | "nuovo_esercizio_attrezzatura"
+      >
+  ) => void;
   onCancel: () => void;
 }) {
   const [form, setForm] = useState<FormState>(() => statoIniziale(riga, bloccoPreselezionato));
@@ -135,6 +143,7 @@ export function SchedaEsercizioModal({
             ...fields,
             nuovo_esercizio_nome: form.esercizioNuovoNome.trim(),
             nuovo_esercizio_tipo_metrica: form.esercizioNuovoTipoMetrica,
+            nuovo_esercizio_attrezzatura: form.esercizioNuovoAttrezzatura.trim() || null,
           }
         : { ...fields, esercizio_id: form.esercizioId }
     );
@@ -236,6 +245,17 @@ export function SchedaEsercizioModal({
               </select>
             </Field>
           </div>
+        )}
+
+        {mostraEsercizioNuovo && (
+          <Field label="Attrezzatura (opzionale)" hint="mostrata come promemoria prima dell'esercizio">
+            <input
+              value={form.esercizioNuovoAttrezzatura}
+              onChange={(e) => setForm((f) => ({ ...f, esercizioNuovoAttrezzatura: e.target.value }))}
+              placeholder="es. Manubri, elastico, corda"
+              className="field-input"
+            />
+          </Field>
         )}
 
         {form.tipoRiga === "normale" && (

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
+import { interceptSessionNav } from "@/lib/allenamento/session-guard";
 
 function isSectionActive(sectionHref: string, pathname: string): boolean {
   if (sectionHref === "#") return false;
@@ -53,7 +54,13 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <div key={section.id} className="mb-2">
             <Link
               href={section.href}
-              onClick={onNavigate}
+              onClick={(e) => {
+                if (interceptSessionNav(section.href)) {
+                  e.preventDefault();
+                  return;
+                }
+                onNavigate?.();
+              }}
               className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                 attivo ? "bg-surface-hover text-foreground" : "text-muted hover:text-foreground"
               }`}
@@ -72,7 +79,13 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                     <Link
                       key={sub.href}
                       href={sub.href}
-                      onClick={onNavigate}
+                      onClick={(e) => {
+                        if (interceptSessionNav(sub.href)) {
+                          e.preventDefault();
+                          return;
+                        }
+                        onNavigate?.();
+                      }}
                       className={`rounded-md px-2 py-1.5 text-sm transition-colors ${
                         subAttivo
                           ? "font-medium text-accent"

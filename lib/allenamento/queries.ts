@@ -120,6 +120,7 @@ export async function getSchedaEsercizi(schedaId: string): Promise<SchedaEserciz
       target_peso: toNumber(row.target_peso),
       esercizio_nome: esercizio?.nome ?? "Esercizio",
       tipo_metrica: esercizio?.tipo_metrica ?? "serie_rip",
+      attrezzatura: esercizio?.attrezzatura ?? null,
     };
   });
 }
