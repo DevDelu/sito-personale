@@ -15,7 +15,7 @@ export default async function PrivateLayout({
   const areaPubblicaLink = (
     <Link href="/" aria-label="Area pubblica" className="btn-secondary flex items-center gap-1.5 !px-3 !py-1.5">
       <ExternalLink className="h-3.5 w-3.5" />
-      <span className="hidden sm:inline">Area pubblica</span>
+      <span>Area pubblica</span>
     </Link>
   );
 
@@ -28,16 +28,23 @@ export default async function PrivateLayout({
   );
 
   // Su mobile la topbar sticky resta leggera (solo il toggle tema): area
-  // pubblica ed esci vivono nel footer del drawer, per non affollare una
-  // barra stretta su schermi piccoli. Su desktop invece tema + area
-  // pubblica vanno in una barra sticky in alto a destra sopra il contenuto
-  // (non più in fondo alla sidebar): "Esci" da solo resta in fondo alla
-  // sidebar.
+  // pubblica ed esci vivono nel footer del drawer, non affollato quindi può
+  // stare appaiato in riga invece che impilato — stessa dimensione/stile di
+  // "Esci", solo icona al posto del testo per restare compatto. Su desktop
+  // invece tema + area pubblica (versione con testo) vanno in una barra
+  // sticky in alto a destra sopra il contenuto: "Esci" da solo resta in
+  // fondo alla sidebar.
   const accountSlot = <ThemeToggle />;
 
+  const areaPubblicaLinkCompatto = (
+    <Link href="/" aria-label="Area pubblica" className="btn-secondary !px-3 !py-1.5">
+      <ExternalLink className="h-3.5 w-3.5" />
+    </Link>
+  );
+
   const drawerFooterSlot = (
-    <div className="flex flex-col gap-2">
-      {areaPubblicaLink}
+    <div className="flex items-center gap-2">
+      {areaPubblicaLinkCompatto}
       {logoutForm}
     </div>
   );

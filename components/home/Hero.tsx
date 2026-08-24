@@ -24,10 +24,10 @@ export async function Hero() {
         <RevealItem>
           <p className="max-w-md text-base leading-relaxed text-muted">{t("subtitle")}</p>
         </RevealItem>
-        <RevealItem className="flex flex-wrap items-center gap-3 pt-2">
+        <RevealItem className="flex flex-nowrap items-center gap-2 overflow-x-auto pt-2 sm:gap-3">
           <a
             href="#contatti"
-            className="rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md"
+            className="shrink-0 whitespace-nowrap rounded-md bg-accent px-3.5 py-2 text-sm font-medium text-accent-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md sm:px-5 sm:py-2.5"
           >
             {t("ctaContact")}
           </a>
@@ -35,14 +35,14 @@ export async function Hero() {
             href={LINKEDIN_URL}
             target="_blank"
             rel="noreferrer"
-            className="rounded-md border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover"
+            className="shrink-0 whitespace-nowrap rounded-md border border-border px-3.5 py-2 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover sm:px-5 sm:py-2.5"
           >
             {t("linkedin")}
           </a>
           <a
             href={CV_URL}
             download
-            className="rounded-md border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover"
+            className="shrink-0 whitespace-nowrap rounded-md border border-border px-3.5 py-2 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover sm:px-5 sm:py-2.5"
           >
             {t("ctaCv")}
           </a>

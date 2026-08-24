@@ -117,3 +117,26 @@ export async function salvaNotaGiorno(data: string, contenuto: string): Promise<
   revalidatePath("/agenda");
   return {};
 }
+
+// Riga singola upsert-ata "a mano" (nessun onConflict: la migration 022 ne
+// garantisce sempre esattamente una) — se per qualche motivo manca ancora,
+// la si crea qui invece di fallire silenziosamente.
+export async function aggiornaPromemoriaNote(attivo: boolean): Promise<AgendaActionResult> {
+  await requireUser();
+
+  const admin = createAdminClient();
+  const { data: esistente, error: fetchError } = await admin
+    .from("agenda_impostazioni")
+    .select("id")
+    .limit(1)
+    .maybeSingle();
+  if (fetchError) return { error: fetchError.message };
+
+  const { error } = esistente
+    ? await admin.from("agenda_impostazioni").update({ promemoria_note_attivo: attivo }).eq("id", esistente.id)
+    : await admin.from("agenda_impostazioni").insert({ promemoria_note_attivo: attivo });
+  if (error) return { error: error.message };
+
+  revalidatePath("/agenda");
+  return {};
+}

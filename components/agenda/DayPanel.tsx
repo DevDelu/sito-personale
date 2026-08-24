@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ExternalLink, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useAgendaMutations } from "@/hooks/useAgendaMutations";
 import { EventoFormModal } from "./EventoFormModal";
+import { NotaModal } from "./NotaModal";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import type { EventoPatch } from "@/app/(private)/agenda/actions";
 import type { Evento, NotaGiorno } from "@/lib/agenda/types";
@@ -32,6 +33,19 @@ function formatOra(iso: string, tuttoIlGiorno: boolean): string {
   return new Date(iso).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
 }
 
+// Un header "Da"/"A" di Gmail è tipicamente `Nome Cognome <email@dominio.it>`
+// (a volte solo l'email nuda): separare nome ed email fa capire subito da
+// quale indirizzo/dominio arriva un messaggio, invece di dover leggere una
+// stringa unica potenzialmente lunga.
+function parseIndirizzo(header: string): { nome: string | null; email: string } {
+  const match = header.match(/^"?([^"<]*)"?\s*<([^>]+)>$/);
+  if (match) {
+    const nome = match[1].trim();
+    return { nome: nome || null, email: match[2].trim() };
+  }
+  return { nome: null, email: header.trim() };
+}
+
 export function DayPanel({
   data,
   eventi,
@@ -53,6 +67,7 @@ export function DayPanel({
 
   const [nota, setNota] = useState(notaIniziale?.contenuto ?? "");
   const [salvandoNota, setSalvandoNota] = useState(false);
+  const [notaModaleAperta, setNotaModaleAperta] = useState(false);
 
   const [mail, setMail] = useState<MailRisposta | null>(null);
   const [mailCaricamento, setMailCaricamento] = useState(false);
@@ -65,28 +80,29 @@ export function DayPanel({
   if (data !== dataCorrente) {
     setDataCorrente(data);
     setNota(notaIniziale?.contenuto ?? "");
+    setNotaModaleAperta(false);
     setMail(null);
     setMailCaricata(false);
     setMailErrore(null);
     setTab("eventi");
   }
 
-  // Autosave con debounce ~800ms, nessun bottone "Salva" per la nota.
-  useEffect(() => {
-    if (nota === (notaIniziale?.contenuto ?? "")) return;
-    const timer = setTimeout(async () => {
-      setSalvandoNota(true);
-      try {
-        await salvaNota(dataCorrente, nota);
-      } catch {
-        // errore già mostrato via `error` dell'hook
-      } finally {
-        setSalvandoNota(false);
-      }
-    }, 800);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nota]);
+  async function handleSalvaNota(contenutoHtml: string) {
+    setSalvandoNota(true);
+    try {
+      await salvaNota(dataCorrente, contenutoHtml);
+      setNota(contenutoHtml);
+      setNotaModaleAperta(false);
+    } catch {
+      // errore già mostrato via `error` dell'hook, il popup resta aperto
+    } finally {
+      setSalvandoNota(false);
+    }
+  }
+
+  async function handleRimuoviNota() {
+    await handleSalvaNota("");
+  }
 
   async function caricaMail() {
     if (mailCaricata || mailCaricamento) return;
@@ -206,15 +222,23 @@ export function DayPanel({
       )}
 
       {tab === "note" && (
-        <div className="flex flex-col gap-1.5">
-          <textarea
-            value={nota}
-            onChange={(e) => setNota(e.target.value)}
-            rows={10}
-            placeholder="Scrivi una nota per questo giorno..."
-            className="field-input"
-          />
-          <span className="text-xs text-muted">{salvandoNota ? "Salvataggio..." : "Salvataggio automatico"}</span>
+        <div className="flex flex-col gap-3">
+          {nota ? (
+            <div
+              className="field-input text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+              dangerouslySetInnerHTML={{ __html: nota }}
+            />
+          ) : (
+            <p className="text-sm text-muted">Nessuna nota per questo giorno.</p>
+          )}
+          <button
+            type="button"
+            onClick={() => setNotaModaleAperta(true)}
+            className="btn-secondary flex w-fit items-center gap-1.5"
+          >
+            {nota ? <Pencil className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+            {nota ? "Modifica nota" : "Scrivi una nota"}
+          </button>
         </div>
       )}
 
@@ -224,8 +248,8 @@ export function DayPanel({
           {mailErrore && <p className="text-sm text-spesa">{mailErrore}</p>}
           {mail && (
             <>
-              <MailSection titolo="Ricevute" messaggi={mail.ricevute} />
-              <MailSection titolo="Inviate" messaggi={mail.inviate} />
+              <MailSection titolo="Ricevute" messaggi={mail.ricevute} ruolo="da" />
+              <MailSection titolo="Inviate" messaggi={mail.inviate} ruolo="a" />
               {mail.ricevute.length === 0 && mail.inviate.length === 0 && (
                 <p className="text-sm text-muted">Nessuna mail in questo giorno.</p>
               )}
@@ -254,6 +278,17 @@ export function DayPanel({
         />
       )}
 
+      {notaModaleAperta && (
+        <NotaModal
+          data={dataCorrente}
+          contenutoIniziale={nota}
+          pending={salvandoNota}
+          onSave={handleSalvaNota}
+          onRimuovi={handleRimuoviNota}
+          onClose={() => setNotaModaleAperta(false)}
+        />
+      )}
+
       {eventoDaEliminare && (
         <DeleteConfirmDialog
           titolo={eventoDaEliminare.titolo}
@@ -273,30 +308,46 @@ export function DayPanel({
   );
 }
 
-function MailSection({ titolo, messaggi }: { titolo: string; messaggi: MailMessage[] }) {
+function MailSection({
+  titolo,
+  messaggi,
+  ruolo,
+}: {
+  titolo: string;
+  messaggi: MailMessage[];
+  // "da" (Ricevute): il mittente è il punto di interesse — da dove arriva.
+  // "a" (Inviate): il destinatario è il punto di interesse — a chi è andata.
+  ruolo: "da" | "a";
+}) {
   if (messaggi.length === 0) return null;
   return (
     <div className="flex flex-col gap-2">
       <span className="text-xs font-medium uppercase tracking-wide text-muted">{titolo}</span>
       <ul className="flex flex-col gap-2">
-        {messaggi.map((m) => (
-          <li key={m.id} className="flex flex-col gap-1 rounded-xl border border-border p-3 text-sm">
-            <div className="flex items-center justify-between gap-2">
-              <span className="truncate font-medium">{m.oggetto}</span>
-              <a
-                href={`https://mail.google.com/mail/u/0/#inbox/${m.id}`}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-icon shrink-0"
-                aria-label="Apri in Gmail"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-            </div>
-            <span className="truncate text-xs text-muted">{m.da || m.a}</span>
-            <span className="truncate text-xs text-muted/70">{m.snippet}</span>
-          </li>
-        ))}
+        {messaggi.map((m) => {
+          const { nome, email } = parseIndirizzo(ruolo === "da" ? m.da : m.a);
+          return (
+            <li key={m.id} className="flex flex-col gap-1.5 rounded-xl border border-border p-3 text-sm">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <span className="block truncate font-semibold">{nome ?? email}</span>
+                  {nome && <span className="block truncate font-figures text-xs text-muted">{email}</span>}
+                </div>
+                <a
+                  href={`https://mail.google.com/mail/u/0/#inbox/${m.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-icon shrink-0"
+                  aria-label="Apri in Gmail"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+              <span className="truncate text-foreground/90">{m.oggetto}</span>
+              <span className="truncate text-xs text-muted/70">{m.snippet}</span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

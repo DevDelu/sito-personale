@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   aggiornaEvento,
+  aggiornaPromemoriaNote,
   creaEvento,
   eliminaEvento,
   salvaNotaGiorno,
@@ -57,5 +58,16 @@ export function useAgendaMutations() {
     }
   }
 
-  return { crea, aggiorna, elimina, salvaNota, pending, error };
+  async function impostaPromemoriaNote(attivo: boolean) {
+    setPending(true);
+    setError(null);
+    const res = await aggiornaPromemoriaNote(attivo);
+    setPending(false);
+    if (res?.error) {
+      setError(res.error);
+      throw new Error(res.error);
+    }
+  }
+
+  return { crea, aggiorna, elimina, salvaNota, impostaPromemoriaNote, pending, error };
 }

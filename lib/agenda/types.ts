@@ -37,6 +37,11 @@ export type IntegrazioneGoogle = {
   created_at: string;
 };
 
+export type ImpostazioniAgenda = {
+  id: string;
+  promemoria_note_attivo: boolean;
+};
+
 export type MailGiorno = {
   id: string;
   da: string;

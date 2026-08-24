@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { getEventiRange, getIntegrazioneGoogle, getNoteRange } from "@/lib/agenda/queries";
+import { getEventiRange, getImpostazioniAgenda, getIntegrazioneGoogle, getNoteRange } from "@/lib/agenda/queries";
 import { AgendaBoard } from "@/components/agenda/AgendaBoard";
 import { SyncStatusBadge } from "@/components/agenda/SyncStatusBadge";
+import { PromemoriaToggle } from "@/components/agenda/PromemoriaToggle";
 
 export const metadata: Metadata = { title: "Agenda" };
 
@@ -29,17 +30,24 @@ export default async function AgendaPage({
   const { google_error } = await searchParams;
   const { fromTimestamp, toTimestamp, fromData, toData } = rangeVisibile();
 
-  const [eventi, integrazione, note] = await Promise.all([
+  const [eventi, integrazione, note, impostazioni] = await Promise.all([
     getEventiRange(fromTimestamp, toTimestamp),
     getIntegrazioneGoogle(),
     getNoteRange(fromData, toData),
+    getImpostazioniAgenda(),
   ]);
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Agenda</h1>
-        <p className="text-sm text-muted">Calendario, note e posta per giorno.</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-col gap-1">
+          <h1 className="font-display text-2xl font-semibold tracking-tight">Agenda</h1>
+          <p className="text-sm text-muted">Calendario, note e posta per giorno.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <PromemoriaToggle attivoIniziale={impostazioni?.promemoria_note_attivo ?? true} />
+          <SyncStatusBadge integrazione={integrazione} />
+        </div>
       </div>
 
       {google_error && (
@@ -47,8 +55,6 @@ export default async function AgendaPage({
           Collegamento Google non riuscito ({google_error}). Riprova con &ldquo;Connetti Google&rdquo;.
         </p>
       )}
-
-      <SyncStatusBadge integrazione={integrazione} />
 
       <AgendaBoard eventi={eventi} note={note} />
     </div>

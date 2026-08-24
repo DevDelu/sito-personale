@@ -1,6 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Evento, IntegrazioneGoogle, NotaGiorno } from "./types";
+import type { Evento, ImpostazioniAgenda, IntegrazioneGoogle, NotaGiorno } from "./types";
 
 // Eventi che si sovrappongono al range [from, to): copre anche quelli
 // iniziati prima ma ancora in corso (es. multi-giorno), non solo quelli con
@@ -47,6 +47,16 @@ export async function getNoteRange(from: string, to: string): Promise<NotaGiorno
 export async function getIntegrazioneGoogle(): Promise<IntegrazioneGoogle | null> {
   const admin = createAdminClient();
   const { data, error } = await admin.from("integrazione_google").select("*").limit(1).maybeSingle();
+  if (error) throw new Error(error.message);
+  return data ?? null;
+}
+
+// Riga singola (stessa convenzione di integrazione_google). Assente = mai
+// creata (migration non ancora eseguita): trattata come promemoria attivo di
+// default dal chiamante, per non bloccare l'invio se la riga manca.
+export async function getImpostazioniAgenda(): Promise<ImpostazioniAgenda | null> {
+  const admin = createAdminClient();
+  const { data, error } = await admin.from("agenda_impostazioni").select("*").limit(1).maybeSingle();
   if (error) throw new Error(error.message);
   return data ?? null;
 }

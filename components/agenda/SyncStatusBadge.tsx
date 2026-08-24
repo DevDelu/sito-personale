@@ -55,52 +55,59 @@ export function SyncStatusBadge({ integrazione }: { integrazione: IntegrazioneGo
     }
   }
 
+  // Stato "connesso" (il caso di ogni giorno): niente più una card a piena
+  // larghezza sempre visibile, solo un pallino di stato + un'icona per
+  // risincronizzare, con i dettagli (ultima sync) nel title/tooltip invece
+  // che scritti in chiaro. Gli stati che richiedono un'azione (scaduto/non
+  // connesso) restano invece testuali e ben visibili, perché lì l'utente
+  // deve effettivamente fare qualcosa.
+  if (stato === "connesso") {
+    return (
+      <div className="flex items-center gap-1.5">
+        <span
+          className="h-1.5 w-1.5 shrink-0 rounded-full bg-entrata"
+          title={`Google collegato · ultima sync ${formatUltimoSync(integrazione?.ultimo_sync ?? null)}`}
+        />
+        <button
+          type="button"
+          onClick={sincronizza}
+          disabled={sincronizzando}
+          aria-label="Sincronizza ora"
+          title={`Sincronizza ora · ultima sync ${formatUltimoSync(integrazione?.ultimo_sync ?? null)}`}
+          className="btn-icon"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${sincronizzando ? "animate-spin" : ""}`} />
+        </button>
+        {errore && (
+          <p className="text-xs text-spesa" role="alert">
+            {errore}
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className="card flex flex-wrap items-center justify-between gap-3 p-3">
-      <div className="flex items-center gap-2 text-sm">
-        {stato === "connesso" && (
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="flex items-center gap-1.5 text-xs">
+        {stato === "scaduto" ? (
           <>
-            <span className="h-2 w-2 rounded-full bg-entrata" />
-            <span className="text-muted">
-              Google collegato · ultima sync {formatUltimoSync(integrazione?.ultimo_sync ?? null)}
-            </span>
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-spesa" />
+            <span className="text-spesa">Google scaduto</span>
           </>
-        )}
-        {stato === "scaduto" && (
+        ) : (
           <>
-            <AlertTriangle className="h-4 w-4 text-spesa" />
-            <span className="text-spesa">Collegamento Google scaduto</span>
-          </>
-        )}
-        {stato === "non_connesso" && (
-          <>
-            <span className="h-2 w-2 rounded-full bg-muted/50" />
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-muted/50" />
             <span className="text-muted">Google non collegato</span>
           </>
         )}
       </div>
-
-      <div className="flex items-center gap-2">
-        {stato === "connesso" ? (
-          <button
-            type="button"
-            onClick={sincronizza}
-            disabled={sincronizzando}
-            className="btn-secondary flex items-center gap-1.5"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${sincronizzando ? "animate-spin" : ""}`} />
-            {sincronizzando ? "Sincronizzazione..." : "Sincronizza ora"}
-          </button>
-        ) : (
-          <Link href="/api/agenda/auth/google" className="btn-primary flex items-center gap-1.5">
-            <Link2 className="h-3.5 w-3.5" />
-            {stato === "scaduto" ? "Riconnetti Google" : "Connetti Google"}
-          </Link>
-        )}
-      </div>
-
+      <Link href="/api/agenda/auth/google" className="btn-secondary flex items-center gap-1.5 !px-2.5 !py-1 text-xs">
+        <Link2 className="h-3 w-3" />
+        {stato === "scaduto" ? "Riconnetti" : "Connetti"}
+      </Link>
       {errore && (
-        <p className="w-full text-sm text-spesa" role="alert">
+        <p className="w-full text-xs text-spesa" role="alert">
           {errore}
         </p>
       )}
