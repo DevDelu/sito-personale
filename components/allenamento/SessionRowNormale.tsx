@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useCountdown } from "@/hooks/useCountdown";
+import { TutorialLink } from "./TutorialLink";
 import type { SchedaEsercizioConNome, SessioneLog } from "@/lib/allenamento/types";
 
 type SetLog = { rip_effettive?: number | null; peso_effettivo?: number | null; tempo_effettivo_sec?: number | null };
@@ -110,6 +111,9 @@ export function SessionRowNormale({
             {targetLabel ? ` · target ${targetLabel}` : ""}
             {row.note ? ` · ${row.note}` : ""}
           </p>
+          <div className="mt-1.5">
+            <TutorialLink esercizioNome={row.esercizio_nome} />
+          </div>
         </div>
         {ultimoValore && (
           <div className="text-right text-xs text-muted">

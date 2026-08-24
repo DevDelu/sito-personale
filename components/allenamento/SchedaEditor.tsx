@@ -191,15 +191,15 @@ export function SchedaEditor({
         Le mie schede
       </Link>
 
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-0.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-col gap-0.5">
           <h1 className="font-display text-2xl font-semibold tracking-tight">Gestione scheda</h1>
-          <p className="text-sm text-muted">{scheda.nome}</p>
+          <p className="truncate text-sm text-muted">{scheda.nome}</p>
         </div>
         <button
           type="button"
           onClick={() => setModaleAperto({ modo: "nuovo" })}
-          className="btn-secondary flex items-center gap-1.5"
+          className="btn-secondary flex shrink-0 items-center gap-1.5"
         >
           <Plus className="h-3.5 w-3.5" />
           Nuovo blocco
@@ -217,52 +217,45 @@ export function SchedaEditor({
           <div className="flex flex-col gap-4">
             {blocchi.map((blocco, bloccoIndex) => (
               <SortableBlocco key={blocco.nome} id={blocco.nome}>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex flex-col">
-                      <button type="button" onClick={() => spostaBlocco(bloccoIndex, -1)} disabled={bloccoIndex === 0} className="btn-icon !h-8 !w-8 disabled:opacity-30">
-                        <ChevronUp className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => spostaBlocco(bloccoIndex, 1)}
-                        disabled={bloccoIndex === blocchi.length - 1}
-                        className="btn-icon !h-8 !w-8 disabled:opacity-30"
-                      >
-                        <ChevronDown className="h-4 w-4" />
-                      </button>
-                    </div>
-                    <span className="font-display text-sm font-semibold">{blocco.nome}</span>
+                <div className="flex min-w-0 items-center gap-1">
+                  <div className="flex shrink-0 flex-col">
                     <button
                       type="button"
-                      onClick={() => {
-                        setRinominandoBlocco(blocco.nome);
-                        setNuovoNomeBlocco(blocco.nome);
-                      }}
-                      aria-label="Rinomina blocco"
-                      className="btn-icon !h-6 !w-6"
+                      onClick={() => spostaBlocco(bloccoIndex, -1)}
+                      disabled={bloccoIndex === 0}
+                      className="btn-icon !h-7 !w-7 disabled:opacity-30"
                     >
-                      <Pencil className="h-3 w-3" />
+                      <ChevronUp className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => spostaBlocco(bloccoIndex, 1)}
+                      disabled={bloccoIndex === blocchi.length - 1}
+                      className="btn-icon !h-7 !w-7 disabled:opacity-30"
+                    >
+                      <ChevronDown className="h-4 w-4" />
                     </button>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setModaleAperto({ modo: "nuovo", blocco: blocco.nome })}
-                      className="btn-secondary flex items-center gap-1 !px-2 !py-1 text-xs"
-                    >
-                      <Plus className="h-3 w-3" />
-                      Esercizio
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEliminandoBlocco(blocco.nome)}
-                      aria-label="Elimina blocco"
-                      className="btn-icon hover:!text-spesa"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
+                  <span className="min-w-0 flex-1 truncate font-display text-sm font-semibold">{blocco.nome}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRinominandoBlocco(blocco.nome);
+                      setNuovoNomeBlocco(blocco.nome);
+                    }}
+                    aria-label="Rinomina blocco"
+                    className="btn-icon !h-7 !w-7 shrink-0"
+                  >
+                    <Pencil className="h-3 w-3" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEliminandoBlocco(blocco.nome)}
+                    aria-label="Elimina blocco"
+                    className="btn-icon !h-7 !w-7 shrink-0 hover:!text-spesa"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
                 </div>
 
                 <DndContext sensors={sensors} onDragEnd={(e) => handleEsercizioDragEnd(bloccoIndex, e)}>
@@ -279,7 +272,7 @@ export function SchedaEditor({
                                 type="button"
                                 onClick={() => spostaEsercizio(bloccoIndex, esIndex, -1)}
                                 disabled={esIndex === 0}
-                                className="btn-icon !h-8 !w-8 disabled:opacity-30"
+                                className="btn-icon !h-7 !w-7 disabled:opacity-30"
                               >
                                 <ChevronUp className="h-3.5 w-3.5" />
                               </button>
@@ -287,7 +280,7 @@ export function SchedaEditor({
                                 type="button"
                                 onClick={() => spostaEsercizio(bloccoIndex, esIndex, 1)}
                                 disabled={esIndex === blocco.esercizi.length - 1}
-                                className="btn-icon !h-8 !w-8 disabled:opacity-30"
+                                className="btn-icon !h-7 !w-7 disabled:opacity-30"
                               >
                                 <ChevronDown className="h-3.5 w-3.5" />
                               </button>
@@ -320,6 +313,15 @@ export function SchedaEditor({
                     </ul>
                   </SortableContext>
                 </DndContext>
+
+                <button
+                  type="button"
+                  onClick={() => setModaleAperto({ modo: "nuovo", blocco: blocco.nome })}
+                  className="btn-secondary flex items-center justify-center gap-1.5 border-dashed !py-2 text-xs"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Aggiungi esercizio
+                </button>
               </SortableBlocco>
             ))}
           </div>
@@ -411,7 +413,7 @@ function SortableBlocco({ id, children }: { id: string; children: React.ReactNod
       style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 }}
       className="card flex flex-col gap-3 p-4"
     >
-      <div className="flex items-start gap-2">
+      <div className="flex min-w-0 items-start gap-2">
         <button
           type="button"
           {...attributes}
@@ -421,7 +423,7 @@ function SortableBlocco({ id, children }: { id: string; children: React.ReactNod
         >
           <GripVertical className="h-3.5 w-3.5" />
         </button>
-        <div className="flex-1">{children}</div>
+        <div className="flex min-w-0 flex-1 flex-col gap-3">{children}</div>
       </div>
     </div>
   );

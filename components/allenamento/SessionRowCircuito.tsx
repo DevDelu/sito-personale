@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useCountdown } from "@/hooks/useCountdown";
+import { TutorialLink } from "./TutorialLink";
 import type { SchedaEsercizioConNome } from "@/lib/allenamento/types";
 
 // Timer automatico lavoro/pausa per `rounds` cicli (es. Corda: 8x 40s
@@ -57,6 +58,9 @@ export function SessionRowCircuito({
         <p className="text-sm text-muted">
           Round {round} di {rounds} · {fase === "lavoro" ? "lavoro" : "pausa"}
         </p>
+        <div className="mt-1.5">
+          <TutorialLink esercizioNome={row.esercizio_nome} />
+        </div>
       </div>
       <span
         className={`font-figures text-6xl font-bold tabular-nums ${fase === "lavoro" ? "text-accent" : "text-muted"}`}

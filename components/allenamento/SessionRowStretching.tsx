@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useCountdown } from "@/hooks/useCountdown";
+import { TutorialLink } from "./TutorialLink";
 import type { SchedaEsercizioConNome } from "@/lib/allenamento/types";
 
 // Countdown singolo per una zona corporea. L'avanzamento automatico tra le
@@ -30,9 +31,12 @@ export function SessionRowStretching({
 
   return (
     <div className="card flex flex-col items-center gap-3 p-5">
-      <span className="text-xs uppercase tracking-wide text-muted">Stretching</span>
-      <span className="font-display text-2xl font-semibold">{row.zona_corporea}</span>
+      <span className="text-xs uppercase tracking-wide text-muted">
+        Stretching{row.zona_corporea ? ` · ${row.zona_corporea}` : ""}
+      </span>
+      <span className="font-display text-2xl font-semibold">{row.esercizio_nome}</span>
       <span className="font-figures text-6xl font-bold tabular-nums text-accent">{remaining}s</span>
+      <TutorialLink esercizioNome={row.esercizio_nome} />
     </div>
   );
 }
