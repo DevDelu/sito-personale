@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { InlineScript } from "@/components/inline-script";
 import "./globals.css";
@@ -24,6 +24,16 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Bussola",
   description: "Bussola — spese, investimenti, collezione e agenda personali.",
+};
+
+// viewportFit "cover": disegna sotto la notch/home-indicator invece di
+// lasciare una barra bianca, così le padding con env(safe-area-inset-*)
+// nei componenti fixed (drawer, barre in basso, toast) hanno un valore
+// reale da usare invece di 0.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

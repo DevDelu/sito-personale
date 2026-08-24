@@ -328,16 +328,35 @@ body {
     @apply hover:-translate-y-0.5 hover:border-accent/25 hover:shadow-lg;
   }
 
-  /* Overlay + pannello per i modali, con animazione d'ingresso. overflow-y-auto
-     + items-start sul mobile evitano che un form con molti campi (es. modifica
-     in blocco) finisca fuori schermo senza modo di scorrere fino al pulsante
-     di conferma; da sm in su torna centrato come prima. */
+  /* Overlay + pannello per i modali. Sotto sm: bottom sheet ancorato al
+     fondo dello schermo (pattern nativo mobile: pieno-larghezza, angoli
+     smussati solo in alto, "grabber" decorativo), con safe-area-bottom per
+     non finire sotto l'home indicator. Da sm in su torna il pannello
+     centrato e flottante di prima. */
   .modal-overlay {
-    @apply fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-[2px] animate-fade-in sm:items-center sm:py-4;
+    @apply fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/50 backdrop-blur-[2px] animate-fade-in sm:items-center sm:px-4 sm:py-4;
   }
 
   .modal-panel {
-    @apply animate-scale-in max-h-[calc(100vh-3rem)] overflow-y-auto rounded-xl border border-border bg-surface shadow-2xl sm:max-h-[calc(100vh-2rem)];
+    @apply animate-slide-up max-h-[90vh] w-full overflow-y-auto rounded-t-2xl border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[calc(100vh-2rem)] sm:w-auto sm:animate-scale-in sm:rounded-xl sm:border sm:pb-0;
+  }
+
+  /* Grabber decorativo del bottom sheet, solo sotto sm: nessuna modifica ai
+     singoli modali che continuano a passare solo "modal-panel ...". */
+  .modal-panel::before {
+    content: "";
+    display: block;
+    width: 2.5rem;
+    height: 0.25rem;
+    margin: 0 auto;
+    border-radius: 999px;
+    background: var(--border);
+  }
+
+  @media (min-width: 640px) {
+    .modal-panel::before {
+      display: none;
+    }
   }
 
   /* Input di testo/data/numero/select condivisi da tutti i form */

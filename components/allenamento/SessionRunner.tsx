@@ -247,7 +247,7 @@ export function SessionRunner({
         </div>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-center gap-2 border-t border-border bg-surface/95 p-3 backdrop-blur-md">
+      <div className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-center gap-2 border-t border-border bg-surface/95 px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur-md">
         <button
           type="button"
           onClick={() => setStepIndex((i) => i + 1)}

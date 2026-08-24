@@ -50,7 +50,9 @@ export default async function PrivateLayout({
           <ThemeToggle />
           {areaPubblicaLink}
         </div>
-        <div className="flex flex-1 flex-col px-4 py-6 sm:px-6 animate-fade-in">{children}</div>
+        <div className="flex flex-1 flex-col px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 animate-fade-in">
+          {children}
+        </div>
       </div>
     </div>
   );
