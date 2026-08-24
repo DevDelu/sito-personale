@@ -40,7 +40,7 @@ export function ProjectCard({ project, categoryLabel }: { project: Project; cate
             {project.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full border border-border px-2 py-0.5 font-mono text-[11px] text-muted"
+                className="rounded-md border border-border px-2 py-0.5 font-mono text-[11px] text-muted"
               >
                 {tag}
               </span>

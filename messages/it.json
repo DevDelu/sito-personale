@@ -1,14 +1,14 @@
 {
   "Hero": {
     "headline": "Mi alleno anche quando nessuno guarda.",
-    "subtitle": "PMO in Aeonvis S.p.A. (cliente Credit Agricole Auto Bank), in cammino verso l'AI Product Engineering.",
+    "subtitle": "Attualmente lavoro come PMO, in cammino verso l'AI Product Engineering.",
     "ctaContact": "Contattami",
     "ctaCv": "Scarica CV",
     "linkedin": "LinkedIn"
   },
   "About": {
     "title": "Chi sono",
-    "p1": "Sono Lorenzo, PMO in Aeonvis S.p.A. sul cliente Credit Agricole Auto Bank: coordino progetti, persone e scadenze dove processo e tecnologia si incontrano. Prima ancora, una tesi triennale in UX/UI design mi ha insegnato a partire sempre dai dati e dalle persone reali prima di disegnare una soluzione.",
+    "p1": "Sono Lorenzo, attualmente lavoro come PMO: coordino progetti, persone e scadenze dove processo e tecnologia si incontrano. Prima ancora, una tesi triennale in UX/UI design mi ha insegnato a partire sempre dai dati e dalle persone reali prima di disegnare una soluzione.",
     "p2": "Oggi sto spostando il baricentro verso l'AI Product Engineering: studio e costruisco strumenti che uniscono product thinking, design e sviluppo, questo sito compreso — costruito da zero con Next.js e Supabase come palestra continua più che come biglietto da visita."
   },
   "Skills": {
@@ -47,7 +47,7 @@
       },
       {
         "title": "Carte collezionabili",
-        "description": "Colleziono carte Pokémon, tra ricerca dei pezzi mancanti e cura della collezione."
+        "description": "Colleziono carte collezionabili, tra ricerca dei pezzi mancanti e cura della collezione."
       },
       {
         "title": "Investimenti",

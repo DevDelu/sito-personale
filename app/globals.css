@@ -95,6 +95,36 @@
   --agenda-personale: #e8792e; /* stesso hue dell'accent dark */
 }
 
+/* Sito pubblico (biglietto da visita): stessi nomi di variabile della
+   Bussola (--background, --accent, ecc.), ma valori diversi, scoperti solo
+   dentro .site-public. Ogni utility esistente (bg-background, bg-accent,
+   btn-primary, card, field-input...) eredita il tema pubblico per cascata
+   senza bisogno di duplicare le classi, e senza toccare :root: l'app
+   privata, che non entra mai in .site-public, resta invariata. */
+.site-public {
+  --background: #f3f0e7;
+  --surface: #ffffff;
+  --surface-hover: #ece6d5;
+  --border: #d9d2ba;
+  --foreground: #17140f;
+  --muted: #6b6554;
+  --accent: #1f6f63;
+  --accent-foreground: #f3f0e7;
+  --stamp: #b24630;
+}
+
+[data-theme="dark"] .site-public {
+  --background: #0c1210;
+  --surface: #131b18;
+  --surface-hover: #1a2420;
+  --border: #223029;
+  --foreground: #f1eee4;
+  --muted: #98998e;
+  --accent: #34b39f;
+  --accent-foreground: #0c1210;
+  --stamp: #e37155;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -104,6 +134,7 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-stamp: var(--stamp);
   --color-spesa: var(--spesa);
   --color-entrata: var(--entrata);
 
