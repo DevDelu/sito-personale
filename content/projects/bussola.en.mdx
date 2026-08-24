@@ -1,0 +1,66 @@
+---
+slug: "bussola"
+title: "Bussola"
+subtitle: "Personal Digital HQ — private dashboard and public portfolio"
+category: "personal"
+cover: "/images/projects/bussola-cover.svg"
+tags: ["Next.js", "TypeScript", "Supabase", "Product Architecture", "Full-Stack"]
+year: 2026
+featured: true
+role: "Product Architect & Full-Stack Developer"
+summary: "A personal digital ecosystem combining a private dashboard for managing finances, investments, calendar and collections, with a bilingual public portfolio built for job searching in AI Product Engineering. Designed and built solo, under an explicit near-zero infrastructure cost constraint."
+accentColors:
+  primary: "#c25a1e"
+  secondary: "#d9822b"
+  tertiary: "#e0a458"
+stats:
+  - value: 5
+    label: "Modules in the private dashboard"
+  - value: 0
+    label: "Monthly infrastructure cost"
+    suffix: "€"
+  - value: 2
+    label: "Languages supported"
+---
+
+## The context
+
+This very site — the one you're on right now — is Bussola. It's the project I use every day, and at the same time the project I'm telling you about: a personal digital ecosystem split into two clearly separated areas. On one side, a private dashboard behind authentication that I use as a "second brain" for finances, investments, calendar and collections. On the other, a bilingual public portfolio (Italian by default, English under `/en/`) built to represent my path toward AI Product Engineering and attract professional opportunities.
+
+I designed and built it alone, thinking not only as a developer but as a product owner: every technical choice had to hold up against four real constraints — future scalability, maintainability, professional-grade output and, above all, a budget close to zero.
+
+## The problem
+
+I track expenses, investments, a card collection and a packed calendar, but they used to be scattered across spreadsheets, different apps and mental notes — no unified view, no consistent history. At the same time, I needed a digital business card that wasn't yet another minimal corporate portfolio, but something that communicated energy and personal growth, consistent with who I am.
+
+The answer to both problems turned out to be the same one: a single product, one stack, run with the discipline of a professional project — but under a cost constraint no professional project would normally accept.
+
+## Architecture: two areas, one discipline
+
+The foundational decision was to separate the two areas cleanly from day one — not just in routing, but in how data is modeled: **the private area must never be able to leak into the public one**, not even by accident. Concretely, that means Row Level Security on every sensitive Supabase table, routes gated by authentication, and — less obviously — care about what never shows up in the public GitHub source: environment variables, detailed policies, internal query structure.
+
+On top of that separation, the architecture is built to grow module by module without one addition breaking the others: each module (expenses, investments, cards, calendar) owns its own tables, components and page, sharing only the authentication layer and the design system.
+
+## Key decisions and trade-offs
+
+A few choices are worth explaining, because they're the ones I learned the most from.
+
+**Rule-based instead of AI-powered inside the app.** Every call to a language model has a cost, and a personal project with a zero-budget constraint can't afford continuous inference on every transaction or event. So I chose deterministic rule engines for tasks like automatic expense categorization — AI stays a tool I use *in chat*, exporting data whenever a deeper analysis is needed, not an always-on component inside the product. It's a trade-off: I give up some automatic "intelligence" and gain predictability, speed and zero cost.
+
+**Incremental saves, not just end-of-flow.** In modules like workout tracking or expenses, every meaningful step — starting a session, each individual set, each transaction — is saved immediately, not only once the whole operation completes. An interruption halfway through (lost connection, app closed by accident) should never cost data.
+
+**Historical data integrity.** Tables recording past events never reference mutable entities directly, but a snapshot of them at the time they were recorded. So if I later edit a workout plan or a collection card, the history of what already happened stays intact and internally consistent.
+
+**Real free-tier constraints, handled explicitly.** The Google Calendar integration, for instance, uses OAuth in "Testing" mode, which for personal accounts expires refresh tokens every 7 days. Instead of treating that as a rare edge case, I designed for it as expected behavior: a reconnect button with explicit error handling, always visible when needed. That's the kind of detail that separates a prototype from a product that actually keeps working over time.
+
+## Design system
+
+The visual system combines two registers: a dark navy/near-black theme with amber accents (dark mode, the default) and a warmer cream variant in light mode. Typography follows a clear hierarchy — Fraunces for headings, with a more expressive, editorial tone; Space Grotesk for body text, clean and readable; JetBrains Mono for technical and numeric elements, giving weight and precision to data and figures.
+
+The Dragon Ball thematic reference isn't decorative but conceptual: energy, continuous training, evolution — used as a metaphor for personal and professional growth, without tipping into childish territory. The animations, built with Framer Motion, follow the same principle: present where they add clarity or delight, never at the expense of performance or the mobile experience.
+
+## What I learned
+
+Building Bussola taught me more about running a real product than any academic project did: balancing ambition against constraints, deciding what to postpone (the AI assistant and the workout app are in the backlog, not abandoned) and what to build solidly right now, and documenting every important decision — not for someone else, but for the version of me six months from now who'll need to remember why he made that call.
+
+By definition, it's a project that never finishes: it grows alongside me, one module at a time.

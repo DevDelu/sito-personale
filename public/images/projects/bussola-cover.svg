@@ -1,0 +1,81 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="22%" cy="26%" r="95%">
+      <stop offset="0%" stop-color="#1c2333" />
+      <stop offset="55%" stop-color="#0b0e14" />
+      <stop offset="100%" stop-color="#08090d" />
+    </radialGradient>
+    <radialGradient id="dialFade" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e0a458" stop-opacity="0.3" />
+      <stop offset="70%" stop-color="#e0a458" stop-opacity="0.09" />
+      <stop offset="100%" stop-color="#e0a458" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="titleFade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fffdf8" />
+      <stop offset="100%" stop-color="#e8c9a3" />
+    </linearGradient>
+    <linearGradient id="needleN" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#c25a1e" />
+      <stop offset="100%" stop-color="#f2b673" />
+    </linearGradient>
+    <filter id="blur1" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="80" />
+    </filter>
+    <filter id="blur2" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="60" />
+    </filter>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0H0V64" fill="none" stroke="#e8792e" stroke-opacity="0.05" stroke-width="1" />
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)" />
+  <rect width="1600" height="900" fill="url(#grid)" />
+
+  <circle cx="1360" cy="120" r="280" fill="#c25a1e" opacity="0.3" filter="url(#blur1)" />
+  <circle cx="40" cy="900" r="240" fill="#e0a458" opacity="0.16" filter="url(#blur2)" />
+
+  <!-- Motivo bussola: quadrante circolare, protagonista visivo a destra
+       (non un'icona letterale di UI, ma il riferimento diretto al nome). -->
+  <g transform="translate(1280,450) scale(0.65)">
+    <circle r="380" fill="url(#dialFade)" />
+    <circle r="320" fill="none" stroke="#e0a458" stroke-opacity="0.45" stroke-width="2" />
+    <circle r="250" fill="none" stroke="#e0a458" stroke-opacity="0.28" stroke-width="1" />
+    <circle r="180" fill="none" stroke="#e0a458" stroke-opacity="0.18" stroke-width="1" />
+
+    <g stroke="#e0a458" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round">
+      <line x1="0" y1="-320" x2="0" y2="-286" />
+      <line x1="0" y1="320" x2="0" y2="286" />
+      <line x1="-320" y1="0" x2="-286" y2="0" />
+      <line x1="320" y1="0" x2="286" y2="0" />
+    </g>
+    <g stroke="#e0a458" stroke-opacity="0.3" stroke-width="1.5">
+      <line x1="-226" y1="-226" x2="-203" y2="-203" />
+      <line x1="226" y1="-226" x2="203" y2="-203" />
+      <line x1="-226" y1="226" x2="-203" y2="203" />
+      <line x1="226" y1="226" x2="203" y2="203" />
+    </g>
+
+    <text x="0" y="-336" text-anchor="middle" font-family="Courier New, monospace" font-size="18" letter-spacing="2" fill="#e0a458" opacity="0.7">N</text>
+    <text x="0" y="352" text-anchor="middle" font-family="Courier New, monospace" font-size="18" letter-spacing="2" fill="#726f63">S</text>
+    <text x="-344" y="6" text-anchor="middle" font-family="Courier New, monospace" font-size="18" letter-spacing="2" fill="#726f63">O</text>
+    <text x="344" y="6" text-anchor="middle" font-family="Courier New, monospace" font-size="18" letter-spacing="2" fill="#726f63">E</text>
+
+    <g transform="rotate(-18)">
+      <path d="M0 -210 L26 30 L0 6 L-26 30 Z" fill="url(#needleN)" />
+      <path d="M0 210 L20 -24 L0 -4 L-20 -24 Z" fill="#4a4640" opacity="0.8" />
+    </g>
+    <circle r="10" fill="#0b0e14" stroke="#f2b673" stroke-width="2.5" />
+  </g>
+
+  <text x="106" y="440" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-weight="600" font-size="176" fill="url(#titleFade)">
+    Bussola
+  </text>
+
+  <text x="110" y="504" font-family="Arial, sans-serif" font-size="27" letter-spacing="0.3" fill="#a8a599">
+    <tspan x="110" dy="0">Dashboard privata</tspan>
+    <tspan x="110" dy="36" fill="#726f63" font-family="Courier New, monospace" font-size="20" letter-spacing="1.5">
+      NEXT.JS · TYPESCRIPT · SUPABASE
+    </tspan>
+  </text>
+</svg>

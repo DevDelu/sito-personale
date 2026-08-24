@@ -16,6 +16,13 @@ const nextConfig: NextConfig = {
           },
         ]
       : [],
+    // Serve solo SVG locali committati da noi in public/ (es. cover dei case
+    // study /progetti), mai upload di terzi: rischio XSS minimo, mitigato
+    // comunque con sandbox/CSP dedicata sull'endpoint di ottimizzazione
+    // immagini, come da raccomandazione Next.js.
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 };
 
