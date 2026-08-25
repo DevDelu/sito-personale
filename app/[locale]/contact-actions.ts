@@ -1,6 +1,7 @@
 "use server";
 
 import { Resend } from "resend";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export type ContactState = { error?: string; success?: boolean } | undefined;
 
@@ -31,8 +32,14 @@ export async function sendContactMessage(
   const errors = ERRORS[locale];
 
   // Honeypot: campo invisibile per gli umani, spesso compilato dai bot.
+  // Resta il primo filtro (gratis, prima di toccare il rate limiter).
   if (String(formData.get("azienda") ?? "").trim() !== "") {
     return { success: true };
+  }
+
+  const ip = await getClientIp();
+  if (!checkRateLimit(`contact:${ip}`, { max: 3, windowMs: 60_000 }).allowed) {
+    return { error: errors.unavailable };
   }
 
   const name = String(formData.get("name") ?? "").trim();

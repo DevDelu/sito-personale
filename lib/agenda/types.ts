@@ -30,7 +30,7 @@ export type NotaGiorno = {
 export type IntegrazioneGoogle = {
   id: string;
   refresh_token_enc: string | null;
-  access_token: string | null;
+  access_token_enc: string | null;
   access_token_scadenza: string | null;
   calendar_sync_token: string | null;
   ultimo_sync: string | null;

@@ -1,6 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { decryptToken } from "@/lib/agenda/crypto";
+import { decryptToken, encryptToken } from "@/lib/agenda/crypto";
 import {
   GoogleReauthRequiredError,
   pullGoogleEvents,
@@ -131,7 +131,7 @@ export async function runGoogleSync(): Promise<SyncResult> {
     .update({
       ultimo_sync: new Date().toISOString(),
       calendar_sync_token: pull.nextSyncToken ?? integrazione.calendar_sync_token,
-      access_token: accessToken,
+      access_token_enc: encryptToken(accessToken),
     })
     .eq("id", integrazione.id);
 

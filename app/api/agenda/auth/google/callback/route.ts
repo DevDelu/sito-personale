@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     const riga = {
       refresh_token_enc: encryptToken(tokens.refresh_token),
-      access_token: tokens.access_token,
+      access_token_enc: encryptToken(tokens.access_token),
       access_token_scadenza: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
       stato: "connesso" as const,
     };
