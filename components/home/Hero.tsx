@@ -1,12 +1,18 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 
 const LINKEDIN_URL = "https://www.linkedin.com/in/lorenzo-de-luca-83819a277/";
-// TODO(Lorenzo): carica il CV in public/ e aggiorna questo percorso.
-const CV_URL = "/cv.pdf";
+// Un CV per lingua: quello inglese non è solo il testo tradotto, ha un
+// taglio pensato per il mercato anglofono (AI Product Engineering).
+const CV_URL_BY_LOCALE: Record<string, string> = {
+  it: "/cv-it.pdf",
+  en: "/cv-en.pdf",
+};
 
 export async function Hero() {
   const t = await getTranslations("Hero");
+  const locale = await getLocale();
+  const cvUrl = CV_URL_BY_LOCALE[locale] ?? CV_URL_BY_LOCALE.it;
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center gap-6 px-6 py-20">
@@ -40,7 +46,7 @@ export async function Hero() {
             {t("linkedin")}
           </a>
           <a
-            href={CV_URL}
+            href={cvUrl}
             download
             className="shrink-0 whitespace-nowrap rounded-md border border-border px-3.5 py-2 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover sm:px-5 sm:py-2.5"
           >
