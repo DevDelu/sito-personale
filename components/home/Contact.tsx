@@ -18,8 +18,8 @@ export function Contact() {
 
   return (
     <section id="contatti" className="mx-auto w-full max-w-5xl border-t border-border px-6 py-16">
-      <RevealGroup className="max-w-2xl">
-        <RevealItem>
+      <RevealGroup>
+        <RevealItem className="max-w-2xl">
           <SectionEyebrow>contatti</SectionEyebrow>
           <h2 className="font-sans text-2xl font-bold tracking-tight">{t("title")}</h2>
           <p className="mt-2 text-sm text-muted">{t("subtitle")}</p>
@@ -27,11 +27,11 @@ export function Contact() {
 
         <RevealItem className="mt-8">
           {state?.success ? (
-            <p className="animate-slide-up rounded-md border border-border bg-surface p-5 text-sm text-foreground">
+            <p className="animate-slide-up max-w-2xl rounded-md border border-border bg-surface p-5 text-sm text-foreground">
               {t("success")}
             </p>
           ) : (
-            <form action={action} className="flex flex-col gap-5">
+            <form action={action} className="relative flex flex-col gap-5">
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="ts" value={renderedAt} />
 
@@ -40,18 +40,20 @@ export function Contact() {
                 <input id="azienda" name="azienda" type="text" tabIndex={-1} autoComplete="off" />
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="name" className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted">
-                  {t("nameLabel")}
-                </label>
-                <input id="name" name="name" type="text" required className={inputClass} />
-              </div>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="name" className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted">
+                    {t("nameLabel")}
+                  </label>
+                  <input id="name" name="name" type="text" required className={inputClass} />
+                </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="email" className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted">
-                  {t("emailLabel")}
-                </label>
-                <input id="email" name="email" type="email" required className={inputClass} />
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="email" className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted">
+                    {t("emailLabel")}
+                  </label>
+                  <input id="email" name="email" type="email" required className={inputClass} />
+                </div>
               </div>
 
               <div className="flex flex-col gap-1.5">
