@@ -15,20 +15,14 @@ export async function Hero() {
   const cvUrl = CV_URL_BY_LOCALE[locale] ?? CV_URL_BY_LOCALE.it;
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center gap-6 px-6 py-20">
-      <RevealGroup className="flex flex-col gap-6">
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-6 px-6 py-20 text-center">
+      <RevealGroup className="flex flex-col items-center gap-6">
         <RevealItem>
           <h1 className="font-sans max-w-xl text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl">
-            Lorenzo De Luca
+            {t("headline")}
           </h1>
         </RevealItem>
-        <RevealItem>
-          <p className="max-w-md text-lg leading-relaxed text-foreground">{t("headline")}</p>
-        </RevealItem>
-        <RevealItem>
-          <p className="max-w-md text-base leading-relaxed text-muted">{t("subtitle")}</p>
-        </RevealItem>
-        <RevealItem className="flex flex-nowrap items-center gap-2 overflow-x-auto pt-2 sm:gap-3">
+        <RevealItem className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto pt-2 sm:gap-3">
           <a
             href="#contatti"
             className="shrink-0 whitespace-nowrap rounded-md bg-accent px-3.5 py-2 text-sm font-medium text-accent-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md sm:px-5 sm:py-2.5"
