@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Script from "next/script";
 import { login, type LoginState } from "./actions";
 
 export function LoginForm({ redirectTo }: { redirectTo: string }) {
@@ -33,6 +34,13 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
           className="field-input bg-surface"
         />
       </div>
+
+      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+      <div
+        className="cf-turnstile"
+        data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+        data-theme="auto"
+      />
 
       {state?.error && (
         <p className="animate-slide-down text-sm text-spesa" role="alert">

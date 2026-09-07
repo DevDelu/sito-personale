@@ -1,0 +1,68 @@
+---
+slug: "radar"
+title: "Radar"
+subtitle: "Personal Digital HQ — dashboard privata e portfolio pubblico"
+category: "personal"
+cover: "/images/projects/radar-cover.svg"
+tags: ["Next.js", "TypeScript", "Supabase", "Product Architecture", "Full-Stack"]
+year: 2026
+featured: true
+role: "Product Architect & Full-Stack Developer"
+summary: "Un sito che uso ogni giorno per tenere sotto controllo spese, investimenti, agenda e collezioni, e che allo stesso tempo racconta chi sono e cosa so fare. Costruito da solo, imparando strada facendo, con l'obiettivo di spendere il più vicino possibile a zero euro al mese di hosting."
+accentColors:
+  primary: "#c25a1e"
+  secondary: "#d9822b"
+  tertiary: "#e0a458"
+stats:
+  - value: 5
+    label: "Moduli nella dashboard privata"
+  - value: 0
+    label: "Costo infrastrutturale mensile"
+    suffix: "€"
+  - value: 2
+    label: "Lingue supportate"
+---
+
+## Il contesto
+
+Questo sito che stai guardando adesso è Radar. È il posto dove tengo sotto controllo la mia vita di tutti i giorni — spese, investimenti, agenda, una collezione di carte — ed è anche il posto dove mi presento a chi legge, con progetti e percorso. Due facce della stessa medaglia: una privata, protetta da login, che uso solo io; una pubblica, che stai leggendo tu adesso.
+
+L'ho progettato e costruito da solo, un po' per necessità (mi serviva uno strumento vero, non l'ennesima app abbandonata dopo due settimane) e un po' per mettermi alla prova su tutto il percorso: dal design alle scelte tecniche, fino a tenere i costi il più vicino possibile a zero.
+
+## Il problema
+
+Avevo spese, investimenti, una collezione di carte e un'agenda piena di impegni sparsi ovunque — fogli Excel, app diverse, promemoria sul telefono. Nessun quadro d'insieme, nessuna storia coerente nel tempo. Allo stesso tempo volevo un sito personale che non fosse l'ennesimo portfolio anonimo, ma qualcosa che raccontasse davvero chi sono.
+
+La soluzione a entrambi i problemi è stata la stessa: un solo progetto, costruito con calma ma con criterio, tenendo bene a mente che ogni euro di costo doveva essere giustificato.
+
+## Architettura: due aree, una disciplina
+
+La prima decisione importante è stata tenere le due parti del sito ben separate fin dall'inizio, non solo nelle pagine ma anche nel modo in cui gestisco i dati: quello che sta nella parte privata non deve mai poter finire, nemmeno per sbaglio, in quella pubblica. In pratica significa regole di sicurezza a livello di database (Row Level Security su Supabase) su ogni tabella sensibile, pagine protette da login, e attenzione a cosa finisce nel codice pubblico su GitHub.
+
+Sopra questa base, ho pensato l'architettura per crescere un pezzo alla volta senza che aggiungere qualcosa rompa il resto: ogni modulo (spese, investimenti, carte, agenda) ha le sue tabelle, i suoi componenti, la sua pagina — condividono solo login e stile grafico.
+
+## Decisioni chiave e trade-off
+
+Un paio di scelte meritano una spiegazione, perché sono quelle da cui ho imparato di più.
+
+**Niente AI dentro l'app, regole scritte a mano.** Ogni chiamata a un modello costa, e con un budget a zero non potevo permettermi di far analizzare ogni spesa da un'intelligenza artificiale. Quindi per cose come la categorizzazione automatica delle spese uso semplici regole scritte da me — l'AI la uso *in chat*, quando serve un'analisi più approfondita, non dentro il prodotto stesso. Perdo un po' di flessibilità, guadagno velocità, prevedibilità e costo zero.
+
+**Salvare tutto, subito, non solo alla fine.** In moduli come l'allenamento o le spese, ogni passaggio importante si salva appena succede, non solo quando finisco. Se si chiude l'app o cade la connessione a metà, non perdo niente.
+
+**La storia non cambia mai.** Le tabelle che registrano cose già successe non puntano a dati che potrei modificare in futuro, ma a una loro fotografia del momento. Così se domani cambio una scheda di allenamento o una carta della collezione, quello che è già successo resta esattamente com'era.
+
+**Convivere con i limiti dei servizi gratuiti.** Google Calendar, ad esempio, con l'account che uso scade il collegamento ogni 7 giorni. Invece di trattarlo come un'eccezione fastidiosa, l'ho progettato come normale: un pulsante per riconnettersi, sempre lì quando serve. Sono questi dettagli che fanno la differenza tra un progetto che funziona per una settimana e uno che funziona per davvero, nel tempo.
+
+## Design system
+
+A livello visivo il sito ha due anime: uno sfondo scuro quasi nero con accenti color ambra (la modalità di default) e una variante più calda, color crema, in chiaro. Per i caratteri: Fraunces per i titoli, un po' più deciso ed espressivo; Space Grotesk per il testo, pulito e facile da leggere; JetBrains Mono per numeri e dettagli tecnici.
+
+Le animazioni, fatte con Framer Motion, seguono una regola semplice: ci sono solo dove aggiungono qualcosa, mai a scapito della velocità o dell'esperienza da telefono.
+
+## Cosa ho imparato
+
+Costruire Radar mi ha insegnato più sulla gestione di un progetto vero che qualsiasi corso o progetto universitario: bilanciare quello che vorrei fare con quello che ha senso fare ora, rimandare senza abbandonare (l'app di allenamento e l'assistente AI sono in lista, non nel cestino), e scrivere giù ogni decisione importante — non per qualcun altro, ma per me stesso tra sei mesi.
+
+Lavorandoci ho anche toccato con mano quanto l'intelligenza artificiale possa già oggi aiutare a costruire, organizzare e capire meglio le cose — e quanto poco ne stiamo ancora sfruttando il potenziale. È una delle ragioni per cui questo percorso mi appassiona così tanto, ed è il motivo per cui continuo a costruirci sopra.
+
+Se ti va di avere un tuo "radar" personale — uno strumento su misura per tenere sotto controllo la tua quotidianità, magari per il tuo team o per la tua azienda — scrivimi pure, senza problemi: ne parliamo volentieri.

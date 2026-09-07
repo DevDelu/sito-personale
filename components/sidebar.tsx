@@ -29,7 +29,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           onClick={onNavigate}
           className="font-display text-base font-semibold tracking-tight"
         >
-          Bussola
+          Radar
         </Link>
       </div>
 
@@ -139,7 +139,7 @@ export function Sidebar({
         >
           <Menu className="h-5 w-5" />
         </button>
-        <span className="font-display text-sm font-semibold">Bussola</span>
+        <span className="font-display text-sm font-semibold">Radar</span>
         {accountSlot}
       </div>
 

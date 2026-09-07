@@ -22,8 +22,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bussola",
-  description: "Bussola — spese, investimenti, collezione e agenda personali.",
+  title: "Radar",
+  description: "Radar — spese, investimenti, collezione e agenda personali.",
 };
 
 // viewportFit "cover": disegna sotto la notch/home-indicator invece di

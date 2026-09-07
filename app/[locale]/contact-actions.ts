@@ -2,6 +2,7 @@
 
 import { Resend } from "resend";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 export type ContactState = { error?: string; success?: boolean } | undefined;
 
@@ -11,18 +12,22 @@ const ERRORS = {
     invalidEmail: "Inserisci un'email valida.",
     unavailable: "Servizio momentaneamente non disponibile, riprova più tardi.",
     sendFailed: "Invio non riuscito, riprova più tardi.",
+    botCheck: "Verifica anti-spam non superata, riprova.",
   },
   en: {
     required: "Please fill in all fields.",
     invalidEmail: "Enter a valid email address.",
     unavailable: "Service temporarily unavailable, please try again later.",
     sendFailed: "Sending failed, please try again later.",
+    botCheck: "Anti-spam check failed, please try again.",
   },
 } as const;
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+const MIN_SUBMIT_MS = 1500;
 
 export async function sendContactMessage(
   _prevState: ContactState,
@@ -31,15 +36,23 @@ export async function sendContactMessage(
   const locale = String(formData.get("locale") ?? "it") === "en" ? "en" : "it";
   const errors = ERRORS[locale];
 
-  // Honeypot: campo invisibile per gli umani, spesso compilato dai bot.
-  // Resta il primo filtro (gratis, prima di toccare il rate limiter).
   if (String(formData.get("azienda") ?? "").trim() !== "") {
+    return { success: true };
+  }
+
+  const renderedAt = Number(formData.get("ts") ?? 0);
+  if (!renderedAt || Date.now() - renderedAt < MIN_SUBMIT_MS) {
     return { success: true };
   }
 
   const ip = await getClientIp();
   if (!checkRateLimit(`contact:${ip}`, { max: 3, windowMs: 60_000 }).allowed) {
     return { error: errors.unavailable };
+  }
+
+  const turnstileToken = String(formData.get("cf-turnstile-response") ?? "");
+  if (!turnstileToken || !(await verifyTurnstileToken(turnstileToken, ip))) {
+    return { error: errors.botCheck };
   }
 
   const name = String(formData.get("name") ?? "").trim();

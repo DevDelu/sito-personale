@@ -8,8 +8,10 @@
   },
   "About": {
     "title": "About me",
-    "p1": "I'm Lorenzo. I currently work as a PMO, coordinating projects, people and deadlines where process meets technology. Before that, a UX/UI design thesis taught me to always start from real data and real people before designing a solution.",
-    "p2": "Right now I'm shifting toward AI Product Engineering: studying and building tools that combine product thinking, design and development — this site included, built from scratch with Next.js and Supabase more as an ongoing training ground than a business card."
+    "p1": "I'm Lorenzo. I currently work as a PMO, coordinating projects, people and deadlines where process meets technology. Before that, a UX/UI design thesis taught me to always start from real data and real people before designing anything.",
+    "p2": "Lately I've been shifting more and more toward AI applied to digital products: I study and build tools that mix design, development and a bit of product thinking — this site included, built more as an ongoing training ground than a business card.",
+    "p3": "Outside of work I stay busy between dumbbells and pull-up bars: I do calisthenics consistently, I recently discovered I really love boxing, and sooner or later I'll get back into swimming too. I also collect trading cards — using tournaments across Europe as an excuse, I manage to mix fun and travel, which isn't a bad excuse at all.",
+    "p4": "I follow economic news and market trends out of genuine curiosity, mostly just to understand how the world moves. And there's always a side project or two in the works — I like building things to learn, and I'm always up for a new challenge."
   },
   "Skills": {
     "title": "Skills",
@@ -37,27 +39,6 @@
     "personal": "Personal project",
     "work": "Work",
     "hackathon": "Hackathon"
-  },
-  "Hobbies": {
-    "title": "Hobbies",
-    "items": [
-      {
-        "title": "Training",
-        "description": "Gym and consistency: I track workouts and progress with the same discipline I bring to work."
-      },
-      {
-        "title": "Trading cards",
-        "description": "I collect trading cards, between hunting missing pieces and curating the collection."
-      },
-      {
-        "title": "Investing",
-        "description": "I follow ETFs and markets as an exercise in patience and long-term data reading."
-      },
-      {
-        "title": "Side projects",
-        "description": "I build small tools for myself — this site is the latest one — to learn by doing."
-      }
-    ]
   },
   "Contact": {
     "title": "Contact",

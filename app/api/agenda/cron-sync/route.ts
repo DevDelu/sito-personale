@@ -27,9 +27,9 @@ async function inviaAvvisoRiconnessione(): Promise<void> {
   const resend = new Resend(apiKey);
   const reconnectUrl = `${siteUrl()}/agenda`;
   await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "Bussola <onboarding@resend.dev>",
+    from: process.env.RESEND_FROM_EMAIL || "Radar <onboarding@resend.dev>",
     to: destinatario,
-    subject: "Bussola: riconnessione Google richiesta",
+    subject: "Radar: riconnessione Google richiesta",
     html: `
       <p>La sincronizzazione notturna dell'Agenda non è riuscita a rinnovare il collegamento con Google: il refresh token è scaduto (modalità Testing del consent screen, scadenza a 7 giorni).</p>
       <p><a href="${reconnectUrl}">Vai alla pagina Agenda per riconnettere Google</a></p>
