@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import Script from "next/script";
 import { useLocale, useTranslations } from "next-intl";
 import { sendContactMessage, type ContactState } from "@/app/[locale]/contact-actions";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
@@ -13,10 +14,11 @@ export function Contact() {
   const t = useTranslations("Contact");
   const locale = useLocale();
   const [state, action, pending] = useActionState<ContactState, FormData>(sendContactMessage, undefined);
+  const [renderedAt] = useState(() => Date.now());
 
   return (
-    <section id="contatti" className="mx-auto w-full max-w-2xl border-t border-border px-6 py-16">
-      <RevealGroup>
+    <section id="contatti" className="mx-auto w-full max-w-5xl border-t border-border px-6 py-16">
+      <RevealGroup className="max-w-2xl">
         <RevealItem>
           <SectionEyebrow>contatti</SectionEyebrow>
           <h2 className="font-sans text-2xl font-bold tracking-tight">{t("title")}</h2>
@@ -31,8 +33,8 @@ export function Contact() {
           ) : (
             <form action={action} className="flex flex-col gap-5">
               <input type="hidden" name="locale" value={locale} />
-              {/* Honeypot: nascosto via CSS, non con `hidden`, così i bot che
-                  ignorano gli stili lo compilano comunque. */}
+              <input type="hidden" name="ts" value={renderedAt} />
+
               <div className="absolute -left-[9999px]" aria-hidden="true">
                 <label htmlFor="azienda">Azienda</label>
                 <input id="azienda" name="azienda" type="text" tabIndex={-1} autoComplete="off" />
@@ -58,6 +60,13 @@ export function Contact() {
                 </label>
                 <textarea id="message" name="message" required rows={5} className={`${inputClass} resize-none`} />
               </div>
+
+              <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+              <div
+                className="cf-turnstile"
+                data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+                data-theme="auto"
+              />
 
               {state?.error && (
                 <p className="animate-slide-down text-sm text-stamp" role="alert">

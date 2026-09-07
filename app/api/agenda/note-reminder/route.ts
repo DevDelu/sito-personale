@@ -66,7 +66,7 @@ export async function GET(request: Request) {
   const resend = new Resend(apiKey);
   try {
     await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || "Bussola <onboarding@resend.dev>",
+      from: process.env.RESEND_FROM_EMAIL || "Radar <onboarding@resend.dev>",
       to: destinatario,
       subject: `Promemoria: nota di oggi (${formatDataLunga(data)})`,
       html: `

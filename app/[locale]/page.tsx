@@ -4,7 +4,6 @@ import { Hero } from "@/components/home/Hero";
 import { About } from "@/components/home/About";
 import { Skills } from "@/components/home/Skills";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
-import { Hobbies } from "@/components/home/Hobbies";
 import { Contact } from "@/components/home/Contact";
 
 export const metadata: Metadata = { title: "Delu" };
@@ -23,7 +22,6 @@ export default async function HomePage({
       <About />
       <Skills />
       <FeaturedProjects />
-      <Hobbies />
       <Contact />
     </>
   );

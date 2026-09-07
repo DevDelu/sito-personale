@@ -8,8 +8,10 @@
   },
   "About": {
     "title": "Chi sono",
-    "p1": "Sono Lorenzo, attualmente lavoro come PMO: coordino progetti, persone e scadenze dove processo e tecnologia si incontrano. Prima ancora, una tesi triennale in UX/UI design mi ha insegnato a partire sempre dai dati e dalle persone reali prima di disegnare una soluzione.",
-    "p2": "Oggi sto spostando il baricentro verso l'AI Product Engineering: studio e costruisco strumenti che uniscono product thinking, design e sviluppo, questo sito compreso — costruito da zero con Next.js e Supabase come palestra continua più che come biglietto da visita."
+    "p1": "Sono Lorenzo: lavoro come PMO, mi occupo di far incontrare processi, persone e scadenze in progetti dove la tecnologia gioca un ruolo centrale. Prima, una tesi in UX/UI design mi ha insegnato a partire sempre dai dati e dalle persone vere prima di disegnare qualsiasi soluzione.",
+    "p2": "Ultimamente mi sto spostando sempre di più verso il mondo dell'AI applicata ai prodotti digitali: studio e costruisco strumenti che uniscono design, sviluppo e un po' di ragionamento da product manager — questo sito compreso, nato più come palestra personale che come biglietto da visita.",
+    "p3": "Fuori dal lavoro mi tengo impegnato tra manubri e sbarre: faccio calisthenics con costanza, di recente ho scoperto che mi piace un sacco boxare, e presto o tardi tornerò anche a nuotare. Colleziono anche carte — con la scusa dei tornei in giro per l'Europa riesco a unire divertimento e viaggi, che non è affatto male come pretesto.",
+    "p4": "Seguo con curiosità le notizie economiche e i trend dei mercati, più per il gusto di capire come si muove il mondo che per altro. E poi ci sono sempre uno o due side project in cantiere: mi piace costruire cose per imparare, e resto aperto a nuove sfide."
   },
   "Skills": {
     "title": "Competenze",
@@ -37,27 +39,6 @@
     "personal": "Progetto personale",
     "work": "Lavoro",
     "hackathon": "Hackathon"
-  },
-  "Hobbies": {
-    "title": "Passioni",
-    "items": [
-      {
-        "title": "Allenamento",
-        "description": "Palestra e costanza: tengo traccia di schede e progressi con la stessa disciplina che metto nel lavoro."
-      },
-      {
-        "title": "Carte collezionabili",
-        "description": "Colleziono carte collezionabili, tra ricerca dei pezzi mancanti e cura della collezione."
-      },
-      {
-        "title": "Investimenti",
-        "description": "Seguo ETF e mercati come esercizio di pazienza e di lettura dei dati nel lungo periodo."
-      },
-      {
-        "title": "Side project",
-        "description": "Costruisco piccoli strumenti per me stesso — questo sito è il più recente — per imparare facendo."
-      }
-    ]
   },
   "Contact": {
     "title": "Contatti",
