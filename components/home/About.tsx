@@ -10,19 +10,18 @@ export async function About() {
     <section id="chi-sono" className="mx-auto w-full max-w-5xl border-t border-border px-6 py-16">
       <RevealGroup className="flex flex-col gap-8 sm:flex-row sm:items-start">
         <RevealItem className="shrink-0 self-center sm:self-start">
-          <div className="relative h-48 w-48 overflow-hidden rounded-md border border-border sm:h-56 sm:w-56">
-            <Image
-              src="/images/lorenzo-about.jpg"
-              alt="Lorenzo De Luca"
-              fill
-              sizes="224px"
-              className="object-cover"
-              style={{ objectPosition: "50% 15%" }}
-            />
-          </div>
+          <Image
+            src="/images/lorenzo-about.png"
+            alt="Lorenzo De Luca"
+            width={738}
+            height={1145}
+            sizes="(min-width: 640px) 320px, 260px"
+            className="h-auto w-[260px] object-contain sm:w-[320px]"
+            priority
+          />
         </RevealItem>
 
-        <div className="flex max-w-md flex-col gap-4">
+        <div className="flex flex-1 flex-col gap-4">
           <RevealItem>
             <SectionEyebrow>chi-sono</SectionEyebrow>
             <h2 className="font-sans text-2xl font-bold tracking-tight">{t("title")}</h2>
