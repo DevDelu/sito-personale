@@ -6,7 +6,7 @@ import { Skills } from "@/components/home/Skills";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
 import { Contact } from "@/components/home/Contact";
 
-export const metadata: Metadata = { title: "Delu" };
+export const metadata: Metadata = { title: "Lorenzo De Luca" };
 
 export default async function HomePage({
   params,

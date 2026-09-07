@@ -18,14 +18,12 @@ export async function Hero() {
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center gap-6 px-6 py-20">
       <RevealGroup className="flex flex-col gap-6">
         <RevealItem>
-          <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
-            # lorenzo-de-luca
-          </span>
+          <h1 className="font-sans max-w-xl text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl">
+            Lorenzo De Luca
+          </h1>
         </RevealItem>
         <RevealItem>
-          <h1 className="font-sans max-w-xl text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl">
-            {t("headline")}
-          </h1>
+          <p className="max-w-md text-lg leading-relaxed text-foreground">{t("headline")}</p>
         </RevealItem>
         <RevealItem>
           <p className="max-w-md text-base leading-relaxed text-muted">{t("subtitle")}</p>
