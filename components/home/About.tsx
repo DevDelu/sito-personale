@@ -8,19 +8,7 @@ export async function About() {
 
   return (
     <section id="chi-sono" className="mx-auto w-full max-w-5xl border-t border-border px-6 py-16">
-      <RevealGroup className="flex flex-col gap-8 sm:flex-row sm:items-start">
-        <RevealItem className="shrink-0 self-center sm:self-start">
-          <Image
-            src="/images/lorenzo-about.png"
-            alt="Lorenzo De Luca"
-            width={738}
-            height={1145}
-            sizes="(min-width: 640px) 320px, 260px"
-            className="h-auto w-[260px] object-contain sm:w-[320px]"
-            priority
-          />
-        </RevealItem>
-
+      <RevealGroup className="flex flex-col gap-10 sm:flex-row sm:items-start sm:gap-8">
         <div className="flex flex-1 flex-col gap-4">
           <RevealItem>
             <SectionEyebrow>chi-sono</SectionEyebrow>
@@ -33,6 +21,18 @@ export async function About() {
             <p>{t("p4")}</p>
           </RevealItem>
         </div>
+
+        <RevealItem className="shrink-0 self-center sm:self-start">
+          <Image
+            src="/images/lorenzo-about.png"
+            alt="Lorenzo De Luca"
+            width={738}
+            height={1145}
+            sizes="(min-width: 640px) 320px, 240px"
+            className="h-auto w-[240px] object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.25)] sm:w-[320px]"
+            priority
+          />
+        </RevealItem>
       </RevealGroup>
     </section>
   );
