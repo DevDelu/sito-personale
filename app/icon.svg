@@ -1,0 +1,22 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#1c2333" />
+      <stop offset="100%" stop-color="#0b0e14" />
+    </radialGradient>
+    <radialGradient id="blipGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f2b673" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#f2b673" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <circle cx="128" cy="128" r="128" fill="url(#bg)" />
+  <circle cx="128" cy="128" r="90" fill="none" stroke="#e0a458" stroke-width="10" opacity="0.85" />
+  <circle cx="128" cy="128" r="52" fill="none" stroke="#e0a458" stroke-width="7" opacity="0.5" />
+  <line x1="128" y1="26" x2="128" y2="50" stroke="#e0a458" stroke-width="8" stroke-linecap="round" opacity="0.7" />
+  <line x1="128" y1="206" x2="128" y2="230" stroke="#e0a458" stroke-width="8" stroke-linecap="round" opacity="0.4" />
+  <line x1="26" y1="128" x2="50" y2="128" stroke="#e0a458" stroke-width="8" stroke-linecap="round" opacity="0.4" />
+  <line x1="206" y1="128" x2="230" y2="128" stroke="#e0a458" stroke-width="8" stroke-linecap="round" opacity="0.4" />
+  <circle cx="168" cy="88" r="26" fill="url(#blipGlow)" />
+  <circle cx="168" cy="88" r="11" fill="#f2b673" />
+  <circle cx="128" cy="128" r="9" fill="#0b0e14" stroke="#f2b673" stroke-width="6" />
+</svg>
