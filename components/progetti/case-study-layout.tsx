@@ -24,30 +24,28 @@ export function CaseStudyLayout({
   return (
     <article className="mx-auto max-w-5xl px-6 py-16">
       <RevealGroup className="flex flex-col">
-        <div className="max-w-2xl">
-          <RevealItem>
-            <Link
-              href="/"
-              className="inline-block py-2 font-mono text-sm text-muted transition-colors hover:text-foreground"
-            >
-              ← {backLinkLabel}
-            </Link>
-          </RevealItem>
+        <RevealItem>
+          <Link
+            href="/"
+            className="inline-block py-2 font-mono text-sm text-muted transition-colors hover:text-foreground"
+          >
+            ← {backLinkLabel}
+          </Link>
+        </RevealItem>
 
-          <RevealItem className="mt-8">
-            <span className="font-mono text-xs uppercase tracking-wide" style={{ color: accent.primary }}>
-              {categoryLabel} · {project.year}
-            </span>
-          </RevealItem>
+        <RevealItem className="mt-8">
+          <span className="font-mono text-xs uppercase tracking-wide" style={{ color: accent.primary }}>
+            {categoryLabel} · {project.year}
+          </span>
+        </RevealItem>
 
-          <RevealItem className="mt-3">
-            <h1 className="font-display text-3xl font-medium italic text-foreground sm:text-4xl">{project.title}</h1>
-          </RevealItem>
+        <RevealItem className="mt-3">
+          <h1 className="font-display text-3xl font-medium italic text-foreground sm:text-4xl">{project.title}</h1>
+        </RevealItem>
 
-          <RevealItem className="mt-4">
-            <p className="max-w-[44ch] text-base leading-relaxed text-muted">{project.summary}</p>
-          </RevealItem>
-        </div>
+        <RevealItem className="mt-4">
+          <p className="text-base leading-relaxed text-muted">{project.summary}</p>
+        </RevealItem>
 
         {project.cover ? (
           <RevealItem className="mt-8">
@@ -58,7 +56,7 @@ export function CaseStudyLayout({
         ) : null}
 
         {project.stats && project.stats.length > 0 ? (
-          <RevealItem className="mt-10 grid max-w-2xl grid-cols-3 gap-3 border-y border-border py-6 sm:gap-6">
+          <RevealItem className="mt-10 grid grid-cols-3 gap-3 border-y border-border py-6 sm:gap-6">
             {project.stats.map((stat, index) => {
               const colors = [accent.primary, accent.secondary, accent.tertiary];
               return (
@@ -78,7 +76,7 @@ export function CaseStudyLayout({
       </RevealGroup>
 
       <div
-        className="mt-4 max-w-2xl [&_h2:nth-of-type(even)]:[border-left-color:var(--accent-tertiary)] [&_h2:nth-of-type(odd)]:[border-left-color:var(--accent-primary)]"
+        className="mt-4 [&_h2:nth-of-type(even)]:[border-left-color:var(--accent-tertiary)] [&_h2:nth-of-type(odd)]:[border-left-color:var(--accent-primary)]"
         style={
           {
             "--accent-primary": accent.primary,
@@ -90,7 +88,7 @@ export function CaseStudyLayout({
       </div>
 
       {project.links && project.links.length > 0 ? (
-        <div className="mt-12 flex max-w-2xl flex-wrap gap-4 border-t border-border pt-8">
+        <div className="mt-12 flex flex-wrap gap-4 border-t border-border pt-8">
           {project.links.map((link) => (
             <a
               key={link.url}

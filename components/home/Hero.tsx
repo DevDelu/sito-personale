@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
+import { DownloadCvButton } from "@/components/home/download-cv-button";
 
 const LINKEDIN_URL = "https://www.linkedin.com/in/lorenzo-de-luca-83819a277/";
 // Un CV per lingua: quello inglese non è solo il testo tradotto, ha un
@@ -37,13 +38,12 @@ export async function Hero() {
           >
             {t("linkedin")}
           </a>
-          <a
+          <DownloadCvButton
             href={cvUrl}
-            download
+            filename={cvUrl.slice(1)}
+            label={t("ctaCv")}
             className="shrink-0 whitespace-nowrap rounded-md border border-border px-3.5 py-2 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover sm:px-5 sm:py-2.5"
-          >
-            {t("ctaCv")}
-          </a>
+          />
         </RevealItem>
       </RevealGroup>
     </main>
