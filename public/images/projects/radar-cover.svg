@@ -5,24 +5,28 @@
       <stop offset="55%" stop-color="#0b0e14" />
       <stop offset="100%" stop-color="#08090d" />
     </radialGradient>
-    <radialGradient id="dialFade" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#e0a458" stop-opacity="0.3" />
-      <stop offset="70%" stop-color="#e0a458" stop-opacity="0.09" />
+    <radialGradient id="screenFade" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e0a458" stop-opacity="0.32" />
+      <stop offset="70%" stop-color="#e0a458" stop-opacity="0.1" />
       <stop offset="100%" stop-color="#e0a458" stop-opacity="0" />
     </radialGradient>
     <linearGradient id="titleFade" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#fffdf8" />
       <stop offset="100%" stop-color="#e8c9a3" />
     </linearGradient>
-    <linearGradient id="needleN" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0%" stop-color="#c25a1e" />
-      <stop offset="100%" stop-color="#f2b673" />
-    </linearGradient>
+    <radialGradient id="sweepFade" cx="0%" cy="100%" r="100%">
+      <stop offset="0%" stop-color="#f2b673" stop-opacity="0.85" />
+      <stop offset="60%" stop-color="#e0a458" stop-opacity="0.28" />
+      <stop offset="100%" stop-color="#e0a458" stop-opacity="0" />
+    </radialGradient>
     <filter id="blur1" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="80" />
     </filter>
     <filter id="blur2" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="60" />
+    </filter>
+    <filter id="blipGlow" x="-200%" y="-200%" width="500%" height="500%">
+      <feGaussianBlur stdDeviation="6" />
     </filter>
     <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
       <path d="M64 0H0V64" fill="none" stroke="#e8792e" stroke-opacity="0.05" stroke-width="1" />
@@ -35,41 +39,55 @@
   <circle cx="1360" cy="120" r="280" fill="#c25a1e" opacity="0.3" filter="url(#blur1)" />
   <circle cx="40" cy="900" r="240" fill="#e0a458" opacity="0.16" filter="url(#blur2)" />
 
-  <!-- Motivo bussola: quadrante circolare, protagonista visivo a destra
-       (non un'icona letterale di UI, ma il riferimento diretto al nome). -->
+  <!-- Radar cerca-sfere stilizzato: dispositivo circolare con schermo,
+       antenna e alcuni "blip" — protagonista visivo a destra, come
+       richiamo diretto al nome del progetto. -->
   <g transform="translate(1280,450) scale(0.65)">
-    <circle r="380" fill="url(#dialFade)" />
-    <circle r="320" fill="none" stroke="#e0a458" stroke-opacity="0.45" stroke-width="2" />
-    <circle r="250" fill="none" stroke="#e0a458" stroke-opacity="0.28" stroke-width="1" />
-    <circle r="180" fill="none" stroke="#e0a458" stroke-opacity="0.18" stroke-width="1" />
+    <!-- antenna -->
+    <line x1="0" y1="-352" x2="0" y2="-404" stroke="#8a8578" stroke-width="5" stroke-linecap="round" />
+    <circle cx="0" cy="-410" r="9" fill="#e0a458" opacity="0.8" />
 
-    <g stroke="#e0a458" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round">
-      <line x1="0" y1="-320" x2="0" y2="-286" />
-      <line x1="0" y1="320" x2="0" y2="286" />
-      <line x1="-320" y1="0" x2="-286" y2="0" />
-      <line x1="320" y1="0" x2="286" y2="0" />
-    </g>
-    <g stroke="#e0a458" stroke-opacity="0.3" stroke-width="1.5">
-      <line x1="-226" y1="-226" x2="-203" y2="-203" />
-      <line x1="226" y1="-226" x2="203" y2="-203" />
-      <line x1="-226" y1="226" x2="-203" y2="203" />
-      <line x1="226" y1="226" x2="203" y2="203" />
+    <!-- corpo/cassa esterna -->
+    <circle r="352" fill="#11151f" stroke="#726f63" stroke-opacity="0.55" stroke-width="6" />
+    <circle r="352" fill="none" stroke="#e0a458" stroke-opacity="0.12" stroke-width="14" />
+
+    <!-- tasti sulla cassa -->
+    <circle cx="-300" cy="120" r="16" fill="none" stroke="#726f63" stroke-opacity="0.6" stroke-width="3" />
+    <circle cx="300" cy="120" r="16" fill="none" stroke="#726f63" stroke-opacity="0.6" stroke-width="3" />
+
+    <!-- schermo -->
+    <circle r="300" fill="url(#screenFade)" />
+    <circle r="300" fill="none" stroke="#e0a458" stroke-opacity="0.45" stroke-width="3" />
+    <circle r="230" fill="none" stroke="#e0a458" stroke-opacity="0.28" stroke-width="1.5" />
+    <circle r="160" fill="none" stroke="#e0a458" stroke-opacity="0.2" stroke-width="1.5" />
+    <circle r="90" fill="none" stroke="#e0a458" stroke-opacity="0.14" stroke-width="1.5" />
+
+    <g stroke="#e0a458" stroke-opacity="0.22" stroke-width="1.5">
+      <line x1="-300" y1="0" x2="300" y2="0" />
+      <line x1="0" y1="-300" x2="0" y2="300" />
     </g>
 
-    <text x="0" y="-336" text-anchor="middle" font-family="Courier New, monospace" font-size="18" letter-spacing="2" fill="#e0a458" opacity="0.7">N</text>
-    <text x="0" y="352" text-anchor="middle" font-family="Courier New, monospace" font-size="18" letter-spacing="2" fill="#726f63">S</text>
-    <text x="-344" y="6" text-anchor="middle" font-family="Courier New, monospace" font-size="18" letter-spacing="2" fill="#726f63">O</text>
-    <text x="344" y="6" text-anchor="middle" font-family="Courier New, monospace" font-size="18" letter-spacing="2" fill="#726f63">E</text>
-
-    <g transform="rotate(-18)">
-      <path d="M0 -210 L26 30 L0 6 L-26 30 Z" fill="url(#needleN)" />
-      <path d="M0 210 L20 -24 L0 -4 L-20 -24 Z" fill="#4a4640" opacity="0.8" />
+    <!-- braccio di scansione -->
+    <g transform="rotate(-46)">
+      <path d="M0 0 L0 -300 A300 300 0 0 1 148 -260 Z" fill="url(#sweepFade)" />
+      <line x1="0" y1="0" x2="0" y2="-300" stroke="#f2b673" stroke-opacity="0.8" stroke-width="3" />
     </g>
-    <circle r="10" fill="#0b0e14" stroke="#f2b673" stroke-width="2.5" />
+
+    <!-- blip: bersagli rilevati sullo schermo -->
+    <circle cx="-96" cy="-150" r="8" fill="#e0a458" opacity="0.85" />
+    <circle cx="130" cy="-70" r="7" fill="#d9822b" opacity="0.8" />
+    <circle cx="60" cy="150" r="7" fill="#e0a458" opacity="0.75" />
+    <circle cx="-150" cy="90" r="6" fill="#d9822b" opacity="0.7" />
+    <circle cx="-40" cy="40" r="13" fill="#f2b673" filter="url(#blipGlow)" opacity="0.9" />
+    <circle cx="-40" cy="40" r="13" fill="none" stroke="#fffdf8" stroke-width="2" opacity="0.8" />
+    <circle cx="-40" cy="40" r="26" fill="none" stroke="#f2b673" stroke-width="1.5" opacity="0.45" />
+
+    <!-- perno centrale -->
+    <circle r="12" fill="#0b0e14" stroke="#f2b673" stroke-width="3" />
   </g>
 
   <text x="106" y="440" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-weight="600" font-size="176" fill="url(#titleFade)">
-    Bussola
+    Radar
   </text>
 
   <text x="110" y="504" font-family="Arial, sans-serif" font-size="27" letter-spacing="0.3" fill="#a8a599">
