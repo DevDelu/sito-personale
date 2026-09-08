@@ -10,8 +10,7 @@ import {
 } from "motion/react";
 
 // La headline reagisce al cursore in due modi, entrambi ancorati alla
-// posizione del mouse dentro il proprio riquadro (non alla finestra intera,
-// a differenza dello sfondo di HeroCursorField): un lieve tilt 3D del testo
+// posizione del mouse dentro il proprio riquadro: un lieve tilt 3D del testo
 // e una seconda copia colorata accent, sovrapposta e "ritagliata" da uno
 // spotlight radiale che segue il cursore — l'effetto luce-che-scopre-colore
 // resta la reazione principale, il tilt è solo un accento in più. Con
