@@ -108,7 +108,11 @@
   --border: #d9d2ba;
   --foreground: #17140f;
   --muted: #6b6554;
-  --accent: #1f6f63;
+  /* Bordeaux campionato dal completo nella foto di About (media dei pixel
+     della giacca, poi schiarito da L~24% a L~32% per restare leggibile
+     come colore UI: contrasto 8.35:1 su --background, meglio del verde
+     acqua che sostituisce). */
+  --accent: #7e2537;
   --accent-foreground: #f3f0e7;
   --stamp: #b24630;
 }
@@ -120,7 +124,9 @@
   --border: #223029;
   --foreground: #f1eee4;
   --muted: #98998e;
-  --accent: #34b39f;
+  /* Stessa tinta della variante chiara, schiarita ulteriormente (L~58%)
+     per restare leggibile su sfondo quasi nero: contrasto 4.77:1. */
+  --accent: #d4546d;
   --accent-foreground: #0c1210;
   --stamp: #e37155;
 }
