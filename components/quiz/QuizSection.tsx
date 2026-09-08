@@ -3,6 +3,7 @@ import { Sparkles } from "lucide-react";
 import { SectionEyebrow } from "@/components/home/section-eyebrow";
 import { LeaderboardPreview } from "./LeaderboardPreview";
 import { QuizLauncher } from "./QuizLauncher";
+import { QuizSectionReveal } from "./QuizSectionReveal";
 
 // Teaser sempre presente lato server, leggero (nessun timer/stato di gioco):
 // solo testo statico + top 5 della classifica. Il motore di gioco vero e
@@ -19,7 +20,7 @@ export function QuizSection() {
         className="pointer-events-none absolute -right-16 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-accent/10 blur-3xl"
         aria-hidden="true"
       />
-      <div className="relative animate-pop-in rounded-2xl border-2 border-accent/25 bg-surface p-6 shadow-lg sm:p-10">
+      <QuizSectionReveal>
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-10">
           <div className="flex flex-1 flex-col gap-4">
             <SectionEyebrow>prima di continuare a leggere</SectionEyebrow>
@@ -41,7 +42,7 @@ export function QuizSection() {
             </Suspense>
           </div>
         </div>
-      </div>
+      </QuizSectionReveal>
     </section>
   );
 }

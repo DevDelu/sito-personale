@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 import { DownloadCvButton } from "@/components/home/download-cv-button";
+import { HeroCursorField } from "@/components/home/hero-cursor-field";
 
 const LINKEDIN_URL = "https://www.linkedin.com/in/lorenzo-de-luca-83819a277/";
 // Un CV per lingua: quello inglese non è solo il testo tradotto, ha un
@@ -21,23 +22,26 @@ export async function Hero() {
   const cvUrl = CV_URL_BY_LOCALE[locale] ?? CV_URL_BY_LOCALE.it;
 
   return (
-    <main className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-2xl flex-1 flex-col items-center justify-center gap-8 px-6 py-20 text-center">
-      <RevealGroup className="flex flex-col items-center gap-8">
-        <RevealItem>
-          <h1 className="font-sans max-w-xl text-5xl font-bold leading-[1.1] tracking-tight sm:text-6xl">
-            {t("headline")}
-          </h1>
-        </RevealItem>
-        <RevealItem className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto pt-2 sm:gap-3">
-          <a href="#contatti" className={HERO_BUTTON_CLASS}>
-            {t("ctaContact")}
-          </a>
-          <a href={LINKEDIN_URL} target="_blank" rel="noreferrer" className={HERO_BUTTON_CLASS}>
-            {t("linkedin")}
-          </a>
-          <DownloadCvButton href={cvUrl} filename={cvUrl.slice(1)} label={t("ctaCv")} className={HERO_BUTTON_CLASS} />
-        </RevealItem>
-      </RevealGroup>
-    </main>
+    <div className="relative w-full flex-1 overflow-hidden">
+      <HeroCursorField />
+      <main className="relative z-10 mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-2xl flex-col items-center justify-center gap-8 px-6 py-20 text-center">
+        <RevealGroup className="flex flex-col items-center gap-8">
+          <RevealItem>
+            <h1 className="font-sans max-w-xl text-5xl font-bold leading-[1.1] tracking-tight sm:text-6xl">
+              {t("headline")}
+            </h1>
+          </RevealItem>
+          <RevealItem className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto pt-2 sm:gap-3">
+            <a href="#contatti" className={HERO_BUTTON_CLASS}>
+              {t("ctaContact")}
+            </a>
+            <a href={LINKEDIN_URL} target="_blank" rel="noreferrer" className={HERO_BUTTON_CLASS}>
+              {t("linkedin")}
+            </a>
+            <DownloadCvButton href={cvUrl} filename={cvUrl.slice(1)} label={t("ctaCv")} className={HERO_BUTTON_CLASS} />
+          </RevealItem>
+        </RevealGroup>
+      </main>
+    </div>
   );
 }
