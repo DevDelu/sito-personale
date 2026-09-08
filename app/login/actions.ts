@@ -8,7 +8,7 @@ import { verifyTurnstileToken } from "@/lib/turnstile";
 
 export type LoginState = { error?: string } | undefined;
 
-function siteUrl(): string {
+export function siteUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return "http://localhost:3000";
@@ -74,6 +74,40 @@ export async function login(
   }
 
   redirect(redirectTo.startsWith("/") ? redirectTo : "/spese");
+}
+
+export type RequestResetState = { error?: string; sent?: boolean } | undefined;
+
+// La risposta è identica per email esistente e inesistente (il messaggio
+// "sent" è nel form): non conferma se un indirizzo è registrato — l'app ha
+// comunque un solo account, quello del proprietario, ma resta la pratica
+// corretta per un form pubblico.
+export async function requestPasswordReset(
+  _prevState: RequestResetState,
+  formData: FormData
+): Promise<RequestResetState> {
+  const ip = await getClientIp();
+
+  if (!checkRateLimit(`reset-request:${ip}`, { max: 3, windowMs: 15 * 60_000 }).allowed) {
+    return { error: "Troppi tentativi, riprova tra poco." };
+  }
+
+  const turnstileToken = String(formData.get("cf-turnstile-response") ?? "");
+  if (!turnstileToken || !(await verifyTurnstileToken(turnstileToken, ip))) {
+    return { error: "Verifica anti-spam non superata, riprova." };
+  }
+
+  const email = String(formData.get("email") ?? "");
+  if (!email) {
+    return { error: "Inserisci un indirizzo email." };
+  }
+
+  const supabase = await createClient();
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${siteUrl()}/auth/callback?redirect_to=/reset-password`,
+  });
+
+  return { sent: true };
 }
 
 export async function logout() {
