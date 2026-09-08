@@ -5,8 +5,14 @@ import { About } from "@/components/home/About";
 import { Skills } from "@/components/home/Skills";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
 import { Contact } from "@/components/home/Contact";
+import { QuizSection } from "@/components/quiz/QuizSection";
 
 export const metadata: Metadata = { title: "Lorenzo De Luca" };
+
+// Il teaser del quiz (top 5 in classifica) è una query diretta a Supabase in
+// un Server Component: revalidate qui, a livello di route segment, tiene la
+// classifica ragionevolmente fresca senza farla ricalcolare a ogni request.
+export const revalidate = 60;
 
 export default async function HomePage({
   params,
@@ -20,6 +26,7 @@ export default async function HomePage({
     <>
       <Hero />
       <About />
+      <QuizSection />
       <Skills />
       <FeaturedProjects />
       <Contact />
