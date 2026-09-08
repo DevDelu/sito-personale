@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
+import { SectionEyebrow } from "@/components/home/section-eyebrow";
 
 export async function About() {
   const t = await getTranslations("About");
@@ -10,7 +11,8 @@ export async function About() {
       <RevealGroup className="flex flex-col gap-10 sm:flex-row sm:items-start sm:gap-8">
         <div className="flex flex-1 flex-col gap-4">
           <RevealItem>
-            <h2 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">{t("title")}</h2>
+            <SectionEyebrow>chi-sono</SectionEyebrow>
+            <h2 className="font-sans text-2xl font-bold tracking-tight">{t("title")}</h2>
           </RevealItem>
           <RevealItem className="flex flex-col gap-4 text-base leading-relaxed text-muted">
             <p>{t("p1")}</p>
