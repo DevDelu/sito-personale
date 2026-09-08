@@ -5,7 +5,6 @@ import Script from "next/script";
 import { useLocale, useTranslations } from "next-intl";
 import { sendContactMessage, type ContactState } from "@/app/[locale]/contact-actions";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
-import { SectionEyebrow } from "@/components/home/section-eyebrow";
 
 const inputClass =
   "w-full border-0 border-b border-border bg-transparent px-0 py-2 text-foreground outline-none transition-colors placeholder:text-muted/60 focus:border-accent";
@@ -20,7 +19,6 @@ export function Contact() {
     <section id="contatti" className="mx-auto w-full max-w-5xl border-t border-border px-6 py-16">
       <RevealGroup>
         <RevealItem className="max-w-2xl">
-          <SectionEyebrow>contatti</SectionEyebrow>
           <h2 className="font-sans text-2xl font-bold tracking-tight">{t("title")}</h2>
           <p className="mt-2 text-sm text-muted">{t("subtitle")}</p>
         </RevealItem>

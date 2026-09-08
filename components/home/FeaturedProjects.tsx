@@ -2,7 +2,6 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { getFeaturedProjects } from "@/lib/projects";
 import { ProjectCard } from "@/components/progetti/project-card";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
-import { SectionEyebrow } from "@/components/home/section-eyebrow";
 import { Link } from "@/i18n/navigation";
 
 export async function FeaturedProjects() {
@@ -18,7 +17,6 @@ export async function FeaturedProjects() {
       <RevealGroup>
         <RevealItem className="flex items-baseline justify-between gap-4">
           <div>
-            <SectionEyebrow>progetti</SectionEyebrow>
             <h2 className="font-sans text-2xl font-bold tracking-tight">{t("title")}</h2>
           </div>
           <Link
