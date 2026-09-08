@@ -4,8 +4,8 @@ Sito personale con area pubblica (portfolio, in arrivo) e area privata (spese, i
 Next.js (App Router) + Supabase + Vercel.
 
 > Nota per chi tocca il codice con un assistente AI: questo progetto usa Next.js 16, con
-> breaking change rispetto alle versioni precedenti (es. `middleware.ts` → `proxy.ts`). Vedi
-> `AGENTS.md` e `node_modules/next/dist/docs/` prima di modificare routing o auth.
+> `middleware.ts` rinominato in `proxy.ts` (funzione `proxy()`). Vedi `AGENTS.md`/`CLAUDE.md`
+> prima di modificare routing o auth.
 
 ## Setup locale
 
