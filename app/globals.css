@@ -236,6 +236,13 @@
   }
 }
 
+/* Tutto il sito è disegnato in rem: scalare il font-size della radice
+   rimpicciolisce proporzionalmente spaziature, testo e dimensioni come
+   uno zoom browser all'80%, senza toccare le singole utility. */
+html {
+  font-size: 80%;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
