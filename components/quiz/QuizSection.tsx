@@ -34,8 +34,8 @@ export function QuizSection() {
               </span>
             </h2>
             <p className="max-w-md text-base leading-relaxed text-muted">
-              5 domande veloci, 15 secondi a domanda. Gioca come ospite oppure accedi con Google per entrare nella
-              classifica generale.
+              5 domande veloci sul mondo dell&apos;AI, 15 secondi a domanda. Gioca come ospite oppure accedi con
+              Google per entrare nella classifica generale.
             </p>
             <QuizLauncher />
           </div>
