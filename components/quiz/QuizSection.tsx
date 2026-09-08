@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { Sparkles } from "lucide-react";
-import { SectionEyebrow } from "@/components/home/section-eyebrow";
 import { LeaderboardPreview } from "./LeaderboardPreview";
 import { QuizLauncher } from "./QuizLauncher";
 import { QuizSectionReveal } from "./QuizSectionReveal";
@@ -25,7 +24,6 @@ export function QuizSection() {
       <QuizSectionReveal>
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-10">
           <div className="flex flex-1 flex-col gap-4">
-            <SectionEyebrow>prima di continuare a leggere</SectionEyebrow>
             <h2 className="flex items-center gap-2.5 font-display text-3xl font-bold tracking-tight sm:text-4xl">
               <Sparkles className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
               {/* Un unico span di testo come figlio flex: senza, il gap del
