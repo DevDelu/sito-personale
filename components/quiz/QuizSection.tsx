@@ -4,6 +4,7 @@ import { SectionEyebrow } from "@/components/home/section-eyebrow";
 import { LeaderboardPreview } from "./LeaderboardPreview";
 import { QuizLauncher } from "./QuizLauncher";
 import { QuizSectionReveal } from "./QuizSectionReveal";
+import { QuizStarsField } from "./quiz-stars-field";
 
 // Teaser sempre presente lato server, leggero (nessun timer/stato di gioco):
 // solo testo statico + top 5 della classifica. Il motore di gioco vero e
@@ -15,11 +16,12 @@ import { QuizSectionReveal } from "./QuizSectionReveal";
 // paragrafo da scorrere.
 export function QuizSection() {
   return (
-    <section id="quiz" className="relative mx-auto w-full max-w-5xl overflow-hidden px-6 py-16">
+    <section id="quiz" className="group relative mx-auto w-full max-w-5xl overflow-hidden px-6 py-16">
       <div
         className="pointer-events-none absolute -right-16 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-accent/10 blur-3xl"
         aria-hidden="true"
       />
+      <QuizStarsField />
       <QuizSectionReveal>
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:gap-10">
           <div className="flex flex-1 flex-col gap-4">
