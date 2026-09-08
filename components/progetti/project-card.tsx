@@ -23,7 +23,7 @@ export function ProjectCard({ project, categoryLabel }: { project: Project; cate
       ) : null}
 
       <div className="flex flex-col gap-2 p-5">
-        <span className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-wide text-muted">
+        <span className="flex items-center gap-1.5 font-mono text-xs text-muted">
           {createElement(projectCategoryIcon(project.category), {
             className: "h-3.5 w-3.5 text-accent",
             strokeWidth: 2,
