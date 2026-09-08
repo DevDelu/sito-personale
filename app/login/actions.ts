@@ -5,14 +5,9 @@ import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { verifyTurnstileToken } from "@/lib/turnstile";
+import { siteUrl } from "@/lib/site-url";
 
 export type LoginState = { error?: string } | undefined;
-
-export function siteUrl(): string {
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "http://localhost:3000";
-}
 
 // Alert diradato (non uno a tentativo, altrimenti sommerge la casella) sui
 // tentativi di login sospetti — usa una chiave e una finestra separate dal
