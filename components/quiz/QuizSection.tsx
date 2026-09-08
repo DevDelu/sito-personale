@@ -26,7 +26,12 @@ export function QuizSection() {
             <SectionEyebrow>prima di continuare a leggere</SectionEyebrow>
             <h2 className="flex items-center gap-2.5 font-display text-3xl font-bold tracking-tight sm:text-4xl">
               <Sparkles className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
-              Quante ne s<span className="text-accent">AI</span>?
+              {/* Un unico span di testo come figlio flex: senza, il gap del
+                  flex container (per l'icona) finiva anche tra "s", "AI" e
+                  "?", spezzando la parola. */}
+              <span>
+                Quante ne s<span className="text-accent">AI</span>?
+              </span>
             </h2>
             <p className="max-w-md text-base leading-relaxed text-muted">
               5 domande veloci, 15 secondi a domanda. Gioca come ospite oppure accedi con Google per entrare nella
