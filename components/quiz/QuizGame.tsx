@@ -8,11 +8,11 @@ import { Leaderboard } from "./Leaderboard";
 import type { LeaderboardRow, QuizAnswerInput, QuizQuestionPublic, QuizSubmitResponse } from "@/lib/quiz/types";
 
 const DURATA_DOMANDA_MS = 15000;
-const PENDING_SUBMIT_KEY = "quiz-pending-submit";
 
 type Feedback = { correct: boolean; correctIndex: number; explain: string };
-type Phase = "checking" | "nickname" | "loading" | "playing" | "submitting" | "result" | "leaderboard";
-type PendingSubmit = { answers: QuizAnswerInput[]; timeMs: number };
+type Phase = "nickname" | "countdown" | "loading" | "playing" | "submitting" | "result" | "leaderboard";
+
+const COUNTDOWN_MS = 3000;
 
 function formatTempo(ms: number): string {
   const totalSec = Math.round(ms / 1000);
@@ -21,19 +21,10 @@ function formatTempo(ms: number): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-async function avviaLoginGoogle(redirectSearch: string) {
-  const supabase = createClient();
-  const gameUrl = `${window.location.origin}${window.location.pathname}${redirectSearch}#quiz`;
-  await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${window.location.origin}/auth/callback?redirect_to=${encodeURIComponent(gameUrl)}`,
-    },
-  });
-}
-
-export function QuizGame({ mode, onClose }: { mode: "guest" | "google"; onClose: () => void }) {
-  const [phase, setPhase] = useState<Phase>(mode === "google" ? "checking" : "nickname");
+// Login Google temporaneamente disattivato: si gioca solo come ospite,
+// punteggio non salvato in classifica (vedi QuizLauncher).
+export function QuizGame({ onClose }: { onClose: () => void }) {
+  const [phase, setPhase] = useState<Phase>("nickname");
   const [nickname, setNickname] = useState<string | null>(null);
   const [questions, setQuestions] = useState<QuizQuestionPublic[]>([]);
   const [index, setIndex] = useState(0);
@@ -46,62 +37,6 @@ export function QuizGame({ mode, onClose }: { mode: "guest" | "google"; onClose:
   const [error, setError] = useState<string | null>(null);
   const startedAtRef = useRef<number | null>(null);
   const answeringRef = useRef(false);
-
-  // Setup per mode="google": riprende un punteggio lasciato in sospeso
-  // (partita fatta da ospite, poi login per salvarla) oppure verifica se il
-  // profilo ha già un nickname prima di iniziare una nuova partita.
-  useEffect(() => {
-    if (mode !== "google") return;
-    let cancelled = false;
-
-    async function setup() {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        if (!cancelled) setError("Accesso con Google non riuscito. Riprova.");
-        return;
-      }
-
-      const pendingRaw = sessionStorage.getItem(PENDING_SUBMIT_KEY);
-      if (pendingRaw) {
-        sessionStorage.removeItem(PENDING_SUBMIT_KEY);
-        try {
-          const pending: PendingSubmit = JSON.parse(pendingRaw);
-          const res = await fetch("/api/quiz/submit", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(pending),
-          });
-          if (!res.ok) throw new Error();
-          const data: QuizSubmitResponse = await res.json();
-          if (!cancelled) {
-            setAnswers(pending.answers);
-            setResult(data);
-            setPhase("result");
-          }
-          return;
-        } catch {
-          // Payload corrotto o richiesta fallita: si passa a una nuova partita.
-        }
-      }
-
-      const { data: profile } = await supabase.from("profiles").select("nickname").eq("id", user.id).maybeSingle();
-      if (cancelled) return;
-      if (profile?.nickname) {
-        setNickname(profile.nickname);
-        setPhase("loading");
-      } else {
-        setPhase("nickname");
-      }
-    }
-
-    setup();
-    return () => {
-      cancelled = true;
-    };
-  }, [mode]);
 
   // Carica le 5 domande quando si entra in fase "loading" (nickname pronto).
   useEffect(() => {
@@ -204,31 +139,8 @@ export function QuizGame({ mode, onClose }: { mode: "guest" | "google"; onClose:
 
   async function handleGuestNickname(value: string): Promise<string | null> {
     setNickname(value);
-    setPhase("loading");
+    setPhase("countdown");
     return null;
-  }
-
-  async function handleGoogleNickname(value: string): Promise<string | null> {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return "Sessione scaduta, ricarica la pagina.";
-
-    const { error: insertError } = await supabase.from("profiles").insert({ id: user.id, nickname: value });
-    if (insertError) {
-      if (insertError.code === "23505") return "Nickname già in uso, scegline un altro.";
-      return "Impossibile salvare il nickname, riprova.";
-    }
-    setNickname(value);
-    setPhase("loading");
-    return null;
-  }
-
-  async function handleSaveAfterGuest() {
-    const timeMs = startedAtRef.current ? Date.now() - startedAtRef.current : (result?.timeMs ?? 0);
-    sessionStorage.setItem(PENDING_SUBMIT_KEY, JSON.stringify({ answers, timeMs } satisfies PendingSubmit));
-    await avviaLoginGoogle("?quiz=google");
   }
 
   function handleReplay() {
@@ -265,7 +177,7 @@ export function QuizGame({ mode, onClose }: { mode: "guest" | "google"; onClose:
           </p>
         )}
 
-        {!error && (phase === "checking" || phase === "loading" || phase === "submitting") && (
+        {!error && (phase === "loading" || phase === "submitting") && (
           <div className="flex flex-col items-center gap-3 py-10 text-sm text-muted">
             <span className="h-8 w-8 animate-pulse rounded-full bg-accent/30" aria-hidden="true" />
             {phase === "submitting" ? "Calcolo il punteggio..." : "Un attimo..."}
@@ -274,15 +186,13 @@ export function QuizGame({ mode, onClose }: { mode: "guest" | "google"; onClose:
 
         {!error && phase === "nickname" && (
           <NicknameForm
-            title={mode === "google" ? "Come vuoi essere chiamato in classifica?" : "Come ti chiami?"}
-            helper={
-              mode === "google"
-                ? "Solo la prima volta: da qui in poi comparirà così in classifica."
-                : "Vale solo per questa partita, non viene salvato."
-            }
-            onSubmit={mode === "google" ? handleGoogleNickname : handleGuestNickname}
+            title="Come ti chiami?"
+            helper="Vale solo per questa partita, non viene salvato."
+            onSubmit={handleGuestNickname}
           />
         )}
+
+        {!error && phase === "countdown" && <ReadyCountdown onDone={() => setPhase("loading")} />}
 
         {!error && phase === "playing" && question && (
           <div className="flex flex-col gap-4">
@@ -327,14 +237,7 @@ export function QuizGame({ mode, onClose }: { mode: "guest" | "google"; onClose:
         )}
 
         {!error && phase === "result" && result && (
-          <ResultView
-            result={result}
-            mode={mode}
-            onReplay={handleReplay}
-            onShowLeaderboard={handleShowLeaderboard}
-            onSaveAfterGuest={handleSaveAfterGuest}
-            onClose={onClose}
-          />
+          <ResultView result={result} onReplay={handleReplay} onShowLeaderboard={handleShowLeaderboard} onClose={onClose} />
         )}
 
         {!error && phase === "leaderboard" && (
@@ -350,6 +253,55 @@ export function QuizGame({ mode, onClose }: { mode: "guest" | "google"; onClose:
             </button>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// Cerchio che si scarica in 3s tra la scelta del nickname e l'inizio della
+// partita, stesso linguaggio visivo dell'anello di risultato: dà un attimo
+// per prepararsi invece di sbattere subito la prima domanda in faccia.
+function ReadyCountdown({ onDone }: { onDone: () => void }) {
+  const [remainingMs, setRemainingMs] = useState(COUNTDOWN_MS);
+
+  useEffect(() => {
+    if (remainingMs <= 0) {
+      onDone();
+      return;
+    }
+    const id = setTimeout(() => setRemainingMs((v) => Math.max(0, v - 100)), 100);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remainingMs]);
+
+  const fraction = remainingMs / COUNTDOWN_MS;
+  const radius = 42;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * (1 - fraction);
+  const secondsLeft = Math.max(1, Math.ceil(remainingMs / 1000));
+
+  return (
+    <div className="flex flex-col items-center gap-5 py-8 text-center">
+      <p className="font-display text-lg font-semibold">Sei pronto/a?</p>
+      <div className="relative h-24 w-24">
+        <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
+          <circle cx="50" cy="50" r={radius} fill="none" stroke="var(--border)" strokeWidth="8" />
+          <circle
+            cx="50"
+            cy="50"
+            r={radius}
+            fill="none"
+            stroke="var(--accent)"
+            strokeWidth="8"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            style={{ transition: "stroke-dashoffset 100ms linear" }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="font-figures text-2xl font-bold">{secondsLeft}</span>
+        </div>
       </div>
     </div>
   );
@@ -385,17 +337,13 @@ function TimerBar({ remainingMs }: { remainingMs: number }) {
 
 function ResultView({
   result,
-  mode,
   onReplay,
   onShowLeaderboard,
-  onSaveAfterGuest,
   onClose,
 }: {
   result: QuizSubmitResponse;
-  mode: "guest" | "google";
   onReplay: () => void;
   onShowLeaderboard: () => void;
-  onSaveAfterGuest: () => void;
   onClose: () => void;
 }) {
   const percent = result.total > 0 ? Math.round((result.score / result.total) * 100) : 0;
@@ -439,16 +387,7 @@ function ResultView({
       <p className="font-display text-lg font-semibold">{messaggio}</p>
       <p className="font-figures text-sm text-muted">Tempo: {formatTempo(result.timeMs)}</p>
 
-      {mode === "guest" ? (
-        <button type="button" onClick={onSaveAfterGuest} className="btn-primary w-full">
-          Accedi con Google per salvare questo punteggio
-        </button>
-      ) : (
-        <p className="text-sm text-entrata">
-          {result.saved ? "Punteggio salvato, sei in classifica." : "Il punteggio precedente resta migliore, non è stato sostituito."}
-          {result.rank != null ? ` (posizione #${result.rank})` : ""}
-        </p>
-      )}
+      <p className="text-sm text-muted">Partita come ospite: il punteggio non viene salvato in classifica.</p>
 
       <div className="flex w-full gap-2">
         <button type="button" onClick={onReplay} className="btn-secondary flex-1">

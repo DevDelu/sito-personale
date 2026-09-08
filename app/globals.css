@@ -354,24 +354,36 @@ body {
     @apply hover:-translate-y-0.5 hover:border-accent/25 hover:shadow-lg;
   }
 
-  /* Overlay + pannello per i modali. Sotto sm: bottom sheet ancorato al
-     fondo dello schermo (pattern nativo mobile: pieno-larghezza, angoli
-     smussati solo in alto, "grabber" decorativo), con safe-area-bottom per
-     non finire sotto l'home indicator. Da sm in su torna il pannello
-     centrato e flottante di prima. */
+  /* Overlay + pannello per i modali: di default pannello centrato e
+     flottante. Il bottom sheet (pieno-larghezza, ancorato al fondo, angoli
+     smussati solo in alto, "grabber" decorativo, safe-area-bottom) scatta
+     solo su schermi stretti E touch (pointer: coarse) — non sulla sola
+     larghezza, altrimenti una finestra desktop stretta (es. split screen)
+     verrebbe trattata come mobile e il modale finirebbe in fondo alla
+     pagina invece che centrato. */
   .modal-overlay {
-    @apply fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/50 backdrop-blur-[2px] animate-fade-in sm:items-center sm:px-4 sm:py-4;
+    @apply fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 backdrop-blur-[2px] animate-fade-in px-4 py-4;
   }
 
   .modal-panel {
-    @apply animate-slide-up max-h-[90vh] w-full overflow-y-auto rounded-t-2xl border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[calc(100vh-2rem)] sm:w-auto sm:animate-scale-in sm:rounded-xl sm:border sm:pb-0;
+    @apply animate-scale-in max-h-[calc(100vh-2rem)] w-auto overflow-y-auto rounded-xl border border-border bg-surface pb-0 shadow-2xl;
   }
 
-  /* Grabber decorativo del bottom sheet, solo sotto sm: nessuna modifica ai
-     singoli modali che continuano a passare solo "modal-panel ...". */
+  @media (max-width: 639px) and (pointer: coarse) {
+    .modal-overlay {
+      @apply items-end px-0 py-0;
+    }
+
+    .modal-panel {
+      @apply animate-slide-up max-h-[90vh] w-full rounded-t-2xl rounded-b-none border-x-0 border-b-0 border-t pb-[env(safe-area-inset-bottom)];
+    }
+  }
+
+  /* Grabber decorativo del bottom sheet, visibile solo quando scatta il
+     bottom sheet (schermo stretto E touch, vedi sopra). */
   .modal-panel::before {
     content: "";
-    display: block;
+    display: none;
     width: 2.5rem;
     height: 0.25rem;
     margin: 0 auto;
@@ -379,9 +391,9 @@ body {
     background: var(--border);
   }
 
-  @media (min-width: 640px) {
+  @media (max-width: 639px) and (pointer: coarse) {
     .modal-panel::before {
-      display: none;
+      display: block;
     }
   }
 
