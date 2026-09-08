@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pause, Play, SkipForward, Square, Wrench } from "lucide-react";
+import { useCountdown } from "@/hooks/useCountdown";
 import { useSessionAudio } from "@/hooks/useSessionAudio";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { salvaLogSerie, terminaSessione, type LogSeriePatch } from "@/app/(private)/allenamenti/actions";
@@ -98,6 +99,43 @@ function attrezzaturaStep(step: Step): string[] {
   return [...viste];
 }
 
+function formatTempoBreve(sec: number): string {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return m > 0 ? `${m}:${String(s).padStart(2, "0")}` : `${s}s`;
+}
+
+// Cosa c'è da fare per una singola riga, in breve: "3 serie da 10-12 rip",
+// "4 round · 40s lavoro / 15s pausa", "30s". Usato sia nella card "Prossimo"
+// durante la sessione, sia nell'annuncio pre-allenamento.
+function descrizioneRiga(row: SchedaEsercizioConNome): string {
+  if (row.tipo_riga === "circuito") {
+    const rounds = row.rounds ?? 1;
+    const lavoro = row.lavoro_sec ?? 30;
+    const pausa = row.pausa_sec ?? 0;
+    return pausa > 0 ? `${rounds} round · ${lavoro}s lavoro / ${pausa}s pausa` : `${rounds} round · ${lavoro}s lavoro`;
+  }
+  if (row.tipo_riga === "stretching") {
+    return `${row.target_tempo_sec ?? 30}s`;
+  }
+  if (row.tipo_metrica === "tempo") {
+    return `${row.target_serie ?? 1} serie da ${formatTempoBreve(row.target_tempo_sec ?? 0)}`;
+  }
+  const rip =
+    row.target_rip_min != null && row.target_rip_max != null
+      ? row.target_rip_min === row.target_rip_max
+        ? `${row.target_rip_min} rip`
+        : `${row.target_rip_min}-${row.target_rip_max} rip`
+      : "max rip";
+  return `${row.target_serie ?? 1} serie da ${rip}`;
+}
+
+function descrizioneStep(step: Step): string {
+  return righeStep(step)
+    .map(descrizioneRiga)
+    .join(" + ");
+}
+
 export function SessionRunner({
   sessione,
   scheda,
@@ -121,6 +159,7 @@ export function SessionRunner({
     return idx === -1 ? steps.length : idx;
   });
   const [avviato, setAvviato] = useState(false);
+  const [inPreparazione, setInPreparazione] = useState(false);
   const [pausaGlobale, setPausaGlobale] = useState(false);
   const [mostraFine, setMostraFine] = useState(false);
   const [confermaTermina, setConfermaTermina] = useState(false);
@@ -128,17 +167,18 @@ export function SessionRunner({
   const [terminandoENavigando, setTerminandoENavigando] = useState(false);
   const startedAtRef = useRef<number | null>(null);
 
-  useWakeLock(avviato);
+  const sessioneInCorso = avviato || inPreparazione;
+  useWakeLock(sessioneInCorso);
 
-  // Mentre l'allenamento è in corso, la sidebar intercetta i click sui link
-  // di navigazione e li passa qui invece di navigare subito (vedi
-  // lib/allenamento/session-guard.ts): si sgancia da sola quando la sessione
-  // finisce o il componente viene smontato.
+  // Mentre l'allenamento è in corso (compresa la preparazione pre-avvio), la
+  // sidebar intercetta i click sui link di navigazione e li passa qui invece
+  // di navigare subito (vedi lib/allenamento/session-guard.ts): si sgancia da
+  // sola quando la sessione finisce o il componente viene smontato.
   useEffect(() => {
-    if (!avviato || mostraFine) return;
+    if (!sessioneInCorso || mostraFine) return;
     setSessionNavGuard((href) => setNavigazionePendente(href));
     return () => setSessionNavGuard(null);
-  }, [avviato, mostraFine]);
+  }, [sessioneInCorso, mostraFine]);
 
   async function terminaENaviga() {
     setTerminandoENavigando(true);
@@ -168,7 +208,17 @@ export function SessionRunner({
 
   function avviaSessione() {
     audio.unlock();
+    if (steps.length === 0) {
+      startedAtRef.current = Date.now();
+      setAvviato(true);
+      return;
+    }
+    setInPreparazione(true);
+  }
+
+  function confermaAvvio() {
     startedAtRef.current = Date.now();
+    setInPreparazione(false);
     setAvviato(true);
   }
 
@@ -186,6 +236,16 @@ export function SessionRunner({
   }
 
   if (!avviato) {
+    if (inPreparazione && stepCorrente) {
+      return (
+        <PreparazionePrompt
+          step={stepCorrente}
+          tick={audio.tick}
+          finish={audio.finish}
+          onDone={confermaAvvio}
+        />
+      );
+    }
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
         <h1 className="font-display text-2xl font-semibold">{scheda.nome}</h1>
@@ -238,6 +298,7 @@ export function SessionRunner({
         <div className="rounded-xl border border-border bg-surface/60 p-3">
           <span className="text-xs font-medium uppercase tracking-wide text-muted">Prossimo</span>
           <p className="mt-1 text-sm font-medium">{nomeStep(prossimoStep)}</p>
+          <p className="mt-0.5 text-sm text-muted">{descrizioneStep(prossimoStep)}</p>
           {attrezzaturaStep(prossimoStep).length > 0 && (
             <p className="mt-1 flex items-center gap-1.5 text-sm text-amber-500 dark:text-amber-400">
               <Wrench className="h-3.5 w-3.5 shrink-0" />
@@ -341,6 +402,41 @@ function ConfermaDialog({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Annuncio del primo esercizio con countdown di preparazione di 30s (stessi
+// beep degli altri timer della sessione) prima dell'avvio vero. Skippabile
+// col bottone "Inizia subito".
+function PreparazionePrompt({
+  step,
+  tick,
+  finish,
+  onDone,
+}: {
+  step: Step;
+  tick: () => void;
+  finish: () => void;
+  onDone: () => void;
+}) {
+  const { remaining } = useCountdown(30, "preparazione", true, { tick, finish, onDone });
+
+  return (
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
+      <span className="text-xs font-medium uppercase tracking-wide text-muted">Si parte con</span>
+      <h1 className="font-display text-2xl font-semibold">{nomeStep(step)}</h1>
+      <p className="text-sm text-muted">{descrizioneStep(step)}</p>
+      {attrezzaturaStep(step).length > 0 && (
+        <p className="flex items-center gap-1.5 text-sm text-amber-500 dark:text-amber-400">
+          <Wrench className="h-3.5 w-3.5 shrink-0" />
+          Prepara: {attrezzaturaStep(step).join(", ")}
+        </p>
+      )}
+      <span className="font-figures text-6xl font-bold tabular-nums text-accent">{remaining}s</span>
+      <button type="button" onClick={onDone} className="btn-secondary">
+        Inizia subito
+      </button>
     </div>
   );
 }

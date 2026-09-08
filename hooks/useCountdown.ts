@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 // riavvio anche quando `seconds` è identico alla fase precedente (es. due
 // round di lavoro consecutivi con la stessa durata). `enabled` tiene il
 // timer fermo finché non deve davvero partire (es. prima serie non ancora
-// completata). Beep negli ultimi 3s, tono+vibrazione di fine gestiti dal
+// completata). Beep negli ultimi 5s, tono+vibrazione di fine gestiti dal
 // chiamante (tick/finish), non qui: l'AudioContext è condiviso per tutta la
 // sessione (useSessionAudio), non ricreato per ogni timer.
 export function useCountdown(
@@ -47,7 +47,7 @@ export function useCountdown(
       if (inPausaRef.current) return;
       setRemaining((prev) => {
         const next = prev - 1;
-        if (next > 0 && next <= 3) callbacksRef.current.tick();
+        if (next > 0 && next <= 5) callbacksRef.current.tick();
         if (next <= 0) {
           clearInterval(interval);
           callbacksRef.current.finish();
