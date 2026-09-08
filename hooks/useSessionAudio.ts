@@ -37,7 +37,7 @@ export function useSessionAudio() {
     osc.stop(start + duration + 0.02);
   }, []);
 
-  // Tick breve: ultimi 3 secondi di ogni timer.
+  // Tick breve: ultimi 5 secondi di ogni timer.
   const tick = useCallback(() => beep(880, 0, 0.08), [beep]);
 
   // Fine timer: due toni ascendenti + vibrazione (con feature detection).
