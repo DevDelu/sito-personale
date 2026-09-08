@@ -4,6 +4,7 @@ import { ProjectCard } from "@/components/progetti/project-card";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 import { SectionHeading } from "@/components/home/section-heading";
 import { Link } from "@/i18n/navigation";
+import { ArrowRight } from "lucide-react";
 
 export async function FeaturedProjects() {
   const locale = await getLocale();
@@ -22,9 +23,14 @@ export async function FeaturedProjects() {
           </div>
           <Link
             href="/progetti"
-            className="shrink-0 font-mono text-sm text-muted transition-colors hover:text-foreground"
+            className="group/link inline-flex shrink-0 items-center gap-1.5 font-mono text-sm text-muted transition-colors hover:text-foreground"
           >
-            {t("viewAll")} →
+            {t("viewAll")}
+            <ArrowRight
+              className="h-3.5 w-3.5 transition-transform duration-200 ease-out group-hover/link:translate-x-1"
+              strokeWidth={2}
+              aria-hidden="true"
+            />
           </Link>
         </RevealItem>
         <RevealItem className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(260px,340px))] gap-6">

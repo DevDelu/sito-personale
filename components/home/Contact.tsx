@@ -41,14 +41,14 @@ export function Contact() {
 
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="name" className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted">
+                  <label htmlFor="name" className="font-mono text-xs text-muted">
                     {t("nameLabel")}
                   </label>
                   <input id="name" name="name" type="text" required className={inputClass} />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="email" className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted">
+                  <label htmlFor="email" className="font-mono text-xs text-muted">
                     {t("emailLabel")}
                   </label>
                   <input id="email" name="email" type="email" required className={inputClass} />
@@ -56,7 +56,7 @@ export function Contact() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="message" className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted">
+                <label htmlFor="message" className="font-mono text-xs text-muted">
                   {t("messageLabel")}
                 </label>
                 <textarea id="message" name="message" required rows={5} className={`${inputClass} resize-none`} />

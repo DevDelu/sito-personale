@@ -1,7 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 import { DownloadCvButton } from "@/components/home/download-cv-button";
-import { HeroCursorField } from "@/components/home/hero-cursor-field";
 import { HeroHeadline } from "@/components/home/hero-headline";
 
 const LINKEDIN_URL = "https://www.linkedin.com/in/lorenzo-de-luca-83819a277/";
@@ -24,7 +23,6 @@ export async function Hero() {
 
   return (
     <div className="relative w-full flex-1 overflow-hidden">
-      <HeroCursorField />
       <main className="relative z-10 mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-2xl flex-col items-center justify-center gap-8 px-6 py-20 text-center">
         <RevealGroup className="flex flex-col items-center gap-8">
           <RevealItem>
