@@ -1,6 +1,7 @@
 "use client";
 
 import { useIsDark } from "@/lib/use-is-dark";
+import { syncThemeColorMeta } from "@/lib/theme-color";
 
 export function ThemeToggle() {
   const isDark = useIsDark();
@@ -13,10 +14,11 @@ export function ThemeToggle() {
         document.documentElement.setAttribute("data-theme", next);
         localStorage.setItem("theme", next);
         // Tiene sincronizzata l'area di sistema (notch/status bar) col tema
-        // scelto manualmente: senza, resterebbe legata alla sola preferenza
-        // di sistema impostata in app/layout.tsx.
-        const color = next === "dark" ? "#0b0e14" : "#faf6ee";
-        document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute("content", color));
+        // scelto manualmente: legge lo sfondo realmente applicato, quindi
+        // segue anche .site-public sul sito pubblico. Il ritardo aspetta la
+        // fine della transizione CSS su background-color (150ms, vedi
+        // app/globals.css) per non leggere un colore a metà interpolazione.
+        setTimeout(syncThemeColorMeta, 160);
       }}
       aria-label={isDark ? "Attiva tema chiaro" : "Attiva tema scuro"}
       className="group flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover hover:shadow-sm active:scale-90 sm:h-9 sm:w-9"

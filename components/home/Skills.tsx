@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Users, Palette, Code2, type LucideIcon } from "lucide-react";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
-import { SectionEyebrow } from "@/components/home/section-eyebrow";
+import { SectionHeading } from "@/components/home/section-heading";
 
 const GROUP_ICONS: LucideIcon[] = [Users, Palette, Code2];
 
@@ -13,8 +13,7 @@ export async function Skills() {
     <section id="competenze" className="mx-auto w-full max-w-5xl border-t border-border px-6 py-16">
       <RevealGroup>
         <RevealItem>
-          <SectionEyebrow>competenze</SectionEyebrow>
-          <h2 className="font-sans text-2xl font-bold tracking-tight">{t("title")}</h2>
+          <SectionHeading>{t("title")}</SectionHeading>
         </RevealItem>
         <RevealItem className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
           {groups.map((group, index) => {
