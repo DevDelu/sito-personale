@@ -61,10 +61,10 @@ export function QuizLauncher() {
   return (
     <>
       <div className="flex flex-wrap gap-3 pt-2">
-        <button type="button" onClick={handleGoogleClick} className="btn-primary">
+        <button type="button" onClick={handleGoogleClick} className="btn-primary !px-6 !py-3 text-base">
           Accedi con Google e gioca
         </button>
-        <button type="button" onClick={handleGuestClick} className="btn-secondary">
+        <button type="button" onClick={handleGuestClick} className="btn-secondary !px-6 !py-3 text-base">
           Gioca come ospite
         </button>
       </div>
