@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { InlineScript } from "@/components/inline-script";
 import { ThemeColorSync } from "@/components/theme-color-sync";
 import "./globals.css";
@@ -71,6 +72,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col overflow-x-hidden bg-background text-foreground">
         <ThemeColorSync />
         {children}
+        <Analytics />
       </body>
     </html>
   );
