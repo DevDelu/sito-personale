@@ -113,6 +113,15 @@ serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `m
 - **`categorie.colore` come riferimento a variabile CSS** (`var(--cat-alimentari)` ecc.) e non
   come hex fisso: mantiene i colori coerenti tra tema chiaro/scuro senza duplicare la palette
   nel database.
+- **Audit visivo dell'area privata (Radar) sui token del design system**: l'area privata già
+  usava di default gli stessi token/utility del resto del sito (`--accent`, `.card`,
+  `.btn-*`, `.field-input`, font Fraunces/Space Grotesk/JetBrains Mono, sidebar responsive a
+  drawer su mobile); l'audit ha trovato solo poche macchie di colore hardcoded fuori palette
+  (badge "da verificare" in `/spese/importa` e avvisi "Prepara" in `SessionRunner`, entrambi in
+  giallo/ambra Tailwind di default) e le ha allineate al token `--accent` esistente, senza
+  introdurre nuovi colori. Il testo bianco con contorno scuro nell'etichetta della ciambella
+  investimenti (`AllocationChart`) resta invariato di proposito: deve restare leggibile sopra
+  fette di colore arbitrario, non sopra `--surface`, quindi non è un token di tema.
 
 ## Cosa manca volutamente in questa fase
 
