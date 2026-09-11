@@ -300,7 +300,7 @@ export function SessionRunner({
           <p className="mt-1 text-sm font-medium">{nomeStep(prossimoStep)}</p>
           <p className="mt-0.5 text-sm text-muted">{descrizioneStep(prossimoStep)}</p>
           {attrezzaturaStep(prossimoStep).length > 0 && (
-            <p className="mt-1 flex items-center gap-1.5 text-sm text-amber-500 dark:text-amber-400">
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-accent">
               <Wrench className="h-3.5 w-3.5 shrink-0" />
               Prepara: {attrezzaturaStep(prossimoStep).join(", ")}
             </p>
@@ -428,7 +428,7 @@ function PreparazionePrompt({
       <h1 className="font-display text-2xl font-semibold">{nomeStep(step)}</h1>
       <p className="text-sm text-muted">{descrizioneStep(step)}</p>
       {attrezzaturaStep(step).length > 0 && (
-        <p className="flex items-center gap-1.5 text-sm text-amber-500 dark:text-amber-400">
+        <p className="flex items-center gap-1.5 text-sm text-accent">
           <Wrench className="h-3.5 w-3.5 shrink-0" />
           Prepara: {attrezzaturaStep(step).join(", ")}
         </p>
