@@ -307,7 +307,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
                           </span>
                         )}
                         {r.daVerificare && (
-                          <span className="ml-2 inline-flex items-center rounded-full border border-yellow-500/40 bg-yellow-500/10 px-2 py-0.5 text-xs text-yellow-600 dark:text-yellow-400">
+                          <span className="ml-2 inline-flex items-center rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-xs text-accent">
                             da verificare
                             {r.categoriaSuggerita ? ` (banca: ${r.categoriaSuggerita})` : ""}
                           </span>
