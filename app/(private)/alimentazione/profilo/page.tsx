@@ -1,0 +1,41 @@
+import type { Metadata } from "next";
+import { getPesoCorporeo, getProfilo } from "@/lib/alimentazione/queries";
+import { Toast } from "@/components/toast";
+import { ProfiloForm } from "./profilo-form";
+import { PesoForm } from "./peso-form";
+import { PesoHistory } from "./peso-history";
+
+export const metadata: Metadata = { title: "Alimentazione · Profilo" };
+
+export default async function ProfiloPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string; peso_added?: string }>;
+}) {
+  const { saved, peso_added } = await searchParams;
+  const [profilo, pesi] = await Promise.all([getProfilo(), getPesoCorporeo()]);
+
+  return (
+    <div className="flex flex-col gap-6">
+      {saved && <Toast message="Profilo aggiornato" />}
+      {peso_added && <Toast message="Peso registrato" />}
+      <div className="flex flex-col gap-1">
+        <h1 className="font-display text-2xl font-semibold tracking-tight">Profilo nutrizionale</h1>
+        <p className="text-sm text-muted">Dati usati per calcolare BMR, TDEE e target kcal della fase attiva.</p>
+      </div>
+
+      <ProfiloForm profilo={profilo} />
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <section className="flex flex-col gap-3">
+          <h2 className="font-display text-sm font-medium text-muted">Registra peso</h2>
+          <PesoForm />
+        </section>
+        <section className="flex flex-col gap-3">
+          <h2 className="font-display text-sm font-medium text-muted">Storico peso</h2>
+          <PesoHistory righe={pesi} />
+        </section>
+      </div>
+    </div>
+  );
+}
