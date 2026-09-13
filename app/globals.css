@@ -7,8 +7,11 @@
   --border: #e6dcc4;
   --foreground: #191512;
   --muted: #756d5c;
-  --accent: #c25a1e;
-  --accent-foreground: #fffdf8;
+  /* Bordeaux: stesso hue/valori dell'accento del sito pubblico (.site-public),
+     ora accento unico su tutto il sito, area privata inclusa. Vedi commento
+     su .site-public per provenienza e contrasto. */
+  --accent: #7e2537;
+  --accent-foreground: #f3f0e7;
   --spesa: #a63b3b;
   --entrata: #2f8a63;
 
@@ -38,7 +41,7 @@
   --invest-indice: #7c5c9e;
 
   /* Solo per il grafico a torta di allocazione: dedicati, lontani da accent
-     (ambra) e dai colori semantici plus/minus (verde/rosso). */
+     e dai colori semantici plus/minus (verde/rosso). */
   --invest-pie-etf: #5b7fde;
   --invest-pie-etc: #3fae6b;
   --invest-pie-crypto: #d6528f;
@@ -57,8 +60,8 @@
   --border: #262e3d;
   --foreground: #f4f1ea;
   --muted: #9c9a90;
-  --accent: #e8792e;
-  --accent-foreground: #0b0e14;
+  --accent: #d4546d;
+  --accent-foreground: #0c1210;
   --spesa: #c24e4e;
   --entrata: #3fa87a;
 
@@ -99,8 +102,11 @@
    Bussola (--background, --accent, ecc.), ma valori diversi, scoperti solo
    dentro .site-public. Ogni utility esistente (bg-background, bg-accent,
    btn-primary, card, field-input...) eredita il tema pubblico per cascata
-   senza bisogno di duplicare le classi, e senza toccare :root: l'app
-   privata, che non entra mai in .site-public, resta invariata. */
+   senza bisogno di duplicare le classi, e senza toccare :root.
+   --accent qui ripete di proposito lo stesso bordeaux ora impostato su
+   :root (era l'unica differenza tra le due palette prima che l'accento
+   diventasse unico su tutto il sito): la regola resta per isolare
+   background/surface/border/stamp, propri del solo sito pubblico. */
 .site-public {
   --background: #f3f0e7;
   --surface: #ffffff;

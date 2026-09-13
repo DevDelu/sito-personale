@@ -122,6 +122,17 @@ serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `m
   introdurre nuovi colori. Il testo bianco con contorno scuro nell'etichetta della ciambella
   investimenti (`AllocationChart`) resta invariato di proposito: deve restare leggibile sopra
   fette di colore arbitrario, non sopra `--surface`, quindi non è un token di tema.
+- **Accento unico bordeaux su tutto il sito (non più ambra su `:root`/bordeaux solo su
+  `.site-public`)**: `--accent` su `:root` (area privata) è stato allineato al bordeaux già
+  usato dal sito pubblico (`#7e2537` chiaro / `#d4546d` scuro, foreground validati per
+  contrasto — vedi commento su `.site-public` in `globals.css` per la provenienza del colore).
+  Prima le due aree avevano hue diversi (ambra in privata, bordeaux in pubblica); ora l'accento
+  è coerente ovunque, riducendo la palette invece di introdurne una terza. `.site-public`
+  mantiene la propria dichiarazione di `--accent` (ora ridondante ma innocua) perché resta
+  l'unico posto a isolare anche `--background`/`--surface`/`--border`/`--stamp`, propri solo
+  del sito pubblico. I colori dedicati che riprendevano di proposito lo stesso hue dell'ambra
+  (`--invest-etf`, `--agenda-personale`) sono lasciati invariati: sono token di categorizzazione
+  indipendenti (hex propri, non `var(--accent)`), non l'accento del tema.
 
 ## Cosa manca volutamente in questa fase
 
