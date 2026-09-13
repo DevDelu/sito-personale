@@ -134,6 +134,19 @@ serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `m
   (`--invest-etf`, `--agenda-personale`) sono lasciati invariati: sono token di categorizzazione
   indipendenti (hex propri, non `var(--accent)`), non l'accento del tema.
 
+- **Snapshot storico in `pasti` (Fase A modulo Alimentazione)**: kcal/proteine/carboidrati/grassi
+  su ogni riga di `pasti` sono calcolati una sola volta all'inserimento (quantità × valori/100g
+  dell'alimento in quel momento) e non più ricalcolati da un join a `alimenti`, stesso principio
+  già in uso in `sessioni_log` (modulo Allenamento) verso `scheda_esercizi`: se l'utente corregge
+  un valore nel catalogo alimenti dopo aver loggato un pasto, i pasti già registrati non devono
+  cambiare. `pasti.alimento_id` è `on delete set null` e `alimento_nome` è anch'esso uno snapshot,
+  per restare leggibile anche se l'alimento originale viene rimosso dal catalogo. TDEE (Mifflin-St
+  Jeor) e riepilogo giornaliero sono calcolati in TypeScript in `lib/alimentazione/queries.ts`,
+  non con una vista SQL: nel repo non esiste un equivalente di "vista calcolata" per logica con
+  più di un semplice join (il costo-base FIFO di Investimenti segue lo stesso principio). Fuori
+  scope per questa fase, per scelta: integrazione con i giorni di allenamento del modulo workout,
+  catalogo esterno/barcode/foto/AI, ricette/meal planning/lista della spesa, notifiche/promemoria.
+
 ## Cosa manca volutamente in questa fase
 
 Collezione carte, agenda, portfolio pubblico DBZ: non ancora sviluppati, per scelta (vedi

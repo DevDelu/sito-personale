@@ -51,6 +51,11 @@
   --agenda-visita: #2563eb;
   --agenda-scadenza: #dc2626;
   --agenda-personale: #c25a1e; /* stesso hue dell'accent light */
+
+  /* Alimentazione: una per macro (barre di progresso, grafico trend) */
+  --macro-proteine: #2563eb;
+  --macro-carboidrati: #ca8a04;
+  --macro-grassi: #db2777;
 }
 
 [data-theme="dark"] {
@@ -96,6 +101,10 @@
   --agenda-visita: #60a5fa;
   --agenda-scadenza: #f87171;
   --agenda-personale: #e8792e; /* stesso hue dell'accent dark */
+
+  --macro-proteine: #60a5fa;
+  --macro-carboidrati: #facc15;
+  --macro-grassi: #f472b6;
 }
 
 /* Sito pubblico (biglietto da visita): stessi nomi di variabile della
