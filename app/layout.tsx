@@ -3,6 +3,7 @@ import { Fraunces, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { InlineScript } from "@/components/inline-script";
 import { ThemeColorSync } from "@/components/theme-color-sync";
+import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -26,6 +27,12 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Radar",
   description: "Radar — spese, investimenti, collezione e agenda personali.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Radar",
+  },
 };
 
 // viewportFit "cover": disegna sotto la notch/home-indicator invece di
@@ -71,6 +78,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col overflow-x-hidden bg-background text-foreground">
         <ThemeColorSync />
+        <ServiceWorkerRegister />
         {children}
         <Analytics />
       </body>
