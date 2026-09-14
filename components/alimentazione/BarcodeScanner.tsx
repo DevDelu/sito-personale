@@ -19,6 +19,14 @@ export function BarcodeScanner({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [errore, setErrore] = useState<string | null>(null);
   const rilevatoRef = useRef(false);
+  // onDetected in un ref: il chiamante (AlimentoSelector) non lo memoizza,
+  // e l'effect qui sotto deve avviare la fotocamera una sola volta al mount
+  // — non ogni volta che AlimentoSelector si ri-renderizza con una nuova
+  // reference della callback (altrimenti riavvio continuo dello stream).
+  const onDetectedRef = useRef(onDetected);
+  useEffect(() => {
+    onDetectedRef.current = onDetected;
+  }, [onDetected]);
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -29,7 +37,7 @@ export function BarcodeScanner({
     function segnalaRilevato(barcode: string) {
       if (cancelled || rilevatoRef.current) return;
       rilevatoRef.current = true;
-      onDetected(barcode);
+      onDetectedRef.current(barcode);
     }
 
     async function avvia() {
@@ -93,7 +101,7 @@ export function BarcodeScanner({
       zxingControls?.stop();
       stream?.getTracks().forEach((t) => t.stop());
     };
-  }, [onDetected]);
+  }, []);
 
   return (
     <div className="modal-overlay">
