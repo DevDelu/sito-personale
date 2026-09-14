@@ -36,13 +36,17 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Non autenticato." }, { status: 401 });
 
   const body = await request.json().catch(() => null);
-  const giornoSettimana = Number(body?.giornoSettimana);
+  // giornoSettimana null/assente = template jolly (non legato a un giorno
+  // fisso della griglia), vedi 029_template_pasti_jolly.sql.
+  const giornoSettimanaRaw = body?.giornoSettimana;
+  const isJolly = giornoSettimanaRaw === null || giornoSettimanaRaw === undefined;
+  const giornoSettimana = isJolly ? null : Number(giornoSettimanaRaw);
   const tipoPasto = String(body?.tipoPasto ?? "");
   const nome = typeof body?.nome === "string" ? body.nome.trim() : "";
   const composizione = parseComposizione(body?.composizione ?? []);
   const note = typeof body?.note === "string" ? body.note.trim() || null : null;
 
-  if (!Number.isInteger(giornoSettimana) || giornoSettimana < 1 || giornoSettimana > 7) {
+  if (!isJolly && (!Number.isInteger(giornoSettimana) || giornoSettimana! < 1 || giornoSettimana! > 7)) {
     return NextResponse.json({ error: "Giorno della settimana non valido." }, { status: 400 });
   }
   if (!TIPI_PASTO.includes(tipoPasto as TipoPasto)) {

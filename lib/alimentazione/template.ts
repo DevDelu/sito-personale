@@ -17,7 +17,7 @@ function mapComposizione(raw: unknown): ComposizioneItem[] {
 function mapTemplateRow(row: Record<string, unknown>): TemplatePasto {
   return {
     id: row.id as string,
-    giorno_settimana: Number(row.giorno_settimana),
+    giorno_settimana: row.giorno_settimana === null ? null : Number(row.giorno_settimana),
     tipo_pasto: row.tipo_pasto as TipoPasto,
     nome: row.nome as string,
     composizione: mapComposizione(row.composizione),
@@ -54,7 +54,7 @@ export async function getTemplateForGiorno(
 }
 
 export async function creaTemplate(input: {
-  giornoSettimana: number;
+  giornoSettimana: number | null;
   tipoPasto: TipoPasto;
   nome: string;
   composizione: ComposizioneItem[];
@@ -82,6 +82,7 @@ export async function aggiornaTemplate(
     nome?: string;
     composizione?: ComposizioneItem[];
     note?: string | null;
+    tipoPasto?: TipoPasto;
   }
 ): Promise<void> {
   const admin = createAdminClient();
@@ -90,6 +91,10 @@ export async function aggiornaTemplate(
   if (patch.nome !== undefined) update.nome = patch.nome;
   if (patch.composizione !== undefined) update.composizione = patch.composizione;
   if (patch.note !== undefined) update.note = patch.note || null;
+  // tipo_pasto modificabile solo per i jolly (giorno_settimana null): per le
+  // celle della griglia il tipo pasto è fissato dalla colonna, la UI non lo
+  // invia mai in quel caso.
+  if (patch.tipoPasto !== undefined) update.tipo_pasto = patch.tipoPasto;
 
   const { error } = await admin.from("template_pasti").update(update).eq("id", id);
   if (error) throw new Error(error.message);

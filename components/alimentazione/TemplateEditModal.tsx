@@ -24,12 +24,21 @@ const LABEL_GIORNO: Record<number, string> = {
 
 type Riga = { alimentoId: string; quantita: string };
 
-export type TemplateSavePayload = { nome: string; composizione: ComposizioneItem[]; note: string | null };
+export type TemplateSavePayload = {
+  nome: string;
+  composizione: ComposizioneItem[];
+  note: string | null;
+  tipoPasto?: TipoPasto; // solo per i jolly, vedi giornoSettimana === null sotto
+};
 
 // Modale di modifica cella del template settimanale: stesso pattern di
 // PastoEditModal, adattato per una composizione a più righe (alimento +
 // quantità) invece di un singolo alimento, con AlimentoSelector riusato per
 // ogni riga (compresa la creazione inline di un alimento nuovo).
+//
+// Con giornoSettimana === null (jolly, non legato a una cella della
+// griglia) il tipo pasto è scelto dall'utente invece di essere fissato dalla
+// colonna della griglia.
 export function TemplateEditModal({
   giornoSettimana,
   tipoPasto,
@@ -41,7 +50,7 @@ export function TemplateEditModal({
   onDelete,
   onCancel,
 }: {
-  giornoSettimana: number;
+  giornoSettimana: number | null;
   tipoPasto: TipoPasto;
   template: TemplatePasto | null;
   alimenti: Alimento[];
@@ -51,9 +60,11 @@ export function TemplateEditModal({
   onDelete?: () => void;
   onCancel: () => void;
 }) {
+  const isJolly = giornoSettimana === null;
   const [alimentiList, setAlimentiList] = useState(alimenti);
   const [nome, setNome] = useState(template?.nome ?? "");
   const [note, setNote] = useState(template?.note ?? "");
+  const [tipoPastoScelto, setTipoPastoScelto] = useState<TipoPasto>(template?.tipo_pasto ?? tipoPasto);
   const [righe, setRighe] = useState<Riga[]>(
     template && template.composizione.length > 0
       ? template.composizione.map((c) => ({ alimentoId: c.alimento_id, quantita: String(c.quantita_g) }))
@@ -96,7 +107,7 @@ export function TemplateEditModal({
       composizione.push({ alimento_id: r.alimentoId, quantita_g: quantita });
     }
 
-    onSave({ nome: nomeTrim, composizione, note: note.trim() || null });
+    onSave({ nome: nomeTrim, composizione, note: note.trim() || null, ...(isJolly ? { tipoPasto: tipoPastoScelto } : {}) });
   }
 
   return (
@@ -104,15 +115,36 @@ export function TemplateEditModal({
       <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-lg flex-col gap-4 p-5">
         <div className="flex flex-col gap-0.5">
           <h2 className="font-display text-base font-semibold">
-            {LABEL_GIORNO[giornoSettimana] ?? giornoSettimana} · {LABEL_TIPO[tipoPasto]}
+            {isJolly ? "Jolly" : `${LABEL_GIORNO[giornoSettimana] ?? giornoSettimana} · ${LABEL_TIPO[tipoPasto]}`}
           </h2>
-          <p className="text-sm text-muted">Nome del pasto e composizione (alimento + grammi per ogni voce).</p>
+          <p className="text-sm text-muted">
+            {isJolly
+              ? "Alternativa veloce non legata a un giorno fisso, selezionabile manualmente dal quick-add."
+              : "Nome del pasto e composizione (alimento + grammi per ogni voce)."}
+          </p>
         </div>
 
         <label className="flex flex-col gap-1.5">
           <span className="text-sm font-medium text-muted">Nome</span>
           <input value={nome} onChange={(e) => setNome(e.target.value)} className="field-input" />
         </label>
+
+        {isJolly && (
+          <label className="flex flex-col gap-1.5">
+            <span className="text-sm font-medium text-muted">Tipo pasto</span>
+            <select
+              value={tipoPastoScelto}
+              onChange={(e) => setTipoPastoScelto(e.target.value as TipoPasto)}
+              className="field-input"
+            >
+              {Object.entries(LABEL_TIPO).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
 
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium text-muted">Composizione</span>
