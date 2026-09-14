@@ -54,7 +54,7 @@ export type ComposizioneItem = { alimento_id: string; quantita_g: number };
 
 export type TemplatePasto = {
   id: string;
-  giorno_settimana: number; // 1 = lunedì .. 7 = domenica
+  giorno_settimana: number | null; // 1 = lunedì .. 7 = domenica; null = jolly (non legato a un giorno fisso)
   tipo_pasto: TipoPasto;
   nome: string;
   composizione: ComposizioneItem[];

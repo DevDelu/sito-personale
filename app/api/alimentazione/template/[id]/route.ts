@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/supabase/dal";
 import { aggiornaTemplate, eliminaTemplate } from "@/lib/alimentazione/template";
-import type { ComposizioneItem } from "@/lib/alimentazione/types";
+import type { ComposizioneItem, TipoPasto } from "@/lib/alimentazione/types";
+
+const TIPI_PASTO: TipoPasto[] = ["colazione", "pranzo", "cena", "spuntino"];
 
 function parseComposizione(raw: unknown): ComposizioneItem[] | null {
   if (!Array.isArray(raw)) return null;
@@ -27,7 +29,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Corpo della richiesta non valido." }, { status: 400 });
   }
 
-  const patch: { nome?: string; composizione?: ComposizioneItem[]; note?: string | null } = {};
+  const patch: { nome?: string; composizione?: ComposizioneItem[]; note?: string | null; tipoPasto?: TipoPasto } = {};
 
   if (typeof body.nome === "string") {
     const nome = body.nome.trim();
@@ -42,6 +44,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     patch.composizione = composizione;
   }
   if ("note" in body) patch.note = typeof body.note === "string" ? body.note.trim() || null : null;
+  // tipo_pasto modificabile solo per i jolly, vedi commento in aggiornaTemplate.
+  if (typeof body.tipoPasto === "string") {
+    if (!TIPI_PASTO.includes(body.tipoPasto as TipoPasto)) {
+      return NextResponse.json({ error: "Tipo pasto non valido." }, { status: 400 });
+    }
+    patch.tipoPasto = body.tipoPasto as TipoPasto;
+  }
 
   try {
     await aggiornaTemplate(id, patch);

@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { ComposizioneItem, TemplatePasto, TipoPasto } from "@/lib/alimentazione/types";
 
 export type TemplateCreateInput = {
-  giornoSettimana: number;
+  giornoSettimana: number | null; // null = jolly, vedi types.ts
   tipoPasto: TipoPasto;
   nome: string;
   composizione: ComposizioneItem[];
@@ -15,6 +15,7 @@ export type TemplatePatch = {
   nome?: string;
   composizione?: ComposizioneItem[];
   note?: string | null;
+  tipoPasto?: TipoPasto;
 };
 
 // Stesso pattern di usePastoMutations.ts: update/delete (+ create, la

@@ -79,9 +79,18 @@ export function AddMealForm({
   // singolo, che resta comunque utilizzabile invariato (giorni/pasti senza
   // template, o per loggare qualcosa fuori piano).
   const giorno = giornoSettimanaDaData(data);
-  const template = templates.find(
+  const templateDelGiorno = templates.find(
     (t) => t.giorno_settimana === giorno && t.tipo_pasto === tipoPasto && t.composizione.length > 0
   );
+
+  // Jolly per il tipo pasto corrente: alternative selezionabili manualmente
+  // (es. panino da lavoro), non legate al giorno — vedi TemplateGrid.
+  const jollyDisponibili = templates.filter(
+    (t) => t.giorno_settimana === null && t.tipo_pasto === tipoPasto && t.composizione.length > 0
+  );
+  const [jollyId, setJollyId] = useState("");
+  const jollyScelto = jollyDisponibili.find((t) => t.id === jollyId) ?? null;
+  const template = jollyScelto ?? templateDelGiorno;
 
   return (
     <div className="flex w-full max-w-lg flex-col gap-6">
@@ -90,7 +99,10 @@ export function AddMealForm({
           <button
             key={t.value}
             type="button"
-            onClick={() => setTipoPasto(t.value)}
+            onClick={() => {
+              setTipoPasto(t.value);
+              setJollyId("");
+            }}
             className={`rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-95 ${
               tipoPasto === t.value
                 ? "border-accent bg-accent text-accent-foreground shadow-sm"
@@ -101,6 +113,24 @@ export function AddMealForm({
           </button>
         ))}
       </div>
+
+      {jollyDisponibili.length > 0 && (
+        <label className="flex flex-col gap-1.5 animate-slide-up">
+          <span className="text-sm font-medium text-muted">Jolly disponibili per questo pasto</span>
+          <select
+            value={jollyId}
+            onChange={(e) => setJollyId(e.target.value)}
+            className="field-input bg-surface"
+          >
+            <option value="">Usa il template del giorno (se presente)</option>
+            {jollyDisponibili.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.nome}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       {template && (
         <TemplatePanel

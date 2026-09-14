@@ -24,7 +24,10 @@ const TIPI: { value: TipoPasto; label: string }[] = [
   { value: "spuntino", label: "Spuntino" },
 ];
 
-type Cella = { giorno: number; tipoPasto: TipoPasto };
+// giorno: null = jolly (non legato a una cella della griglia, vedi
+// TemplateEditModal). jollyId identifica quale jolly esistente si sta
+// modificando (assente = si sta creando un jolly nuovo).
+type Cella = { giorno: number; tipoPasto: TipoPasto } | { giorno: null; tipoPasto: TipoPasto; jollyId?: string };
 
 export function TemplateGrid({ templates, alimenti }: { templates: TemplatePasto[]; alimenti: Alimento[] }) {
   const router = useRouter();
@@ -33,14 +36,21 @@ export function TemplateGrid({ templates, alimenti }: { templates: TemplatePasto
   const [deleting, setDeleting] = useState<TemplatePasto | null>(null);
 
   const alimentiById = new Map(alimenti.map((a) => [a.id, a]));
+  const jolly = templates.filter((t) => t.giorno_settimana === null);
 
   function templateFor(giorno: number, tipoPasto: TipoPasto): TemplatePasto | null {
     return templates.find((t) => t.giorno_settimana === giorno && t.tipo_pasto === tipoPasto) ?? null;
   }
 
+  function templateInModifica(): TemplatePasto | null {
+    if (!editing) return null;
+    if (editing.giorno === null) return jolly.find((t) => t.id === editing.jollyId) ?? null;
+    return templateFor(editing.giorno, editing.tipoPasto);
+  }
+
   async function handleSave(payload: TemplateSavePayload) {
     if (!editing) return;
-    const esistente = templateFor(editing.giorno, editing.tipoPasto);
+    const esistente = templateInModifica();
     if (esistente) {
       await updateTemplate(esistente.id, payload);
     } else {
@@ -62,7 +72,7 @@ export function TemplateGrid({ templates, alimenti }: { templates: TemplatePasto
     router.refresh();
   }
 
-  const cellaInModifica = editing ? templateFor(editing.giorno, editing.tipoPasto) : null;
+  const cellaInModifica = templateInModifica();
 
   return (
     <>
@@ -112,6 +122,50 @@ export function TemplateGrid({ templates, alimenti }: { templates: TemplatePasto
             </Fragment>
           ))}
         </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-0.5">
+            <h2 className="font-display text-base font-semibold">Jolly</h2>
+            <p className="text-sm text-muted">
+              Alternative veloci non legate a un giorno fisso, selezionabili manualmente dal quick-add.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setEditing({ giorno: null, tipoPasto: "pranzo" })}
+            className="btn-secondary !px-3 !py-1.5 text-xs"
+          >
+            + Nuovo jolly
+          </button>
+        </div>
+
+        {jolly.length > 0 && (
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {jolly.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setEditing({ giorno: null, tipoPasto: t.tipo_pasto, jollyId: t.id })}
+                className="card card-hover flex flex-col gap-1 p-2.5 text-left text-xs"
+              >
+                <span className="text-sm font-medium leading-snug">{t.nome}</span>
+                <span className="text-muted">
+                  {TIPI.find((tp) => tp.value === t.tipo_pasto)?.label} ·{" "}
+                  {t.composizione.length > 0
+                    ? t.composizione
+                        .map((c) => {
+                          const alimento = alimentiById.get(c.alimento_id);
+                          return `${alimento?.nome ?? "?"} ${c.quantita_g}g`;
+                        })
+                        .join(" · ")
+                    : "Nessuna composizione fissa"}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {editing && (
