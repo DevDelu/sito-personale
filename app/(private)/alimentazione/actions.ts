@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/supabase/dal";
 import { creaPasto, registraPeso, salvaProfilo } from "@/lib/alimentazione/queries";
-import type { FaseObiettivo, LivelloAttivita, TipoPasto } from "@/lib/alimentazione/types";
+import { registraPastoDaTemplate as registraPastoDaTemplateQuery } from "@/lib/alimentazione/template";
+import type { ComposizioneItem, FaseObiettivo, LivelloAttivita, TipoPasto } from "@/lib/alimentazione/types";
 
 const TIPI_PASTO: TipoPasto[] = ["colazione", "pranzo", "cena", "spuntino"];
 
@@ -31,6 +32,50 @@ export async function aggiungiPasto(
 
   try {
     await creaPasto({ data, tipoPasto: tipoPastoRaw as TipoPasto, alimentoId, quantitaG, note });
+  } catch (e) {
+    return { error: (e as Error).message };
+  }
+
+  revalidatePath("/alimentazione");
+  redirect("/alimentazione?added=1");
+}
+
+export type RegistraPastoDaTemplateState = { error?: string } | undefined;
+
+// Registra in un colpo solo un pasto reale per ogni voce della composizione
+// del template del giorno (loop su creaPasto in
+// lib/alimentazione/template.ts): il quick-add continua a funzionare
+// invariato per giorni/pasti senza template o per loggare qualcosa fuori
+// piano, questa è solo un'alternativa più veloce quando il template combacia.
+export async function registraPastoDaTemplate(
+  _prevState: RegistraPastoDaTemplateState,
+  formData: FormData
+): Promise<RegistraPastoDaTemplateState> {
+  await requireUser();
+
+  const tipoPastoRaw = String(formData.get("tipo_pasto") ?? "");
+  const data = String(formData.get("data") ?? "").trim();
+  const composizioneRaw = String(formData.get("composizione") ?? "");
+
+  if (!TIPI_PASTO.includes(tipoPastoRaw as TipoPasto)) return { error: "Seleziona un tipo pasto valido." };
+  if (!data) return { error: "La data è obbligatoria." };
+
+  let composizione: ComposizioneItem[];
+  try {
+    const parsed = JSON.parse(composizioneRaw);
+    if (!Array.isArray(parsed) || parsed.length === 0) throw new Error();
+    composizione = parsed.map((r) => {
+      const alimentoId = String(r.alimento_id ?? "");
+      const quantitaG = Number(r.quantita_g);
+      if (!alimentoId || !Number.isFinite(quantitaG) || quantitaG <= 0) throw new Error();
+      return { alimento_id: alimentoId, quantita_g: quantitaG };
+    });
+  } catch {
+    return { error: "Composizione del template non valida." };
+  }
+
+  try {
+    await registraPastoDaTemplateQuery({ data, tipoPasto: tipoPastoRaw as TipoPasto, composizione });
   } catch (e) {
     return { error: (e as Error).message };
   }

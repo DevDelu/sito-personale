@@ -2,11 +2,19 @@
 
 import { useActionState, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { aggiungiPasto, type AggiungiPastoState } from "../actions";
+import { aggiungiPasto, registraPastoDaTemplate, type AggiungiPastoState } from "../actions";
 import { AlimentoSelector } from "@/components/alimentazione/AlimentoSelector";
-import type { Alimento, Pasto, TipoPasto } from "@/lib/alimentazione/types";
+import type { Alimento, Pasto, TemplatePasto, TipoPasto } from "@/lib/alimentazione/types";
 
 const oggi = () => new Date().toISOString().slice(0, 10);
+
+// 1 = lunedì .. 7 = domenica (getUTCDay() usa 0 = domenica, va rimappato) —
+// stessa logica di giornoSettimanaDaData in lib/alimentazione/template.ts,
+// duplicata qui perché quel file è server-only e questo è un componente client.
+function giornoSettimanaDaData(dataIso: string): number {
+  const giorno = new Date(`${dataIso}T00:00:00Z`).getUTCDay();
+  return giorno === 0 ? 7 : giorno;
+}
 
 const TIPI: { value: TipoPasto; label: string }[] = [
   { value: "colazione", label: "Colazione" },
@@ -15,7 +23,15 @@ const TIPI: { value: TipoPasto; label: string }[] = [
   { value: "spuntino", label: "Spuntino" },
 ];
 
-export function AddMealForm({ alimenti, pastiRecenti }: { alimenti: Alimento[]; pastiRecenti: Pasto[] }) {
+export function AddMealForm({
+  alimenti,
+  pastiRecenti,
+  templates,
+}: {
+  alimenti: Alimento[];
+  pastiRecenti: Pasto[];
+  templates: TemplatePasto[];
+}) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState<AggiungiPastoState, FormData>(aggiungiPasto, undefined);
 
@@ -23,6 +39,7 @@ export function AddMealForm({ alimenti, pastiRecenti }: { alimenti: Alimento[]; 
   const [tipoPasto, setTipoPasto] = useState<TipoPasto>("colazione");
   const [alimentoId, setAlimentoId] = useState("");
   const [quantita, setQuantita] = useState("100");
+  const [data, setData] = useState(oggi());
 
   function handleAlimentoCreato(nuovo: Alimento) {
     setAlimentiList((prev) =>
@@ -57,8 +74,17 @@ export function AddMealForm({ alimenti, pastiRecenti }: { alimenti: Alimento[]; 
     setQuantita(String(ultimoSimile.quantita_g));
   }
 
+  // Template del giorno/tipo pasto selezionati, se ne esiste uno con
+  // composizione non vuota: mostra il pannello "Usa template" sopra al form
+  // singolo, che resta comunque utilizzabile invariato (giorni/pasti senza
+  // template, o per loggare qualcosa fuori piano).
+  const giorno = giornoSettimanaDaData(data);
+  const template = templates.find(
+    (t) => t.giorno_settimana === giorno && t.tipo_pasto === tipoPasto && t.composizione.length > 0
+  );
+
   return (
-    <form action={formAction} className="flex w-full max-w-lg animate-slide-up flex-col gap-4">
+    <div className="flex w-full max-w-lg flex-col gap-6">
       <div className="flex flex-wrap gap-2">
         {TIPI.map((t) => (
           <button
@@ -75,6 +101,18 @@ export function AddMealForm({ alimenti, pastiRecenti }: { alimenti: Alimento[]; 
           </button>
         ))}
       </div>
+
+      {template && (
+        <TemplatePanel
+          key={template.id}
+          template={template}
+          data={data}
+          tipoPasto={tipoPasto}
+          alimenti={alimentiList}
+        />
+      )}
+
+      <form action={formAction} className="flex flex-col gap-4 animate-slide-up">
       <input type="hidden" name="tipo_pasto" value={tipoPasto} />
       <input type="hidden" name="alimento_id" value={alimentoId} />
 
@@ -112,7 +150,14 @@ export function AddMealForm({ alimenti, pastiRecenti }: { alimenti: Alimento[]; 
           />
         </Field>
         <Field label="Data">
-          <input name="data" type="date" required defaultValue={oggi()} className="field-input bg-surface" />
+          <input
+            name="data"
+            type="date"
+            required
+            value={data}
+            onChange={(e) => setData(e.target.value)}
+            className="field-input bg-surface"
+          />
         </Field>
       </div>
 
@@ -143,6 +188,80 @@ export function AddMealForm({ alimenti, pastiRecenti }: { alimenti: Alimento[]; 
           Annulla
         </button>
       </div>
+      </form>
+    </div>
+  );
+}
+
+// Pannello "Usa template": elenca la composizione del template del
+// giorno/tipo pasto correnti con le grammature target, editabili, e registra
+// un Pasto reale per ogni voce in un'unica server action. Non tocca il form
+// singolo sopra/sotto, che resta l'unico modo di loggare qualcosa fuori
+// template.
+function TemplatePanel({
+  template,
+  data,
+  tipoPasto,
+  alimenti,
+}: {
+  template: TemplatePasto;
+  data: string;
+  tipoPasto: TipoPasto;
+  alimenti: Alimento[];
+}) {
+  const [state, formAction, pending] = useActionState(registraPastoDaTemplate, undefined);
+  const [righe, setRighe] = useState(
+    template.composizione.map((c) => ({ alimentoId: c.alimento_id, quantita: String(c.quantita_g) }))
+  );
+
+  function aggiornaQuantita(index: number, quantita: string) {
+    setRighe((prev) => prev.map((r, i) => (i === index ? { ...r, quantita } : r)));
+  }
+
+  const composizionePayload = JSON.stringify(
+    righe.map((r) => ({ alimento_id: r.alimentoId, quantita_g: Number(r.quantita.replace(",", ".")) }))
+  );
+
+  return (
+    <form action={formAction} className="card flex animate-slide-up flex-col gap-3 p-4">
+      <div className="flex flex-col gap-0.5">
+        <span className="text-sm font-medium">Usa template: {template.nome}</span>
+        <span className="text-xs text-muted">Registra tutte le voci qui sotto come un unico pasto.</span>
+      </div>
+
+      <input type="hidden" name="tipo_pasto" value={tipoPasto} />
+      <input type="hidden" name="data" value={data} />
+      <input type="hidden" name="composizione" value={composizionePayload} />
+
+      <div className="flex flex-col gap-2">
+        {righe.map((riga, index) => {
+          const alimento = alimenti.find((a) => a.id === riga.alimentoId);
+          return (
+            <div key={riga.alimentoId} className="flex items-center justify-between gap-3 text-sm">
+              <span>{alimento?.nome ?? "Alimento non trovato"}</span>
+              <div className="flex items-center gap-1.5">
+                <input
+                  value={riga.quantita}
+                  onChange={(e) => aggiornaQuantita(index, e.target.value)}
+                  inputMode="decimal"
+                  className="field-input w-20 bg-surface text-right"
+                />
+                <span className="text-xs text-muted">g</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {state?.error && (
+        <p className="text-sm text-spesa" role="alert">
+          {state.error}
+        </p>
+      )}
+
+      <button type="submit" disabled={pending} className="btn-primary self-start">
+        {pending ? "Registrazione..." : "Registra pasto da template"}
+      </button>
     </form>
   );
 }
