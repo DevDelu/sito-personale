@@ -72,6 +72,7 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     subsections: [
       { href: "/alimentazione", label: "Overview" },
       { href: "/alimentazione/gestione", label: "Gestione" },
+      { href: "/alimentazione/template", label: "Template settimanale" },
       { href: "/alimentazione/aggiungi", label: "+ Aggiungi" },
       { href: "/alimentazione/profilo", label: "Profilo" },
     ],

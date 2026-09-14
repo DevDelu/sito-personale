@@ -50,6 +50,31 @@ export type ProfiloNutrizionale = {
   updated_at: string;
 };
 
+export type ComposizioneItem = { alimento_id: string; quantita_g: number };
+
+export type TemplatePasto = {
+  id: string;
+  giorno_settimana: number; // 1 = lunedì .. 7 = domenica
+  tipo_pasto: TipoPasto;
+  nome: string;
+  composizione: ComposizioneItem[];
+  note: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+// Aderenza non calcolabile (nessun template per quel giorno/tipo pasto, o
+// template con composizione vuota) è un caso normale, non un errore — stesso
+// principio di RiepilogoTdee.
+export type AderenzaPasto =
+  | { ok: false }
+  | {
+      ok: true;
+      templateNome: string;
+      aderenza: number; // 0..1
+      fuoriPiano: string[]; // nomi di alimenti loggati non previsti dal template
+    };
+
 export type MacroTotali = {
   kcal: number;
   proteine_g: number;

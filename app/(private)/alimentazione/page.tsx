@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getPastiByData, getPastiTraDate, getRiepilogoTdee, sommaMacro, trendSettimanale } from "@/lib/alimentazione/queries";
+import {
+  getAlimenti,
+  getPastiByData,
+  getPastiTraDate,
+  getRiepilogoTdee,
+  sommaMacro,
+  trendSettimanale,
+} from "@/lib/alimentazione/queries";
+import { aderenzaMedia, getTemplatePasti } from "@/lib/alimentazione/template";
 import { MacroProgressBars, stimaTargetMacro } from "@/components/alimentazione/MacroProgressBars";
 import { WeeklyTrendChart } from "@/components/alimentazione/WeeklyTrendChart";
 import { TodayMealsList } from "@/components/alimentazione/TodayMealsList";
@@ -24,10 +32,13 @@ export default async function AlimentazionePage({
   const { added } = await searchParams;
   const oggi = todayIso();
 
-  const [riepilogo, pastiOggi, pastiSettimana] = await Promise.all([
+  const [riepilogo, pastiOggi, pastiSettimana, pastiMese, templates, alimenti] = await Promise.all([
     getRiepilogoTdee(),
     getPastiByData(oggi),
     getPastiTraDate(daysAgoIso(7), oggi),
+    getPastiTraDate(daysAgoIso(30), oggi),
+    getTemplatePasti(),
+    getAlimenti(),
   ]);
 
   const consumoOggi = sommaMacro(pastiOggi);
@@ -35,6 +46,9 @@ export default async function AlimentazionePage({
 
   const targetKcal = riepilogo.ok ? riepilogo.targetKcal : null;
   const targetMacro = riepilogo.ok ? stimaTargetMacro(riepilogo.targetKcal, riepilogo.pesoKg) : null;
+
+  const aderenzaSettimana = aderenzaMedia(pastiSettimana, templates, alimenti, daysAgoIso(7), oggi);
+  const aderenzaMese = aderenzaMedia(pastiMese, templates, alimenti, daysAgoIso(30), oggi);
 
   return (
     <div className="flex flex-col gap-6">
@@ -79,6 +93,8 @@ export default async function AlimentazionePage({
         <WeeklyTrendChart punti={trend} targetKcal={targetKcal} />
       </div>
 
+      <AderenzaCard settimana={aderenzaSettimana} mese={aderenzaMese} />
+
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-sm font-medium text-muted">Pasti di oggi</h2>
@@ -88,6 +104,37 @@ export default async function AlimentazionePage({
         </div>
         <TodayMealsList pasti={pastiOggi} />
       </section>
+    </div>
+  );
+}
+
+// "N/D" quando non c'è ancora abbastanza dato (nessun template configurato
+// per i giorni/pasti loggati, o nessun pasto nel periodo) invece di un
+// numero fuorviante — stesso spirito del ramo "non calcolabile" del TDEE.
+function AderenzaCard({ settimana, mese }: { settimana: number | null; mese: number | null }) {
+  return (
+    <div className="card flex flex-col gap-3 p-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-sm font-medium text-muted">Aderenza al piano</h2>
+        <Link href="/alimentazione/template" className="text-xs font-medium text-accent hover:underline">
+          Gestisci template
+        </Link>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <AderenzaValue label="Ultimi 7 giorni" valore={settimana} />
+        <AderenzaValue label="Ultimi 30 giorni" valore={mese} />
+      </div>
+    </div>
+  );
+}
+
+function AderenzaValue({ label, valore }: { label: string; valore: number | null }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-xs text-muted">{label}</span>
+      <span className="font-figures text-2xl font-semibold">
+        {valore === null ? <span className="text-muted">N/D</span> : `${Math.round(valore * 100)}%`}
+      </span>
     </div>
   );
 }
