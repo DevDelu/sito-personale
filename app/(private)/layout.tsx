@@ -5,6 +5,9 @@ import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sidebar } from "@/components/sidebar";
 import { TabBar } from "@/components/shell/TabBar";
+import { appViewport } from "@/lib/app-viewport";
+
+export const viewport = appViewport;
 
 export default async function PrivateLayout({
   children,

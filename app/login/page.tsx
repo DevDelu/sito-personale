@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { LoginForm } from "./login-form";
+import { appViewport } from "@/lib/app-viewport";
 
 export const metadata: Metadata = { title: "Accedi" };
+export const viewport = appViewport;
 
 export default async function LoginPage({
   searchParams,
