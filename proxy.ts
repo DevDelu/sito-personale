@@ -6,7 +6,15 @@ import { updateSession } from "@/lib/supabase/proxy";
 // Rotte non sotto app/[locale]/ (area privata, login, api): restano gestite
 // da updateSession() esattamente come prima, senza passare dal middleware
 // next-intl. /progetti è invece sotto app/[locale]/progetti (bilingue).
-const UNLOCALIZED_PREFIXES = ["/spese", "/investimenti", "/carte", "/allenamenti", "/agenda", "/alimentazione"];
+const UNLOCALIZED_PREFIXES = [
+  "/spese",
+  "/investimenti",
+  "/carte",
+  "/allenamenti",
+  "/agenda",
+  "/alimentazione",
+  "/impostazioni",
+];
 const UNLOCALIZED_EXACT_ROUTES = ["/login"];
 
 const intlMiddleware = createMiddleware(routing);
