@@ -10,6 +10,10 @@ export type SidebarSection = {
   disabled?: boolean;
   badge?: string;
   subsections?: SidebarSubsection[];
+  // Sezioni con uno slot dedicato nella tab bar mobile (5 al massimo: le
+  // altre restano raggiungibili solo da "Altro"). Cambiare la selezione è
+  // una riga qui, la fonte resta unica per sidebar desktop e tab bar.
+  mobileTab?: boolean;
 };
 
 export const SIDEBAR_SECTIONS: SidebarSection[] = [
@@ -18,6 +22,7 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     label: "Spese",
     icon: Wallet,
     href: "/spese",
+    mobileTab: true,
     subsections: [
       { href: "/spese", label: "Overview" },
       { href: "/spese/gestione", label: "Gestione" },
@@ -30,6 +35,7 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     label: "Investimenti",
     icon: TrendingUp,
     href: "/investimenti",
+    mobileTab: true,
     subsections: [
       { href: "/investimenti", label: "Overview" },
       { href: "/investimenti/gestione", label: "Gestione" },
@@ -51,6 +57,7 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     label: "Allenamento",
     icon: Dumbbell,
     href: "/allenamenti",
+    mobileTab: true,
     subsections: [
       { href: "/allenamenti", label: "Overview" },
       { href: "/allenamenti/schede", label: "Le mie schede" },
@@ -69,6 +76,7 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     label: "Alimentazione",
     icon: Apple,
     href: "/alimentazione",
+    mobileTab: true,
     subsections: [
       { href: "/alimentazione", label: "Overview" },
       { href: "/alimentazione/gestione", label: "Gestione" },

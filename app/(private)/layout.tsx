@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/supabase/dal";
 import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sidebar } from "@/components/sidebar";
+import { TabBar } from "@/components/shell/TabBar";
 
 export default async function PrivateLayout({
   children,
@@ -27,40 +28,24 @@ export default async function PrivateLayout({
     </form>
   );
 
-  // Su mobile la topbar sticky resta leggera (solo il toggle tema): area
-  // pubblica ed esci vivono nel footer del drawer, non affollato quindi può
-  // stare appaiato in riga invece che impilato — stessa dimensione/stile di
-  // "Esci", solo icona al posto del testo per restare compatto. Su desktop
-  // invece tema + area pubblica (versione con testo) vanno in una barra
-  // sticky in alto a destra sopra il contenuto: "Esci" da solo resta in
-  // fondo alla sidebar.
-  const accountSlot = <ThemeToggle />;
-
-  const areaPubblicaLinkCompatto = (
-    <Link href="/" aria-label="Area pubblica" className="btn-secondary !px-3 !py-1.5">
-      <ExternalLink className="h-3.5 w-3.5" />
-    </Link>
-  );
-
-  const drawerFooterSlot = (
-    <div className="flex items-center gap-2">
-      {areaPubblicaLinkCompatto}
-      {logoutForm}
-    </div>
-  );
-
   return (
-    <div className="flex min-h-full flex-1 flex-col md:flex-row">
-      <Sidebar accountSlot={accountSlot} drawerFooterSlot={drawerFooterSlot} logoutSlot={logoutForm} />
+    // .app-shell delimita lo scope di tutto lo stile mobile nuovo (vedi
+    // "UI mobile" in CLAUDE.md): sotto 768px la tab bar in basso sostituisce
+    // la topbar con hamburger/drawer di prima, quindi il contenuto ha
+    // padding sia sopra (safe-area) che sotto (tab bar + safe-area).
+    // Da md in su la sidebar desktop resta identica a prima.
+    <div className="app-shell flex min-h-full flex-1 flex-col md:flex-row">
+      <Sidebar logoutSlot={logoutForm} />
       <div className="flex flex-1 flex-col">
         <div className="sticky top-0 z-20 hidden items-center justify-end gap-2 border-b border-border bg-surface/80 px-4 py-3 backdrop-blur-md sm:px-6 md:flex">
           <ThemeToggle />
           {areaPubblicaLink}
         </div>
-        <div className="flex flex-1 flex-col px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 animate-fade-in">
+        <div className="animate-fade-in flex flex-1 flex-col px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-[calc(var(--app-tabbar-height)+env(safe-area-inset-bottom)+1.5rem)] sm:px-6 md:pt-6 md:pb-6">
           {children}
         </div>
       </div>
+      <TabBar />
     </div>
   );
 }

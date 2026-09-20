@@ -1,5 +1,7 @@
 "use client";
 
+import { Sheet } from "./Sheet";
+
 export function DeleteConfirmDialog({
   titolo,
   count,
@@ -23,28 +25,26 @@ export function DeleteConfirmDialog({
   const isBulk = typeof count === "number" && count > 1;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-panel w-full max-w-sm p-5">
-        <h2 className="font-display text-base font-semibold">
-          {title ?? (isBulk ? `Eliminare ${count} movimenti?` : "Eliminare questo movimento?")}
-        </h2>
-        <p className="mt-1 text-sm text-muted">
-          {description ??
-            (isBulk ? (
-              `Le ${count} righe selezionate verranno rimosse definitivamente. L'operazione non è reversibile.`
-            ) : (
-              <>&ldquo;{titolo}&rdquo; verrà rimosso definitivamente. L&apos;operazione non è reversibile.</>
-            ))}
-        </p>
-        <div className="mt-4 flex justify-end gap-3">
-          <button type="button" onClick={onCancel} className="btn-secondary">
-            Annulla
-          </button>
-          <button type="button" onClick={onConfirm} disabled={pending} className="btn-danger">
-            {pending ? "Eliminazione..." : "Elimina"}
-          </button>
-        </div>
+    <Sheet onClose={onCancel} className="max-w-sm p-5">
+      <h2 className="font-display text-base font-semibold">
+        {title ?? (isBulk ? `Eliminare ${count} movimenti?` : "Eliminare questo movimento?")}
+      </h2>
+      <p className="mt-1 text-sm text-muted">
+        {description ??
+          (isBulk ? (
+            `Le ${count} righe selezionate verranno rimosse definitivamente. L'operazione non è reversibile.`
+          ) : (
+            <>&ldquo;{titolo}&rdquo; verrà rimosso definitivamente. L&apos;operazione non è reversibile.</>
+          ))}
+      </p>
+      <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <button type="button" onClick={onCancel} className="btn-secondary">
+          Annulla
+        </button>
+        <button type="button" onClick={onConfirm} disabled={pending} className="btn-danger">
+          {pending ? "Eliminazione..." : "Elimina"}
+        </button>
       </div>
-    </div>
+    </Sheet>
   );
 }

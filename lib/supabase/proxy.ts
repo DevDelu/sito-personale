@@ -10,6 +10,7 @@ const PROTECTED_PREFIXES = [
   "/agenda",
   "/alimentazione",
   "/impostazioni",
+  "/altro",
 ];
 
 export async function updateSession(request: NextRequest) {
