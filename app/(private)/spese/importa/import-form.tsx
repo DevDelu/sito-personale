@@ -175,7 +175,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
             accept=".xlsx"
             onChange={handleFileChangeExcel}
             disabled={stato === "parsing" || stato === "importing"}
-            className="w-fit rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground transition-all duration-150 file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-foreground file:transition-opacity hover:file:opacity-90"
+            className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground transition-all duration-150 file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-foreground file:transition-opacity hover:file:opacity-90 md:w-fit"
           />
           <p className="text-xs text-muted">
             Colonne attese, in ordine: tipo, data, importo, categoria, titolo, descrizione,
@@ -194,7 +194,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
                 accept=".csv"
                 onChange={(e) => setCryptoFile(e.target.files?.[0] ?? null)}
                 disabled={stato === "parsing" || stato === "importing"}
-                className="w-fit rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground transition-all duration-150 file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-foreground file:transition-opacity hover:file:opacity-90"
+                className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground transition-all duration-150 file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-foreground file:transition-opacity hover:file:opacity-90 md:w-fit"
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -204,7 +204,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
                 accept=".xlsx"
                 onChange={(e) => setIntesaFile(e.target.files?.[0] ?? null)}
                 disabled={stato === "parsing" || stato === "importing"}
-                className="w-fit rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground transition-all duration-150 file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-foreground file:transition-opacity hover:file:opacity-90"
+                className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground transition-all duration-150 file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-foreground file:transition-opacity hover:file:opacity-90 md:w-fit"
               />
             </div>
           </div>
@@ -216,7 +216,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
             type="button"
             onClick={handleAnalizzaGrezzi}
             disabled={(!cryptoFile && !intesaFile) || stato === "parsing" || stato === "importing"}
-            className="btn-primary self-start"
+            className="btn-primary w-full self-stretch md:w-fit md:self-start"
           >
             {stato === "parsing" ? "Analisi in corso..." : "Analizza file"}
           </button>
@@ -263,7 +263,69 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
               {daVerificareCount > 0 && <> — {daVerificareCount} da verificare</>}. {numeroSelezionate}{" "}
               selezionate per l&apos;import.
             </p>
-            <div className="overflow-x-auto rounded-xl border border-border">
+            {/* Mobile: righe di lista invece della tabella (stesse info,
+                stack verticale leggibile senza scroll orizzontale). */}
+            <div className="flex flex-col divide-y divide-[var(--app-hairline)] overflow-hidden rounded-[var(--app-card-radius)] bg-surface md:hidden">
+              {righe.length === 0 ? (
+                <p className="px-4 py-6 text-center text-sm text-muted">Nessuna riga valida in questo file.</p>
+              ) : (
+                righe.map((r, i) => (
+                  <label key={i} className="flex items-start gap-3 px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selezionate[i] ?? false}
+                      onChange={(e) =>
+                        setSelezionate((prev) => {
+                          const next = [...prev];
+                          next[i] = e.target.checked;
+                          return next;
+                        })
+                      }
+                      className="mt-1 h-5 w-5 shrink-0 rounded border-border accent-[var(--accent)]"
+                    />
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="truncate text-[17px] text-foreground">{r.titolo}</span>
+                        <span className="font-figures shrink-0 text-[15px] text-muted">
+                          {formatCurrency(r.importo)}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 text-[13px] text-muted">
+                        <span className="capitalize">{r.tipo}</span>
+                        <span>·</span>
+                        <span>{new Date(`${r.data}T00:00:00Z`).toLocaleDateString("it-IT")}</span>
+                        {r.duplicato && (
+                          <span className="rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-accent">
+                            già presente
+                          </span>
+                        )}
+                      </div>
+                      {r.daVerificare ? (
+                        <select
+                          value={r.categoria}
+                          onChange={(e) => handleCategoriaChange(i, e.target.value)}
+                          className="field-input mt-1 w-full"
+                        >
+                          {categorie
+                            .filter((c) => c.tipo === r.tipo)
+                            .map((c) => (
+                              <option key={c.id} value={c.nome}>
+                                {c.nome}
+                              </option>
+                            ))}
+                        </select>
+                      ) : (
+                        <div>
+                          <CategoryBadge nome={r.categoria} />
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                ))
+              )}
+            </div>
+
+            <div className="hidden overflow-x-auto rounded-xl border border-border md:block">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-border text-muted">
                   <tr>
@@ -392,7 +454,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
                 type="button"
                 onClick={handleConferma}
                 disabled={stato === "importing" || numeroSelezionate === 0}
-                className="btn-primary self-start"
+                className="btn-primary w-full self-stretch md:w-fit md:self-start"
               >
                 {stato === "importing"
                   ? "Importazione in corso..."

@@ -8,6 +8,7 @@ import { useExpenseMutations } from "@/hooks/useExpenseMutations";
 import { useMovimentoForm } from "@/hooks/useMovimentoForm";
 import { MovimentoFormFields } from "./MovimentoFormFields";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
+import { Sheet } from "@/components/ui/Sheet";
 import type { TransactionListItem } from "./TransactionList";
 import type { Categoria } from "@/lib/types";
 
@@ -52,8 +53,8 @@ export function TransactionDetailModal({
   });
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-panel w-full max-w-md p-5">
+    <>
+      <Sheet onClose={onClose} className="max-w-md p-5">
         {modalita === "dettaglio" ? (
           <div className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-2">
@@ -138,7 +139,7 @@ export function TransactionDetailModal({
             </div>
           </form>
         )}
-      </div>
+      </Sheet>
 
       {confermaEliminazione && (
         <DeleteConfirmDialog
@@ -148,7 +149,7 @@ export function TransactionDetailModal({
           onCancel={() => setConfermaEliminazione(false)}
         />
       )}
-    </div>
+    </>
   );
 }
 

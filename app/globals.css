@@ -258,6 +258,86 @@ html {
   font-size: 80%;
 }
 
+/* UI mobile (area privata, PWA iOS): sotto 768px, quando il wrapper del
+   layout privato (.app-shell, vedi app/(private)/layout.tsx) è nel DOM,
+   riporta la radice al 100% così le misure iOS della scala tipografica
+   (documentate in CLAUDE.md) tornano ai px reali invece che scalate
+   all'80%. Il sito pubblico e il layout desktop dell'area privata restano
+   invariati: non hanno .app-shell nell'albero, oppure sono sopra 768px.
+   :has() è supportato da iOS 15.4+. */
+@media (max-width: 767px) {
+  html:has(.app-shell) {
+    font-size: 100%;
+  }
+}
+
+.app-shell {
+  /* Token nuovi, usati solo sotto .app-shell (mobile): hairline dei
+     separatori interni alle liste raggruppate, raggio card in stile iOS,
+     altezza della tab bar (per il padding del contenuto) e del segmented
+     control. */
+  --app-hairline: var(--border);
+  --app-card-radius: 16px;
+  --app-tabbar-height: 49px;
+}
+
+@media (max-width: 767px) {
+  /* Font di sistema per il feeling nativo iOS: una sola scorciatoia che
+     ridefinisce le variabili già usate da centinaia di file (font-sans,
+     .font-display, .font-figures) invece di riscriverli uno a uno. Fraunces
+     e JetBrains Mono restano caricati per il sito pubblico e il desktop. */
+  .app-shell {
+    --font-sans: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  }
+
+  .app-shell .font-display {
+    font-family: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  }
+
+  .app-shell .font-figures {
+    font-family: -apple-system, "SF Pro Text", system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Comportamento da app: niente flash grigio al tap, niente doppio-tap per
+     zoomare su bottoni/link/tab, niente popup di selezione testo sui
+     controlli (titoli, tab bar, header restano leggibili ma non
+     selezionabili come farebbe un'app nativa). */
+  .app-shell {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .app-shell button,
+  .app-shell a,
+  .app-shell [role="tab"] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .app-shell .app-static {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .app-shell .app-scroll {
+    overscroll-behavior: contain;
+  }
+
+  /* Campi: mai sotto i 16px (altrimenti iOS zooma la pagina al focus),
+     altezza minima comoda al tocco. */
+  .app-shell .field-input {
+    font-size: 17px;
+    min-height: 48px;
+    border-radius: 12px;
+  }
+
+  .app-shell select.field-input,
+  .app-shell textarea.field-input {
+    min-height: 0;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -381,7 +461,7 @@ body {
   }
 
   .modal-panel {
-    @apply animate-scale-in max-h-[calc(100vh-2rem)] w-auto overflow-y-auto rounded-xl border border-border bg-surface pb-0 shadow-2xl;
+    @apply animate-scale-in max-h-[calc(100dvh-2rem)] w-auto overflow-y-auto rounded-xl border border-border bg-surface pb-0 shadow-2xl;
   }
 
   @media (max-width: 639px) and (pointer: coarse) {
@@ -390,7 +470,7 @@ body {
     }
 
     .modal-panel {
-      @apply animate-slide-up max-h-[90vh] w-full rounded-t-2xl rounded-b-none border-x-0 border-b-0 border-t pb-[env(safe-area-inset-bottom)];
+      @apply animate-slide-up max-h-[90dvh] w-full rounded-t-2xl rounded-b-none border-x-0 border-b-0 border-t pb-[env(safe-area-inset-bottom)];
     }
   }
 

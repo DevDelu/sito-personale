@@ -3,6 +3,13 @@ import { getCategorie, getMovimenti } from "@/lib/spese/queries";
 import { ExpenseTable } from "@/components/spese/ExpenseTable";
 import { GestioneFilters } from "./gestione-filters";
 import { Pagination } from "./pagination";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
+
+const SPESE_SEGMENTI = SIDEBAR_SECTIONS.find((s) => s.id === "spese")!.subsections!.filter(
+  (s) => !s.label.startsWith("+")
+);
 
 export const metadata: Metadata = { title: "Spese · Gestione" };
 
@@ -48,7 +55,10 @@ export default async function GestionePage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
+      <PageHeader title="Gestione" parent={{ href: "/spese", label: "Spese" }} />
+      <SegmentedControl items={SPESE_SEGMENTI} />
+
+      <div className="hidden flex-col gap-1 md:flex">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Gestione movimenti</h1>
         <p className="text-sm text-muted">
           {total} movimenti totali. Cerca, filtra, modifica o elimina.

@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Recupera password" };
 
 export default function RecuperaPasswordPage() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-8 px-6">
+    <main className="app-shell flex min-h-[100dvh] flex-1 flex-col items-center justify-center gap-8 px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       <div className="flex max-w-sm flex-col gap-2 text-center">
         <h1 className="font-display text-2xl font-semibold tracking-tight">
           Recupera password

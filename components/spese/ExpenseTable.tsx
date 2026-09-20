@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
 import { CategoryBadge } from "@/components/category-badge";
+import { categoryColor } from "@/lib/category-style";
 import { formatCurrency } from "@/lib/spese-utils";
 import { useExpenseMutations, type MovimentoPatch } from "@/hooks/useExpenseMutations";
 import {
@@ -13,11 +14,34 @@ import {
 } from "@/hooks/useBulkMovimentoMutations";
 import { ExpenseEditModal } from "./ExpenseEditModal";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
+import { ActionBar } from "@/components/ui/ActionBar";
 import { BulkEditModal } from "./BulkEditModal";
 import type { Categoria, Movimento } from "@/lib/types";
 
 function rowKey(r: Movimento): string {
   return `${r.tipo}-${r.id}`;
+}
+
+function giornoLabel(iso: string): string {
+  const oggi = new Date().toISOString().slice(0, 10);
+  const ieri = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  if (iso === oggi) return "Oggi";
+  if (iso === ieri) return "Ieri";
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("it-IT", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+  });
+}
+
+function raggruppaPerGiorno(rows: Movimento[]): { giorno: string; righe: Movimento[] }[] {
+  const gruppi: { giorno: string; righe: Movimento[] }[] = [];
+  for (const r of rows) {
+    const ultimo = gruppi[gruppi.length - 1];
+    if (ultimo && ultimo.giorno === r.data) ultimo.righe.push(r);
+    else gruppi.push({ giorno: r.data, righe: [r] });
+  }
+  return gruppi;
 }
 
 export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie: Categoria[] }) {
@@ -29,6 +53,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
   const [categorieList, setCategorieList] = useState(categorie);
   const [prevCategorie, setPrevCategorie] = useState(categorie);
   const [selezionati, setSelezionati] = useState<Set<string>>(new Set());
+  const [modalitaSelezione, setModalitaSelezione] = useState(false);
   const [prevRows, setPrevRows] = useState(rows);
   const [modificaBulk, setModificaBulk] = useState(false);
   const [eliminaBulk, setEliminaBulk] = useState(false);
@@ -48,6 +73,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
   if (rows !== prevRows) {
     setPrevRows(rows);
     setSelezionati(new Set());
+    if (modalitaSelezione) setModalitaSelezione(false);
   }
 
   function handleCategoriaCreata(nuova: Categoria) {
@@ -88,11 +114,22 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
     );
   }
 
+  function handleRigaClickMobile(r: Movimento) {
+    if (modalitaSelezione) toggleRiga(r);
+    else setEditing(r);
+  }
+
+  function uscitaSelezione() {
+    setModalitaSelezione(false);
+    setSelezionati(new Set());
+  }
+
   const righeSelezionate = rows.filter((r) => selezionati.has(rowKey(r)));
   const itemsSelezionati: BulkMovimentoItem[] = righeSelezionate.map((r) => ({
     id: r.id,
     tipo: r.tipo,
   }));
+  const gruppiPerGiorno = useMemo(() => raggruppaPerGiorno(rows), [rows]);
 
   async function handleBulkApply(patch: BulkMovimentoPatch) {
     await bulk.bulkUpdate(itemsSelezionati, patch);
@@ -110,126 +147,228 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
 
   return (
     <>
-      {righeSelezionate.length > 0 && (
-        <div className="animate-slide-down mb-3 flex flex-wrap items-center gap-3 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 shadow-sm">
-          <span className="text-sm font-medium">
-            {righeSelezionate.length} {righeSelezionate.length === 1 ? "selezionato" : "selezionati"}
-          </span>
-          <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
-            <button type="button" onClick={() => setModificaBulk(true)} className="btn-primary !px-3 !py-1.5">
-              Modifica in blocco
+      {/* Mobile: lista raggruppata per giorno, con intestazioni sticky e
+          selezione multipla in stile iOS (checkbox tondi + ActionBar sopra
+          la tab bar). Da md in su resta la tabella qui sotto. */}
+      <div className="flex flex-col gap-4 md:hidden">
+        <div className="flex items-center justify-between">
+          <span className="text-[13px] text-muted">{rows.length} movimenti</span>
+          <button
+            type="button"
+            onClick={() => (modalitaSelezione ? uscitaSelezione() : setModalitaSelezione(true))}
+            className="text-[15px] font-medium text-accent active:opacity-60"
+          >
+            {modalitaSelezione ? "Annulla" : "Seleziona"}
+          </button>
+        </div>
+
+        {rows.length === 0 ? (
+          <p className="py-6 text-center text-sm text-muted">Nessun movimento trovato.</p>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {gruppiPerGiorno.map((gruppo) => (
+              <div key={gruppo.giorno} className="flex flex-col gap-1.5">
+                <h3 className="app-static px-1 text-[13px] font-medium text-muted capitalize">
+                  {giornoLabel(gruppo.giorno)}
+                </h3>
+                <div
+                  className="divide-y divide-[var(--app-hairline)] overflow-hidden bg-surface"
+                  style={{ borderRadius: "var(--app-card-radius)" }}
+                >
+                  {gruppo.righe.map((r) => {
+                    const key = rowKey(r);
+                    const selezionata = selezionati.has(key);
+                    const colore = r.categoria_colore || categoryColor(r.categoria_nome);
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => handleRigaClickMobile(r)}
+                        className={`flex min-h-[56px] w-full items-center gap-3 py-2 pr-4 pl-4 text-left transition-colors duration-150 active:bg-surface-hover ${
+                          selezionata ? "bg-accent/5" : ""
+                        }`}
+                      >
+                        {modalitaSelezione && (
+                          <input
+                            type="checkbox"
+                            aria-label="Seleziona riga"
+                            checked={selezionata}
+                            readOnly
+                            className="h-5 w-5 shrink-0 rounded-full border-border accent-[var(--accent)]"
+                          />
+                        )}
+                        <span
+                          className="h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: colore }}
+                          aria-hidden
+                        />
+                        <span className="flex min-w-0 flex-1 flex-col">
+                          <span className="truncate text-[17px] text-foreground">
+                            {r.titolo ?? r.descrizione ?? "—"}
+                          </span>
+                          <span className="truncate text-[13px] text-muted">
+                            {r.categoria_nome ?? "Senza categoria"}
+                          </span>
+                        </span>
+                        <span
+                          className={`font-figures shrink-0 text-[17px] ${
+                            r.tipo === "entrata" ? "text-entrata" : "text-spesa"
+                          }`}
+                        >
+                          {r.tipo === "entrata" ? "+" : "-"}
+                          {formatCurrency(r.importo)}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {modalitaSelezione && righeSelezionate.length > 0 && (
+          <ActionBar>
+            <span className="mr-auto text-[15px] font-medium">
+              {righeSelezionate.length} {righeSelezionate.length === 1 ? "selezionato" : "selezionati"}
+            </span>
+            <button type="button" onClick={() => setModificaBulk(true)} className="btn-secondary !px-3 !py-1.5">
+              Modifica
             </button>
             <button
               type="button"
               onClick={() => setEliminaBulk(true)}
               className="btn-secondary !px-3 !py-1.5 hover:!text-spesa"
             >
-              Elimina selezionate
+              Elimina
             </button>
-            <button
-              type="button"
-              onClick={() => setSelezionati(new Set())}
-              className="btn-secondary !px-3 !py-1.5"
-            >
-              Deseleziona
-            </button>
-          </div>
-        </div>
-      )}
+          </ActionBar>
+        )}
+      </div>
 
-      <div className="overflow-x-auto rounded-xl border border-border shadow-sm">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-border text-muted">
-            <tr>
-              <th className="w-8 px-3 py-2">
-                <input
-                  type="checkbox"
-                  aria-label="Seleziona tutto"
-                  checked={rows.length > 0 && selezionati.size === rows.length}
-                  onChange={toggleTutte}
-                  className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
-                />
-              </th>
-              <th className="px-3 py-2 font-medium">Data</th>
-              <th className="px-3 py-2 font-medium">Titolo</th>
-              <th className="px-3 py-2 font-medium">Categoria</th>
-              <th className="px-3 py-2 font-medium">Tipo</th>
-              <th className="px-3 py-2 font-medium">Fonte</th>
-              <th className="px-3 py-2 text-right font-medium">Importo</th>
-              <th className="px-3 py-2" />
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => {
-              const extra =
-                r.categoria_nome === "Bonifici" && r.nominativo
-                  ? r.nominativo
-                  : r.categoria_nome === "PayPal" && r.dettaglio
-                    ? r.dettaglio
-                    : null;
-              const key = rowKey(r);
-              const selezionata = selezionati.has(key);
-              return (
-                <tr
-                  key={key}
-                  className={`border-b border-border transition-colors duration-150 last:border-0 hover:bg-surface-hover ${
-                    selezionata ? "bg-accent/5" : ""
-                  }`}
-                >
-                  <td className="px-3 py-2">
-                    <input
-                      type="checkbox"
-                      aria-label="Seleziona riga"
-                      checked={selezionata}
-                      onChange={() => toggleRiga(r)}
-                      className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
-                    />
-                  </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-muted">
-                    {new Date(`${r.data}T00:00:00Z`).toLocaleDateString("it-IT")}
-                  </td>
-                  <td className="px-3 py-2">
-                    <span>{r.titolo ?? r.descrizione ?? "—"}</span>
-                    {extra && <div className="text-xs text-muted">{extra}</div>}
-                  </td>
-                  <td className="px-3 py-2">
-                    <CategoryBadge nome={r.categoria_nome} colore={r.categoria_colore} />
-                  </td>
-                  <td className="px-3 py-2 text-muted capitalize">{r.tipo}</td>
-                  <td className="px-3 py-2 text-xs text-muted/70">{r.fonte}</td>
-                  <td className="px-3 py-2 text-right font-figures">{formatCurrency(r.importo)}</td>
-                  <td className="px-3 py-2">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setEditing(r)}
-                        aria-label="Modifica"
-                        className="btn-icon"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeleting(r)}
-                        aria-label="Elimina"
-                        className="btn-icon hover:!text-spesa"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
+      {/* Desktop: tabella con selezione inline (comportamento invariato). */}
+      <div className="hidden md:block">
+        {righeSelezionate.length > 0 && (
+          <div className="animate-slide-down mb-3 flex flex-wrap items-center gap-3 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 shadow-sm">
+            <span className="text-sm font-medium">
+              {righeSelezionate.length} {righeSelezionate.length === 1 ? "selezionato" : "selezionati"}
+            </span>
+            <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+              <button type="button" onClick={() => setModificaBulk(true)} className="btn-primary !px-3 !py-1.5">
+                Modifica in blocco
+              </button>
+              <button
+                type="button"
+                onClick={() => setEliminaBulk(true)}
+                className="btn-secondary !px-3 !py-1.5 hover:!text-spesa"
+              >
+                Elimina selezionate
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelezionati(new Set())}
+                className="btn-secondary !px-3 !py-1.5"
+              >
+                Deseleziona
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="overflow-x-auto rounded-xl border border-border shadow-sm">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-border text-muted">
+              <tr>
+                <th className="w-8 px-3 py-2">
+                  <input
+                    type="checkbox"
+                    aria-label="Seleziona tutto"
+                    checked={rows.length > 0 && selezionati.size === rows.length}
+                    onChange={toggleTutte}
+                    className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
+                  />
+                </th>
+                <th className="px-3 py-2 font-medium">Data</th>
+                <th className="px-3 py-2 font-medium">Titolo</th>
+                <th className="px-3 py-2 font-medium">Categoria</th>
+                <th className="px-3 py-2 font-medium">Tipo</th>
+                <th className="px-3 py-2 font-medium">Fonte</th>
+                <th className="px-3 py-2 text-right font-medium">Importo</th>
+                <th className="px-3 py-2" />
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => {
+                const extra =
+                  r.categoria_nome === "Bonifici" && r.nominativo
+                    ? r.nominativo
+                    : r.categoria_nome === "PayPal" && r.dettaglio
+                      ? r.dettaglio
+                      : null;
+                const key = rowKey(r);
+                const selezionata = selezionati.has(key);
+                return (
+                  <tr
+                    key={key}
+                    className={`border-b border-border transition-colors duration-150 last:border-0 hover:bg-surface-hover ${
+                      selezionata ? "bg-accent/5" : ""
+                    }`}
+                  >
+                    <td className="px-3 py-2">
+                      <input
+                        type="checkbox"
+                        aria-label="Seleziona riga"
+                        checked={selezionata}
+                        onChange={() => toggleRiga(r)}
+                        className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
+                      />
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-muted">
+                      {new Date(`${r.data}T00:00:00Z`).toLocaleDateString("it-IT")}
+                    </td>
+                    <td className="px-3 py-2">
+                      <span>{r.titolo ?? r.descrizione ?? "—"}</span>
+                      {extra && <div className="text-xs text-muted">{extra}</div>}
+                    </td>
+                    <td className="px-3 py-2">
+                      <CategoryBadge nome={r.categoria_nome} colore={r.categoria_colore} />
+                    </td>
+                    <td className="px-3 py-2 text-muted capitalize">{r.tipo}</td>
+                    <td className="px-3 py-2 text-xs text-muted/70">{r.fonte}</td>
+                    <td className="px-3 py-2 text-right font-figures">{formatCurrency(r.importo)}</td>
+                    <td className="px-3 py-2">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditing(r)}
+                          aria-label="Modifica"
+                          className="btn-icon"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleting(r)}
+                          aria-label="Elimina"
+                          className="btn-icon hover:!text-spesa"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {rows.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="px-3 py-6 text-center text-muted">
+                    Nessun movimento trovato.
                   </td>
                 </tr>
-              );
-            })}
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={8} className="px-3 py-6 text-center text-muted">
-                  Nessun movimento trovato.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {editing && (

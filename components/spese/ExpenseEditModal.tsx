@@ -4,6 +4,7 @@ import type { Categoria, Movimento } from "@/lib/types";
 import type { MovimentoPatch } from "@/hooks/useExpenseMutations";
 import { useMovimentoForm } from "@/hooks/useMovimentoForm";
 import { MovimentoFormFields } from "./MovimentoFormFields";
+import { Sheet } from "@/components/ui/Sheet";
 
 export function ExpenseEditModal({
   movimento,
@@ -30,8 +31,8 @@ export function ExpenseEditModal({
   }
 
   return (
-    <div className="modal-overlay">
-      <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
+    <Sheet onClose={onCancel}>
+      <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">Modifica movimento</h2>
 
         <MovimentoFormFields
@@ -56,6 +57,6 @@ export function ExpenseEditModal({
           </button>
         </div>
       </form>
-    </div>
+    </Sheet>
   );
 }
