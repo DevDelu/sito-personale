@@ -1,16 +1,24 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { Pause, Play, SkipForward, Square, Wrench } from "lucide-react";
-import { useCountdown } from "@/hooks/useCountdown";
 import { useSessionAudio } from "@/hooks/useSessionAudio";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { salvaLogSerie, terminaSessione, type LogSeriePatch } from "@/app/(private)/allenamenti/actions";
 import { setSessionNavGuard } from "@/lib/allenamento/session-guard";
+import {
+  COUNTDOWN_SECONDS_OPTIONS,
+  getCountdownSecondsServerSnapshot,
+  getCountdownSecondsSnapshot,
+  setCountdownSeconds,
+  subscribeCountdownSeconds,
+  type CountdownSeconds,
+} from "@/lib/allenamento/countdown-prefs";
 import { SessionRowNormale } from "./SessionRowNormale";
 import { SessionRowCircuito } from "./SessionRowCircuito";
 import { SessionRowStretching } from "./SessionRowStretching";
+import { StartCountdown } from "./StartCountdown";
 import type { Scheda, SchedaEsercizioConNome, Sessione, SessioneLog } from "@/lib/allenamento/types";
 
 type Step =
@@ -167,6 +175,12 @@ export function SessionRunner({
   const [terminandoENavigando, setTerminandoENavigando] = useState(false);
   const startedAtRef = useRef<number | null>(null);
 
+  const countdownSeconds: CountdownSeconds = useSyncExternalStore(
+    subscribeCountdownSeconds,
+    getCountdownSecondsSnapshot,
+    getCountdownSecondsServerSnapshot
+  );
+
   const sessioneInCorso = avviato || inPreparazione;
   useWakeLock(sessioneInCorso);
 
@@ -238,11 +252,15 @@ export function SessionRunner({
   if (!avviato) {
     if (inPreparazione && stepCorrente) {
       return (
-        <PreparazionePrompt
-          step={stepCorrente}
+        <StartCountdown
+          seconds={countdownSeconds}
+          stepLabel={nomeStep(stepCorrente)}
+          stepDetail={descrizioneStep(stepCorrente)}
+          attrezzatura={attrezzaturaStep(stepCorrente)}
           tick={audio.tick}
           finish={audio.finish}
           onDone={confermaAvvio}
+          onCancel={() => setInPreparazione(false)}
         />
       );
     }
@@ -250,6 +268,9 @@ export function SessionRunner({
       <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
         <h1 className="font-display text-2xl font-semibold">{scheda.nome}</h1>
         {scheda.descrizione && <p className="max-w-sm text-sm text-muted">{scheda.descrizione}</p>}
+        {steps.length > 0 && (
+          <CountdownDurataSelector value={countdownSeconds} onChange={setCountdownSeconds} />
+        )}
         <button
           type="button"
           onClick={avviaSessione}
@@ -406,37 +427,36 @@ function ConfermaDialog({
   );
 }
 
-// Annuncio del primo esercizio con countdown di preparazione di 30s (stessi
-// beep degli altri timer della sessione) prima dell'avvio vero. Skippabile
-// col bottone "Inizia subito".
-function PreparazionePrompt({
-  step,
-  tick,
-  finish,
-  onDone,
+// Selettore della durata del countdown di preparazione, mostrato sulla
+// schermata "Inizia allenamento". Valore ricordato in localStorage (vedi
+// lib/allenamento/countdown-prefs.ts).
+function CountdownDurataSelector({
+  value,
+  onChange,
 }: {
-  step: Step;
-  tick: () => void;
-  finish: () => void;
-  onDone: () => void;
+  value: CountdownSeconds;
+  onChange: (value: CountdownSeconds) => void;
 }) {
-  const { remaining } = useCountdown(30, "preparazione", true, { tick, finish, onDone });
-
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-      <span className="text-xs font-medium uppercase tracking-wide text-muted">Si parte con</span>
-      <h1 className="font-display text-2xl font-semibold">{nomeStep(step)}</h1>
-      <p className="text-sm text-muted">{descrizioneStep(step)}</p>
-      {attrezzaturaStep(step).length > 0 && (
-        <p className="flex items-center gap-1.5 text-sm text-accent">
-          <Wrench className="h-3.5 w-3.5 shrink-0" />
-          Prepara: {attrezzaturaStep(step).join(", ")}
-        </p>
-      )}
-      <span className="font-figures text-6xl font-bold tabular-nums text-accent">{remaining}s</span>
-      <button type="button" onClick={onDone} className="btn-secondary">
-        Inizia subito
-      </button>
+    <div className="flex flex-col items-center gap-2">
+      <span className="text-xs font-medium uppercase tracking-wide text-muted">Countdown di preparazione</span>
+      <div className="flex gap-2">
+        {COUNTDOWN_SECONDS_OPTIONS.map((s) => (
+          <button
+            key={s}
+            type="button"
+            onClick={() => onChange(s)}
+            aria-pressed={value === s}
+            className={`rounded-full border px-3 py-1 text-sm font-medium transition-all duration-150 ease-out active:scale-95 ${
+              value === s
+                ? "border-accent bg-accent text-accent-foreground shadow-sm"
+                : "border-border text-muted hover:text-foreground"
+            }`}
+          >
+            {s}s
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
