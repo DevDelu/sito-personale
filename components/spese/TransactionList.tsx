@@ -1,5 +1,5 @@
-import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/spese-utils";
+import { categoryColor } from "@/lib/category-style";
 import type { Deposito, Spesa } from "@/lib/types";
 
 export type TransactionListItem = {
@@ -70,11 +70,13 @@ export function TransactionList({
   return (
     <ul className="flex max-h-56 flex-col gap-1.5 overflow-y-auto">
       {items.map((item) => {
-        const Icon = item.tipo === "entrata" ? ArrowUpCircle : ArrowDownCircle;
+        const colore = item.categoria_colore || categoryColor(item.categoria_nome);
         const rowContent = (
           <>
-            <Icon
-              className={`h-4 w-4 shrink-0 ${item.tipo === "entrata" ? "text-entrata" : "text-spesa"}`}
+            <span
+              className="h-2.5 w-2.5 shrink-0 rounded-full"
+              style={{ backgroundColor: colore }}
+              aria-hidden
             />
             <div className="flex min-w-0 flex-1 flex-col">
               <span className="truncate font-medium text-foreground">

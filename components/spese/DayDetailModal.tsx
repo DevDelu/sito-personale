@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
 import { CategoryBadge } from "@/components/category-badge";
+import { Sheet } from "@/components/ui/Sheet";
 import { formatCurrency, formatFonte } from "@/lib/spese-utils";
 import { TransactionDetailModal } from "./TransactionDetailModal";
 import type { TransactionListItem } from "./TransactionList";
@@ -38,27 +39,14 @@ export function DayDetailModal({
 }) {
   const [dettaglio, setDettaglio] = useState<TransactionListItem | null>(null);
 
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
-
   function handleChanged() {
     onChanged();
   }
 
   return (
     <>
-      <div
-        className="modal-overlay"
-        onClick={(e) => {
-          if (e.target === e.currentTarget) onClose();
-        }}
-      >
-        <div className="modal-panel w-full max-w-lg p-5">
+      <Sheet onClose={onClose} className="max-w-lg p-5">
+        <div>
           <div className="mb-4 flex items-start justify-between gap-2">
             <h2 className="font-display text-base font-semibold capitalize">{dayLabel(giorno)}</h2>
             <button type="button" onClick={onClose} aria-label="Chiudi" className="btn-icon">
@@ -69,7 +57,7 @@ export function DayDetailModal({
           {items.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted">Nessuna transazione in questo giorno.</p>
           ) : (
-            <ul className="flex max-h-[60vh] flex-col gap-2 overflow-y-auto">
+            <ul className="flex max-h-[60dvh] flex-col gap-2 overflow-y-auto">
               {items.map((item) => (
                 <li key={item.id}>
                   <button
@@ -107,7 +95,7 @@ export function DayDetailModal({
             </ul>
           )}
         </div>
-      </div>
+      </Sheet>
 
       {dettaglio && (
         <TransactionDetailModal

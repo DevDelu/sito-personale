@@ -8,7 +8,13 @@ import type { Categoria } from "@/lib/types";
 
 const oggi = () => new Date().toISOString().slice(0, 10);
 
-export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
+export function AddTransactionForm({
+  categorie,
+  formId,
+}: {
+  categorie: Categoria[];
+  formId?: string;
+}) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState<AggiungiMovimentoState, FormData>(
     aggiungiMovimento,
@@ -31,7 +37,7 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
   const mostraDettaglio = categoriaSelezionata?.nome === "PayPal";
 
   return (
-    <form action={formAction} className="flex w-full max-w-lg animate-slide-up flex-col gap-4">
+    <form id={formId} action={formAction} className="flex w-full max-w-lg animate-slide-up flex-col gap-4">
       <div className="flex gap-2">
         {(["spesa", "entrata"] as const).map((t) => (
           <button
@@ -53,36 +59,39 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
       </div>
       <input type="hidden" name="tipo" value={tipo} />
 
+      {/* Su mobile l'importo è il campo più prominente, in cima: dimensione
+          da titolo, tastiera numerica. Su desktop resta di taglia normale,
+          affiancato alla data come prima. */}
+      <Field label="Importo (€)">
+        <input
+          name="importo"
+          type="number"
+          inputMode="decimal"
+          step="0.01"
+          min="0.01"
+          required
+          className="field-input bg-surface text-center text-[32px] font-bold max-md:py-4 md:text-left md:text-base md:font-normal"
+        />
+      </Field>
+
       <Field label="Titolo">
         <input
           name="titolo"
           type="text"
           required
-          className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+          className="field-input bg-surface"
         />
       </Field>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Importo (€)">
-          <input
-            name="importo"
-            type="number"
-            step="0.01"
-            min="0.01"
-            required
-            className="field-input bg-surface"
-          />
-        </Field>
-        <Field label="Data">
-          <input
-            name="data"
-            type="date"
-            required
-            defaultValue={oggi()}
-            className="field-input bg-surface"
-          />
-        </Field>
-      </div>
+      <Field label="Data">
+        <input
+          name="data"
+          type="date"
+          required
+          defaultValue={oggi()}
+          className="field-input bg-surface"
+        />
+      </Field>
 
       <Field label="Categoria">
         <CategoriaSelector
@@ -116,7 +125,7 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
         <textarea
           name="descrizione"
           rows={2}
-          className="rounded-xl border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-accent"
+          className="field-input bg-surface"
         />
       </Field>
 
@@ -126,7 +135,16 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
         </p>
       )}
 
-      <div className="flex gap-3">
+      {/* Su mobile il salvataggio avviene dal pulsante nella PageHeader
+          (sempre visibile, la tastiera non lo copre): qui resta solo il
+          feedback di caricamento. Su desktop, senza header d'azione, i
+          pulsanti restano qui come prima. */}
+      {pending && (
+        <p className="text-sm text-muted md:hidden" role="status">
+          Salvataggio...
+        </p>
+      )}
+      <div className="hidden gap-3 md:flex">
         <button type="submit" disabled={pending} className="btn-primary">
           {pending ? "Salvataggio..." : "Aggiungi"}
         </button>
@@ -138,9 +156,17 @@ export function AddTransactionForm({ categorie }: { categorie: Categoria[] }) {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+  className = "",
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className={`flex flex-col gap-1.5 ${className}`}>
       <span className="text-sm font-medium text-muted">{label}</span>
       {children}
     </label>

@@ -14,7 +14,7 @@ export function MetricCard({
 }) {
   return (
     <div
-      className="card card-hover animate-slide-up flex flex-col gap-1 border-l-4 px-4 py-3"
+      className="card card-hover max-md:animate-none flex flex-col gap-1 border-l-4 px-4 py-3 max-md:border-l-0"
       style={{ borderLeftColor: `var(${colorVar})` }}
     >
       <span className="text-xs text-muted">{label}</span>

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { formatCurrency } from "@/lib/spese-utils";
 import { CategoriaSelector } from "./CategoriaSelector";
+import { Sheet } from "@/components/ui/Sheet";
 import type { BulkMovimentoPatch } from "@/hooks/useBulkMovimentoMutations";
 import type { Categoria, Movimento, TipoCategoria } from "@/lib/types";
 
@@ -127,9 +128,8 @@ export function BulkEditModal({
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-panel w-full max-w-md p-5">
-        {fase === "campi" ? (
+    <Sheet onClose={onCancel} className="max-w-md p-5">
+      {fase === "campi" ? (
           <form onSubmit={handleContinua} className="flex flex-col gap-4">
             <div>
               <h2 className="font-display text-base font-semibold">Modifica in blocco</h2>
@@ -272,8 +272,7 @@ export function BulkEditModal({
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </Sheet>
   );
 }
 
