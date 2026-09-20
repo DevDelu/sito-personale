@@ -158,6 +158,20 @@ serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `m
   → Condividi → Aggiungi a Home, richiede 16.4+), non dal sito visitato nel browser. Vedi
   CLAUDE.md, sezione "PWA e notifiche push", per i dettagli implementativi.
 
+- **Countdown di preparazione allenamento configurabile (30/45/60s, default 30s) in
+  localStorage, non in DB**: è una preferenza di dispositivo/utente per darsi il tempo di
+  allontanarsi dal telefono prima del primo esercizio, non un dato di dominio da avere in
+  Supabase — `radar.workout.countdownSeconds`, letture/scritture avvolte in try/catch,
+  fallback al default se assente/non valida. Nessuna scrittura sul DB durante il countdown
+  stesso (tick/beep riusano lo stesso `useSessionAudio` del timer di riposo); Annulla torna
+  alla schermata precedente senza effetti collaterali. Nota di architettura: la riga
+  `sessioni` viene creata all'apertura di `/allenamenti/sessione/nuova` (prima ancora dello
+  schermo "Inizia allenamento"), non alla fine del countdown — comportamento preesistente a
+  questa modifica, per cui "annulla il countdown" non elimina comunque quella riga già creata
+  in precedenza. Farlo davvero coincidere richiederebbe spostare `creaSessione` da server
+  action a chiamata client-side al termine del countdown, un refactor di routing più ampio,
+  lasciato come backlog.
+
 ## Cosa manca volutamente in questa fase
 
 Collezione carte, agenda, portfolio pubblico DBZ: non ancora sviluppati, per scelta (vedi
