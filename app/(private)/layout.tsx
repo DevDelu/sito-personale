@@ -44,7 +44,7 @@ export default async function PrivateLayout({
           <ThemeToggle />
           {areaPubblicaLink}
         </div>
-        <div className="animate-fade-in flex flex-1 flex-col px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-[calc(var(--app-tabbar-height)+env(safe-area-inset-bottom)+1.5rem)] sm:px-6 md:pt-6 md:pb-6">
+        <div className="app-page-content animate-fade-in flex flex-1 flex-col px-4 pb-[calc(var(--app-tabbar-height)+env(safe-area-inset-bottom)+1rem)] sm:px-6 md:pt-6 md:pb-6">
           {children}
         </div>
       </div>

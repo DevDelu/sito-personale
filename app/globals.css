@@ -336,6 +336,24 @@ html {
   .app-shell textarea.field-input {
     min-height: 0;
   }
+
+  /* Padding superiore per la safe-area del contenuto pagina
+     (app/(private)/layout.tsx, classe .app-page-content): annullato quando
+     la pagina monta una PageHeader (classe .app-page-header, ovunque al suo
+     interno, non necessariamente il primo figlio — es. un Toast prima di
+     lei) perché PageHeader applica già la propria safe-area sulla barra
+     sticky. Prima questo era gestito con un margine negativo che doveva
+     ripetere lo stesso calc() byte per byte in due file diversi (layout.tsx
+     e PageHeader.tsx): bastava che uno dei due cambiasse per rompere la
+     cancellazione e lasciare doppia safe-area. Con :has() la regola vive in
+     un solo posto. */
+  .app-page-content {
+    padding-top: calc(0.5rem + env(safe-area-inset-top));
+  }
+
+  .app-page-content:has(.app-page-header) {
+    padding-top: 0;
+  }
 }
 
 body {

@@ -31,12 +31,13 @@ export function PageHeader({
   }, []);
 
   return (
-    // -mt-[...] annulla il padding-top per la safe-area già applicato dal
-    // contenuto della pagina (app/(private)/layout.tsx): senza, la
-    // safe-area verrebbe sommata due volte (una volta dal layout, una da
-    // pt-[env(safe-area-inset-top)] qui sotto), lasciando uno spazio vuoto
-    // enorme sopra il titolo.
-    <div className="-mx-4 -mt-[calc(0.5rem+env(safe-area-inset-top))] md:hidden">
+    // .app-page-header è solo un marcatore: la regola CSS scoped
+    // (.app-page-content:has(.app-page-header), app/globals.css) azzera il
+    // padding-top per la safe-area già applicato dal contenuto della
+    // pagina, perché questo componente applica la propria safe-area sulla
+    // barra sticky qui sotto. Un'unica regola dichiarativa invece di due
+    // calc() che dovevano restare identici byte per byte in due file.
+    <div className="app-page-header -mx-4 md:hidden">
       <div
         className="sticky top-0 z-20 border-b bg-surface/85 px-4 pt-[env(safe-area-inset-top)] backdrop-blur-md transition-colors duration-200"
         style={{ borderBottomColor: compatto ? "var(--app-hairline)" : "transparent" }}
