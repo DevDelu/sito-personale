@@ -158,6 +158,20 @@ serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `m
   → Condividi → Aggiungi a Home, richiede 16.4+), non dal sito visitato nel browser. Vedi
   CLAUDE.md, sezione "PWA e notifiche push", per i dettagli implementativi.
 
+- **UI mobile dell'area privata: tab bar + font di sistema + `font-size: 100%` solo sotto
+  `.app-shell` (invece di riscalare tutto il sito)**: usata quasi solo da iPhone come PWA
+  installata, l'area privata web-adattata (hamburger/drawer, tabelle a scroll orizzontale,
+  `text-xs` reale ~9,6px per via dell'`html { font-size: 80% }` ereditato dal sito pubblico)
+  non dava un feeling da app nativa. La tab bar in basso (5 slot configurabili via
+  `mobileTab` in `lib/sidebar-config.ts`, fonte unica con la sidebar desktop) sostituisce
+  hamburger/drawer solo sotto `md`; il font di sistema (SF su iPhone) sostituisce
+  Fraunces/JetBrains Mono solo dentro `.app-shell`, scelta voluta contro la linea generale
+  "mai font di sistema" per il feeling nativo. Il ripristino al 100% del font-size è scoped a
+  `html:has(.app-shell)` sotto 768px invece di toccare `html` globalmente, per non
+  ingrandire il sito pubblico o il desktop dell'area privata. Il resto dei moduli (Carte,
+  Agenda, Allenamenti, Alimentazione) eredita queste fondamenta ma non è stato ridisegnato
+  pagina per pagina in questa fase: restano backlog ordinato (vedi PR).
+
 ## Cosa manca volutamente in questa fase
 
 Collezione carte, agenda, portfolio pubblico DBZ: non ancora sviluppati, per scelta (vedi

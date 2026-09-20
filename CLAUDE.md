@@ -37,7 +37,8 @@ Tienilo a mente prima di toccare routing/auth: cercare `middleware.ts` o la funz
 
 `proxy.ts` fa da router tra due sistemi:
 - Rotte **non localizzate** (`/spese`, `/investimenti`, `/carte`, `/allenamenti`, `/agenda`,
-  `/login`, `/api/*`) → gestite da `updateSession()` in `lib/supabase/proxy.ts` (refresh sessione
+  `/alimentazione`, `/impostazioni`, `/altro`, `/login`, `/api/*`) → gestite da
+  `updateSession()` in `lib/supabase/proxy.ts` (refresh sessione
   Supabase).
 - Tutto il resto (area pubblica sotto `app/[locale]/`) → middleware `next-intl` per il routing
   bilingue.
@@ -108,6 +109,46 @@ Punti da tenere a mente:
   `isOwner(user.email)`, non solo la sessione — un giocatore del quiz con login Google ha
   comunque una sessione Supabase valida (vedi sopra). `runtime = "nodejs"` obbligatorio (web-push
   non gira su Edge).
+
+### UI mobile (area privata, PWA iOS)
+
+Sotto `768px`, l'area privata ha un aspetto da app iOS nativa invece del sito web adattato
+(hamburger + drawer, tabelle a scroll orizzontale). Tutto lo stile nuovo è scoped alla classe
+`.app-shell` (sul wrapper di `app/(private)/layout.tsx`, riusata anche da `/login`,
+`/login/recupera-password` e `/reset-password`) combinata con `< md`: il sito pubblico e il
+layout desktop dell'area privata non cambiano.
+
+- **`html { font-size: 80% }`** (`app/globals.css`, sito pubblico) è riportato al 100% solo
+  sotto `768px` quando `.app-shell` è nel DOM (`html:has(.app-shell)`), altrimenti `text-xs`
+  risulterebbe ~9,6px reali. Se aggiungi una pagina privata nuova, verificala a 390px e 375px
+  cercando overflow orizzontale: eredita l'ingrandimento automaticamente.
+- **Scala tipografica iOS** (ora a rem = px reali, vedi sopra): titolo grande 32px bold,
+  titolo sezione 22px, corpo/campi 17px, secondario 15px, nota 13px, tab bar 11px. **Nessun
+  testo sotto i 12px** tranne le etichette della tab bar.
+- **Font di sistema** (`-apple-system, "SF Pro Text", system-ui`) sostituisce
+  Fraunces/Space Grotesk/JetBrains Mono solo dentro `.app-shell`: scelta voluta per il
+  feeling nativo, non estenderla al sito pubblico o al desktop.
+- **Tab bar mobile** (`components/shell/TabBar.tsx`, `md:hidden`): 5 slot, definiti da
+  `mobileTab: true` su `lib/sidebar-config.ts` (fonte unica con la sidebar desktop — cambiare
+  quali moduli hanno lo slot è una riga). Rispetta `interceptSessionNav` (nav guard
+  allenamento) e si nasconde su `/allenamenti/sessione/*`. Le sezioni senza slot dedicato
+  (Carte, Agenda, Impostazioni) più le azioni di account (tema, area pubblica, esci) vivono in
+  `/altro` (`app/(private)/altro/page.tsx`) — vedi la gotcha sotto.
+- **Gotcha `/altro`**: come ogni rotta nuova dell'area privata, va aggiunta **sia** a
+  `UNLOCALIZED_PREFIXES` in `proxy.ts` **sia** a `PROTECTED_PREFIXES` in
+  `lib/supabase/proxy.ts` (vedi "Routing" sopra), altrimenti `next-intl` la intercetta (404) o
+  la protezione a due livelli si rompe.
+- **Primitive obbligatorie per i nuovi moduli mobile** (`components/ui/`): `PageHeader`
+  (barra sticky con titolo grande, azione a destra, back con chevron), `SegmentedControl`
+  (sottosezioni di modulo, da `SIDEBAR_SECTIONS[...].subsections`), `Sheet` (bottom sheet con
+  trascinamento per chiudere, blocco scroll body, `dvh`, chiusura Esc — sostituisce i
+  `modal-overlay`/`modal-panel` grezzi nei modali dell'area privata), `ListGroup`/`ListRow`
+  (liste raggruppate stile Impostazioni iOS), `ActionBar` (barra fissa sopra la tab bar per
+  la selezione multipla).
+- **Modulo modello: Spese** (`app/(private)/spese/*`, `components/spese/*`). Gli altri moduli
+  (Investimenti, Carte, Allenamenti, Agenda, Alimentazione) ereditano le fondamenta e la tab
+  bar ma non sono stati ridisegnati pagina per pagina: vanno affrontati uno alla volta con lo
+  stesso schema, non "per completezza" senza che sia richiesto.
 
 ### Decision log (dal README)
 
