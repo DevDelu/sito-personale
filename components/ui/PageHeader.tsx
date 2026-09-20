@@ -31,7 +31,12 @@ export function PageHeader({
   }, []);
 
   return (
-    <div className="-mx-4 md:hidden">
+    // -mt-[...] annulla il padding-top per la safe-area già applicato dal
+    // contenuto della pagina (app/(private)/layout.tsx): senza, la
+    // safe-area verrebbe sommata due volte (una volta dal layout, una da
+    // pt-[env(safe-area-inset-top)] qui sotto), lasciando uno spazio vuoto
+    // enorme sopra il titolo.
+    <div className="-mx-4 -mt-[calc(0.5rem+env(safe-area-inset-top))] md:hidden">
       <div
         className="sticky top-0 z-20 border-b bg-surface/85 px-4 pt-[env(safe-area-inset-top)] backdrop-blur-md transition-colors duration-200"
         style={{ borderBottomColor: compatto ? "var(--app-hairline)" : "transparent" }}
