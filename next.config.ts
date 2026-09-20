@@ -21,6 +21,14 @@ async function headers() {
         { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
       ],
     },
+    {
+      // Il service worker non va mai servito da cache: un browser che tiene
+      // /sw.js vecchio (il default statico di Vercel/Next per i file in
+      // public/ non è "no-store") ritarda di ore l'arrivo di fix come questo
+      // stesso commit. Vedi anche il commento in cima a public/sw.js.
+      source: "/sw.js",
+      headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }],
+    },
   ];
 }
 
