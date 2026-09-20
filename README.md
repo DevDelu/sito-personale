@@ -147,6 +147,17 @@ serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `m
   scope per questa fase, per scelta: integrazione con i giorni di allenamento del modulo workout,
   catalogo esterno/barcode/foto/AI, ricette/meal planning/lista della spesa, notifiche/promemoria.
 
+- **PWA + Web Push (invece di Capacitor/React Native) per le notifiche su iPhone**: serve solo
+  "svegliare" Lorenzo su alcuni eventi (es. token Google scaduto in Agenda) dal proprio telefono,
+  non un'app nativa completa. Capacitor/React Native avrebbero richiesto un account sviluppatore
+  Apple a pagamento, pubblicazione su App Store e una seconda codebase/pipeline di build da
+  mantenere in parallelo al sito Next.js. Con una PWA installabile (già presente, vedi PR #30) +
+  Web Push standard (VAPID, libreria `web-push`, nessun servizio esterno a pagamento tipo
+  Firebase/OneSignal) restano un solo repo, un solo deploy (Vercel) e zero costi ricorrenti; il
+  limite noto è che su iOS/iPadOS le notifiche funzionano solo dall'app aggiunta alla Home (Safari
+  → Condividi → Aggiungi a Home, richiede 16.4+), non dal sito visitato nel browser. Vedi
+  CLAUDE.md, sezione "PWA e notifiche push", per i dettagli implementativi.
+
 ## Cosa manca volutamente in questa fase
 
 Collezione carte, agenda, portfolio pubblico DBZ: non ancora sviluppati, per scelta (vedi
