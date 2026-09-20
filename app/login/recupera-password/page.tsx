@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { RecoverForm } from "./recover-form";
+import { appViewport } from "@/lib/app-viewport";
 
 export const metadata: Metadata = { title: "Recupera password" };
+export const viewport = appViewport;
 
 export default function RecuperaPasswordPage() {
   return (

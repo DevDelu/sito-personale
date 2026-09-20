@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { useRouter } from "next/navigation";
 import { aggiungiMovimento, type AggiungiMovimentoState } from "../actions";
-import { CategoriaSelector } from "@/components/spese/CategoriaSelector";
+import { CategoriaPickerSheet } from "@/components/spese/CategoriaPickerSheet";
 import type { Categoria } from "@/lib/types";
 
 const oggi = () => new Date().toISOString().slice(0, 10);
@@ -70,6 +70,7 @@ export function AddTransactionForm({
           step="0.01"
           min="0.01"
           required
+          autoFocus
           className="field-input bg-surface text-center text-[32px] font-bold max-md:py-4 md:text-left md:text-base md:font-normal"
         />
       </Field>
@@ -94,14 +95,13 @@ export function AddTransactionForm({
       </Field>
 
       <Field label="Categoria">
-        <CategoriaSelector
+        <CategoriaPickerSheet
           categorie={categorieList}
           tipo={tipo}
           value={categoriaId}
           onChange={setCategoriaId}
           onCategoriaCreata={handleCategoriaCreata}
           name="categoria_id"
-          sfondo="surface"
         />
       </Field>
 

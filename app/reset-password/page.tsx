@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { ResetPasswordForm } from "./reset-password-form";
+import { appViewport } from "@/lib/app-viewport";
 
 export const metadata: Metadata = { title: "Reimposta password" };
+export const viewport = appViewport;
 
 export default function ResetPasswordPage() {
   return (
