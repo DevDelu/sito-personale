@@ -19,6 +19,7 @@ import { SessionRowNormale } from "./SessionRowNormale";
 import { SessionRowCircuito } from "./SessionRowCircuito";
 import { SessionRowStretching } from "./SessionRowStretching";
 import { StartCountdown } from "./StartCountdown";
+import { WakeLockIndicator } from "./WakeLockIndicator";
 import type { Scheda, SchedaEsercizioConNome, Sessione, SessioneLog } from "@/lib/allenamento/types";
 
 type Step =
@@ -182,7 +183,7 @@ export function SessionRunner({
   );
 
   const sessioneInCorso = avviato || inPreparazione;
-  useWakeLock(sessioneInCorso);
+  const { isSupported: wakeLockSupportato, isActive: schermoAttivo } = useWakeLock(sessioneInCorso);
 
   // Mentre l'allenamento è in corso (compresa la preparazione pre-avvio), la
   // sidebar intercetta i click sui link di navigazione e li passa qui invece
@@ -252,16 +253,19 @@ export function SessionRunner({
   if (!avviato) {
     if (inPreparazione && stepCorrente) {
       return (
-        <StartCountdown
-          seconds={countdownSeconds}
-          stepLabel={nomeStep(stepCorrente)}
-          stepDetail={descrizioneStep(stepCorrente)}
-          attrezzatura={attrezzaturaStep(stepCorrente)}
-          tick={audio.tick}
-          finish={audio.finish}
-          onDone={confermaAvvio}
-          onCancel={() => setInPreparazione(false)}
-        />
+        <>
+          <WakeLockIndicator isSupported={wakeLockSupportato} isActive={schermoAttivo} />
+          <StartCountdown
+            seconds={countdownSeconds}
+            stepLabel={nomeStep(stepCorrente)}
+            stepDetail={descrizioneStep(stepCorrente)}
+            attrezzatura={attrezzaturaStep(stepCorrente)}
+            tick={audio.tick}
+            finish={audio.finish}
+            onDone={confermaAvvio}
+            onCancel={() => setInPreparazione(false)}
+          />
+        </>
       );
     }
     return (
@@ -295,6 +299,7 @@ export function SessionRunner({
 
   return (
     <div className="flex flex-1 flex-col gap-4 pb-24">
+      <WakeLockIndicator isSupported={wakeLockSupportato} isActive={schermoAttivo} />
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium uppercase tracking-wide text-muted">
           {stepCorrente.kind === "superset" ? stepCorrente.rowA.blocco : stepCorrente.row.blocco}
