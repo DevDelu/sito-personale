@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
-// Barra di navigazione compatta sticky (stile iOS "large title"): il titolo
-// nella barra resta invisibile finché la pagina non ha scrollato oltre il
-// titolo grande sotto, poi appare. Solo mobile (md:hidden): desktop resta
-// il layout esistente con h1 semplice nella pagina.
+// Barra di navigazione compatta sticky, sempre visibile (non più il pattern
+// "large title" che cresce/si riduce con lo scroll: dopo tre giri di bug
+// legati proprio a quella doppia altezza — titolo grande + barra separata —
+// una sola barra è più robusta e occupa meno spazio). Solo mobile
+// (md:hidden): desktop resta il layout esistente con h1 semplice nella
+// pagina.
 export function PageHeader({
   title,
   parent,
@@ -17,32 +18,16 @@ export function PageHeader({
   parent?: { href: string; label: string };
   action?: React.ReactNode;
 }) {
-  const [compatto, setCompatto] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => setCompatto(!entry.isIntersecting), {
-      threshold: 1,
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   return (
     // .app-page-header è solo un marcatore: la regola CSS scoped
     // (.app-page-content:has(.app-page-header), app/globals.css) azzera il
     // padding-top per la safe-area già applicato dal contenuto della
-    // pagina, perché questo componente applica la propria safe-area sulla
-    // barra sticky qui sotto. Un'unica regola dichiarativa invece di due
-    // calc() che dovevano restare identici byte per byte in due file.
+    // pagina, perché questo componente applica la propria safe-area qui
+    // sotto. Un'unica regola dichiarativa invece di calc() da tenere
+    // sincronizzati in due file.
     <div className="app-page-header -mx-4 md:hidden">
-      <div
-        className="sticky top-0 z-20 border-b bg-surface/85 px-4 pt-[env(safe-area-inset-top)] backdrop-blur-md transition-colors duration-200"
-        style={{ borderBottomColor: compatto ? "var(--app-hairline)" : "transparent" }}
-      >
-        <div className="grid h-11 grid-cols-[1fr_auto_1fr] items-center">
+      <div className="sticky top-0 z-20 border-b border-[var(--app-hairline)] bg-surface/85 px-4 pt-[env(safe-area-inset-top)] backdrop-blur-md">
+        <div className="grid h-12 grid-cols-[1fr_auto_1fr] items-center">
           {parent ? (
             <Link
               href={parent.href}
@@ -54,20 +39,12 @@ export function PageHeader({
           ) : (
             <span />
           )}
-          <span
-            className={`app-static col-start-2 truncate text-center text-[17px] font-semibold transition-opacity duration-150 ${
-              compatto ? "opacity-100" : "opacity-0"
-            }`}
-          >
+          <span className="app-static col-start-2 truncate text-center text-[17px] font-semibold">
             {title}
           </span>
           <div className="flex justify-self-end">{action}</div>
         </div>
       </div>
-      <div ref={sentinelRef} aria-hidden className="h-px" />
-      <h1 className="app-static px-4 pt-3 pb-2 text-[32px] leading-tight font-bold tracking-tight">
-        {title}
-      </h1>
     </div>
   );
 }

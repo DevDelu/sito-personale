@@ -19,7 +19,7 @@ export default async function AllenamentoPage() {
 
   if (schede.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Allenamento</h1>
         <p className="max-w-sm text-sm text-muted">
           Nessuna scheda configurata. Creane una per iniziare ad allenarti.
@@ -32,7 +32,7 @@ export default async function AllenamentoPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-6 px-6 py-8">
+    <div className="flex flex-1 flex-col gap-6">
       <div className="flex flex-col items-center gap-1 text-center">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Avvia allenamento</h1>
         <p className="text-sm text-muted">Scegli la scheda da usare per questa sessione.</p>

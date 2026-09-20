@@ -348,7 +348,7 @@ html {
      cancellazione e lasciare doppia safe-area. Con :has() la regola vive in
      un solo posto. */
   .app-page-content {
-    padding-top: calc(0.5rem + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
   }
 
   .app-page-content:has(.app-page-header) {
