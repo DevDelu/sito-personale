@@ -77,6 +77,38 @@ auth, vedi commento in `.env.example`):
   è scaduto
 - `/api/agenda/note-reminder` — reminder note agenda
 
+### PWA e notifiche push
+
+Il sito è installabile come PWA (`public/manifest.webmanifest`, `public/sw.js`,
+`components/service-worker-register.tsx`). `public/sw.js` è **l'unico service worker del
+progetto**: non crearne un secondo, estendere quello esistente (fetch pass-through, nessuna
+cache/offline, più i handler `push`/`notificationclick`).
+
+Le notifiche push usano Web Push standard (VAPID, libreria `web-push`), nessun servizio esterno
+a pagamento. `lib/push/send.ts` (`sendPushToOwner()`) è **l'unico punto di invio** di tutto il
+progetto: qualunque funzionalità futura che debba notificare Lorenzo (reminder pasti, alert
+token Google scaduto, digest agenda...) chiama questa funzione, non `web-push` direttamente.
+Nessun caso d'uso reale è ancora collegato: solo la pagina `/impostazioni` con un pulsante di
+prova.
+
+Punti da tenere a mente:
+- **Permesso solo da gesto utente**: `Notification.requestPermission()` va chiamato solo dentro
+  un handler di click esplicito (`components/push/PushSettings.tsx`), mai all'avvio della pagina
+  — Safari/iOS lo bloccherebbero.
+- **Ogni push deve mostrare una notifica**: su iOS un push che non chiama
+  `showNotification()` porta il sistema a revocare la subscription. Il handler `push` in
+  `public/sw.js` chiama sempre `showNotification()`, anche a scopo di test.
+- **Env var VAPID** (`NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` —
+  quest'ultima fallback a `mailto:` + `AGENDA_ALERT_EMAIL` se assente, vedi `.env.example`):
+  generate con `npx web-push generate-vapid-keys`. Se mancano (o manca la tabella
+  `push_subscriptions`, migration `030_push_subscriptions.sql`), `sendPushToOwner()` restituisce
+  `{ ok: false, reason: ... }` invece di lanciare — build, altre pagine e le route
+  `app/api/push/*` restano funzionanti, la UI in `/impostazioni` mostra "non configurato".
+- **Owner-only**: tutte le route `app/api/push/*` controllano `getUser()` **+**
+  `isOwner(user.email)`, non solo la sessione — un giocatore del quiz con login Google ha
+  comunque una sessione Supabase valida (vedi sopra). `runtime = "nodejs"` obbligatorio (web-push
+  non gira su Edge).
+
 ### Decision log (dal README)
 
 - **Overview/Gestione separate in Spese**: Overview è sola lettura (aggregati, grafici);
