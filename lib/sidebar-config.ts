@@ -68,7 +68,6 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     label: "Alimentazione",
     icon: Apple,
     href: "/alimentazione",
-    mobileTab: true,
     subsections: [
       { href: "/alimentazione", label: "Overview" },
       { href: "/alimentazione/gestione", label: "Gestione" },

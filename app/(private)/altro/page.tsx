@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ExternalLink, Layers, LogOut, Dumbbell, Bell } from "lucide-react";
+import { ExternalLink, Layers, LogOut, Dumbbell, Apple, Bell } from "lucide-react";
 import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ListGroup, ListRow, ListRowLink } from "@/components/ui/ListGroup";
@@ -22,6 +22,12 @@ export default function AltroPage() {
             href="/allenamenti"
             icon={<Dumbbell className="h-5 w-5" strokeWidth={1.75} />}
             title="Allenamento"
+            chevron
+          />
+          <ListRowLink
+            href="/alimentazione"
+            icon={<Apple className="h-5 w-5" strokeWidth={1.75} />}
+            title="Alimentazione"
             chevron
           />
         </ListGroup>
