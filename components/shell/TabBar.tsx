@@ -30,7 +30,7 @@ export function TabBar() {
   return (
     <nav
       aria-label="Navigazione principale"
-      className="app-scroll fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-surface/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
+      className="app-scroll fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-surface-hover pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_8px_rgba(0,0,0,0.15)] md:hidden"
       style={{ height: "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom))" }}
     >
       {TAB_SECTIONS.map((section) => {
