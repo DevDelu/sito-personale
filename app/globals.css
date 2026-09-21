@@ -265,6 +265,19 @@ html {
    all'80%. Il sito pubblico e il layout desktop dell'area privata restano
    invariati: non hanno .app-shell nell'albero, oppure sono sopra 768px.
    :has() è supportato da iOS 15.4+. */
+/* Rimbalzo elastico dello scroll (rubber-band) su iOS Safari: quando il
+   documento è più corto del viewport (es. Allenamento con poche schede,
+   Altro), WebKit può rivelare — anche da fermo, non solo trascinando —
+   un'area oltre il contenuto dipinta nativamente col colore di
+   theme-color (vedi commento in app/layout.tsx), non con lo sfondo CSS
+   della pagina: nessuna barra/PageHeader può "coprirla" perché non fa
+   parte del documento. Disattivarlo sull'intera area privata evita che
+   quella fascia nativa venga mai mostrata, indipendentemente da quanto
+   contenuto ha la pagina. */
+html:has(.app-shell) {
+  overscroll-behavior-y: none;
+}
+
 @media (max-width: 767px) {
   html:has(.app-shell) {
     font-size: 100%;
