@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   getAlimenti,
   getPastiByData,
@@ -10,9 +11,15 @@ import {
 } from "@/lib/alimentazione/queries";
 import { aderenzaMedia, getTemplatePasti } from "@/lib/alimentazione/template";
 import { MacroProgressBars, stimaTargetMacro } from "@/components/alimentazione/MacroProgressBars";
-import { WeeklyTrendChart } from "@/components/alimentazione/WeeklyTrendChart";
 import { TodayMealsList } from "@/components/alimentazione/TodayMealsList";
 import { Toast } from "@/components/toast";
+
+// recharts (~400KB) in un chunk separato dal bundle principale della route,
+// stesso principio di ChartsSection in investimenti/spese (vedi commento
+// lì): resta SSR, niente ssr:false, non supportato nei Server Component.
+const WeeklyTrendChart = dynamic(() =>
+  import("@/components/alimentazione/WeeklyTrendChart").then((m) => m.WeeklyTrendChart)
+);
 
 export const metadata: Metadata = { title: "Alimentazione" };
 
