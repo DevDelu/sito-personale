@@ -21,7 +21,7 @@ export function SegmentedControl({ items }: { items: SegmentedItem[] }) {
             href={item.href}
             role="tab"
             aria-selected={attivo}
-            className={`flex-1 rounded-[8px] px-3 py-1.5 text-center text-[15px] font-medium transition-all duration-150 ease-out active:scale-[0.97] ${
+            className={`flex-1 truncate rounded-[8px] px-2 py-1.5 text-center text-[15px] font-medium transition-all duration-150 ease-out active:scale-[0.97] ${
               attivo ? "bg-surface text-foreground shadow-sm" : "text-muted"
             }`}
           >

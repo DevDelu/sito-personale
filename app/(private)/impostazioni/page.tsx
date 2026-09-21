@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { PushSettings } from "@/components/push/PushSettings";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const metadata: Metadata = { title: "Impostazioni" };
 
 export default function ImpostazioniPage() {
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
+      <PageHeader title="Impostazioni" parent={{ href: "/altro", label: "Altro" }} />
+
+      <div className="hidden flex-col gap-1 md:flex">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Impostazioni</h1>
         <p className="text-sm text-muted">Preferenze dell&apos;app installata come PWA.</p>
       </div>
