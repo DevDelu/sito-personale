@@ -12,10 +12,10 @@ export const metadata: Metadata = { title: "Altro" };
 // desktop vivono nella topbar/sidebar (tema, area pubblica, esci).
 export default function AltroPage() {
   return (
-    <div className="flex flex-col gap-6 md:hidden">
+    <div className="flex flex-1 flex-col md:hidden">
       <PageHeader title="Altro" />
 
-      <div className="flex flex-col gap-6 px-4">
+      <div className="flex flex-1 flex-col justify-center gap-6 px-4 py-6">
         <ListGroup>
           <ListRowLink href="/carte" icon={<Layers className="h-5 w-5" strokeWidth={1.75} />} title="Carte" chevron />
           <ListRowLink
