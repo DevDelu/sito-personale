@@ -17,29 +17,30 @@ type WakeLockNavigator = Navigator & {
 export function useWakeLock(active: boolean) {
   const lockRef = useRef<{ release: () => Promise<void> } | null>(null);
   const requestingRef = useRef(false);
+  const cancelledRef = useRef(false);
+
+  async function request() {
+    if (requestingRef.current || lockRef.current) return;
+    requestingRef.current = true;
+    try {
+      const nav = navigator as WakeLockNavigator;
+      if (!nav.wakeLock) return;
+      const lock = await nav.wakeLock.request("screen");
+      if (cancelledRef.current) {
+        lock.release().catch(() => {});
+        return;
+      }
+      lockRef.current = lock;
+    } catch {
+      // Negato o non disponibile: nessun impatto sul resto della sessione.
+    } finally {
+      requestingRef.current = false;
+    }
+  }
 
   useEffect(() => {
     if (!active) return;
-    let cancelled = false;
-
-    async function request() {
-      if (requestingRef.current || lockRef.current) return;
-      requestingRef.current = true;
-      try {
-        const nav = navigator as WakeLockNavigator;
-        if (!nav.wakeLock) return;
-        const lock = await nav.wakeLock.request("screen");
-        if (cancelled) {
-          lock.release().catch(() => {});
-          return;
-        }
-        lockRef.current = lock;
-      } catch {
-        // Negato o non disponibile: nessun impatto sul resto della sessione.
-      } finally {
-        requestingRef.current = false;
-      }
-    }
+    cancelledRef.current = false;
 
     request();
 
@@ -49,10 +50,18 @@ export function useWakeLock(active: boolean) {
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
       document.removeEventListener("visibilitychange", onVisibilityChange);
       lockRef.current?.release().catch(() => {});
       lockRef.current = null;
     };
   }, [active]);
+
+  // Esposto per essere chiamato direttamente dentro un handler di click:
+  // iOS Safari richiede che navigator.wakeLock.request() parta nello stesso
+  // turno sincrono del gesto utente, non da un useEffect innescato dal
+  // cambio di stato (stesso motivo per cui qui accanto audio.unlock() viene
+  // chiamato nel click e non in un effetto). L'effetto sopra resta comunque
+  // la rete di sicurezza per il riaggancio dopo un cambio app.
+  return { requestNow: request };
 }

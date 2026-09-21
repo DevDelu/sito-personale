@@ -168,7 +168,7 @@ export function SessionRunner({
   const startedAtRef = useRef<number | null>(null);
 
   const sessioneInCorso = avviato || inPreparazione;
-  useWakeLock(sessioneInCorso);
+  const wakeLock = useWakeLock(sessioneInCorso);
 
   // Mentre l'allenamento è in corso (compresa la preparazione pre-avvio), la
   // sidebar intercetta i click sui link di navigazione e li passa qui invece
@@ -208,6 +208,7 @@ export function SessionRunner({
 
   function avviaSessione() {
     audio.unlock();
+    wakeLock.requestNow();
     if (steps.length === 0) {
       startedAtRef.current = Date.now();
       setAvviato(true);

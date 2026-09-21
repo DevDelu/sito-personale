@@ -62,11 +62,13 @@ function ListRowContent({ icon, dot, title, subtitle, value, chevron, destructiv
 // Riga cliccabile (navigazione): usa Link.
 export function ListRowLink({
   href,
+  onNavigate,
   ...props
-}: ListRowBaseProps & { href: string }) {
+}: ListRowBaseProps & { href: string; onNavigate?: () => void }) {
   return (
     <Link
       href={href}
+      onClick={onNavigate}
       className="flex min-h-[56px] items-center gap-3 pr-4 transition-colors duration-150 ease-out active:bg-surface-hover"
     >
       <ListRowContent {...props} />
