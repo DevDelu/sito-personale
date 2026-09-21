@@ -30,8 +30,8 @@ export function TabBar() {
   return (
     <nav
       aria-label="Navigazione principale"
-      className="app-scroll fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-surface-hover pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_8px_rgba(0,0,0,0.15)] md:hidden"
-      style={{ height: "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom))" }}
+      className="app-scroll fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-surface-hover pb-[max(env(safe-area-inset-bottom),20px)] shadow-[0_-2px_8px_rgba(0,0,0,0.15)] md:hidden"
+      style={{ height: "calc(var(--app-tabbar-height) + max(env(safe-area-inset-bottom), 20px))" }}
     >
       {TAB_SECTIONS.map((section) => {
         const Icon = section.icon;
