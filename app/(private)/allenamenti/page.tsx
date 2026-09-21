@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Play } from "lucide-react";
-import { getSchedeConMeta } from "@/lib/allenamento/queries";
+import { getSchedeConMeta, getSessioni } from "@/lib/allenamento/queries";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { MetricCard } from "@/components/ui/MetricCard";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
 
 const ALLENAMENTI_SEGMENTI = SIDEBAR_SECTIONS.find((s) => s.id === "allenamenti")!.subsections!;
@@ -19,8 +20,26 @@ function formatUltimoUtilizzo(iso: string | null): string {
   })}`;
 }
 
+function formatData(iso: string): string {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("it-IT", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
 export default async function AllenamentoPage() {
-  const schede = await getSchedeConMeta();
+  const [schede, sessioni] = await Promise.all([getSchedeConMeta(), getSessioni()]);
+
+  const oggi = new Date();
+  const sessioniMese = sessioni.filter((s) => {
+    const d = new Date(`${s.data}T00:00:00Z`);
+    return d.getUTCFullYear() === oggi.getUTCFullYear() && d.getUTCMonth() === oggi.getUTCMonth();
+  });
+  const ultimaSessione = sessioni[0] ?? null;
+  const nomeSchedaUltima = ultimaSessione
+    ? (schede.find((s) => s.id === ultimaSessione.scheda_id)?.nome ?? "Scheda eliminata")
+    : null;
 
   if (schede.length === 0) {
     return (
@@ -45,6 +64,26 @@ export default async function AllenamentoPage() {
     <div className="flex flex-1 flex-col gap-6">
       <PageHeader title="Allenamento" />
       <SegmentedControl items={ALLENAMENTI_SEGMENTI} />
+
+      <div className="grid grid-cols-2 gap-3">
+        <MetricCard
+          label="Questo mese"
+          value={String(sessioniMese.length)}
+          colorVar="--accent"
+          note={sessioniMese.length === 1 ? "sessione" : "sessioni"}
+        />
+        <div className="card flex flex-col gap-0.5 px-4 py-3">
+          <span className="text-xs text-muted">Ultimo allenamento</span>
+          {ultimaSessione ? (
+            <>
+              <span className="truncate font-display text-base font-semibold">{nomeSchedaUltima}</span>
+              <span className="text-xs text-muted">{formatData(ultimaSessione.data)}</span>
+            </>
+          ) : (
+            <span className="font-display text-base font-semibold text-muted">Nessuno ancora</span>
+          )}
+        </div>
+      </div>
 
       <div className="flex flex-1 flex-col justify-center gap-6 md:flex-none md:justify-start">
         <div className="flex flex-col items-center gap-1 text-center">

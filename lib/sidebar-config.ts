@@ -57,19 +57,11 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     label: "Allenamento",
     icon: Dumbbell,
     href: "/allenamenti",
-    mobileTab: true,
     subsections: [
       { href: "/allenamenti", label: "Overview" },
       { href: "/allenamenti/schede", label: "Le mie schede" },
       { href: "/allenamenti/storico", label: "Storico" },
     ],
-  },
-  {
-    id: "agenda",
-    label: "Agenda",
-    icon: Calendar,
-    href: "/agenda",
-    subsections: [{ href: "/agenda", label: "Calendario" }],
   },
   {
     id: "alimentazione",
@@ -84,6 +76,14 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
       { href: "/alimentazione/aggiungi", label: "+ Aggiungi" },
       { href: "/alimentazione/profilo", label: "Profilo" },
     ],
+  },
+  {
+    id: "agenda",
+    label: "Agenda",
+    icon: Calendar,
+    href: "/agenda",
+    mobileTab: true,
+    subsections: [{ href: "/agenda", label: "Calendario" }],
   },
   {
     id: "impostazioni",
