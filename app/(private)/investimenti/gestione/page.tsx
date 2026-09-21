@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import { getAssets, getRiconciliazioneAsset, getTransazioni } from "@/lib/investimenti/queries";
 import { TransazioneTable } from "@/components/investimenti/TransazioneTable";
 import { RiconciliazioneBanner } from "@/components/investimenti/RiconciliazioneBanner";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
+
+const INVESTIMENTI_SEGMENTI = SIDEBAR_SECTIONS.find((s) => s.id === "investimenti")!.subsections!;
 
 export const metadata: Metadata = { title: "Investimenti · Gestione" };
 
@@ -14,7 +19,10 @@ export default async function InvestimentiGestionePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
+      <PageHeader title="Gestione" parent={{ href: "/investimenti", label: "Investimenti" }} />
+      <SegmentedControl items={INVESTIMENTI_SEGMENTI} />
+
+      <div className="hidden flex-col gap-1 md:flex">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Gestione investimenti</h1>
         <p className="text-sm text-muted">
           Ogni campo, incluso &ldquo;qualità del costo&rdquo;, è modificabile: aggiorna i dati stimati non

@@ -3,8 +3,13 @@ import type { Metadata } from "next";
 import { getPortfolioHistoryByAsset, getPosizioniCorrenti, getTransazioni } from "@/lib/investimenti/queries";
 import { SummaryCards } from "@/components/investimenti/SummaryCards";
 import { PositionsTable } from "@/components/investimenti/PositionsTable";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
 
 export const metadata: Metadata = { title: "Investimenti" };
+
+const INVESTIMENTI_SEGMENTI = SIDEBAR_SECTIONS.find((s) => s.id === "investimenti")!.subsections!;
 
 // Un solo import dinamico per entrambi i grafici: recharts (~400KB) finisce
 // in un unico chunk separato dal bundle principale della route, invece di
@@ -37,7 +42,10 @@ export default async function InvestimentiPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
+      <PageHeader title="Investimenti" />
+      <SegmentedControl items={INVESTIMENTI_SEGMENTI} />
+
+      <div className="hidden flex-col gap-1 md:flex">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Investimenti</h1>
         <p className="text-sm text-muted">Posizioni correnti, calcolate con il metodo FIFO.</p>
       </div>
