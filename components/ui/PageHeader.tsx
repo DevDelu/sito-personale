@@ -26,7 +26,7 @@ export function PageHeader({
     // sotto. Un'unica regola dichiarativa invece di calc() da tenere
     // sincronizzati in due file.
     <div className="app-page-header -mx-4 md:hidden">
-      <div className="sticky top-0 z-20 border-b border-[var(--app-hairline)] bg-surface/85 px-4 pt-[env(safe-area-inset-top)] backdrop-blur-md">
+      <div className="sticky top-0 z-20 border-b border-[var(--app-hairline)] bg-surface-hover px-4 pt-[env(safe-area-inset-top)]">
         <div className="grid h-12 grid-cols-[1fr_auto_1fr] items-center">
           {parent ? (
             <Link
