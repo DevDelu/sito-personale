@@ -60,7 +60,7 @@ export function SchedeList({ schede }: { schede: SchedaConMeta[] }) {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-col gap-0.5">
-          <h1 className="font-display text-2xl font-semibold tracking-tight">Le mie schede</h1>
+          <h1 className="hidden font-display text-2xl font-semibold tracking-tight md:block">Le mie schede</h1>
           <p className="text-sm text-muted">
             {visibili.length} {visibili.length === 1 ? "scheda" : "schede"}
             {mostraArchiviate ? "" : numArchiviate > 0 ? ` · ${numArchiviate} archiviate nascoste` : ""}

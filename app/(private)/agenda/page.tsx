@@ -3,6 +3,7 @@ import { getEventiRange, getImpostazioniAgenda, getIntegrazioneGoogle, getNoteRa
 import { AgendaBoard } from "@/components/agenda/AgendaBoard";
 import { SyncStatusBadge } from "@/components/agenda/SyncStatusBadge";
 import { PromemoriaToggle } from "@/components/agenda/PromemoriaToggle";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const metadata: Metadata = { title: "Agenda" };
 
@@ -39,7 +40,16 @@ export default async function AgendaPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <PageHeader
+        title="Agenda"
+        parent={{ href: "/altro", label: "Altro" }}
+        action={<PromemoriaToggle attivoIniziale={impostazioni?.promemoria_note_attivo ?? true} />}
+      />
+      <div className="md:hidden">
+        <SyncStatusBadge integrazione={integrazione} />
+      </div>
+
+      <div className="hidden flex-wrap items-center justify-between gap-2 md:flex">
         <div className="flex flex-col gap-1">
           <h1 className="font-display text-2xl font-semibold tracking-tight">Agenda</h1>
           <p className="text-sm text-muted">Calendario, note e posta per giorno.</p>

@@ -3,6 +3,11 @@ import type { Metadata } from "next";
 import { getPortfolioHistoryByAsset, getPosizioniCorrenti, getTransazioni } from "@/lib/investimenti/queries";
 import { SummaryCards } from "@/components/investimenti/SummaryCards";
 import { PositionsTable } from "@/components/investimenti/PositionsTable";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
+
+const INVESTIMENTI_SEGMENTI = SIDEBAR_SECTIONS.find((s) => s.id === "investimenti")!.subsections!;
 
 export const metadata: Metadata = { title: "Investimenti" };
 
@@ -37,7 +42,10 @@ export default async function InvestimentiPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
+      <PageHeader title="Investimenti" />
+      <SegmentedControl items={INVESTIMENTI_SEGMENTI} />
+
+      <div className="hidden flex-col gap-1 md:flex">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Investimenti</h1>
         <p className="text-sm text-muted">Posizioni correnti, calcolate con il metodo FIFO.</p>
       </div>

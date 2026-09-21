@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Play } from "lucide-react";
 import { getSchedeConMeta } from "@/lib/allenamento/queries";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
+
+const ALLENAMENTO_SEGMENTI = SIDEBAR_SECTIONS.find((s) => s.id === "allenamenti")!.subsections!;
 
 export const metadata: Metadata = { title: "Allenamento" };
 
@@ -19,22 +24,30 @@ export default async function AllenamentoPage() {
 
   if (schede.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Allenamento</h1>
-        <p className="max-w-sm text-sm text-muted">
-          Nessuna scheda configurata. Creane una per iniziare ad allenarti.
-        </p>
-        <Link href="/allenamenti/schede" className="btn-primary !px-6 !py-3 text-base">
-          Vai a Le mie schede
-        </Link>
+      <div className="flex flex-1 flex-col gap-6">
+        <PageHeader title="Allenamento" />
+        <SegmentedControl items={ALLENAMENTO_SEGMENTI} />
+
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+          <h1 className="hidden font-display text-2xl font-semibold tracking-tight md:block">Allenamento</h1>
+          <p className="max-w-sm text-sm text-muted">
+            Nessuna scheda configurata. Creane una per iniziare ad allenarti.
+          </p>
+          <Link href="/allenamenti/schede" className="btn-primary !px-6 !py-3 text-base">
+            Vai a Le mie schede
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex flex-1 flex-col gap-6">
+      <PageHeader title="Allenamento" />
+      <SegmentedControl items={ALLENAMENTO_SEGMENTI} />
+
       <div className="flex flex-col items-center gap-1 text-center">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Avvia allenamento</h1>
+        <h1 className="hidden font-display text-2xl font-semibold tracking-tight md:block">Avvia allenamento</h1>
         <p className="text-sm text-muted">Scegli la scheda da usare per questa sessione.</p>
       </div>
 
