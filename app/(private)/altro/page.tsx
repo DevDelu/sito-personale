@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ExternalLink, Layers, LogOut, Calendar, Bell } from "lucide-react";
+import { ExternalLink, Layers, LogOut, Dumbbell, Bell } from "lucide-react";
 import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ListGroup, ListRow, ListRowLink } from "@/components/ui/ListGroup";
@@ -19,9 +19,9 @@ export default function AltroPage() {
         <ListGroup>
           <ListRowLink href="/carte" icon={<Layers className="h-5 w-5" strokeWidth={1.75} />} title="Carte" chevron />
           <ListRowLink
-            href="/agenda"
-            icon={<Calendar className="h-5 w-5" strokeWidth={1.75} />}
-            title="Agenda"
+            href="/allenamenti"
+            icon={<Dumbbell className="h-5 w-5" strokeWidth={1.75} />}
+            title="Allenamento"
             chevron
           />
         </ListGroup>
