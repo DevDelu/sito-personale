@@ -33,6 +33,14 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "Radar",
   },
+  // Next genera solo il meta "mobile-web-app-capable" (lo standard più
+  // recente): alcune versioni di iOS riconoscono la modalità standalone
+  // in modo più affidabile (safe-area comprese) solo col tag storico
+  // "apple-mobile-web-app-capable", quindi lo aggiungiamo esplicitamente
+  // accanto a quello generato automaticamente.
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+  },
 };
 
 // viewportFit "cover": disegna sotto la notch/home-indicator invece di
