@@ -4,6 +4,13 @@ import type { TipoPasto } from "@/lib/alimentazione/types";
 import { PastoTable } from "@/components/alimentazione/PastoTable";
 import { GestioneFilters } from "./gestione-filters";
 import { Pagination } from "./pagination";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
+
+const ALIMENTAZIONE_SEGMENTI = SIDEBAR_SECTIONS.find((s) => s.id === "alimentazione")!.subsections!.filter(
+  (s) => !s.label.startsWith("+")
+);
 
 export const metadata: Metadata = { title: "Alimentazione · Gestione" };
 
@@ -37,7 +44,10 @@ export default async function GestioneAlimentazionePage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
+      <PageHeader title="Gestione" parent={{ href: "/alimentazione", label: "Alimentazione" }} />
+      <SegmentedControl items={ALIMENTAZIONE_SEGMENTI} />
+
+      <div className="hidden flex-col gap-1 md:flex">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Gestione pasti</h1>
         <p className="text-sm text-muted">{total} pasti registrati. Filtra, modifica o elimina.</p>
       </div>

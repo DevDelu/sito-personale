@@ -3,6 +3,15 @@ import { getCollectionOverview } from "@/lib/carte/queries";
 import { formatCurrency } from "@/lib/carte/format";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { CollectionSections } from "@/components/carte/CollectionSections";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { FAB } from "@/components/ui/FAB";
+import { Plus } from "lucide-react";
+import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
+
+const CARTE_SEGMENTI = SIDEBAR_SECTIONS.find((s) => s.id === "carte")!.subsections!.filter(
+  (s) => !s.label.startsWith("+")
+);
 
 export const metadata: Metadata = { title: "Carte" };
 
@@ -11,7 +20,10 @@ export default async function CartePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1">
+      <PageHeader title="Carte" />
+      <SegmentedControl items={CARTE_SEGMENTI} />
+
+      <div className="hidden flex-col gap-1 md:flex">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Collezione carte</h1>
         <p className="text-sm text-muted">Dragon Ball Super — Fusion World, prezzi da Cardmarket.</p>
       </div>
@@ -26,6 +38,8 @@ export default async function CartePage() {
           </section>
         }
       />
+
+      <FAB href="/carte/nuova" label="Aggiungi carta" icon={<Plus className="h-6 w-6" strokeWidth={2.25} />} />
     </div>
   );
 }

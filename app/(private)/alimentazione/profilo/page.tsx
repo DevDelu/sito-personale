@@ -4,6 +4,13 @@ import { Toast } from "@/components/toast";
 import { ProfiloForm } from "./profilo-form";
 import { PesoForm } from "./peso-form";
 import { PesoHistory } from "./peso-history";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
+
+const ALIMENTAZIONE_SEGMENTI = SIDEBAR_SECTIONS.find((s) => s.id === "alimentazione")!.subsections!.filter(
+  (s) => !s.label.startsWith("+")
+);
 
 export const metadata: Metadata = { title: "Alimentazione · Profilo" };
 
@@ -19,7 +26,10 @@ export default async function ProfiloPage({
     <div className="flex flex-col gap-6">
       {saved && <Toast message="Profilo aggiornato" />}
       {peso_added && <Toast message="Peso registrato" />}
-      <div className="flex flex-col gap-1">
+      <PageHeader title="Profilo" parent={{ href: "/alimentazione", label: "Alimentazione" }} />
+      <SegmentedControl items={ALIMENTAZIONE_SEGMENTI} />
+
+      <div className="hidden flex-col gap-1 md:flex">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Profilo nutrizionale</h1>
         <p className="text-sm text-muted">Dati usati per calcolare BMR, TDEE e target kcal della fase attiva.</p>
       </div>

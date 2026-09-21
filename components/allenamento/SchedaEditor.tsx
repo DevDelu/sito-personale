@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
   DndContext,
   KeyboardSensor,
@@ -19,9 +18,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ArrowLeft, ChevronDown, ChevronUp, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { useSchedaMutations } from "@/hooks/useSchedaMutations";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { SchedaEsercizioModal } from "./SchedaEsercizioModal";
 import type { SchedaEsercizioFields, NuovoSchedaEsercizioInput } from "@/app/(private)/allenamenti/actions";
 import type { Esercizio, Scheda, SchedaEsercizioConNome } from "@/lib/allenamento/types";
@@ -183,15 +183,22 @@ export function SchedaEditor({
 
   return (
     <div className="flex flex-col gap-4">
-      <Link
-        href="/allenamenti/schede"
-        className="flex w-fit items-center gap-1 text-sm text-muted hover:text-foreground"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        Le mie schede
-      </Link>
+      <PageHeader
+        title={scheda.nome}
+        parent={{ href: "/allenamenti/schede", label: "Le mie schede" }}
+        action={
+          <button
+            type="button"
+            onClick={() => setModaleAperto({ modo: "nuovo" })}
+            className="text-accent active:opacity-60"
+            aria-label="Nuovo blocco"
+          >
+            <Plus className="h-5 w-5" strokeWidth={2.25} />
+          </button>
+        }
+      />
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="hidden flex-wrap items-center justify-between gap-2 md:flex">
         <div className="flex min-w-0 flex-col gap-0.5">
           <h1 className="font-display text-2xl font-semibold tracking-tight">Gestione scheda</h1>
           <p className="truncate text-sm text-muted">{scheda.nome}</p>
