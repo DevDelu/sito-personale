@@ -1,11 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { CalendarDays } from "lucide-react";
-import { CalendarView } from "./CalendarView";
 import { DayPanel } from "./DayPanel";
 import { QuickAddBar } from "./QuickAddBar";
 import type { Evento, NotaGiorno } from "@/lib/agenda/types";
+
+// FullCalendar (core + plugin daygrid/timegrid/list/interaction) è una
+// libreria pesante: import dinamico con ssr:false per tenerla fuori dal
+// bundle iniziale della route /agenda, stesso principio di ChartsSection in
+// spese/investimenti (vedi commento lì).
+const CalendarView = dynamic(() => import("./CalendarView").then((m) => m.CalendarView), { ssr: false });
 
 // Orchestratore client: tiene lo stato del giorno selezionato (aperto dal
 // calendario o da un evento) e lo passa al pannello sotto. Il calendario è
