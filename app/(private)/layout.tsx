@@ -37,7 +37,15 @@ export default async function PrivateLayout({
     // la topbar con hamburger/drawer di prima, quindi il contenuto ha
     // padding sia sopra (safe-area) che sotto (tab bar + safe-area).
     // Da md in su la sidebar desktop resta identica a prima.
-    <div className="app-shell flex min-h-full flex-1 flex-col md:flex-row">
+    // min-h-[100dvh] (non min-h-full): min-height:100% richiede che OGNI
+    // antenato (html, body) abbia un'altezza esplicita perché la percentuale
+    // si risolva, altrimenti equivale ad "auto" — su una pagina con poco
+    // contenuto (Altro) .app-shell restava più basso del viewport reale e
+    // il "flex-1 justify-center" delle pagine corte (Altro, Allenamento) non
+    // aveva spazio in cui centrarsi, lasciando lo sfondo vuoto sotto la tab
+    // bar. 100dvh è ancorato al viewport reale, stesso pattern già usato in
+    // app/login/page.tsx e affini.
+    <div className="app-shell flex min-h-[100dvh] flex-1 flex-col md:flex-row">
       <Sidebar logoutSlot={logoutForm} />
       <div className="flex flex-1 flex-col">
         <div className="sticky top-0 z-20 hidden items-center justify-end gap-2 border-b border-border bg-surface/80 px-4 py-3 backdrop-blur-md sm:px-6 md:flex">
