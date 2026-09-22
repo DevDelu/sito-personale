@@ -89,8 +89,8 @@ Le notifiche push usano Web Push standard (VAPID, libreria `web-push`), nessun s
 a pagamento. `lib/push/send.ts` (`sendPushToOwner()`) è **l'unico punto di invio** di tutto il
 progetto: qualunque funzionalità futura che debba notificare Lorenzo (reminder pasti, alert
 token Google scaduto, digest agenda...) chiama questa funzione, non `web-push` direttamente.
-Nessun caso d'uso reale è ancora collegato: solo la pagina `/impostazioni` con un pulsante di
-prova.
+Oltre alla pagina `/impostazioni` (pulsante di prova), i casi d'uso reali collegati sono i cron
+di notifica e l'alert di sicurezza — vedi "Cron notifiche" sotto.
 
 Punti da tenere a mente:
 - **Permesso solo da gesto utente**: `Notification.requestPermission()` va chiamato solo dentro
@@ -109,6 +109,40 @@ Punti da tenere a mente:
   `isOwner(user.email)`, non solo la sessione — un giocatore del quiz con login Google ha
   comunque una sessione Supabase valida (vedi sopra). `runtime = "nodejs"` obbligatorio (web-push
   non gira su Edge).
+
+#### Cron notifiche
+
+Cinque cron in più (`vercel.json`), oltre ai tre di "Cron job" sopra, agganciati a
+`sendPushToOwner()` (più un push non-cron sul login sospetto). Stesso pattern
+`CRON_SECRET`/`Authorization: Bearer` delle altre route cron: se `CRON_SECRET` non è impostata,
+restano invocabili senza autenticazione (vedi commento in `.env.example`).
+
+Singolo utente (Lorenzo è l'unico owner): nessun filtro `user_id` nelle query di questi cron,
+stesso principio già usato da `sendPushToOwner()`.
+
+- `/api/cron/alimentazione/pranzo-non-loggato` — `30 12 * * *` (≈14:30 Italia). Push se non
+  esiste ancora un pasto `tipo = 'pranzo'` per oggi (fuso Europe/Rome, vedi
+  `lib/cron/data-italia.ts`).
+- `/api/cron/alimentazione/cena-non-loggata` — `30 19 * * *` (≈21:30 Italia). Stessa logica per
+  `tipo = 'cena'`.
+- `/api/cron/alimentazione/peso-settimanale` — `0 7 * * 0`, domenica (≈09:00 Italia). Push se
+  manca una pesata nella settimana corrente (lun-dom, Europe/Rome).
+- `/api/cron/alimentazione/kcal-soglia` — `0 21 * * *` (≈23:00 Italia). Confronta le kcal
+  loggate oggi con il target TDEE (`getRiepilogoTdee()`): push solo se lo scarto supera il 20%
+  del target (costante `SOGLIA_SCOSTAMENTO_PERCENTUALE` in cima al file, non env). Zero pasti
+  loggati oggi → nessun push (già coperto dai due promemoria pasto sopra, evita doppioni).
+- `/api/cron/spese/promemoria-csv` — `0 16 * * 0`, domenica (≈18:00 Italia). Promemoria "alla
+  cieca" per l'upload CSV: nessun controllo se questa settimana è già stata caricata (il flusso
+  di import non ha un modo affidabile per saperlo, vedi decision log nel README).
+- **Alert push login sospetto** (`app/login/actions.ts`, `inviaAvvisoTentativiSospetti`): non è
+  un cron. Quando scatta il rate-limit del login, subito dopo l'email via Resend già esistente
+  parte anche `sendPushToOwner()` con lo stesso IP nel corpo. Stessa finestra/deduplica
+  dell'email (una notifica ogni 15 minuti, non una per tentativo bloccato).
+
+Nota sull'ora: i cron Vercel girano in UTC fisso, senza fuso — gli orari sopra sono calcolati
+sull'ora legale italiana (CEST, UTC+2); con il passaggio a UTC+1 (fine ottobre) l'orario reale
+slitta di un'ora. Accettabile dato che l'imprecisione di schedulazione di Vercel Cron è già di
+±59 minuti sul piano Hobby.
 
 ### UI mobile (area privata, PWA iOS)
 
