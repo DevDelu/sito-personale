@@ -158,6 +158,17 @@ serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `m
   → Condividi → Aggiungi a Home, richiede 16.4+), non dal sito visitato nel browser. Vedi
   CLAUDE.md, sezione "PWA e notifiche push", per i dettagli implementativi.
 
+- **Promemoria spese CSV "alla cieca" (nessun controllo se la settimana è già stata caricata)**:
+  il flusso di import (manuale o via `/api/spese/importa/grezzo`) non ha un modo semplice e
+  affidabile per sapere se "questa settimana" è già stata coperta — servirebbe una logica ad
+  hoc solo per questo controllo. Il cron settimanale invia sempre il promemoria, stesso giorno
+  ogni settimana: falso positivo occasionale (promemoria anche se già fatto) preferito a
+  costruire un controllo di stato fragile. Renderlo condizionale (es. sull'ultima transazione
+  importata) resta backlog, non implementato.
+- **Nessun promemoria push per la colazione**: spesso saltata volontariamente (es. digiuno
+  intermittente), a differenza di pranzo e cena che restano promemoria utili. Solo un'assunzione
+  di Lorenzo, non un vincolo tecnico — si aggiunge come gli altri due se in futuro serve.
+
 - **UI mobile dell'area privata: tab bar + font di sistema + `font-size: 100%` solo sotto
   `.app-shell` (invece di riscalare tutto il sito)**: usata quasi solo da iPhone come PWA
   installata, l'area privata web-adattata (hamburger/drawer, tabelle a scroll orizzontale,

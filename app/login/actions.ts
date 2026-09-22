@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { siteUrl } from "@/lib/site-url";
+import { sendPushToOwner } from "@/lib/push/send";
 
 export type LoginState = { error?: string } | undefined;
 
@@ -35,6 +36,15 @@ async function inviaAvvisoTentativiSospetti(ip: string): Promise<void> {
       <p>Se non sei stato tu, non serve nessuna azione immediata: il rate limit blocca già i tentativi automatici.</p>
       <p><a href="${siteUrl()}/login">Vai alla pagina di login</a></p>
     `,
+  });
+
+  // Push in tempo reale accanto all'email: sendPushToOwner degrada da sola
+  // (VAPID/tabella non configurati) senza far fallire il flusso di login.
+  await sendPushToOwner({
+    title: "Accesso sospetto rilevato",
+    body: `Più tentativi di login falliti da ${ip}.`,
+    url: "/impostazioni",
+    tag: "sicurezza-login",
   });
 }
 

@@ -269,6 +269,17 @@ export async function getPesoCorporeo(): Promise<PesoCorporeo[]> {
   return (data ?? []).map((p) => ({ ...p, peso_kg: toNumber(p.peso_kg) }));
 }
 
+export async function getPesoCorporeoTraDate(from: string, to: string): Promise<PesoCorporeo[]> {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("peso_corporeo")
+    .select("*")
+    .gte("data", from)
+    .lte("data", to);
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((p) => ({ ...p, peso_kg: toNumber(p.peso_kg) }));
+}
+
 async function getUltimoPeso(): Promise<PesoCorporeo | null> {
   const admin = createAdminClient();
   const { data, error } = await admin
