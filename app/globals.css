@@ -369,6 +369,17 @@ html:has(.app-shell) {
   }
 }
 
+/* html (non solo body) deve avere lo sfondo del tema: iOS Safari dipinge
+   l'area rivelata oltre il documento (rubber-band, ma anche la fascia
+   dell'home indicator quando la pagina è più corta del viewport, es.
+   Altro/Allenamento) col background-color di <html>, non di <body>. Senza
+   questa riga quella fascia resta nera di default a prescindere dai fix di
+   overscroll/contrasto sulla tab bar (che coprono solo l'area dentro il
+   documento). */
+html {
+  background: var(--background);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
