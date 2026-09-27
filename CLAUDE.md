@@ -55,6 +55,16 @@ Tienilo a mente prima di toccare routing/auth: cercare `middleware.ts` o la funz
   del quiz con login Google otterrebbe accesso alle pagine private.
   `isOwner()` è in un file separato senza `import "server-only"` perché è condiviso sia da
   `dal.ts` (Server Component/Action) sia da `proxy.ts` (edge runtime).
+- **API private: controllo centrale nel proxy** (`updateSession()` in `lib/supabase/proxy.ts`):
+  ogni `/api/*` richiede l'owner, tranne `API_AUTONOME` (quiz multi-utente, cron e
+  `/api/feedback/agente` con secret Bearer verificato nella route). Una route nuova è quindi
+  protetta di default; se deve essere pubblica o a secret va aggiunta ad `API_AUTONOME`. Prima
+  molte route controllavano solo `getUser()`, cioè qualunque sessione (anche un giocatore del quiz).
+- **Tester in sola lettura** (`isTester()`, env `TESTER_EMAIL`): l'utente degli agenti notturni.
+  Apre tutte le pagine private (`requireUser()` lo accetta) e fa GET sulle API, ma il proxy rifiuta
+  ogni sua richiesta non GET/HEAD (Server Action comprese) e le rotte in `API_VIETATE_AL_TESTER`
+  (OAuth Google, lettura email). Le Server Action usano `requireWriter()` (solo owner) come
+  seconda barriera: nelle action nuove usa sempre `requireWriter()`, non `requireUser()`.
 
 ### i18n
 

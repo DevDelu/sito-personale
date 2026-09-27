@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireUser } from "@/lib/supabase/dal";
+import { requireWriter } from "@/lib/supabase/dal";
 import { decryptToken } from "@/lib/agenda/crypto";
 import { deleteEventFromGoogle, refreshAccessToken } from "@/lib/agenda/google-client";
 import type { CategoriaEvento } from "@/lib/agenda/types";
@@ -21,7 +21,7 @@ export type EventoPatch = {
 };
 
 export async function creaEvento(patch: EventoPatch): Promise<AgendaActionResult> {
-  await requireUser();
+  await requireWriter();
   if (!patch.titolo.trim()) return { error: "Il titolo è obbligatorio." };
 
   const admin = createAdminClient();
@@ -47,7 +47,7 @@ export async function creaEvento(patch: EventoPatch): Promise<AgendaActionResult
 // nel patch in quel caso). Qualunque modifica locale riporta l'evento a
 // pending_push: la prossima sync lo ripropaga a Google.
 export async function aggiornaEvento(id: string, patch: Partial<EventoPatch>): Promise<AgendaActionResult> {
-  await requireUser();
+  await requireWriter();
   if (patch.titolo !== undefined && !patch.titolo.trim()) return { error: "Il titolo è obbligatorio." };
 
   const columnPatch: Record<string, unknown> = { sync_status: "pending_push" };
@@ -69,7 +69,7 @@ export async function aggiornaEvento(id: string, patch: Partial<EventoPatch>): P
 }
 
 export async function eliminaEvento(id: string): Promise<AgendaActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { data: evento, error: fetchError } = await admin
@@ -109,7 +109,7 @@ export async function eliminaEvento(id: string): Promise<AgendaActionResult> {
 }
 
 export async function salvaNotaGiorno(data: string, contenuto: string): Promise<AgendaActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { error } = await admin
@@ -125,7 +125,7 @@ export async function salvaNotaGiorno(data: string, contenuto: string): Promise<
 // garantisce sempre esattamente una) — se per qualche motivo manca ancora,
 // la si crea qui invece di fallire silenziosamente.
 export async function aggiornaPromemoriaNote(attivo: boolean): Promise<AgendaActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { data: esistente, error: fetchError } = await admin

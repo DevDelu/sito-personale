@@ -2,7 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { isOwner } from "@/lib/supabase/owner";
+import { isOwner, isTester } from "@/lib/supabase/owner";
 
 // lib/supabase/proxy.ts (middleware) chiama già supabase.auth.getUser() ad
 // ogni richiesta protetta e propaga l'esito via header di richiesta: qui ci
@@ -31,7 +31,23 @@ export async function getUser() {
 // login con Google per il quiz otterrebbe una sessione Supabase valida e
 // passerebbe anche il solo check "utente loggato" delle route private
 // (spese, investimenti, carte, agenda, allenamenti).
+//
+// Il tester degli agenti notturni (TESTER_EMAIL) passa requireUser() per
+// poter aprire le pagine, ma non requireWriter(): le Server Action e ogni
+// scrittura usano requireWriter().
 export async function requireUser() {
+  const user = await getUser();
+
+  if (!user || (!isOwner(user.email) && !isTester(user.email))) {
+    redirect("/login");
+  }
+
+  return user;
+}
+
+// Solo owner: per Server Action e scritture. Doppia protezione rispetto al
+// blocco delle richieste non-GET del tester in lib/supabase/proxy.ts.
+export async function requireWriter() {
   const user = await getUser();
 
   if (!user || !isOwner(user.email)) {

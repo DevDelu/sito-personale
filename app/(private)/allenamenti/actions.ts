@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireUser } from "@/lib/supabase/dal";
+import { requireWriter } from "@/lib/supabase/dal";
 import { getSchedaEsercizi } from "@/lib/allenamento/queries";
 import type { TipoMetrica, TipoRiga } from "@/lib/allenamento/types";
 
@@ -16,7 +16,7 @@ export type ImpegnoFissoPatch = {
 };
 
 export async function creaImpegnoFisso(patch: ImpegnoFissoPatch): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   if (!patch.titolo.trim()) return { error: "Il titolo è obbligatorio." };
   if (patch.giorno_settimana < 0 || patch.giorno_settimana > 6) {
@@ -37,7 +37,7 @@ export async function creaImpegnoFisso(patch: ImpegnoFissoPatch): Promise<Allena
 }
 
 export async function eliminaImpegnoFisso(id: string): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { error } = await admin.from("impegni_fissi").delete().eq("id", id);
@@ -53,7 +53,7 @@ export async function eliminaImpegnoFisso(id: string): Promise<AllenamentoAction
 // scheda (blocchi/esercizi/target) viene congelato qui: se la scheda viene
 // modificata dopo, questa sessione resta invariata (vedi 019_allenamento_schede.sql).
 export async function creaSessione(schedaId: string): Promise<{ id: string } | { error: string }> {
-  await requireUser();
+  await requireWriter();
 
   const righe = await getSchedaEsercizi(schedaId);
   if (righe.length === 0) return { error: "Questa scheda non ha ancora esercizi: aggiungine almeno uno." };
@@ -81,7 +81,7 @@ export async function salvaLogSerie(
   sessioneId: string,
   patch: LogSeriePatch
 ): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { error } = await admin.from("sessioni_log").insert({
@@ -109,7 +109,7 @@ export async function aggiornaSessione(
   sessioneId: string,
   patch: FineSessionePatch
 ): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { error } = await admin
@@ -145,7 +145,7 @@ export async function terminaSessione(
 // ---------------------------------------------------------------------------
 
 export async function eliminaSessione(sessioneId: string): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   // Cascade su sessioni_log gestito dalla FK "on delete cascade" (migration 016).
@@ -160,7 +160,7 @@ export async function aggiornaSessioneLog(
   logId: string,
   patch: Omit<LogSeriePatch, "scheda_esercizio_id">
 ): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { error } = await admin
@@ -179,7 +179,7 @@ export async function aggiornaSessioneLog(
 }
 
 export async function eliminaSessioneLog(logId: string): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { error } = await admin.from("sessioni_log").delete().eq("id", logId);
@@ -201,7 +201,7 @@ export async function aggiornaSessioniBulk(
   ids: string[],
   patch: BulkSessionePatch
 ): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
   if (ids.length === 0) return { error: "Nessuna sessione selezionata." };
 
   const columnPatch: Record<string, unknown> = {};
@@ -219,7 +219,7 @@ export async function aggiornaSessioniBulk(
 }
 
 export async function eliminaSessioniBulk(ids: string[]): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
   if (ids.length === 0) return { error: "Nessuna sessione selezionata." };
 
   const admin = createAdminClient();
@@ -285,7 +285,7 @@ export async function aggiornaSchedaEsercizio(
   id: string,
   patch: SchedaEsercizioPatch
 ): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
   if (!patch.blocco.trim()) return { error: "Il nome del blocco è obbligatorio." };
   if (!patch.esercizio_id) return { error: "Seleziona un esercizio." };
 
@@ -303,7 +303,7 @@ export async function aggiornaSchedaEsercizio(
 }
 
 export async function eliminaSchedaEsercizio(id: string): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { error } = await admin.from("scheda_esercizi").delete().eq("id", id);
@@ -318,7 +318,7 @@ export async function eliminaSchedaEsercizio(id: string): Promise<AllenamentoAct
 export async function aggiungiSchedaEsercizio(
   input: NuovoSchedaEsercizioInput
 ): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
   if (!input.blocco.trim()) return { error: "Il nome del blocco è obbligatorio." };
 
   const admin = createAdminClient();
@@ -372,7 +372,7 @@ export async function aggiungiSchedaEsercizio(
 // completo degli id — il server si limita a rinumerare `ordine` 1..N, stessa
 // sequenza globale descritta nella migration 016.
 export async function riordinaSchedaEsercizi(idsInOrdine: string[]): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const risultati = await Promise.all(
@@ -392,7 +392,7 @@ export async function rinominaBlocco(
   vecchioNome: string,
   nuovoNome: string
 ): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
   if (!nuovoNome.trim()) return { error: "Il nome del blocco è obbligatorio." };
 
   const admin = createAdminClient();
@@ -410,7 +410,7 @@ export async function rinominaBlocco(
 }
 
 export async function eliminaBlocco(schedaId: string, nome: string): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { error } = await admin.from("scheda_esercizi").delete().eq("scheda_id", schedaId).eq("blocco", nome);
@@ -431,7 +431,7 @@ export async function eliminaBlocco(schedaId: string, nome: string): Promise<All
 export type SchedaPatch = { nome: string; descrizione: string | null };
 
 export async function creaScheda(patch: SchedaPatch): Promise<{ id: string } | { error: string }> {
-  await requireUser();
+  await requireWriter();
   if (!patch.nome.trim()) return { error: "Il nome della scheda è obbligatorio." };
 
   const admin = createAdminClient();
@@ -448,7 +448,7 @@ export async function creaScheda(patch: SchedaPatch): Promise<{ id: string } | {
 }
 
 export async function aggiornaScheda(id: string, patch: SchedaPatch): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
   if (!patch.nome.trim()) return { error: "Il nome della scheda è obbligatorio." };
 
   const admin = createAdminClient();
@@ -465,7 +465,7 @@ export async function aggiornaScheda(id: string, patch: SchedaPatch): Promise<Al
 }
 
 export async function archiviaScheda(id: string, archiviata: boolean): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { error } = await admin.from("schede").update({ is_archiviata: archiviata }).eq("id", id);
@@ -477,7 +477,7 @@ export async function archiviaScheda(id: string, archiviata: boolean): Promise<A
 }
 
 export async function eliminaScheda(id: string): Promise<AllenamentoActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   // Cascade su scheda_esercizi gestito dalla FK "on delete cascade"
@@ -497,7 +497,7 @@ export async function eliminaScheda(id: string): Promise<AllenamentoActionResult
 // catalogo globale). Le sessioni passate della scheda originale non vengono
 // toccate né copiate.
 export async function duplicaScheda(id: string): Promise<{ id: string } | { error: string }> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { data: originale, error: schedaErr } = await admin
