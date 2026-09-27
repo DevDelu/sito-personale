@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/supabase/dal";
+import { requireWriter } from "@/lib/supabase/dal";
 import { creaPasto, registraPeso, salvaProfilo } from "@/lib/alimentazione/queries";
 import { registraPastoDaTemplate as registraPastoDaTemplateQuery } from "@/lib/alimentazione/template";
 import type { ComposizioneItem, FaseObiettivo, LivelloAttivita, TipoPasto } from "@/lib/alimentazione/types";
@@ -15,7 +15,7 @@ export async function aggiungiPasto(
   _prevState: AggiungiPastoState,
   formData: FormData
 ): Promise<AggiungiPastoState> {
-  await requireUser();
+  await requireWriter();
 
   const tipoPastoRaw = String(formData.get("tipo_pasto") ?? "");
   const alimentoId = String(formData.get("alimento_id") ?? "").trim();
@@ -51,7 +51,7 @@ export async function registraPastoDaTemplate(
   _prevState: RegistraPastoDaTemplateState,
   formData: FormData
 ): Promise<RegistraPastoDaTemplateState> {
-  await requireUser();
+  await requireWriter();
 
   const tipoPastoRaw = String(formData.get("tipo_pasto") ?? "");
   const data = String(formData.get("data") ?? "").trim();
@@ -90,7 +90,7 @@ export async function aggiornaProfilo(
   _prevState: SalvaProfiloState,
   formData: FormData
 ): Promise<SalvaProfiloState> {
-  await requireUser();
+  await requireWriter();
 
   const altezzaCm = Number(formData.get("altezza_cm"));
   const eta = Number(formData.get("eta"));
@@ -134,7 +134,7 @@ export async function aggiungiPeso(
   _prevState: RegistraPesoState,
   formData: FormData
 ): Promise<RegistraPesoState> {
-  await requireUser();
+  await requireWriter();
 
   const data = String(formData.get("data") ?? "").trim();
   const pesoKg = Number(String(formData.get("peso_kg") ?? "").replace(",", "."));

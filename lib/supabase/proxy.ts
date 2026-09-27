@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { isOwner } from "@/lib/supabase/owner";
+import { isOwner, isTester } from "@/lib/supabase/owner";
 
 const PROTECTED_PREFIXES = [
   "/spese",
@@ -12,6 +12,27 @@ const PROTECTED_PREFIXES = [
   "/impostazioni",
   "/altro",
 ];
+
+// API che si autenticano da sole e restano fuori dal controllo owner qui
+// sotto: il quiz è multi-utente per scelta, cron e agenti usano un secret
+// Bearer verificato nella route stessa.
+const API_AUTONOME = [
+  "/api/quiz/",
+  "/api/cron/",
+  "/api/agenda/cron-sync",
+  "/api/agenda/note-reminder",
+  "/api/feedback/agente",
+];
+
+// GET con effetti o dati troppo sensibili anche per un tester in sola
+// lettura: collegamento Google (OAuth) e lettura delle email.
+const API_VIETATE_AL_TESTER = ["/api/agenda/auth/", "/api/agenda/mail"];
+
+// Voci che finiscono con "/" coprono tutto il sottoalbero, le altre solo la
+// rotta esatta e i suoi figli (/api/agenda/mail non copre /api/agenda/mailx).
+function inizia(pathname: string, prefissi: string[]) {
+  return prefissi.some((p) => (p.endsWith("/") ? pathname.startsWith(p) : pathname === p || pathname.startsWith(`${p}/`)));
+}
 
 export async function updateSession(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
@@ -76,14 +97,37 @@ export async function updateSession(request: NextRequest) {
   // il redirect sotto (login → /spese) lo rimbalzerebbe in loop contro
   // requireUser() in app/(private)/layout.tsx.
   const isOwnerUser = isOwner(user?.email);
+  const isTesterUser = isTester(user?.email);
+  const lettura = request.method === "GET" || request.method === "HEAD";
 
-  if (isProtected && !isOwnerUser) {
+  // Controllo centrale per TUTTE le API private: prima molte route
+  // verificavano solo getUser() (qualunque sessione, compreso un giocatore
+  // del quiz con login Google) e non isOwner(). Qui: owner sempre, tester
+  // solo in lettura e non sulle rotte vietate, nessun altro.
+  if (pathname.startsWith("/api/") && !inizia(pathname, API_AUTONOME)) {
+    const consentito =
+      isOwnerUser || (isTesterUser && lettura && !inizia(pathname, API_VIETATE_AL_TESTER));
+    if (!consentito) {
+      return NextResponse.json(
+        { error: user ? "Non autorizzato." : "Non autenticato." },
+        { status: user ? 403 : 401 }
+      );
+    }
+  }
+
+  // Tester sulle pagine private: può navigare (GET) ma non inviare nulla.
+  // Le Server Action sono POST verso la pagina, quindi finiscono qui.
+  if (isProtected && isTesterUser && !lettura) {
+    return NextResponse.json({ error: "Utente tester in sola lettura." }, { status: 403 });
+  }
+
+  if (isProtected && !isOwnerUser && !isTesterUser) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (pathname === "/login" && isOwnerUser) {
+  if (pathname === "/login" && (isOwnerUser || isTesterUser)) {
     return NextResponse.redirect(new URL("/spese", request.url));
   }
 

@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireUser } from "@/lib/supabase/dal";
+import { requireWriter } from "@/lib/supabase/dal";
 
 export type AggiungiMovimentoState = { error?: string } | undefined;
 
@@ -11,7 +11,7 @@ export async function aggiungiMovimento(
   _prevState: AggiungiMovimentoState,
   formData: FormData
 ): Promise<AggiungiMovimentoState> {
-  await requireUser();
+  await requireWriter();
 
   const tipo = formData.get("tipo") === "entrata" ? "entrata" : "spesa";
   const titolo = String(formData.get("titolo") ?? "").trim();

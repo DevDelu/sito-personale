@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireUser } from "@/lib/supabase/dal";
+import { requireWriter } from "@/lib/supabase/dal";
 import { getPriceHistory, type PricePoint } from "@/lib/carte/queries";
 import type { CardCondition, ProductType } from "@/lib/carte/types";
 
@@ -64,7 +64,7 @@ export async function aggiungiCarta(
   _prevState: AggiungiCartaState,
   formData: FormData
 ): Promise<AggiungiCartaState> {
-  await requireUser();
+  await requireWriter();
 
   const name = String(formData.get("name") ?? "").trim();
   const cardNumber = String(formData.get("card_number") ?? "").trim();
@@ -165,7 +165,7 @@ export async function modificaCarta(
   cardId: number,
   patch: ModificaCartaPatch
 ): Promise<CarteActionResult> {
-  await requireUser();
+  await requireWriter();
 
   if (!patch.name.trim()) {
     return { error: "Il titolo della carta è obbligatorio." };
@@ -211,7 +211,7 @@ export async function modificaCarta(
 }
 
 export async function aggiornaImmagineCarta(cardId: number, formData: FormData): Promise<CarteActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const imageFile = formData.get("image");
   if (!(imageFile instanceof File) || imageFile.size === 0) {
@@ -230,12 +230,12 @@ export async function aggiornaImmagineCarta(cardId: number, formData: FormData):
 }
 
 export async function getStoricoPrezzo(collectionId: number, idProduct: number | null): Promise<PricePoint[]> {
-  await requireUser();
+  await requireWriter();
   return getPriceHistory(collectionId, idProduct);
 }
 
 export async function eliminaCarta(id: number): Promise<CarteActionResult> {
-  await requireUser();
+  await requireWriter();
 
   const admin = createAdminClient();
   const { error } = await admin.from("my_collection").delete().eq("id", id);
