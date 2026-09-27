@@ -199,8 +199,11 @@ tutti verso lo stesso sheet (`components/feedback/FeedbackSheet.tsx`, ospitato d
   scatta su `errore_api` (risposte 5xx da `/api/*`, via `fetch` osservata) ed `errore_js`; gli
   altri tipi arriveranno col tracciamento d'uso. Regole anti-invadenza pure e testate in
   `lib/feedback/regole-suggerimento.ts`.
-- **Riserva**: riga in `/altro` (allega l'ultima pagina visitata prima di Altro), voce "Feedback"
+- **Riserva**: pulsante flottante in Spese (`FeedbackFAB`, origine `pulsante`, migration 032), riga in `/altro` (allega l'ultima pagina visitata prima di Altro), voce "Feedback"
   in fondo alla sidebar desktop, scorciatoia `F` senza campi a fuoco.
+
+Su mobile lo sheet scende **dall'alto** (`<Sheet posizione="alto">`): ancorato in basso veniva
+coperto dalla tastiera iOS, che si apre subito.
 
 Dati: tabella `feedback` (`supabase/031_feedback.sql`), insert via `POST /api/feedback`
 (getUser + isOwner). `contesto` contiene solo metadati: route template (id → `[id]`, vedi

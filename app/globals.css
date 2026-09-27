@@ -534,6 +534,35 @@ body {
     }
   }
 
+  /* Variante "dall'alto" del bottom sheet (<Sheet posizione="alto">): per
+     gli sheet con un campo di testo che apre subito la tastiera (feedback),
+     che su iOS altrimenti copre o spinge fuori schermo un pannello ancorato
+     in basso. Stesso scope del bottom sheet: su desktop resta il modale
+     centrato di sempre. Grabber spostato in fondo (::after). */
+  @media (max-width: 639px) and (pointer: coarse) {
+    .modal-overlay.modal-overlay--alto {
+      @apply items-start;
+    }
+
+    .modal-panel.modal-panel--alto {
+      @apply animate-slide-down rounded-t-none rounded-b-2xl border-t-0 border-b pt-[env(safe-area-inset-top)] pb-0;
+    }
+
+    .modal-panel.modal-panel--alto::before {
+      display: none;
+    }
+
+    .modal-panel.modal-panel--alto::after {
+      content: "";
+      display: block;
+      width: 2.5rem;
+      height: 0.25rem;
+      margin: 0 auto 0.5rem;
+      border-radius: 999px;
+      background: var(--border);
+    }
+  }
+
   /* Input di testo/data/numero/select condivisi da tutti i form */
   .field-input {
     @apply rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none transition-all duration-150 ease-out focus:border-accent focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_15%,transparent)];

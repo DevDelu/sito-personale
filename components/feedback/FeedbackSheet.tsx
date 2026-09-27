@@ -18,8 +18,9 @@ const PLACEHOLDER: Record<FeedbackTipo, string> = {
   idea: "Cosa ti servirebbe?",
 };
 
-// "Invia" sta nella barra in alto a destra, non in fondo: su iOS la tastiera
-// (che si apre subito) coprirebbe un pulsante in basso.
+// Su mobile lo sheet scende dall'alto (Sheet posizione="alto"): con la
+// tastiera aperta subito, un pannello ancorato in basso veniva coperto o
+// spinto fuori schermo da iOS. "Invia" resta nella barra in alto a destra.
 export function FeedbackSheet({
   tipoIniziale,
   onClose,
@@ -36,7 +37,13 @@ export function FeedbackSheet({
 
   useEffect(() => {
     registraFocusCampoFeedback(() => campo.current?.focus({ preventScroll: true }));
-    return () => registraFocusCampoFeedback(null);
+    const el = campo.current;
+    return () => {
+      registraFocusCampoFeedback(null);
+      // Chiude la tastiera insieme allo sheet: su iOS un campo smontato
+      // mentre ha il focus può lasciare la pagina scrollata/spostata.
+      el?.blur();
+    };
   }, []);
 
   function invia() {
@@ -44,7 +51,7 @@ export function FeedbackSheet({
   }
 
   return (
-    <Sheet onClose={onClose}>
+    <Sheet onClose={onClose} posizione="alto">
       <div className="flex flex-col">
         <div className="app-static grid h-12 grid-cols-[1fr_auto_1fr] items-center border-b border-[var(--app-hairline)] px-2">
           <button

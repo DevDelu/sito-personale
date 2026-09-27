@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Plus } from "lucide-react";
 import { getOverviewData } from "@/lib/spese/queries";
 import { Overview } from "./overview";
 import { Toast } from "@/components/toast";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { FAB } from "@/components/ui/FAB";
+import { FeedbackFAB } from "@/components/feedback/FeedbackAccessi";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
 
 // Le voci Overview/Gestione/Importa del segmented control mobile vengono da
-// qui, senza duplicare le etichette: "+ Aggiungi" diventa il FAB in basso a
-// destra invece che una quarta voce.
+// qui, senza duplicare le etichette. "+ Aggiungi" resta fuori: l'aggiunta
+// passa dal "+" centrale della tab bar, il FAB in basso a destra è il
+// feedback.
 const SPESE_SEGMENTI = SIDEBAR_SECTIONS.find((s) => s.id === "spese")!.subsections!.filter(
   (s) => !s.label.startsWith("+")
 );
@@ -65,7 +65,7 @@ export default async function SpesePage({
 
       <Overview spese={spese} categorie={categorie} depositi={depositi} range={range} />
 
-      <FAB href="/spese/nuovo" label="Aggiungi movimento" icon={<Plus className="h-6 w-6" strokeWidth={2.25} />} />
+      <FeedbackFAB />
     </div>
   );
 }
