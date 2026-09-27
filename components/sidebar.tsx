@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
 import { interceptSessionNav } from "@/lib/allenamento/session-guard";
+import { FeedbackVoceSidebar } from "@/components/feedback/FeedbackAccessi";
 
 function isSectionActive(sectionHref: string, pathname: string): boolean {
   if (sectionHref === "#") return false;
@@ -104,7 +105,10 @@ export function Sidebar({ logoutSlot }: { logoutSlot: React.ReactNode }) {
       <div className="flex-1 overflow-y-auto">
         <SidebarContent />
       </div>
-      <div className="border-t border-border p-3">{logoutSlot}</div>
+      <div className="border-t border-border p-3">
+        <FeedbackVoceSidebar />
+        {logoutSlot}
+      </div>
     </aside>
   );
 }

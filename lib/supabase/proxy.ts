@@ -15,6 +15,12 @@ const PROTECTED_PREFIXES = [
 
 export async function updateSession(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
+  // Questi header li imposta SOLO questo proxy (sotto, dopo getUser()), e
+  // dal.ts li considera già verificati: vanno scartati se arrivano dal
+  // client, altrimenti bastava inviarli a mano con l'email dell'owner per
+  // superare getUser()/isOwner() su qualunque route /api/*.
+  requestHeaders.delete("x-verified-user-id");
+  requestHeaders.delete("x-verified-user-email");
   let supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } });
 
   const supabase = createServerClient(

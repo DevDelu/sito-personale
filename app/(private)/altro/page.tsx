@@ -4,6 +4,7 @@ import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ListGroup, ListRow, ListRowLink } from "@/components/ui/ListGroup";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { FeedbackRigaAltro } from "@/components/feedback/FeedbackAccessi";
 
 export const metadata: Metadata = { title: "Altro" };
 
@@ -30,6 +31,7 @@ export default function AltroPage() {
             title="Alimentazione"
             chevron
           />
+          <FeedbackRigaAltro />
         </ListGroup>
 
         <ListGroup>
