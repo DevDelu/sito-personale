@@ -35,20 +35,46 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      # Senza i secret del tester il collaudo non può entrare: si salta con un
+      # avviso invece di fallire ogni notte (vedi docs/agenti-da-fare.md).
+      - name: Controlla i secret del tester
+        id: secret
+        env:
+          TESTER_EMAIL: ${{ secrets.TESTER_EMAIL }}
+          TESTER_PASSWORD: ${{ secrets.TESTER_PASSWORD }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          mancanti=""
+          for n in TESTER_EMAIL TESTER_PASSWORD SUPABASE_URL SUPABASE_ANON_KEY; do
+            [ -z "${!n}" ] && mancanti="$mancanti $n"
+          done
+          if [ -n "$mancanti" ]; then
+            echo "::warning::Collaudo saltato, secret mancanti:$mancanti (vedi docs/agenti-da-fare.md)"
+            echo "pronto=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "pronto=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.secret.outputs.pronto == 'true'
         with:
           ref: main
 
       - uses: actions/setup-node@v4
+        if: steps.secret.outputs.pronto == 'true'
         with:
           node-version: 22
           cache: npm
 
       - run: npm ci
+        if: steps.secret.outputs.pronto == 'true'
 
       - run: npx playwright install --with-deps chromium
+        if: steps.secret.outputs.pronto == 'true'
 
       - name: Collaudo iPhone
+        if: steps.secret.outputs.pronto == 'true'
         env:
           E2E_BASE_URL: ${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url || secrets.RADAR_URL }}
           TESTER_EMAIL: ${{ secrets.TESTER_EMAIL }}
@@ -60,7 +86,7 @@ jobs:
         run: npx playwright test --reporter=list,json
 
       - name: Issue dal-collaudo (solo di notte)
-        if: always() && github.event_name != 'deployment_status'
+        if: always() && steps.secret.outputs.pronto == 'true' && github.event_name != 'deployment_status'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node .github/scripts/collaudo-issue.mjs collaudo.json

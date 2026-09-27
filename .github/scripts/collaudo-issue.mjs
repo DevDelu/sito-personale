@@ -41,7 +41,13 @@ if (!existsSync(file)) {
   process.exit(0);
 }
 const report = JSON.parse(readFileSync(file, "utf8"));
-const elenco = (report.suites ?? []).flatMap((s) => falliti(s));
+// Errore prima dei test (login del tester, sito irraggiungibile): non è
+// "tutto verde", quindi non si chiude nulla; lo si segnala come voce unica.
+const erroriGlobali = (report.errors ?? []).map((e) => ({
+  titolo: "Il collaudo non è partito (login del tester o sito irraggiungibile)",
+  errore: (e.message ?? "").replace(/\u001b\[[0-9;]*m/g, "").split("\n").find((r) => r.trim())?.trim().slice(0, 160) ?? "",
+}));
+const elenco = [...erroriGlobali, ...(report.suites ?? []).flatMap((s) => falliti(s))];
 console.log(`Test falliti: ${elenco.length}`);
 
 const aperte = await github("GET", `/issues?labels=${ETICHETTA}&state=open&per_page=10`);
