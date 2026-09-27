@@ -16,9 +16,11 @@ npm run dev        # dev server, http://localhost:3000
 npm run build       # build produzione
 npm run start       # avvia build produzione
 npm run lint         # eslint (eslint-config-next core-web-vitals + typescript)
+npm test            # unit test node:test su lib/**/*.test.ts (type stripping di Node 22, nessun runner)
 ```
 
-Non esiste una test suite (nessun runner configurato in `package.json`).
+Nessuna suite e2e per ora: solo unit test su logica pura (oggi `lib/feedback/`). I file di test
+importano con estensione `.ts` (serve a Node), da qui `allowImportingTsExtensions` in `tsconfig.json`.
 
 Setup Supabase locale: crea un progetto free su supabase.com, esegui **in ordine** tutte le
 migration in `supabase/` (numerate, partendo da `schema.sql`), crea manualmente l'utente in
@@ -183,6 +185,34 @@ layout desktop dell'area privata non cambiano.
   (Investimenti, Carte, Allenamenti, Agenda, Alimentazione) ereditano le fondamenta e la tab
   bar ma non sono stati ridisegnati pagina per pagina: vanno affrontati uno alla volta con lo
   stesso schema, non "per completezza" senza che sia richiesto.
+
+### Feedback (Radar, POTENZIAMENTO 1)
+
+Lorenzo lascia un feedback in meno di 5 secondi, senza ingombro visivo permanente. Tre accessi,
+tutti verso lo stesso sheet (`components/feedback/FeedbackSheet.tsx`, ospitato da
+`FeedbackProvider` nel layout privato e aperto via `apriFeedback()` in `lib/feedback/bus.ts`):
+- **Pressione lunga (~500 ms) sulla tab già attiva** della tab bar (`hooks/usePressioneLunga.ts`).
+  Su una tab non attiva resta un tap normale. Lo sheet si apre al timer; il focus al campo
+  arriva al `touchend` perché iOS apre la tastiera solo dentro un gesto utente — non spostarlo
+  nel timer. Un suggerimento di scoperta compare una sola volta (flag in localStorage).
+- **Suggerimento dopo un attrito** ("Qualcosa non va? Dimmelo", sopra la tab bar, 4 s): oggi
+  scatta su `errore_api` (risposte 5xx da `/api/*`, via `fetch` osservata) ed `errore_js`; gli
+  altri tipi arriveranno col tracciamento d'uso. Regole anti-invadenza pure e testate in
+  `lib/feedback/regole-suggerimento.ts`.
+- **Riserva**: riga in `/altro` (allega l'ultima pagina visitata prima di Altro), voce "Feedback"
+  in fondo alla sidebar desktop, scorciatoia `F` senza campi a fuoco.
+
+Dati: tabella `feedback` (`supabase/031_feedback.sql`), insert via `POST /api/feedback`
+(getUser + isOwner). `contesto` contiene solo metadati: route template (id → `[id]`, vedi
+`lib/feedback/pagina.ts`), chiavi dei filtri senza valori, viewport, tema, SHA
+(`VERCEL_GIT_COMMIT_SHA`, aggiunto lato server), attriti recenti. Se l'invio fallisce il
+feedback va in una coda in localStorage e riparte al prossimo avvio/ritorno online.
+
+Agenti: `GET/PATCH /api/feedback/agente` con `Authorization: Bearer <FEEDBACK_AGENTE_SECRET>`
+(obbligatoria, fail-closed): `GET ?stato=nuovo` elenca i feedback da trasformare in issue
+`dal-lorenzo`, `PATCH { id, stato, issue_number }` li segna dopo la issue,
+`PATCH { issue_number, stato: "risolto", pr_number }` è chiamato da
+`.github/workflows/feedback-risolto.yml` al merge di una PR che chiude una issue `dal-lorenzo`.
 
 ### Decision log (dal README)
 
