@@ -17,10 +17,15 @@ npm run build       # build produzione
 npm run start       # avvia build produzione
 npm run lint         # eslint (eslint-config-next core-web-vitals + typescript)
 npm test            # unit test node:test su lib/**/*.test.ts e .github/scripts/*.test.mjs (Node 22, nessun runner)
+npm run test:e2e    # collaudatore Playwright sul sito vero col tester in sola lettura (vedi tests/e2e/README.md)
 ```
 
-Nessuna suite e2e per ora: solo unit test su logica pura (oggi `lib/feedback/`). I file di test
-importano con estensione `.ts` (serve a Node), da qui `allowImportingTsExtensions` in `tsconfig.json`.
+Gli unit test importano con estensione `.ts` (serve a Node), da qui `allowImportingTsExtensions` in
+`tsconfig.json`. Il collaudatore (`tests/e2e/`, `.github/workflows/collaudo.yml`) gira a ogni deploy
+Vercel e ogni notte; entra come tester con `signInWithPassword` via `@supabase/ssr` (niente form di
+login, che ha Turnstile). Vede dati reali in un repo pubblico: **mai** screenshot/video/trace o
+report caricati come artifact, e asserzioni solo strutturali. Pagina privata nuova → aggiungila a
+`PAGINE` in `tests/e2e/pagine.spec.ts`; bug corretto → test che fallisce prima e passa dopo.
 
 Setup Supabase locale: crea un progetto free su supabase.com, esegui **in ordine** tutte le
 migration in `supabase/` (numerate, partendo da `schema.sql`), crea manualmente l'utente in

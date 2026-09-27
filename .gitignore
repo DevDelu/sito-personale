@@ -43,3 +43,8 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Collaudatore (Playwright): sessione del tester e report, mai nel repo
+/tests/e2e/.auth/
+/test-results/
+/playwright-report/
