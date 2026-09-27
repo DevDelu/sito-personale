@@ -16,7 +16,7 @@ npm run dev        # dev server, http://localhost:3000
 npm run build       # build produzione
 npm run start       # avvia build produzione
 npm run lint         # eslint (eslint-config-next core-web-vitals + typescript)
-npm test            # unit test node:test su lib/**/*.test.ts (type stripping di Node 22, nessun runner)
+npm test            # unit test node:test su lib/**/*.test.ts e .github/scripts/*.test.mjs (Node 22, nessun runner)
 ```
 
 Nessuna suite e2e per ora: solo unit test su logica pura (oggi `lib/feedback/`). I file di test
@@ -216,6 +216,19 @@ Agenti: `GET/PATCH /api/feedback/agente` con `Authorization: Bearer <FEEDBACK_AG
 `dal-lorenzo`, `PATCH { id, stato, issue_number }` li segna dopo la issue,
 `PATCH { issue_number, stato: "risolto", pr_number }` è chiamato da
 `.github/workflows/feedback-risolto.yml` al merge di una PR che chiude una issue `dal-lorenzo`.
+
+#### Job notturno feedback → issue
+
+`.github/workflows/radar-feedback-notte.yml` (01:23 UTC, più avvio manuale da Actions): legge i
+feedback `nuovo`, Claude Code (`claude -p` col token dell'abbonamento, `CLAUDE_CODE_OAUTH_TOKEN`)
+scrive titolo e parafrasi in `.radar-tmp/proposte.json` seguendo
+`.github/scripts/prompt-feedback-notte.md`, poi `.github/scripts/feedback-notte.mjs pubblica` crea
+le issue `dal-lorenzo` e segna i feedback `in-lavorazione`. Il repo è **pubblico**: Claude gira
+senza token GitHub, secret del sito, Bash o rete, il suo output non va nei log, e ogni parafrasi
+passa da `.github/scripts/privacy.mjs` (importi, valute, date, email, numeri lunghi, 6+ parole
+copiate dall'originale → corpo generico che rimanda a Supabase). Idempotente: il marcatore
+`<!-- feedback-id -->` nella issue evita doppioni se l'aggiornamento di stato fallisce. Nelle notti
+senza feedback Claude non parte (niente quota).
 
 ### Decision log (dal README)
 

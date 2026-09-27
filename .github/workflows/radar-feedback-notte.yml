@@ -1,0 +1,74 @@
+# Job notturno: i feedback lasciati da Lorenzo nell'app (tabella `feedback`,
+# stato `nuovo`) diventano issue `dal-lorenzo` con una parafrasi senza dati
+# personali, e il feedback passa a `in-lavorazione` con il numero della issue.
+# Vedi CLAUDE.md > "Feedback".
+#
+# Il repo è PUBBLICO: log e issue sono visibili a chiunque. Per questo:
+# - Claude gira senza token GitHub, senza secret del sito e senza Bash o
+#   rete (solo Read/Glob/Grep/Write), e il suo output non va nei log;
+# - le issue le crea lo script, dopo un controllo privacy deterministico
+#   (.github/scripts/privacy.mjs); se la parafrasi non passa, pubblica un
+#   corpo generico che rimanda a Supabase.
+#
+# Secret: CLAUDE_CODE_OAUTH_TOKEN (claude setup-token), RADAR_URL,
+# FEEDBACK_AGENTE_SECRET. Avvio manuale: Actions > radar-feedback-notte >
+# Run workflow.
+name: radar-feedback-notte
+
+on:
+  schedule:
+    # 01:23 UTC ≈ 03:23 in Italia (ora legale). Minuto non tondo: i cron
+    # di GitHub all'ora esatta partono spesso in ritardo.
+    - cron: "23 1 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: radar-feedback-notte
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  feedback-in-issue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Scarica i feedback nuovi
+        id: scarica
+        env:
+          RADAR_URL: ${{ secrets.RADAR_URL }}
+          FEEDBACK_AGENTE_SECRET: ${{ secrets.FEEDBACK_AGENTE_SECRET }}
+        run: node .github/scripts/feedback-notte.mjs scarica
+
+      # Solo se c'è qualcosa da fare: niente quota Claude nelle notti vuote.
+      - name: Claude scrive titoli e parafrasi
+        if: steps.scarica.outputs.quanti != '0'
+        continue-on-error: true
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          npm install -g @anthropic-ai/claude-code >/dev/null 2>&1
+          # Output rediretto: contiene ragionamenti sul testo privato.
+          claude -p "$(cat .github/scripts/prompt-feedback-notte.md)" \
+            --allowedTools "Read,Glob,Grep,Write" \
+            --disallowedTools "Bash,WebFetch,WebSearch" \
+            --max-turns 40 > /dev/null 2>&1 \
+            && echo "Claude ha terminato." \
+            || echo "Claude non ha terminato: le issue avranno il corpo generico."
+          test -f .radar-tmp/proposte.json && echo "proposte.json presente." || echo "proposte.json assente."
+
+      - name: Crea le issue e aggiorna lo stato
+        if: steps.scarica.outputs.quanti != '0'
+        env:
+          RADAR_URL: ${{ secrets.RADAR_URL }}
+          FEEDBACK_AGENTE_SECRET: ${{ secrets.FEEDBACK_AGENTE_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node .github/scripts/feedback-notte.mjs pubblica
