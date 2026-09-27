@@ -1,0 +1,66 @@
+# Collaudatore: suite Playwright deterministica (tests/e2e/) sul sito vero,
+# con l'utente tester in sola lettura su un iPhone simulato. Non usa Claude.
+# - a ogni deploy Vercel riuscito (anteprima di una PR o produzione): il
+#   risultato compare come check sul commit/PR;
+# - ogni notte sulla produzione, prima degli altri agenti: se qualcosa non
+#   va apre/aggiorna la issue `dal-collaudo`, e la chiude quando torna verde.
+#
+# Repo PUBBLICO e dati reali: niente screenshot, video, trace né report
+# caricati come artifact (vedi playwright.config.ts).
+#
+# Si esegue sempre il codice dei test di `main`, anche sulle anteprime: i
+# secret del tester non passano mai a codice non ancora mergiato.
+#
+# Secret: TESTER_EMAIL, TESTER_PASSWORD, SUPABASE_URL, SUPABASE_ANON_KEY,
+# RADAR_URL; facoltativo VERCEL_BYPASS_SECRET se le anteprime sono protette.
+name: collaudo
+
+on:
+  deployment_status:
+  schedule:
+    - cron: "53 0 * * *" # ≈02:53 in Italia, prima del job feedback (01:23 UTC)
+  workflow_dispatch:
+
+concurrency:
+  group: collaudo-${{ github.event.deployment.id || github.event_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  collaudo:
+    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Collaudo iPhone
+        env:
+          E2E_BASE_URL: ${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url || secrets.RADAR_URL }}
+          TESTER_EMAIL: ${{ secrets.TESTER_EMAIL }}
+          TESTER_PASSWORD: ${{ secrets.TESTER_PASSWORD }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_BYPASS_SECRET }}
+          PLAYWRIGHT_JSON_OUTPUT_NAME: collaudo.json
+        run: npx playwright test --reporter=list,json
+
+      - name: Issue dal-collaudo (solo di notte)
+        if: always() && github.event_name != 'deployment_status'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node .github/scripts/collaudo-issue.mjs collaudo.json
