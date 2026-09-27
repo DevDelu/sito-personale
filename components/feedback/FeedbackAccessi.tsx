@@ -2,6 +2,7 @@
 
 import { MessageSquare } from "lucide-react";
 import { ListRowButton } from "@/components/ui/ListGroup";
+import { FAB } from "@/components/ui/FAB";
 import { apriFeedback } from "@/lib/feedback/bus";
 
 // Accessi visibili di riserva al feedback (il principale è la pressione
@@ -33,5 +34,17 @@ export function FeedbackVoceSidebar() {
       <span className="flex-1 text-left">Feedback</span>
       <kbd className="rounded border border-border px-1.5 font-mono text-[11px] text-muted">F</kbd>
     </button>
+  );
+}
+
+// Pulsante flottante dedicato (solo mobile), in Spese al posto del vecchio
+// FAB "+" che duplicava il "+" centrale della tab bar.
+export function FeedbackFAB() {
+  return (
+    <FAB
+      onClick={() => apriFeedback({ origine: "pulsante" })}
+      label="Lascia un feedback"
+      icon={<MessageSquare className="h-6 w-6" strokeWidth={2} />}
+    />
   );
 }

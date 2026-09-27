@@ -8,6 +8,13 @@ export async function inserisciFeedback(payload: FeedbackPayload) {
   const admin = createAdminClient();
   const contesto = { ...payload.contesto, versione: process.env.VERCEL_GIT_COMMIT_SHA ?? null };
   const { error } = await admin.from("feedback").insert({ ...payload, contesto });
+  // 23514 = check_violation: migration 032 (origine 'pulsante') non ancora
+  // applicata. Meglio salvare il feedback con un'origine vicina che perderlo.
+  if (error?.code === "23514" && payload.origine === "pulsante") {
+    const retry = await admin.from("feedback").insert({ ...payload, origine: "tab", contesto });
+    if (retry.error) throw retry.error;
+    return;
+  }
   if (error) throw error;
 }
 

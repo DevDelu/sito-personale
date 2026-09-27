@@ -13,15 +13,20 @@ const CHIUDI_VELOCITY = 600;
 // di bottom sheet (grabber, angoli smussati solo in alto, safe-area), qui
 // aggiunge trascinamento per chiudere, blocco scroll del body e chiusura con
 // Esc. Su desktop resta un modale centrato, senza trascinamento.
+// posizione="alto": su mobile scende dall'alto e si chiude trascinando verso
+// l'alto — per sheet con tastiera aperta subito (vedi app/globals.css).
 export function Sheet({
   onClose,
   children,
   className = "",
+  posizione = "basso",
 }: {
   onClose: () => void;
   children: React.ReactNode;
   className?: string;
+  posizione?: "basso" | "alto";
 }) {
+  const alto = posizione === "alto";
   const [trascinabile, setTrascinabile] = useState(false);
 
   useEffect(() => {
@@ -47,18 +52,19 @@ export function Sheet({
 
   return (
     <div
-      className="modal-overlay"
+      className={`modal-overlay ${alto ? "modal-overlay--alto" : ""}`}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <motion.div
-        className={`modal-panel w-full max-w-md ${className}`}
+        className={`modal-panel w-full max-w-md ${alto ? "modal-panel--alto" : ""} ${className}`}
         drag={trascinabile ? "y" : false}
         dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={{ top: 0, bottom: 0.5 }}
+        dragElastic={alto ? { top: 0.5, bottom: 0 } : { top: 0, bottom: 0.5 }}
         onDragEnd={(_e, info: PanInfo) => {
-          if (info.offset.y > CHIUDI_OFFSET_PX || info.velocity.y > CHIUDI_VELOCITY) onClose();
+          const verso = alto ? -1 : 1;
+          if (info.offset.y * verso > CHIUDI_OFFSET_PX || info.velocity.y * verso > CHIUDI_VELOCITY) onClose();
         }}
       >
         {children}
