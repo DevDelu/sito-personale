@@ -22,7 +22,7 @@
   --cat-bonifici: #7c3aed;
   --cat-ristoranti: #db2777;
   --cat-altro: #626b81;
-  --cat-stipendio: #059669;
+  --cat-stipendio: #15803d;
   --cat-rimborso: #0d9488;
 
   /* Palette per categorie create dinamicamente dall'utente (Modifica 1) */
@@ -32,6 +32,7 @@
   --cat-extra-4: #4f46e5;
   --cat-extra-5: #e11d48;
   --cat-extra-6: #92400e;
+  --cat-extra-7: #a21caf;
 
   /* Investimenti: un colore per tipo asset, distinto dalle categorie Spese */
   --invest-etf: #c25a1e;
@@ -46,11 +47,18 @@
   --invest-pie-etc: #3fae6b;
   --invest-pie-crypto: #d6528f;
 
-  /* Agenda: una per categoria evento (ferie/visita/scadenza/personale) */
-  --agenda-ferie: #059669;
-  --agenda-visita: #2563eb;
-  --agenda-scadenza: #dc2626;
-  --agenda-personale: #c25a1e; /* stesso hue dell'accent light */
+  /* Agenda: una per categoria evento (ferie/visita/scadenza/personale),
+     prese dalla palette del sito (entrata, blu investimenti, spesa, accento
+     bordeaux) invece dei blu/verdi accesi di Tailwind. */
+  --agenda-ferie: #2f8a63;
+  --agenda-visita: #3b6e91;
+  --agenda-scadenza: #a63b3b;
+  --agenda-personale: #7e2537;
+
+  /* Podio carte (oro, argento, bronzo) */
+  --podio-oro: #b8860b;
+  --podio-argento: #7d8793;
+  --podio-bronzo: #a0612c;
 
   /* Alimentazione: una per macro (barre di progresso, grafico trend) */
   --macro-proteine: #2563eb;
@@ -77,7 +85,7 @@
   --cat-bonifici: #a78bfa;
   --cat-ristoranti: #f472b6;
   --cat-altro: #8a93a8;
-  --cat-stipendio: #34d399;
+  --cat-stipendio: #86efac;
   --cat-rimborso: #2dd4bf;
 
   --cat-extra-1: #22d3ee;
@@ -86,6 +94,7 @@
   --cat-extra-4: #818cf8;
   --cat-extra-5: #fb7185;
   --cat-extra-6: #d6a35c;
+  --cat-extra-7: #e879f9;
 
   --invest-etf: #e8792e;
   --invest-etc: #56b58d;
@@ -97,10 +106,14 @@
   --invest-pie-etc: #3fae6b;
   --invest-pie-crypto: #d6528f;
 
-  --agenda-ferie: #34d399;
-  --agenda-visita: #60a5fa;
-  --agenda-scadenza: #f87171;
-  --agenda-personale: #e8792e; /* stesso hue dell'accent dark */
+  --agenda-ferie: #3fa87a;
+  --agenda-visita: #5b9bc4;
+  --agenda-scadenza: #c24e4e;
+  --agenda-personale: #d4546d;
+
+  --podio-oro: #e5c158;
+  --podio-argento: #c3cad3;
+  --podio-bronzo: #d08a52;
 
   --macro-proteine: #60a5fa;
   --macro-carboidrati: #facc15;
@@ -622,9 +635,41 @@ body {
   font-size: 0.8rem;
 }
 
+/* Oggi: numero in un cerchio pieno color accento, riconoscibile a colpo
+   d'occhio anche su iPhone invece del solo colore del testo. */
 .agenda-calendar .fc-day-today .fc-daygrid-day-number {
-  color: var(--accent);
+  margin: 2px;
+  min-width: 1.6rem;
+  border-radius: 9999px;
+  background: var(--accent);
+  color: var(--accent-foreground);
   font-weight: 600;
+  text-align: center;
+}
+
+/* Eventi come etichette arrotondate e leggibili (in vista mese anche quelli
+   con orario, vedi eventDisplay="block" in CalendarView). */
+.agenda-calendar .fc-daygrid-event,
+.agenda-calendar .fc-timegrid-event {
+  border-radius: 6px;
+  padding: 1px 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.agenda-calendar .fc-col-header-cell-cushion {
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .agenda-calendar .fc-toolbar-title {
+    font-size: 1rem;
+  }
+  .agenda-calendar .fc-button {
+    padding: 0.3rem 0.55rem;
+    font-size: 0.8rem;
+  }
 }
 
 /* headerToolbar ha 3 gruppi (nav, titolo, viste): su schermi stretti vanno

@@ -103,6 +103,7 @@ export function CalendarView({
           eventStartEditable
           eventDurationEditable
           dayMaxEvents
+          eventDisplay="block"
           height="auto"
           locale="it"
           firstDay={1}

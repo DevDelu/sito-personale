@@ -43,8 +43,8 @@ export function CollectionSections({
   return (
     <>
       <section className="flex flex-col gap-3">
-        <h2 className="font-display text-sm font-medium text-muted">Le tue carte di valore</h2>
-        <HeroCards carte={hero} onView={setViewing} onEdit={setEditing} onDelete={setDeleting} />
+        <h2 className="font-display text-sm font-medium text-muted">Il podio</h2>
+        <HeroCards carte={hero} onView={setViewing} />
       </section>
 
       {metricsSlot}

@@ -116,7 +116,12 @@ export function PositionsTable({
                       <div className="flex flex-col">
                         <span>{formatCurrency(p.prezzoAttuale)}</span>
                         <span className="text-xs font-sans text-muted">
-                          {p.prezzoAttualeFonte === "prezzi_storico" ? "storico" : "ultima transazione"}
+                          {p.prezzoAttualeFonte === "prezzi_storico" ? "mercato" : "ultima transazione"}
+                          {p.prezzoAttualeData &&
+                            ` · ${new Date(`${p.prezzoAttualeData}T00:00:00`).toLocaleDateString("it-IT", {
+                              day: "2-digit",
+                              month: "2-digit",
+                            })}`}
                         </span>
                       </div>
                     )}
