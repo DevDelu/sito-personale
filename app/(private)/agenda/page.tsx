@@ -59,7 +59,9 @@ export default async function AgendaPage({
         </p>
       )}
 
-      <AgendaBoard eventi={eventi} note={note} />
+      <div data-fb-area="agenda.board" className="contents">
+        <AgendaBoard eventi={eventi} note={note} />
+      </div>
     </div>
   );
 }

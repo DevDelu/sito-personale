@@ -31,7 +31,7 @@ export function ExpenseEditModal({
   }
 
   return (
-    <Sheet onClose={onCancel}>
+    <Sheet onClose={onCancel} area="spese.modifica-movimento" entita={`transazione:${movimento.id}`}>
       <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">Modifica movimento</h2>
 

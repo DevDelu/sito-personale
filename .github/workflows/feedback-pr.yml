@@ -1,0 +1,91 @@
+# Collega le PR ai feedback di Lorenzo (vedi CLAUDE.md > "Feedback"), per
+# ogni issue `dal-lorenzo` che la PR chiude ("Closes #N" o collegata dalla
+# sidebar):
+# - PR aperta (anche bozza) → feedback `in-lavorazione` con il numero della PR;
+# - PR mergiata → resta `in-lavorazione` (diventa `da-verificare` solo dopo
+#   il deploy di produzione, feedback-deploy.yml) e riceve la `nota-fix`:
+#   la riga "Nota per Lorenzo: ..." del corpo della PR, una frase senza gergo;
+# - PR chiusa senza merge → il feedback torna `preso-in-carico`.
+# Passa dall'endpoint /api/feedback/agente: la service role key resta su Vercel.
+#
+# Secret richiesti (Settings > Secrets and variables > Actions):
+#   RADAR_URL               es. https://tuo-dominio.it (senza / finale)
+#   FEEDBACK_AGENTE_SECRET  stesso valore della env var su Vercel
+#                           (FEEDBACK_AGENT_SECRET accettato come alias)
+# Se mancano, il job termina senza errori con un avviso.
+name: feedback-pr
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  aggiorna-stato:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          RADAR_URL: ${{ secrets.RADAR_URL }}
+          FEEDBACK_AGENTE_SECRET: ${{ secrets.FEEDBACK_AGENTE_SECRET || secrets.FEEDBACK_AGENT_SECRET }}
+        with:
+          script: |
+            const { RADAR_URL, FEEDBACK_AGENTE_SECRET } = process.env;
+            if (!RADAR_URL || !FEEDBACK_AGENTE_SECRET) {
+              core.notice("RADAR_URL o FEEDBACK_AGENTE_SECRET mancanti: stato dei feedback non aggiornato.");
+              return;
+            }
+            const pull = context.payload.pull_request;
+            const pr = pull.number;
+            const risposta = await github.graphql(
+              `query($owner: String!, $repo: String!, $pr: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequest(number: $pr) {
+                    closingIssuesReferences(first: 20) {
+                      nodes { number labels(first: 20) { nodes { name } } }
+                    }
+                  }
+                }
+              }`,
+              { owner: context.repo.owner, repo: context.repo.repo, pr }
+            );
+            const issue = risposta.repository.pullRequest.closingIssuesReferences.nodes
+              .filter((i) => i.labels.nodes.some((l) => l.name === "dal-lorenzo"))
+              .map((i) => i.number);
+            if (issue.length === 0) return;
+
+            async function radar(body) {
+              const res = await fetch(`${RADAR_URL.replace(/\/$/, "")}/api/feedback/agente`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${FEEDBACK_AGENTE_SECRET}`, "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+              });
+              // 409: transizione non valida per lo stato attuale (es. il
+              // feedback è già da verificare): nulla da fare, non è un errore.
+              if (res.status === 409) {
+                core.notice(`Issue #${body.issue_number}: ${(await res.json()).error}`);
+                return;
+              }
+              if (!res.ok) throw new Error(`Issue #${body.issue_number}: ${res.status} ${await res.text()}`);
+              core.info(`Issue #${body.issue_number}: ${JSON.stringify(await res.json())}`);
+            }
+
+            // Una frase per Lorenzo, dal corpo della PR (testo non loggato).
+            const nota = /^\s*(?:[-*]\s*)?(?:\*\*)?Nota per Lorenzo(?:\*\*)?\s*:\s*(?:\*\*)?\s*(.+?)\s*$/im.exec(pull.body ?? "")?.[1];
+
+            for (const numero of issue) {
+              if (context.payload.action !== "closed") {
+                await radar({ issue_number: numero, stato: "in-lavorazione", pr_number: pr });
+              } else if (pull.merged) {
+                // Idempotente: copre anche una PR aperta prima di questo workflow.
+                await radar({ issue_number: numero, stato: "in-lavorazione", pr_number: pr });
+                if (nota) await radar({ issue_number: numero, evento: "nota-fix", testo: nota });
+                else core.notice(`PR #${pr}: manca la riga "Nota per Lorenzo:" nel corpo.`);
+              } else {
+                await radar({ issue_number: numero, stato: "preso-in-carico" });
+              }
+            }

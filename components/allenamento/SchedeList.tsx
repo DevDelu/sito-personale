@@ -101,7 +101,7 @@ export function SchedeList({ schede }: { schede: SchedaConMeta[] }) {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visibili.map((scheda) => (
-            <div key={scheda.id} className="card card-hover flex flex-col gap-3 p-4">
+            <div key={scheda.id} data-fb-entita={`scheda:${scheda.id}`} className="card card-hover flex flex-col gap-3 p-4">
               <div className="flex flex-col gap-0.5">
                 <span className="font-display text-base font-semibold">{scheda.nome}</span>
                 {scheda.descrizione && <p className="text-sm text-muted">{scheda.descrizione}</p>}
@@ -161,7 +161,7 @@ export function SchedeList({ schede }: { schede: SchedaConMeta[] }) {
 
       {nuovaAperta && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setNuovaAperta(false)}>
-          <form onSubmit={handleCrea} className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
+          <form data-fb-area="allenamenti.nuova-scheda" onSubmit={handleCrea} className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
             <h2 className="font-display text-base font-semibold">Nuova scheda</h2>
             <label className="flex flex-col gap-1.5">
               <span className="text-sm font-medium text-muted">Nome</span>

@@ -1,6 +1,8 @@
 "use client";
 
-import { MessageSquare } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Inbox, MessageSquare } from "lucide-react";
 import { ListRowButton } from "@/components/ui/ListGroup";
 import { FAB } from "@/components/ui/FAB";
 import { apriFeedback } from "@/lib/feedback/bus";
@@ -34,6 +36,24 @@ export function FeedbackVoceSidebar() {
       <span className="flex-1 text-left">Feedback</span>
       <kbd className="rounded border border-border px-1.5 font-mono text-[11px] text-muted">F</kbd>
     </button>
+  );
+}
+
+// Link alla pagina /feedback, sotto la voce "Feedback" della sidebar desktop.
+export function FeedbackLinkSidebar() {
+  const pathname = usePathname();
+  const attivo = pathname === "/feedback";
+  return (
+    <Link
+      href="/feedback"
+      aria-current={attivo ? "page" : undefined}
+      className={`mb-2 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:text-foreground ${
+        attivo ? "text-foreground" : "text-muted"
+      }`}
+    >
+      <Inbox className="h-4 w-4" strokeWidth={1.75} />
+      <span className="flex-1 text-left">I miei feedback</span>
+    </Link>
   );
 }
 

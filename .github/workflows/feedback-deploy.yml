@@ -1,0 +1,76 @@
+# Chiude il cerchio lato sistema: dopo un deploy di PRODUZIONE riuscito, ogni
+# feedback `in-lavorazione` la cui PR è mergiata E contenuta nel commit
+# deployato passa a `da-verificare`. Il merge da solo non basta: finché il
+# deploy non è in produzione Lorenzo non può verificare nulla.
+#
+# Vercel emette `deployment_status` su questo repo (lo usa già collaudo.yml);
+# qui si filtra l'ambiente "Production". Nessun polling di riserva: se un
+# evento si perde, il deploy successivo recupera (il confronto è "PR
+# contenuta nel commit deployato", non "PR di questo deploy").
+#
+# Secret: RADAR_URL, FEEDBACK_AGENTE_SECRET (o l'alias FEEDBACK_AGENT_SECRET).
+name: feedback-deploy
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  da-verificare:
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      (github.event.deployment.environment == 'Production' || github.event.deployment.production_environment)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          RADAR_URL: ${{ secrets.RADAR_URL }}
+          FEEDBACK_AGENTE_SECRET: ${{ secrets.FEEDBACK_AGENTE_SECRET || secrets.FEEDBACK_AGENT_SECRET }}
+        with:
+          script: |
+            const { RADAR_URL, FEEDBACK_AGENTE_SECRET } = process.env;
+            if (!RADAR_URL || !FEEDBACK_AGENTE_SECRET) {
+              core.notice("RADAR_URL o FEEDBACK_AGENTE_SECRET mancanti: nessun feedback passato a da-verificare.");
+              return;
+            }
+            const base = RADAR_URL.replace(/\/$/, "");
+            const headers = { Authorization: `Bearer ${FEEDBACK_AGENTE_SECRET}`, "Content-Type": "application/json" };
+            const sha = context.payload.deployment.sha;
+
+            const lista = await fetch(`${base}/api/feedback/agente?stato=in-lavorazione`, { headers });
+            if (!lista.ok) throw new Error(`Lettura feedback: ${lista.status}`);
+            const { feedback } = await lista.json();
+
+            // Una PR può chiudere più feedback: una sola lettura per PR.
+            const contenute = new Map();
+            async function prInProduzione(numero) {
+              if (contenute.has(numero)) return contenute.get(numero);
+              const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: numero });
+              let esito = false;
+              if (pr.merged && pr.merge_commit_sha) {
+                // "ahead"/"identical": il commit deployato contiene il merge.
+                const { data: cmp } = await github.rest.repos.compareCommitsWithBasehead({
+                  ...context.repo,
+                  basehead: `${pr.merge_commit_sha}...${sha}`,
+                });
+                esito = cmp.status === "ahead" || cmp.status === "identical";
+              }
+              contenute.set(numero, esito);
+              return esito;
+            }
+
+            let passati = 0;
+            for (const f of feedback) {
+              if (!f.pr_number || !(await prInProduzione(f.pr_number))) continue;
+              const res = await fetch(`${base}/api/feedback/agente`, {
+                method: "POST",
+                headers,
+                body: JSON.stringify({ id: f.id, stato: "da-verificare", autore: "sistema" }),
+              });
+              if (!res.ok) core.warning(`Feedback ${f.id}: ${res.status}`);
+              else passati++;
+            }
+            core.info(`Deploy ${sha.slice(0, 7)}: ${passati} feedback passati a da-verificare.`);

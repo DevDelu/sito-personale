@@ -15,16 +15,23 @@ const CHIUDI_VELOCITY = 600;
 // Esc. Su desktop resta un modale centrato, senza trascinamento.
 // posizione="alto": su mobile scende dall'alto e si chiude trascinando verso
 // l'alto — per sheet con tastiera aperta subito (vedi app/globals.css).
+// `area` (obbligatoria) e `entita` finiscono su data-fb-area/data-fb-entita
+// del pannello: il feedback aperto sopra questo sheet sa dov'era Lorenzo
+// (vedi lib/feedback/aree.ts).
 export function Sheet({
   onClose,
   children,
   className = "",
   posizione = "basso",
+  area,
+  entita,
 }: {
   onClose: () => void;
   children: React.ReactNode;
   className?: string;
   posizione?: "basso" | "alto";
+  area: string;
+  entita?: string;
 }) {
   const alto = posizione === "alto";
   const [trascinabile, setTrascinabile] = useState(false);
@@ -59,6 +66,8 @@ export function Sheet({
     >
       <motion.div
         className={`modal-panel w-full max-w-md ${alto ? "modal-panel--alto" : ""} ${className}`}
+        data-fb-area={area}
+        data-fb-entita={entita}
         drag={trascinabile ? "y" : false}
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={alto ? { top: 0.5, bottom: 0 } : { top: 0, bottom: 0.5 }}

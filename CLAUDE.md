@@ -17,6 +17,7 @@ npm run build       # build produzione
 npm run start       # avvia build produzione
 npm run lint         # eslint (eslint-config-next core-web-vitals + typescript)
 npm test            # unit test node:test su lib/**/*.test.ts e .github/scripts/*.test.mjs (Node 22, nessun runner)
+npm run check:fb-aree  # ogni pagina privata ha aree di feedback, tutte presenti in lib/feedback/aree.ts
 npm run test:e2e    # collaudatore Playwright sul sito vero col tester in sola lettura (vedi tests/e2e/README.md)
 ```
 
@@ -44,7 +45,7 @@ Tienilo a mente prima di toccare routing/auth: cercare `middleware.ts` o la funz
 
 `proxy.ts` fa da router tra due sistemi:
 - Rotte **non localizzate** (`/spese`, `/investimenti`, `/carte`, `/allenamenti`, `/agenda`,
-  `/alimentazione`, `/impostazioni`, `/altro`, `/login`, `/api/*`) → gestite da
+  `/alimentazione`, `/impostazioni`, `/altro`, `/feedback`, `/login`, `/api/*`) → gestite da
   `updateSession()` in `lib/supabase/proxy.ts` (refresh sessione
   Supabase).
 - Tutto il resto (area pubblica sotto `app/[locale]/`) → middleware `next-intl` per il routing
@@ -204,7 +205,7 @@ layout desktop dell'area privata non cambiano.
   bar ma non sono stati ridisegnati pagina per pagina: vanno affrontati uno alla volta con lo
   stesso schema, non "per completezza" senza che sia richiesto.
 
-### Feedback (Radar, POTENZIAMENTO 1)
+### Feedback (Radar, POTENZIAMENTO 1 + ciclo chiuso)
 
 Lorenzo lascia un feedback in meno di 5 secondi, senza ingombro visivo permanente. Tre accessi,
 tutti verso lo stesso sheet (`components/feedback/FeedbackSheet.tsx`, ospitato da
@@ -223,30 +224,92 @@ tutti verso lo stesso sheet (`components/feedback/FeedbackSheet.tsx`, ospitato d
 Su mobile lo sheet scende **dall'alto** (`<Sheet posizione="alto">`): ancorato in basso veniva
 coperto dalla tastiera iOS, che si apre subito.
 
-Dati: tabella `feedback` (`supabase/031_feedback.sql`), insert via `POST /api/feedback`
-(getUser + isOwner). `contesto` contiene solo metadati: route template (id → `[id]`, vedi
-`lib/feedback/pagina.ts`), chiavi dei filtri senza valori, viewport, tema, SHA
-(`VERCEL_GIT_COMMIT_SHA`, aggiunto lato server), attriti recenti. Se l'invio fallisce il
-feedback va in una coda in localStorage e riparte al prossimo avvio/ritorno online.
+Su desktop la scorciatoia `F` funziona anche con un modale aperto (ne cattura l'area). Su iPhone i
+modali coprono la tab bar (overlay `z-50` sopra la tab bar `z-30`): con un modale aperto la
+pressione lunga sulla tab non è raggiungibile.
 
-Agenti: `GET/PATCH /api/feedback/agente` con `Authorization: Bearer <FEEDBACK_AGENTE_SECRET>`
-(obbligatoria, fail-closed): `GET ?stato=nuovo` elenca i feedback da trasformare in issue
-`dal-lorenzo`, `PATCH { id, stato, issue_number }` li segna dopo la issue,
-`PATCH { issue_number, stato: "risolto", pr_number }` è chiamato da
-`.github/workflows/feedback-risolto.yml` al merge di una PR che chiude una issue `dal-lorenzo`.
+#### Dove: contesto preciso
+
+- **Aree nominate**: `data-fb-area="modulo.pagina.sezione"` sulle sezioni principali di ogni pagina
+  privata (wrapper `<div ... className="contents">`, nessun effetto sul layout), `area` obbligatoria
+  su ogni `<Sheet>` e `data-fb-area` sul `.modal-panel` dei modali grezzi. Etichette leggibili
+  **solo** in `lib/feedback/aree.ts`. Sui dati: `data-fb-entita="tipo:id"` (solo tipo e id).
+  `npm run check:fb-aree` (in `.github/workflows/ci.yml`) fallisce se una pagina privata non ha
+  aree o se un'area usata non è in `aree.ts`: **pagina/modale nuovo → aggiungi area e etichetta**.
+  Pagina senza UI (solo redirect): commento `// fb-aree: <motivo>`.
+- **Cattura all'apertura** (`lib/feedback/cattura.ts`): `route` template, `url` reale (path +
+  query, resta solo in Supabase), `area` (lo Sheet/modale aperto più in alto, altrimenti
+  l'elemento al centro dello schermo → `closest('[data-fb-area]')`), `entita`, `scroll_y`. Da
+  `/altro` vale l'ultima pagina visitata.
+- **"Indica il punto"**: lo sheet si smonta, barra "Tocca l'elemento · Annulla", il tap successivo
+  è intercettato in capture su `window` (non attiva l'elemento). Salva `punto` (ruolo, etichetta
+  max 60 caratteri con cifre → `#`, selettore stabile, posizione %). Nessuno screenshot.
+- **Doppioni**: se sulla stessa `route` ci sono feedback non chiusi, lo sheet lo dice; sceglierne
+  uno trasforma il testo in una nota (`nota_per`) invece di un feedback nuovo.
+
+#### Stati e storico
+
+```
+nuovo → preso-in-carico → in-lavorazione → da-verificare → verificato
+              ↓                 ↓               ↓
+         serve-info ←───────────┘           riaperto → preso-in-carico
+qualsiasi stato non chiuso → scartato (solo Lorenzo)
+```
+
+Matrice esplicita in `lib/feedback/stati.ts` (testata), usata da `cambiaStato()` in
+`lib/feedback/queries.ts`: nessuna route scrive `stato` direttamente, ogni cambio scrive una riga
+in `feedback_eventi` (timeline: `cambio-stato`/`nota`/`domanda`/`risposta`/`nota-fix`). Due
+aggiunte rispetto al disegno: `in-lavorazione → preso-in-carico` (PR chiusa senza merge) e
+`riaperto → in-lavorazione` (PR aperta prima del job notturno). Migration `033_feedback_ciclo.sql`
+(rimappa gli stati di 031: `in-lavorazione` senza PR → `preso-in-carico`, `risolto` →
+`da-verificare`). RLS come le altre tabelle: default-deny, accesso solo server-side.
+
+- **Lorenzo** (Server Action in `app/(private)/feedback/actions.ts`, `requireWriter()`):
+  `verificato`, `riaperto`, `scartato`, risposta a `serve-info`, note, testo modificabile solo da
+  `nuovo`.
+- **Agenti**: `POST /api/feedback/agente` (PATCH alias) con `Authorization: Bearer
+  <FEEDBACK_AGENTE_SECRET>` (alias `FEEDBACK_AGENT_SECRET`, obbligatoria, fail-closed):
+  `preso-in-carico`, `serve-info` (con domanda in `testo`), `in-lavorazione`, `nota-fix`,
+  `{ riportati: [...] }`. `verificato`/`scartato` → **403**. `GET ?stato=...` e
+  `GET ?eventi=da-riportare`.
+- **Sistema**: `.github/workflows/feedback-deploy.yml` su `deployment_status` (Production,
+  success): feedback `in-lavorazione` con PR mergiata **e contenuta nello SHA deployato** →
+  `da-verificare` (`autore: "sistema"`). `.github/workflows/feedback-pr.yml`: PR aperta →
+  `in-lavorazione`; mergiata → `nota-fix` dalla riga `Nota per Lorenzo: ...` del corpo PR;
+  chiusa senza merge → `preso-in-carico`.
+
+#### Ciclo di verifica
+
+Quando un feedback è `da-verificare` e Lorenzo apre la sua `route`, `FeedbackProvider` evidenzia
+per 2 s il punto indicato (contorno ambra) e mostra sopra la tab bar "Avevi segnalato un problema
+qui. È sistemato?" con la `nota-fix` sotto. Sì → `verificato`; No → `riaperto` + sheet "Cosa non va
+ancora?" (facoltativo, diventa nota). Regole in `lib/feedback/regole-verifica.ts`: 1 avviso per
+sessione, mai in `/allenamenti/sessione/*`, con un campo in focus o sopra uno Sheet; sparisce
+dopo 6 s. Solo owner (il tester non lo vede). Nessuna chiusura automatica.
+
+Pagina **`/feedback`** (da `/altro`, con contatore dei da verificare, e dalla sidebar desktop):
+Aperti / Da verificare / Chiusi, `serve-info` in cima, card con area leggibile ed età, Sheet di
+dettaglio con contesto, "Vai al punto", timeline, link issue/PR e azioni; card riepilogo (contatori,
+tempo medio fino a `verificato`, tasso di riapertura).
 
 #### Job notturno feedback → issue
 
 `.github/workflows/radar-feedback-notte.yml` (01:23 UTC, più avvio manuale da Actions): legge i
-feedback `nuovo`, Claude Code (`claude -p` col token dell'abbonamento, `CLAUDE_CODE_OAUTH_TOKEN`)
-scrive titolo e parafrasi in `.radar-tmp/proposte.json` seguendo
-`.github/scripts/prompt-feedback-notte.md`, poi `.github/scripts/feedback-notte.mjs pubblica` crea
-le issue `dal-lorenzo` e segna i feedback `in-lavorazione`. Il repo è **pubblico**: Claude gira
-senza token GitHub, secret del sito, Bash o rete, il suo output non va nei log, e ogni parafrasi
-passa da `.github/scripts/privacy.mjs` (importi, valute, date, email, numeri lunghi, 6+ parole
-copiate dall'originale → corpo generico che rimanda a Supabase). Idempotente: il marcatore
-`<!-- feedback-id -->` nella issue evita doppioni se l'aggiornamento di stato fallisce. Nelle notti
-senza feedback Claude non parte (niente quota).
+feedback `nuovo`, quelli `riaperto` e le note/risposte di Lorenzo non ancora riportate; Claude Code
+(`claude -p` col token dell'abbonamento, `CLAUDE_CODE_OAUTH_TOKEN`) scrive titoli e parafrasi in
+`.radar-tmp/proposte.json` seguendo `.github/scripts/prompt-feedback-notte.md`, poi
+`.github/scripts/feedback-notte.mjs pubblica` crea le issue `dal-lorenzo` (→ `preso-in-carico`),
+riapre quelle dei riaperti con etichetta `riaperto` (`ostinato` dalla 2ª riapertura) e riporta le
+note parafrasate. Il repo è **pubblico**: Claude gira senza token GitHub, secret del sito, Bash o
+rete, il suo output non va nei log. Nella issue vanno solo route template, etichetta dell'area,
+ruolo/etichetta dell'elemento (senza cifre né valute), **tipo** di entità e parafrasi
+(`.github/scripts/feedback-issue.mjs`, testato in `feedback-issue.test.mjs`); `url`, id
+dell'entità e testi originali restano in Supabase. Ogni parafrasi passa da
+`.github/scripts/privacy.mjs` (importi, valute, date, email, numeri lunghi, 6+ parole copiate →
+testo generico che rimanda a Supabase). Idempotente: il marcatore `<!-- feedback-id -->` evita
+doppioni. Nelle notti senza testi da parafrasare Claude non parte (niente quota).
+
+Priorità e convenzioni per gli agenti che sistemano i feedback: `docs/agenti-da-fare.md`.
 
 ### Decision log (dal README)
 

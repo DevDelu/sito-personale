@@ -151,7 +151,7 @@ export function SchedaEsercizioModal({
 
   return (
     <div className="modal-overlay">
-      <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-lg flex-col gap-4 overflow-y-auto p-5">
+      <form data-fb-area="allenamenti.esercizio-scheda" onSubmit={handleSubmit} className="modal-panel flex w-full max-w-lg flex-col gap-4 overflow-y-auto p-5">
         <h2 className="font-display text-base font-semibold">
           {riga ? `Modifica ${riga.esercizio_nome}` : "Aggiungi esercizio"}
         </h2>

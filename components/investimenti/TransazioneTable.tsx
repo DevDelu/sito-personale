@@ -152,6 +152,7 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
               return (
                 <tr
                   key={r.id}
+                  data-fb-entita={`transazione-investimento:${r.id}`}
                   className={`border-b border-border transition-colors duration-150 last:border-0 hover:bg-surface-hover ${
                     selezionata ? "bg-accent/5" : ""
                   }`}

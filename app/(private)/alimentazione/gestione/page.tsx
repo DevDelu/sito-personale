@@ -52,9 +52,15 @@ export default async function GestioneAlimentazionePage({
         <p className="text-sm text-muted">{total} pasti registrati. Filtra, modifica o elimina.</p>
       </div>
 
-      <GestioneFilters />
-      <PastoTable rows={rows} />
-      <Pagination page={currentPage} totalPages={totalPages} pageSize={pageSize} />
+      <div data-fb-area="alimentazione.gestione.filtri" className="contents">
+        <GestioneFilters />
+      </div>
+      <div data-fb-area="alimentazione.gestione.tabella" className="contents">
+        <PastoTable rows={rows} />
+      </div>
+      <div data-fb-area="alimentazione.gestione.paginazione" className="contents">
+        <Pagination page={currentPage} totalPages={totalPages} pageSize={pageSize} />
+      </div>
     </div>
   );
 }

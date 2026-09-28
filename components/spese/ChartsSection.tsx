@@ -22,7 +22,7 @@ export function ChartsSection({
 }) {
   return (
     <>
-      <section className="flex flex-col gap-3">
+      <section data-fb-area="spese.overview.trend" className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Andamento giornaliero</h2>
         <DailyTrendChart
           spese={spese}
@@ -34,12 +34,12 @@ export function ChartsSection({
         />
       </section>
 
-      <section className="flex flex-col gap-3">
+      <section data-fb-area="spese.overview.categorie-trend" className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Andamento per categoria</h2>
         <CategorySpendingTrendChart spese={spese} categorie={categorieList} from={range.from} to={range.to} />
       </section>
 
-      <section className="flex flex-col gap-3">
+      <section data-fb-area="spese.overview.torta" className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Movimenti per categoria</h2>
         <CategoryPieChart
           spese={spese}

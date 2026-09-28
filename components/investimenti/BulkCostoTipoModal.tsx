@@ -26,7 +26,7 @@ export function BulkCostoTipoModal({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-panel w-full max-w-sm p-5">
+      <div data-fb-area="investimenti.modifica-costo-multipla" className="modal-panel w-full max-w-sm p-5">
         <h2 className="font-display text-base font-semibold">Modifica qualità del costo in blocco</h2>
         <p className="mt-1 text-sm text-muted">
           Imposta lo stesso valore di &ldquo;costo_tipo&rdquo; per le {count} transazioni selezionate.

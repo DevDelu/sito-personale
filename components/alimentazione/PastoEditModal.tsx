@@ -41,7 +41,7 @@ export function PastoEditModal({
 
   return (
     <div className="modal-overlay">
-      <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
+      <form data-fb-area="alimentazione.modifica-pasto" data-fb-entita={`pasto:${pasto.id}`} onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">Modifica pasto</h2>
         <p className="text-sm text-muted">
           {pasto.alimento_nome} — la quantità aggiorna kcal/macro in proporzione allo snapshot originale.

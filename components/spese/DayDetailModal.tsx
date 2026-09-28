@@ -45,7 +45,7 @@ export function DayDetailModal({
 
   return (
     <>
-      <Sheet onClose={onClose} className="max-w-lg p-5">
+      <Sheet onClose={onClose} className="max-w-lg p-5" area="spese.dettaglio-giorno">
         <div>
           <div className="mb-4 flex items-start justify-between gap-2">
             <h2 className="font-display text-base font-semibold capitalize">{dayLabel(giorno)}</h2>

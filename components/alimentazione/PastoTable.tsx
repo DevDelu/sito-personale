@@ -60,7 +60,7 @@ export function PastoTable({ rows }: { rows: Pasto[] }) {
           </thead>
           <tbody className="divide-y divide-border">
             {rows.map((p) => (
-              <tr key={p.id} className="transition-colors hover:bg-surface-hover">
+              <tr key={p.id} data-fb-entita={`pasto:${p.id}`} className="transition-colors hover:bg-surface-hover">
                 <td className="px-4 py-3 font-figures">{p.data}</td>
                 <td className="px-4 py-3">{LABEL_TIPO[p.tipo_pasto] ?? p.tipo_pasto}</td>
                 <td className="px-4 py-3">

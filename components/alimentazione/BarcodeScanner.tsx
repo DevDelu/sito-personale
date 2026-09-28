@@ -105,7 +105,7 @@ export function BarcodeScanner({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-panel flex w-full max-w-md flex-col gap-3 p-5">
+      <div data-fb-area="alimentazione.scanner" className="modal-panel flex w-full max-w-md flex-col gap-3 p-5">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-base font-semibold">Cerca da barcode</h2>
           <button type="button" onClick={onClose} aria-label="Chiudi" className="btn-icon">

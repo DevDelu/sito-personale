@@ -51,18 +51,22 @@ export default async function InvestimentiPage({
         <p className="text-sm text-muted">Posizioni correnti, calcolate con il metodo FIFO.</p>
       </div>
 
-      <AggiornaPrezzi />
+      <div data-fb-area="investimenti.overview.aggiorna-prezzi" className="contents">
+        <AggiornaPrezzi />
+      </div>
 
-      <SummaryCards
-        totaleInvestito={totaleInvestito}
-        valoreAttuale={valoreAttuale}
-        plusvalenzaAssoluta={plusvalenzaAssoluta}
-        plusvalenzaPercentuale={plusvalenzaPercentuale}
-      />
+      <div data-fb-area="investimenti.overview.riepilogo" className="contents">
+        <SummaryCards
+          totaleInvestito={totaleInvestito}
+          valoreAttuale={valoreAttuale}
+          plusvalenzaAssoluta={plusvalenzaAssoluta}
+          plusvalenzaPercentuale={plusvalenzaPercentuale}
+        />
+      </div>
 
       <ChartsSection posizioni={posizioni} punti={storico.punti} gruppi={storico.gruppi} />
 
-      <section className="flex flex-col gap-3">
+      <section data-fb-area="investimenti.posizioni" className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Posizioni</h2>
         <PositionsTable posizioni={posizioni} transazioni={transazioni} />
       </section>

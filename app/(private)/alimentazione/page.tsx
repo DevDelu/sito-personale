@@ -76,7 +76,7 @@ export default async function AlimentazionePage({
       </div>
 
       {!riepilogo.ok && (
-        <div className="card flex flex-col gap-2 p-4 text-sm">
+        <div data-fb-area="alimentazione.overview.tdee" className="card flex flex-col gap-2 p-4 text-sm">
           {riepilogo.motivo === "profilo_incompleto" ? (
             <>
               <p>
@@ -98,21 +98,21 @@ export default async function AlimentazionePage({
       )}
 
       {riepilogo.ok && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div data-fb-area="alimentazione.overview.tdee" className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <SummaryCard label="BMR stimato" value={`${riepilogo.bmr} kcal`} />
           <SummaryCard label="TDEE stimato" value={`${riepilogo.tdee} kcal`} />
           <SummaryCard label="Target kcal (fase attiva)" value={`${riepilogo.targetKcal} kcal`} highlight />
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div data-fb-area="alimentazione.overview.macro-trend" className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <MacroProgressBars consumo={consumoOggi} target={targetMacro} />
         <WeeklyTrendChart punti={trend} targetKcal={targetKcal} />
       </div>
 
       <AderenzaCard settimana={aderenzaSettimana} mese={aderenzaMese} />
 
-      <section className="flex flex-col gap-3">
+      <section data-fb-area="alimentazione.overview.pasti-oggi" className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-sm font-medium text-muted">Pasti di oggi</h2>
           <Link href="/alimentazione/aggiungi" className="btn-primary !px-3 !py-1.5">
@@ -130,7 +130,7 @@ export default async function AlimentazionePage({
 // numero fuorviante — stesso spirito del ramo "non calcolabile" del TDEE.
 function AderenzaCard({ settimana, mese }: { settimana: number | null; mese: number | null }) {
   return (
-    <div className="card flex flex-col gap-3 p-4">
+    <div data-fb-area="alimentazione.overview.aderenza" className="card flex flex-col gap-3 p-4">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-sm font-medium text-muted">Aderenza al piano</h2>
         <Link href="/alimentazione/template" className="text-xs font-medium text-accent hover:underline">

@@ -37,7 +37,7 @@ export function HeroCards({
         const stile = PODIO[posizione];
         const prezzo = c.current_price ?? c.purchase_price;
         return (
-          <li key={c.id} className="flex min-w-0 flex-1 basis-0 flex-col sm:max-w-[180px]">
+          <li key={c.id} data-fb-entita={`carta:${c.id}`} className="flex min-w-0 flex-1 basis-0 flex-col sm:max-w-[180px]">
             <button
               type="button"
               onClick={() => onView(c)}

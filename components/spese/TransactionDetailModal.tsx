@@ -54,7 +54,12 @@ export function TransactionDetailModal({
 
   return (
     <>
-      <Sheet onClose={onClose} className="max-w-md p-5">
+      <Sheet
+        onClose={onClose}
+        className="max-w-md p-5"
+        area={modalita === "modifica" ? "spese.modifica-movimento" : "spese.dettaglio-movimento"}
+        entita={`transazione:${transazione.id}`}
+      >
         {modalita === "dettaglio" ? (
           <div className="flex flex-col gap-4">
             <div className="flex items-start justify-between gap-2">

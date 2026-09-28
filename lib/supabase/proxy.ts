@@ -11,6 +11,7 @@ const PROTECTED_PREFIXES = [
   "/alimentazione",
   "/impostazioni",
   "/altro",
+  "/feedback",
 ];
 
 // API che si autenticano da sole e restano fuori dal controllo owner qui

@@ -57,6 +57,7 @@ export function PositionsTable({
             return (
               <Fragment key={p.asset.id}>
                 <tr
+                  data-fb-entita={`asset:${p.asset.isin ?? p.asset.ticker}`}
                   onClick={() => setEspansa(aperta ? null : p.asset.id)}
                   className="cursor-pointer border-b border-border transition-colors last:border-0 hover:bg-surface-hover"
                 >
@@ -150,7 +151,7 @@ export function PositionsTable({
                         </thead>
                         <tbody>
                           {transazioniAsset.map((t) => (
-                            <tr key={t.id} className="border-t border-border">
+                            <tr key={t.id} data-fb-entita={`transazione-investimento:${t.id}`} className="border-t border-border">
                               <td className="px-2 py-1.5 whitespace-nowrap text-muted">
                                 {new Date(`${t.data}T00:00:00Z`).toLocaleDateString("it-IT")}
                               </td>

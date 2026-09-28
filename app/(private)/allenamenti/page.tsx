@@ -47,7 +47,7 @@ export default async function AllenamentoPage() {
         <PageHeader title="Allenamento" />
         <SegmentedControl items={ALLENAMENTI_SEGMENTI} />
 
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+        <div data-fb-area="allenamenti.overview.schede" className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
           <h1 className="hidden font-display text-2xl font-semibold tracking-tight md:block">Allenamento</h1>
           <p className="max-w-sm text-sm text-muted">
             Nessuna scheda configurata. Creane una per iniziare ad allenarti.
@@ -65,7 +65,7 @@ export default async function AllenamentoPage() {
       <PageHeader title="Allenamento" />
       <SegmentedControl items={ALLENAMENTI_SEGMENTI} />
 
-      <div className="grid grid-cols-2 gap-3">
+      <div data-fb-area="allenamenti.overview.metriche" className="grid grid-cols-2 gap-3">
         <MetricCard
           label="Questo mese"
           value={String(sessioniMese.length)}
@@ -85,7 +85,7 @@ export default async function AllenamentoPage() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col justify-center gap-6 md:flex-none md:justify-start">
+      <div data-fb-area="allenamenti.overview.schede" className="flex flex-1 flex-col justify-center gap-6 md:flex-none md:justify-start">
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="hidden font-display text-2xl font-semibold tracking-tight md:block">Avvia allenamento</h1>
           <p className="text-sm text-muted">Scegli la scheda da usare per questa sessione.</p>
@@ -95,7 +95,7 @@ export default async function AllenamentoPage() {
           {schede.map((scheda) => {
             const avviabile = scheda.numEsercizi > 0;
             return (
-              <div key={scheda.id} className="card card-hover flex flex-col gap-3 p-4">
+              <div key={scheda.id} data-fb-entita={`scheda:${scheda.id}`} className="card card-hover flex flex-col gap-3 p-4">
                 <div className="flex flex-col gap-0.5">
                   <span className="font-display text-base font-semibold">{scheda.nome}</span>
                   {scheda.descrizione && <p className="text-sm text-muted">{scheda.descrizione}</p>}

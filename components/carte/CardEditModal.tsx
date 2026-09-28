@@ -100,7 +100,7 @@ export function CardEditModal({
 
   return (
     <div className="modal-overlay">
-      <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
+      <form data-fb-area="collezione.modifica-carta" data-fb-entita={`carta:${carta.id}`} onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">Modifica {carta.name}</h2>
 
         <div className="flex items-center gap-4">

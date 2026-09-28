@@ -127,7 +127,7 @@ function ImpegnoFormModal({
 
   return (
     <div className="modal-overlay">
-      <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
+      <form data-fb-area="allenamenti.impegno-fisso" onSubmit={handleSubmit} className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">Nuovo impegno fisso</h2>
 
         <label className="flex flex-col gap-1.5">

@@ -24,7 +24,9 @@ export default async function NuovoMovimentoPage() {
       <h1 className="hidden font-display text-xl font-semibold tracking-tight md:block">
         Aggiungi movimento
       </h1>
-      <AddTransactionForm categorie={categorie} formId={FORM_ID} />
+      <div data-fb-area="spese.nuovo.form" className="contents">
+        <AddTransactionForm categorie={categorie} formId={FORM_ID} />
+      </div>
     </div>
   );
 }
