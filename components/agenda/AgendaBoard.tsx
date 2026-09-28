@@ -12,6 +12,9 @@ import type { Evento, NotaGiorno } from "@/lib/agenda/types";
 // bundle iniziale della route /agenda, stesso principio di ChartsSection in
 // spese/investimenti (vedi commento lì).
 const CalendarView = dynamic(() => import("./CalendarView").then((m) => m.CalendarView), { ssr: false });
+// Solo client: "oggi", "domani" e gli orari dipendono dal fuso del
+// dispositivo, lato server (UTC) darebbero un mismatch di idratazione.
+const ProssimiImpegni = dynamic(() => import("./ProssimiImpegni").then((m) => m.ProssimiImpegni), { ssr: false });
 
 // Orchestratore client: tiene lo stato del giorno selezionato (aperto dal
 // calendario o da un evento) e lo passa al pannello sotto. Il calendario è
@@ -37,6 +40,8 @@ export function AgendaBoard({ eventi, note }: { eventi: Evento[]; note: NotaGior
 
   return (
     <div className="flex flex-col gap-4">
+      <ProssimiImpegni eventi={eventi} onSelectEvent={apriEvento} />
+
       <QuickAddBar />
 
       <CalendarView
