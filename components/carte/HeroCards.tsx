@@ -1,22 +1,27 @@
 "use client";
 
-import { Pencil, Trash2 } from "lucide-react";
 import { CardPlaceholder } from "./CardPlaceholder";
 import { formatCurrency } from "@/lib/carte/format";
+import { ordinePodio, type PosizionePodio } from "@/lib/carte/podio";
 import type { CollectionCard } from "@/lib/carte/types";
 
-const RANK_LABEL = ["N.1", "N.2", "N.3"];
+const PODIO: Record<PosizionePodio, { colore: string; gradino: string; etichetta: string }> = {
+  1: { colore: "var(--podio-oro)", gradino: "h-14 sm:h-16", etichetta: "Primo posto" },
+  2: { colore: "var(--podio-argento)", gradino: "h-10 sm:h-11", etichetta: "Secondo posto" },
+  3: { colore: "var(--podio-bronzo)", gradino: "h-7 sm:h-8", etichetta: "Terzo posto" },
+};
 
+// Le tre carte di maggior valore su un podio (2° – 1° – 3°): tre colonne
+// strette che stanno anche a 375px, gradini di altezza diversa con il
+// numero e il colore della medaglia. Modifica/elimina sono nel dettaglio
+// (tap sulla carta), come per le altre carte: sul podio avrebbero affollato
+// colonne da ~110px.
 export function HeroCards({
   carte,
   onView,
-  onEdit,
-  onDelete,
 }: {
   carte: CollectionCard[];
   onView: (carta: CollectionCard) => void;
-  onEdit: (carta: CollectionCard) => void;
-  onDelete: (carta: CollectionCard) => void;
 }) {
   if (carte.length === 0) {
     return (
@@ -27,73 +32,45 @@ export function HeroCards({
   }
 
   return (
-    <div className="grid justify-center gap-4 [grid-template-columns:repeat(auto-fit,192px)]">
-      {carte.map((c, i) => {
+    <ol className="mx-auto flex w-full max-w-xl items-end justify-center gap-2 sm:gap-4">
+      {ordinePodio(carte).map(({ carta: c, posizione }) => {
+        const stile = PODIO[posizione];
+        const prezzo = c.current_price ?? c.purchase_price;
         return (
-          <div
-            key={c.id}
-            onClick={() => onView(c)}
-            className="card card-hover animate-slide-up flex w-48 cursor-pointer flex-col gap-3 p-4"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <span className="w-fit rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-accent uppercase">
-                {RANK_LABEL[i]}
+          <li key={c.id} className="flex min-w-0 flex-1 basis-0 flex-col sm:max-w-[180px]">
+            <button
+              type="button"
+              onClick={() => onView(c)}
+              aria-label={`${stile.etichetta}: ${c.name}`}
+              className="animate-slide-up flex min-w-0 flex-col gap-1.5 rounded-xl p-1 text-left transition-transform active:scale-[0.97] sm:p-1.5 md:hover:-translate-y-0.5"
+            >
+              <CardPlaceholder
+                name={c.name}
+                imageUrl={c.image_url}
+                className="aspect-[5/7] w-full rounded-lg shadow-sm"
+              />
+              <span className="line-clamp-2 min-h-[2lh] text-xs leading-tight font-semibold sm:text-sm">
+                {c.name}
               </span>
-              <div className="flex shrink-0 items-center gap-1">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(c);
-                  }}
-                  aria-label="Modifica"
-                  className="btn-icon"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(c);
-                  }}
-                  aria-label="Elimina"
-                  className="btn-icon hover:!text-spesa"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </div>
+              <span className="font-figures text-sm font-bold sm:text-base">
+                {prezzo !== null ? formatCurrency(prezzo) : "n/d"}
+              </span>
+            </button>
+            <div
+              aria-hidden
+              className={`${stile.gradino} flex items-start justify-center rounded-t-lg border-t-2 pt-1`}
+              style={{
+                borderColor: stile.colore,
+                backgroundColor: `color-mix(in srgb, ${stile.colore} 22%, transparent)`,
+              }}
+            >
+              <span className="font-figures text-sm font-bold" style={{ color: stile.colore }}>
+                {posizione}
+              </span>
             </div>
-
-            <CardPlaceholder
-              name={c.name}
-              imageUrl={c.image_url}
-              className="aspect-[5/7] w-full rounded-lg"
-            />
-
-            <div className="flex flex-col gap-0.5">
-              <span className="font-display text-sm leading-tight font-semibold">{c.name}</span>
-              {c.card_number && <span className="font-figures text-xs text-muted/70">{c.card_number}</span>}
-              {c.current_price !== null ? (
-                <>
-                  <span className="text-xs text-muted">Prezzo attuale</span>
-                  <span className="font-figures text-xl font-bold">{formatCurrency(c.current_price)}</span>
-                </>
-              ) : c.purchase_price !== null ? (
-                <>
-                  <span className="text-xs text-muted">Prezzo di acquisto</span>
-                  <span className="font-figures text-xl font-bold">{formatCurrency(c.purchase_price)}</span>
-                  <span className="text-xs text-muted/70">prezzo di mercato non disponibile</span>
-                </>
-              ) : (
-                <span className="mt-0.5 w-fit rounded-full border border-border px-2 py-0.5 text-[10px] font-medium tracking-wide text-muted uppercase">
-                  Prezzo non disponibile
-                </span>
-              )}
-            </div>
-          </div>
+          </li>
         );
       })}
-    </div>
+    </ol>
   );
 }
