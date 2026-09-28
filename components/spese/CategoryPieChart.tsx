@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { resolveCategoryColor } from "@/lib/category-style";
+import { mappaColoriCategorie } from "@/lib/category-palette";
 import { categorieOrdinatePerTotale, formatCurrency, type CategoriaTotale } from "@/lib/spese-utils";
 import {
   TransactionList,
@@ -72,7 +73,15 @@ function groupByWeek(items: TransactionListItem[]): { label: string; items: Tran
     }));
 }
 
-function CategorySummaryTable({ data, totale }: { data: CategoriaTotale[]; totale: number }) {
+function CategorySummaryTable({
+  data,
+  totale,
+  coloreDi,
+}: {
+  data: CategoriaTotale[];
+  totale: number;
+  coloreDi: (c: CategoriaTotale) => string;
+}) {
   if (data.length === 0) {
     return <p className="text-sm text-muted">Nessun movimento nel periodo selezionato.</p>;
   }
@@ -91,7 +100,7 @@ function CategorySummaryTable({ data, totale }: { data: CategoriaTotale[]; total
             <td className="flex items-center gap-2 py-1.5">
               <span
                 className="h-2.5 w-2.5 shrink-0 rounded-full"
-                style={{ backgroundColor: resolveCategoryColor(c.nome, c.colore) }}
+                style={{ backgroundColor: coloreDi(c) }}
               />
               <span className="truncate">{c.nome}</span>
             </td>
@@ -153,6 +162,10 @@ export function CategoryPieChart({
   const data = useMemo(() => categorieOrdinatePerTotale(items), [items]);
   const totale = data.reduce((s, d) => s + d.totale, 0);
   const transactions = useMemo(() => transactionsByCategory(items), [items]);
+  // Un colore diverso per ogni fetta, calcolato su tutte le categorie (non
+  // solo quelle nel periodo) così resta stabile cambiando filtri.
+  const colori = useMemo(() => mappaColoriCategorie(categorie), [categorie]);
+  const coloreDi = (c: CategoriaTotale) => colori.get(c.nome) ?? resolveCategoryColor(c.nome, c.colore);
 
   function handleSliceClick(index: number) {
     const entry = data[index];
@@ -224,7 +237,7 @@ export function CategoryPieChart({
                   {data.map((entry) => (
                     <Cell
                       key={entry.nome}
-                      fill={resolveCategoryColor(entry.nome, entry.colore)}
+                      fill={coloreDi(entry)}
                       opacity={
                         categoriaSelezionata && categoriaSelezionata !== entry.nome ? 0.35 : 1
                       }
@@ -246,7 +259,7 @@ export function CategoryPieChart({
       </div>
 
       <div className="card p-4">
-        <CategorySummaryTable data={data} totale={totale} />
+        <CategorySummaryTable data={data} totale={totale} coloreDi={coloreDi} />
       </div>
 
       {categoriaSelezionata && (

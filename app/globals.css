@@ -22,7 +22,7 @@
   --cat-bonifici: #7c3aed;
   --cat-ristoranti: #db2777;
   --cat-altro: #626b81;
-  --cat-stipendio: #059669;
+  --cat-stipendio: #15803d;
   --cat-rimborso: #0d9488;
 
   /* Palette per categorie create dinamicamente dall'utente (Modifica 1) */
@@ -32,6 +32,7 @@
   --cat-extra-4: #4f46e5;
   --cat-extra-5: #e11d48;
   --cat-extra-6: #92400e;
+  --cat-extra-7: #a21caf;
 
   /* Investimenti: un colore per tipo asset, distinto dalle categorie Spese */
   --invest-etf: #c25a1e;
@@ -77,7 +78,7 @@
   --cat-bonifici: #a78bfa;
   --cat-ristoranti: #f472b6;
   --cat-altro: #8a93a8;
-  --cat-stipendio: #34d399;
+  --cat-stipendio: #86efac;
   --cat-rimborso: #2dd4bf;
 
   --cat-extra-1: #22d3ee;
@@ -86,6 +87,7 @@
   --cat-extra-4: #818cf8;
   --cat-extra-5: #fb7185;
   --cat-extra-6: #d6a35c;
+  --cat-extra-7: #e879f9;
 
   --invest-etf: #e8792e;
   --invest-etc: #56b58d;

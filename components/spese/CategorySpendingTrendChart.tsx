@@ -12,13 +12,14 @@ import {
 } from "recharts";
 import type { TooltipContentProps } from "recharts";
 import { resolveCategoryColor } from "@/lib/category-style";
+import { mappaColoriCategorie } from "@/lib/category-palette";
 import {
   adaptiveTickInterval,
   categorieOrdinatePerTotale,
   formatCurrency,
   type CategoriaTotale,
 } from "@/lib/spese-utils";
-import type { Spesa } from "@/lib/types";
+import type { Categoria, Spesa } from "@/lib/types";
 
 const axisTick = { fill: "var(--muted)", fontSize: 12, fontFamily: "var(--font-mono)" };
 
@@ -94,14 +95,19 @@ function CategoryTrendTooltip({ active, payload, label }: TrendTooltipProps) {
 
 export function CategorySpendingTrendChart({
   spese,
+  categorie: tutteLeCategorie,
   from,
   to,
 }: {
   spese: Spesa[];
+  categorie: Categoria[];
   from: string;
   to: string;
 }) {
   const { data, categorie } = useMemo(() => buildSerie(spese, from, to), [spese, from, to]);
+  // Stessi colori (tutti diversi) del grafico a torta, vedi mappaColoriCategorie.
+  const colori = useMemo(() => mappaColoriCategorie(tutteLeCategorie), [tutteLeCategorie]);
+  const coloreDi = (c: CategoriaTotale) => colori.get(c.nome) ?? resolveCategoryColor(c.nome, c.colore);
   const tickInterval = adaptiveTickInterval(data.length);
 
   const [nascoste, setNascoste] = useState<Set<string>>(() => defaultNascoste(categorie));
@@ -129,7 +135,7 @@ export function CategorySpendingTrendChart({
         <div className="flex flex-wrap gap-2">
           {categorie.map((cat) => {
             const nascosta = nascoste.has(cat.nome);
-            const colore = resolveCategoryColor(cat.nome, cat.colore);
+            const colore = coloreDi(cat);
             return (
               <button
                 key={cat.nome}
@@ -179,7 +185,7 @@ export function CategorySpendingTrendChart({
                     type="monotone"
                     dataKey={cat.nome}
                     name={cat.nome}
-                    stroke={resolveCategoryColor(cat.nome, cat.colore)}
+                    stroke={coloreDi(cat)}
                     strokeWidth={2}
                     dot={false}
                     isAnimationActive

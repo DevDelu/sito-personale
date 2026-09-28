@@ -36,7 +36,7 @@ export function ChartsSection({
 
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Andamento per categoria</h2>
-        <CategorySpendingTrendChart spese={spese} from={range.from} to={range.to} />
+        <CategorySpendingTrendChart spese={spese} categorie={categorieList} from={range.from} to={range.to} />
       </section>
 
       <section className="flex flex-col gap-3">
