@@ -90,7 +90,10 @@ Supabase vivono in `lib/<dominio>/queries.ts`, mai inline nei componenti.
 Tre cron definiti in `vercel.json`, protetti da `CRON_SECRET` (header
 `Authorization: Bearer <CRON_SECRET>` — se assente in env, le route restano invocabili senza
 auth, vedi commento in `.env.example`):
-- `/api/cron/update-portfolio-prices` — aggiorna prezzi investimenti
+- `/api/cron/update-portfolio-prices` — aggiorna prezzi investimenti. Stessa logica
+  (`aggiornaPrezzi()` in `lib/investimenti/aggiorna-prezzi.ts`) anche on demand: `/investimenti`
+  chiama `POST /api/investimenti/aggiorna-prezzi` all'apertura se l'ultimo aggiornamento ha più
+  di 15 minuti (il piano Hobby permette un solo cron al giorno, troppo poco da solo)
 - `/api/agenda/cron-sync` — sync agenda Google, notifica via email (Resend) se il refresh token
   è scaduto
 - `/api/agenda/note-reminder` — reminder note agenda
