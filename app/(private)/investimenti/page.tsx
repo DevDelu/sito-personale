@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getPortfolioHistoryByAsset, getPosizioniCorrenti, getTransazioni } from "@/lib/investimenti/queries";
 import { SummaryCards } from "@/components/investimenti/SummaryCards";
 import { PositionsTable } from "@/components/investimenti/PositionsTable";
+import { AggiornaPrezzi } from "@/components/investimenti/AggiornaPrezzi";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
@@ -49,6 +50,8 @@ export default async function InvestimentiPage({
         <h1 className="font-display text-2xl font-semibold tracking-tight">Investimenti</h1>
         <p className="text-sm text-muted">Posizioni correnti, calcolate con il metodo FIFO.</p>
       </div>
+
+      <AggiornaPrezzi />
 
       <SummaryCards
         totaleInvestito={totaleInvestito}
