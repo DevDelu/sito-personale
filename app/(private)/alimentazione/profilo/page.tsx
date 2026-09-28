@@ -34,14 +34,16 @@ export default async function ProfiloPage({
         <p className="text-sm text-muted">Dati usati per calcolare BMR, TDEE e target kcal della fase attiva.</p>
       </div>
 
-      <ProfiloForm profilo={profilo} />
+      <div data-fb-area="alimentazione.profilo.dati" className="contents">
+        <ProfiloForm profilo={profilo} />
+      </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <section className="flex flex-col gap-3">
+        <section data-fb-area="alimentazione.profilo.peso" className="flex flex-col gap-3">
           <h2 className="font-display text-sm font-medium text-muted">Registra peso</h2>
           <PesoForm />
         </section>
-        <section className="flex flex-col gap-3">
+        <section data-fb-area="alimentazione.profilo.storico-peso" className="flex flex-col gap-3">
           <h2 className="font-display text-sm font-medium text-muted">Storico peso</h2>
           <PesoHistory righe={pesi} />
         </section>

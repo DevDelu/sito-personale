@@ -13,6 +13,9 @@ export type AperturaFeedback = {
   // Se assente si usa la pagina corrente; /altro passa l'ultima pagina
   // visitata prima di Altro.
   pagina?: string;
+  // "Non risolto" dall'avviso di verifica: lo sheet chiede "Cosa non va
+  // ancora?" e il testo (facoltativo) diventa una nota su quel feedback.
+  riapertoId?: string;
 };
 
 let apriHandler: ((a: AperturaFeedback) => void) | null = null;
@@ -62,8 +65,37 @@ const session = () => window.sessionStorage;
 export const leggiLocale = <T,>(chiave: string, fallback: T) => leggi(local, chiave, fallback);
 export const scriviLocale = (chiave: string, valore: unknown) => scrivi(local, chiave, valore);
 
+export const leggiSessione = <T,>(chiave: string, fallback: T) => leggi(session, chiave, fallback);
+export const scriviSessione = (chiave: string, valore: unknown) => scrivi(session, chiave, valore);
+
 const CHIAVE_ULTIMA_PAGINA = "radar.feedback.ultimaPagina";
-export type UltimaPagina = { pagina: string; query_chiavi: string[] };
+export type UltimaPagina = { pagina: string; query_chiavi: string[]; url?: string };
+
+// "Vai al punto" (pagina /feedback): il selettore da evidenziare quando la
+// pagina di destinazione è montata. Lo consuma FeedbackProvider.
+const CHIAVE_PUNTO_DA_EVIDENZIARE = "radar.feedback.evidenzia";
+
+export function preparaEvidenziazione(selettore: string) {
+  scrivi(session, CHIAVE_PUNTO_DA_EVIDENZIARE, selettore);
+}
+
+export function prendiEvidenziazione(): string | null {
+  const v = leggi<string | null>(session, CHIAVE_PUNTO_DA_EVIDENZIARE, null);
+  if (v) scrivi(session, CHIAVE_PUNTO_DA_EVIDENZIARE, null);
+  return v;
+}
+
+// L'avviso di verifica e la pagina /feedback si tengono allineati: dopo
+// un'azione da una parte, l'altra ricarica i feedback da verificare.
+let daVerificareCambiati: (() => void) | null = null;
+
+export function registraDaVerificareCambiati(fn: typeof daVerificareCambiati) {
+  daVerificareCambiati = fn;
+}
+
+export function notificaDaVerificareCambiati() {
+  daVerificareCambiati?.();
+}
 
 export function salvaUltimaPagina(v: UltimaPagina) {
   scrivi(session, CHIAVE_ULTIMA_PAGINA, v);

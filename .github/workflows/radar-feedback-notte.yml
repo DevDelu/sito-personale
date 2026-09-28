@@ -1,6 +1,9 @@
 # Job notturno: i feedback lasciati da Lorenzo nell'app (tabella `feedback`,
 # stato `nuovo`) diventano issue `dal-lorenzo` con una parafrasi senza dati
-# personali, e il feedback passa a `in-lavorazione` con il numero della issue.
+# personali, e il feedback passa a `preso-in-carico` con il numero della
+# issue. I feedback `riaperto` (Lorenzo ha detto "non è sistemato") riaprono
+# la loro issue con l'etichetta `riaperto` (`ostinato` dalla seconda volta),
+# e le note/risposte di Lorenzo finiscono nella issue, parafrasate.
 # Vedi CLAUDE.md > "Feedback".
 #
 # Il repo è PUBBLICO: log e issue sono visibili a chiunque. Per questo:
@@ -11,7 +14,8 @@
 #   corpo generico che rimanda a Supabase.
 #
 # Secret: CLAUDE_CODE_OAUTH_TOKEN (claude setup-token), RADAR_URL,
-# FEEDBACK_AGENTE_SECRET. Avvio manuale: Actions > radar-feedback-notte >
+# FEEDBACK_AGENTE_SECRET (o l'alias FEEDBACK_AGENT_SECRET).
+# Avvio manuale: Actions > radar-feedback-notte >
 # Run workflow.
 name: radar-feedback-notte
 
@@ -41,16 +45,17 @@ jobs:
         with:
           node-version: 22
 
-      - name: Scarica i feedback nuovi
+      - name: Scarica feedback nuovi, riaperti e note
         id: scarica
         env:
           RADAR_URL: ${{ secrets.RADAR_URL }}
-          FEEDBACK_AGENTE_SECRET: ${{ secrets.FEEDBACK_AGENTE_SECRET }}
+          FEEDBACK_AGENTE_SECRET: ${{ secrets.FEEDBACK_AGENTE_SECRET || secrets.FEEDBACK_AGENT_SECRET }}
         run: node .github/scripts/feedback-notte.mjs scarica
 
-      # Solo se c'è qualcosa da fare: niente quota Claude nelle notti vuote.
+      # Solo se c'è qualcosa da parafrasare: niente quota Claude nelle notti
+      # vuote (i soli riaperti senza note non ne hanno bisogno).
       - name: Claude scrive titoli e parafrasi
-        if: steps.scarica.outputs.quanti != '0'
+        if: steps.scarica.outputs.da_parafrasare != '0'
         continue-on-error: true
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -65,10 +70,10 @@ jobs:
             || echo "Claude non ha terminato: le issue avranno il corpo generico."
           test -f .radar-tmp/proposte.json && echo "proposte.json presente." || echo "proposte.json assente."
 
-      - name: Crea le issue e aggiorna lo stato
+      - name: Crea/riapre le issue, riporta le note e aggiorna lo stato
         if: steps.scarica.outputs.quanti != '0'
         env:
           RADAR_URL: ${{ secrets.RADAR_URL }}
-          FEEDBACK_AGENTE_SECRET: ${{ secrets.FEEDBACK_AGENTE_SECRET }}
+          FEEDBACK_AGENTE_SECRET: ${{ secrets.FEEDBACK_AGENTE_SECRET || secrets.FEEDBACK_AGENT_SECRET }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node .github/scripts/feedback-notte.mjs pubblica

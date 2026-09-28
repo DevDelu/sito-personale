@@ -76,7 +76,7 @@ export function TransazioneFormModal({
 
   return (
     <div className="modal-overlay">
-      <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
+      <form data-fb-area="investimenti.transazione-form" data-fb-entita={transazione ? `transazione-investimento:${transazione.id}` : undefined} onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">{titolo}</h2>
 
         <div className="flex flex-col gap-1.5">

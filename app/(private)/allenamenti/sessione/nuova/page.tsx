@@ -1,3 +1,4 @@
+// fb-aree: nessuna UI, crea la sessione e reindirizza (vedi scripts/check-fb-aree.mjs).
 import { redirect } from "next/navigation";
 import { creaSessione } from "../../actions";
 

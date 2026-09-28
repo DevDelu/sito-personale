@@ -63,7 +63,7 @@ export function GestioneFilters({ categorie }: { categorie: Categoria[] }) {
       </div>
 
       {filtriAperti && (
-        <Sheet onClose={() => setFiltriAperti(false)} className="max-w-md p-5">
+        <Sheet onClose={() => setFiltriAperti(false)} className="max-w-md p-5" area="spese.filtri-gestione">
           <div className="flex flex-col gap-4">
             <h2 className="font-display text-base font-semibold">Filtri</h2>
 

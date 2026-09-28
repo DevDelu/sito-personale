@@ -30,9 +30,13 @@ export default async function InvestimentiGestionePage() {
         </p>
       </div>
 
-      <RiconciliazioneBanner righe={riconciliazione} />
+      <div data-fb-area="investimenti.gestione.riconciliazione" className="contents">
+        <RiconciliazioneBanner righe={riconciliazione} />
+      </div>
 
-      <TransazioneTable rows={transazioni} assets={assets} />
+      <div data-fb-area="investimenti.gestione.tabella" className="contents">
+        <TransazioneTable rows={transazioni} assets={assets} />
+      </div>
     </div>
   );
 }

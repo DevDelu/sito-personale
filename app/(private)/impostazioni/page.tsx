@@ -13,7 +13,7 @@ export default function ImpostazioniPage() {
         <p className="text-sm text-muted">Preferenze dell&apos;app installata come PWA.</p>
       </div>
 
-      <section className="card flex flex-col gap-4 p-5">
+      <section data-fb-area="impostazioni.notifiche" className="card flex flex-col gap-4 p-5">
         <div className="flex flex-col gap-1">
           <h2 className="font-display text-lg font-medium">Notifiche</h2>
           <p className="text-sm text-muted">

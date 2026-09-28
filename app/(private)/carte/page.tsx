@@ -21,16 +21,18 @@ export default async function CartePage() {
         <p className="text-sm text-muted">Dragon Ball Super — Fusion World, prezzi da Cardmarket.</p>
       </div>
 
-      <CollectionSections
-        hero={hero}
-        resto={resto}
-        metricsSlot={
-          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <MetricCard label="Valore totale" value={formatCurrency(valoreTotale)} colorVar="--accent" />
-            <MetricCard label="Numero carte" value={String(numeroCarte)} colorVar="--invest-stock" />
-          </section>
-        }
-      />
+      <div data-fb-area="collezione.griglia" className="contents">
+        <CollectionSections
+          hero={hero}
+          resto={resto}
+          metricsSlot={
+            <section data-fb-area="collezione.metriche" className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <MetricCard label="Valore totale" value={formatCurrency(valoreTotale)} colorVar="--accent" />
+              <MetricCard label="Numero carte" value={String(numeroCarte)} colorVar="--invest-stock" />
+            </section>
+          }
+        />
+      </div>
 
       <FAB href="/carte/nuova" label="Aggiungi carta" icon={<Plus className="h-6 w-6" strokeWidth={2.25} />} />
     </div>

@@ -12,5 +12,9 @@ export default async function GestioneSchedaPage({ params }: { params: Promise<{
 
   const [righe, catalogo] = await Promise.all([getSchedaEsercizi(scheda.id), getEsercizi()]);
 
-  return <SchedaEditor scheda={scheda} righe={righe} catalogo={catalogo} />;
+  return (
+    <div data-fb-area="allenamenti.scheda.editor" className="contents">
+      <SchedaEditor scheda={scheda} righe={righe} catalogo={catalogo} />
+    </div>
+  );
 }

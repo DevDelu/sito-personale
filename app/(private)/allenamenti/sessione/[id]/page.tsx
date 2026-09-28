@@ -32,12 +32,14 @@ export default async function SessionePage({ params }: { params: Promise<{ id: s
   );
 
   return (
-    <SessionRunner
-      sessione={sessione}
-      scheda={scheda}
-      righe={righe}
-      logEsistenti={logEsistenti}
-      ultimiValori={Object.fromEntries(ultimiValoriEntries)}
-    />
+    <div data-fb-area="allenamenti.sessione.runner" className="contents">
+      <SessionRunner
+        sessione={sessione}
+        scheda={scheda}
+        righe={righe}
+        logEsistenti={logEsistenti}
+        ultimiValori={Object.fromEntries(ultimiValoriEntries)}
+      />
+    </div>
   );
 }

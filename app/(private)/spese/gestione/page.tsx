@@ -65,9 +65,15 @@ export default async function GestionePage({
         </p>
       </div>
 
-      <GestioneFilters categorie={categorie} />
-      <ExpenseTable rows={rows} categorie={categorie} />
-      <Pagination page={currentPage} totalPages={totalPages} pageSize={pageSize} />
+      <div data-fb-area="spese.gestione.filtri" className="contents">
+        <GestioneFilters categorie={categorie} />
+      </div>
+      <div data-fb-area="spese.gestione.tabella" className="contents">
+        <ExpenseTable rows={rows} categorie={categorie} />
+      </div>
+      <div data-fb-area="spese.gestione.paginazione" className="contents">
+        <Pagination page={currentPage} totalPages={totalPages} pageSize={pageSize} />
+      </div>
     </div>
   );
 }

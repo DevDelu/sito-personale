@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { requireUser } from "@/lib/supabase/dal";
+import { isOwner } from "@/lib/supabase/owner";
 import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sidebar } from "@/components/sidebar";
@@ -15,7 +16,7 @@ export default async function PrivateLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireUser();
+  const user = await requireUser();
 
   const areaPubblicaLink = (
     <Link href="/" aria-label="Area pubblica" className="btn-secondary flex items-center gap-1.5 !px-3 !py-1.5">
@@ -58,7 +59,7 @@ export default async function PrivateLayout({
         </div>
       </div>
       <TabBar />
-      <FeedbackProvider />
+      <FeedbackProvider owner={isOwner(user.email)} />
     </div>
   );
 }

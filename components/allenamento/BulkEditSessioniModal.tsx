@@ -53,7 +53,7 @@ export function BulkEditSessioniModal({
 
   return (
     <div className="modal-overlay">
-      <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
+      <form data-fb-area="allenamenti.modifica-sessioni-multipla" onSubmit={handleSubmit} className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
         <div>
           <h2 className="font-display text-base font-semibold">Modifica in blocco</h2>
           <p className="mt-1 text-sm text-muted">

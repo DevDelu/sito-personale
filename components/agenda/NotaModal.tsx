@@ -50,7 +50,7 @@ export function NotaModal({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-panel flex w-full max-w-lg flex-col gap-3 p-5">
+      <div data-fb-area="agenda.nota" className="modal-panel flex w-full max-w-lg flex-col gap-3 p-5">
         <h2 className="font-display text-base font-semibold capitalize">Nota &middot; {formatDataLunga(data)}</h2>
 
         <div className="flex flex-wrap items-center gap-1 rounded-lg border border-border p-1">

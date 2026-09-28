@@ -101,6 +101,7 @@ export function TransactionList({
         return (
           <li
             key={item.id}
+            data-fb-entita={`transazione:${item.id}`}
             className="border-b border-border/60 pb-1.5 text-xs last:border-0 last:pb-0"
           >
             {onItemClick ? (

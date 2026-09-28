@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
 import { interceptSessionNav } from "@/lib/allenamento/session-guard";
-import { FeedbackVoceSidebar } from "@/components/feedback/FeedbackAccessi";
+import { FeedbackLinkSidebar, FeedbackVoceSidebar } from "@/components/feedback/FeedbackAccessi";
 
 function isSectionActive(sectionHref: string, pathname: string): boolean {
   if (sectionHref === "#") return false;
@@ -107,6 +107,7 @@ export function Sidebar({ logoutSlot }: { logoutSlot: React.ReactNode }) {
       </div>
       <div className="border-t border-border p-3">
         <FeedbackVoceSidebar />
+        <FeedbackLinkSidebar />
         {logoutSlot}
       </div>
     </aside>

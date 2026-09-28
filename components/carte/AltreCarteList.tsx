@@ -43,6 +43,7 @@ export function AltreCarteList({
         return (
           <div
             key={c.id}
+            data-fb-entita={`carta:${c.id}`}
             onMouseMove={(e) => handleMove(e, c)}
             onMouseLeave={() => setHover(null)}
             onClick={() => onView(c)}

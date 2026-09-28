@@ -26,7 +26,7 @@ export function QuickAddButton() {
       </button>
 
       {aperto && (
-        <Sheet onClose={() => setAperto(false)}>
+        <Sheet onClose={() => setAperto(false)} area="shell.aggiunta-rapida">
           <div className="flex flex-col gap-4 p-4">
             <h2 className="font-display text-lg font-semibold">Cosa vuoi aggiungere?</h2>
             <ListGroup>

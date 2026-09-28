@@ -15,7 +15,9 @@ export default async function LeMieSchedePage() {
     <div className="flex flex-col gap-6">
       <PageHeader title="Le mie schede" parent={{ href: "/allenamenti", label: "Allenamento" }} />
       <SegmentedControl items={ALLENAMENTI_SEGMENTI} />
-      <SchedeList schede={schede} />
+      <div data-fb-area="allenamenti.schede.lista" className="contents">
+        <SchedeList schede={schede} />
+      </div>
     </div>
   );
 }

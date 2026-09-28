@@ -26,7 +26,9 @@ export default async function ImportaPage() {
           Sanpaolo per una categorizzazione automatica.
         </p>
       </div>
-      <ImportForm categorie={categorie} />
+      <div data-fb-area="spese.importa.form" className="contents">
+        <ImportForm categorie={categorie} />
+      </div>
     </div>
   );
 }

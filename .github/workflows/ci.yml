@@ -1,0 +1,32 @@
+# Controlli veloci su ogni PR e su main: unit test, controllo delle aree di
+# feedback (npm run check:fb-aree, vedi lib/feedback/aree.ts) e lint. Il
+# build lo fa già Vercel sull'anteprima. Nessun secret.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  controlli:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+
+      - run: npm run check:fb-aree
+
+      - run: npm run lint

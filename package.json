@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --test \"lib/**/*.test.ts\" \".github/scripts/*.test.mjs\"",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check:fb-aree": "node scripts/check-fb-aree.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

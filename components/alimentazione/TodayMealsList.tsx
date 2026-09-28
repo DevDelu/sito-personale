@@ -22,7 +22,7 @@ export function TodayMealsList({ pasti }: { pasti: Pasto[] }) {
   return (
     <ul className="card flex flex-col divide-y divide-border">
       {pasti.map((p) => (
-        <li key={p.id} className="flex items-center justify-between gap-3 px-4 py-3">
+        <li key={p.id} data-fb-entita={`pasto:${p.id}`} className="flex items-center justify-between gap-3 px-4 py-3">
           <div className="flex flex-col gap-0.5">
             <span className="text-sm font-medium">{p.alimento_nome}</span>
             <span className="text-xs text-muted">

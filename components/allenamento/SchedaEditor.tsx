@@ -383,7 +383,7 @@ export function SchedaEditor({
 
       {rinominandoBlocco && (
         <div className="modal-overlay">
-          <div className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
+          <div data-fb-area="allenamenti.rinomina-blocco" className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
             <h2 className="font-display text-base font-semibold">Rinomina blocco</h2>
             <label className="flex flex-col gap-1.5">
               <span className="text-sm font-medium text-muted">Nome blocco</span>

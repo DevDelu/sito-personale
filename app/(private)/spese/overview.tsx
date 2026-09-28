@@ -61,9 +61,13 @@ export function Overview({
 
   return (
     <div className="flex flex-col gap-8">
-      <FilterBar range={range} />
+      <div data-fb-area="spese.overview.filtri" className="contents">
+        <FilterBar range={range} />
+      </div>
 
-      <SummaryCards entrate={totaleEntrate} uscite={totaleSpese} />
+      <div data-fb-area="spese.overview.riepilogo" className="contents">
+        <SummaryCards entrate={totaleEntrate} uscite={totaleSpese} />
+      </div>
 
       <ChartsSection
         spese={spese}

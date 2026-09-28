@@ -18,7 +18,9 @@ export default function InvestimentiImportaPage() {
         <h1 className="font-display text-2xl font-semibold tracking-tight">Importa transazioni</h1>
         <p className="text-sm text-muted">Carica un file Excel con le transazioni da aggiungere.</p>
       </div>
-      <ImportForm />
+      <div data-fb-area="investimenti.importa.form" className="contents">
+        <ImportForm />
+      </div>
     </div>
   );
 }

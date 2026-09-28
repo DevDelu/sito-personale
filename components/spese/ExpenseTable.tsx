@@ -182,6 +182,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
                     return (
                       <button
                         key={key}
+                        data-fb-entita={`transazione:${r.id}`}
                         type="button"
                         onClick={() => handleRigaClickMobile(r)}
                         className={`flex min-h-[56px] w-full items-center gap-3 py-2 pr-4 pl-4 text-left transition-colors duration-150 active:bg-surface-hover ${
@@ -310,6 +311,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
                 return (
                   <tr
                     key={key}
+                    data-fb-entita={`transazione:${r.id}`}
                     className={`border-b border-border transition-colors duration-150 last:border-0 hover:bg-surface-hover ${
                       selezionata ? "bg-accent/5" : ""
                     }`}

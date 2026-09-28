@@ -128,7 +128,7 @@ export function BulkEditModal({
   }
 
   return (
-    <Sheet onClose={onCancel} className="max-w-md p-5">
+    <Sheet onClose={onCancel} className="max-w-md p-5" area="spese.modifica-multipla">
       {fase === "campi" ? (
           <form onSubmit={handleContinua} className="flex flex-col gap-4">
             <div>

@@ -13,5 +13,9 @@ export default async function SessioneDettaglioPage({ params }: { params: Promis
 
   const log = await getLogPerSessioneConNome(sessione);
 
-  return <SessionDetailEditor sessione={sessione} log={log} />;
+  return (
+    <div data-fb-area="allenamenti.storico.dettaglio" className="contents">
+      <SessionDetailEditor sessione={sessione} log={log} />
+    </div>
+  );
 }

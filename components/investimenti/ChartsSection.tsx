@@ -16,7 +16,7 @@ export function ChartsSection({
   gruppi: GruppoStorico[];
 }) {
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div data-fb-area="investimenti.overview.grafici" className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-sm font-medium text-muted">Andamento portafoglio</h2>
         <PortfolioHistoryChart punti={punti} gruppi={gruppi} />

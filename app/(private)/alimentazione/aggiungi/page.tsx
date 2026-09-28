@@ -23,7 +23,9 @@ export default async function AggiungiPastoPage() {
           pasto selezionati hanno un template, puoi registrarlo in un colpo solo.
         </p>
       </div>
-      <AddMealForm alimenti={alimenti} pastiRecenti={recenti} templates={templates} />
+      <div data-fb-area="alimentazione.aggiungi.form" className="contents">
+        <AddMealForm alimenti={alimenti} pastiRecenti={recenti} templates={templates} />
+      </div>
     </div>
   );
 }

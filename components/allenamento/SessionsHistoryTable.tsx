@@ -159,6 +159,7 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: Sessione[] }) {
                 return (
                   <tr
                     key={s.id}
+                    data-fb-entita={`sessione:${s.id}`}
                     className={`border-b border-border transition-colors duration-150 last:border-0 ${
                       selezionata ? "bg-accent/5" : ""
                     }`}

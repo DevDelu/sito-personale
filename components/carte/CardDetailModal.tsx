@@ -55,7 +55,7 @@ export function CardDetailModal({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
+      <div data-fb-area="collezione.dettaglio-carta" data-fb-entita={`carta:${carta.id}`} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <div className="flex items-start justify-between gap-2">
           <h2 className="font-display text-base font-semibold">{carta.name}</h2>
           <button type="button" onClick={onClose} aria-label="Chiudi" className="btn-icon">

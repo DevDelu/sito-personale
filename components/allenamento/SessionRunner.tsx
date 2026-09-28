@@ -391,7 +391,7 @@ function ConfermaDialog({
 }) {
   return (
     <div className="modal-overlay">
-      <div className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5 text-center">
+      <div data-fb-area="allenamenti.sessione.conferma" className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5 text-center">
         <h2 className="font-display text-base font-semibold">{titolo}</h2>
         <p className="text-sm text-muted">{messaggio}</p>
         <div className="flex justify-center gap-3">

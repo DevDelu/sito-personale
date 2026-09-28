@@ -207,7 +207,7 @@ export function DayPanel({
           ) : (
             <ul className="flex flex-col gap-2">
               {eventi.map((e) => (
-                <li key={e.id} className="flex items-start justify-between gap-2 rounded-xl border border-border p-3">
+                <li key={e.id} data-fb-entita={`evento:${e.id}`} className="flex items-start justify-between gap-2 rounded-xl border border-border p-3">
                   <div className="flex min-w-0 items-start gap-2">
                     <span
                       className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"

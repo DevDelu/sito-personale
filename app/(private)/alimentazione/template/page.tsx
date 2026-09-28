@@ -28,7 +28,9 @@ export default async function TemplateSettimanalePage() {
         </p>
       </div>
 
-      <TemplateGrid templates={templates} alimenti={alimenti} />
+      <div data-fb-area="alimentazione.template.griglia" className="contents">
+        <TemplateGrid templates={templates} alimenti={alimenti} />
+      </div>
     </div>
   );
 }

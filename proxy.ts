@@ -15,6 +15,7 @@ const UNLOCALIZED_PREFIXES = [
   "/alimentazione",
   "/impostazioni",
   "/altro",
+  "/feedback",
 ];
 const UNLOCALIZED_EXACT_ROUTES = ["/login"];
 

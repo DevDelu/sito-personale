@@ -84,7 +84,7 @@ export function EventoFormModal({
 
   return (
     <div className="modal-overlay">
-      <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
+      <form data-fb-area="agenda.evento-form" data-fb-entita={evento ? `evento:${evento.id}` : undefined} onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">{evento ? "Modifica evento" : "Nuovo evento"}</h2>
 
         <Field label="Titolo">

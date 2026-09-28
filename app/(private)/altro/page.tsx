@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { ExternalLink, Layers, LogOut, Dumbbell, Apple, Bell } from "lucide-react";
+import { ExternalLink, Layers, LogOut, Dumbbell, Apple, Bell, Inbox } from "lucide-react";
+import { contaDaVerificare } from "@/lib/feedback/queries";
 import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ListGroup, ListRow, ListRowLink } from "@/components/ui/ListGroup";
@@ -11,12 +12,16 @@ export const metadata: Metadata = { title: "Altro" };
 // Rotta raggiunta solo dalla tab bar mobile (md:hidden altrove): contiene i
 // moduli senza slot dedicato nella tab bar, più le stesse azioni che su
 // desktop vivono nella topbar/sidebar (tema, area pubblica, esci).
-export default function AltroPage() {
+export default async function AltroPage() {
+  // Contatore dei feedback da verificare a destra della riga "I miei
+  // feedback"; 0 se la migration 033 non è ancora applicata.
+  const daVerificare = await contaDaVerificare().catch(() => 0);
+
   return (
     <div className="flex flex-1 flex-col md:hidden">
       <PageHeader title="Altro" />
 
-      <div className="flex flex-1 flex-col justify-center gap-6 px-4 py-6">
+      <div data-fb-area="altro.menu" className="flex flex-1 flex-col justify-center gap-6 px-4 py-6">
         <ListGroup>
           <ListRowLink href="/carte" icon={<Layers className="h-5 w-5" strokeWidth={1.75} />} title="Carte" chevron />
           <ListRowLink
@@ -32,6 +37,14 @@ export default function AltroPage() {
             chevron
           />
           <FeedbackRigaAltro />
+          <ListRowLink
+            href="/feedback"
+            icon={<Inbox className="h-5 w-5" strokeWidth={1.75} />}
+            title="I miei feedback"
+            subtitle={daVerificare > 0 ? "Da verificare" : undefined}
+            value={daVerificare > 0 ? String(daVerificare) : undefined}
+            chevron
+          />
         </ListGroup>
 
         <ListGroup>

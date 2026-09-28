@@ -9,7 +9,9 @@ export default function NuovaCartaPage() {
     <div className="flex flex-col gap-6">
       <PageHeader title="Aggiungi carta" parent={{ href: "/carte", label: "Carte" }} />
       <h1 className="hidden font-display text-xl font-semibold tracking-tight md:block">Aggiungi carta</h1>
-      <AddCardForm />
+      <div data-fb-area="collezione.nuova.form" className="contents">
+        <AddCardForm />
+      </div>
     </div>
   );
 }

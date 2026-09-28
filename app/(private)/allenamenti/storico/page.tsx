@@ -23,9 +23,13 @@ export default async function StoricoAllenamentoPage() {
         <p className="text-sm text-muted">{sessioni.length} sessioni registrate.</p>
       </div>
 
-      <SessionsHistoryTable sessioni={sessioni} />
+      <div data-fb-area="allenamenti.storico.sessioni" className="contents">
+        <SessionsHistoryTable sessioni={sessioni} />
+      </div>
 
-      <ProgressTable sessioni={progressi.sessioni} log={progressi.log} />
+      <div data-fb-area="allenamenti.storico.progressi" className="contents">
+        <ProgressTable sessioni={progressi.sessioni} log={progressi.log} />
+      </div>
     </div>
   );
 }

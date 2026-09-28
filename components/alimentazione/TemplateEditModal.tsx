@@ -112,7 +112,7 @@ export function TemplateEditModal({
 
   return (
     <div className="modal-overlay">
-      <form onSubmit={handleSubmit} className="modal-panel flex w-full max-w-lg flex-col gap-4 p-5">
+      <form data-fb-area="alimentazione.modifica-template" data-fb-entita={template ? `template-pasto:${template.id}` : undefined} onSubmit={handleSubmit} className="modal-panel flex w-full max-w-lg flex-col gap-4 p-5">
         <div className="flex flex-col gap-0.5">
           <h2 className="font-display text-base font-semibold">
             {isJolly ? "Jolly" : `${LABEL_GIORNO[giornoSettimana] ?? giornoSettimana} · ${LABEL_TIPO[tipoPasto]}`}

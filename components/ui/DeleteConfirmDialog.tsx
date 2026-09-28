@@ -25,7 +25,7 @@ export function DeleteConfirmDialog({
   const isBulk = typeof count === "number" && count > 1;
 
   return (
-    <Sheet onClose={onCancel} className="max-w-sm p-5">
+    <Sheet onClose={onCancel} className="max-w-sm p-5" area="comune.conferma-eliminazione">
       <h2 className="font-display text-base font-semibold">
         {title ?? (isBulk ? `Eliminare ${count} movimenti?` : "Eliminare questo movimento?")}
       </h2>
