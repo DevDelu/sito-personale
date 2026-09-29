@@ -47,3 +47,25 @@ export function motiviNonPubblicabile(pubblico, originale = "") {
   if (originale && copiaDa(originale, pubblico)) motivi.push("testo copiato dall'originale");
   return [...new Set(motivi)];
 }
+
+// Da riga di comando, per lo sviluppatore notturno prima di pubblicare
+// titolo e corpo di una PR (repo pubblico):
+//   node .github/scripts/privacy.mjs <file-da-pubblicare> [file-testo-originale]
+// Esce con 1 e stampa i motivi se il testo non è pubblicabile.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const { readFileSync } = await import("node:fs");
+  const [file, originale] = process.argv.slice(2);
+  if (!file) {
+    console.error("Uso: node .github/scripts/privacy.mjs <file> [file-originale]");
+    process.exit(2);
+  }
+  // Le righe tecniche (id del feedback, issue chiuse) non sono dati personali
+  // e un uuid può sembrare un "numero lungo".
+  const testo = readFileSync(file, "utf8").replace(/^.*\b(Feedback-id|Closes|Fixes)\b.*$/gim, "");
+  const motivi = motiviNonPubblicabile(testo, originale ? readFileSync(originale, "utf8") : "");
+  if (motivi.length) {
+    console.error(`Non pubblicabile: ${motivi.join(", ")}.`);
+    process.exit(1);
+  }
+  console.log("Ok: pubblicabile.");
+}

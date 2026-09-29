@@ -12,6 +12,12 @@ un punto è fatto.
 - [ ] Verificare che ci siano anche `CLAUDE_CODE_OAUTH_TOKEN` e `FEEDBACK_AGENTE_SECRET` (servono
   al job notturno feedback → issue).
 - [ ] Eseguire `supabase/033_feedback_ciclo.sql` nell'SQL editor (dopo 031 e 032).
+- [ ] Eseguire `supabase/034_feedback_testo_lungo.sql` (feedback fino a 5000 caratteri).
+- [ ] **Sviluppatore notturno**: nell'ambiente cloud di Claude Code (claude.ai/code → menu
+  dell'ambiente → Edit → variabili) aggiungere `RADAR_URL` e `FEEDBACK_AGENTE_SECRET`, stessi valori
+  dei secret GitHub. Senza, la routine si ferma e lo dice.
+- [ ] `CLAUDE_CODE_OAUTH_TOKEN` probabilmente scaduto: il 29/09 Claude si è fermato dopo 6 secondi e le
+  issue #67/#68 sono uscite senza parafrasi. Rigenerarlo con `claude setup-token` e aggiornare il secret.
 - [ ] `FEEDBACK_AGENTE_SECRET` (o l'alias `FEEDBACK_AGENT_SECRET`, stesso valore) su Vercel **e**
   nei secret GitHub: ora lo usano anche `feedback-pr.yml` e `feedback-deploy.yml`.
 - [ ] Al primo deploy di produzione dopo il merge: Actions → feedback-deploy deve partire (evento
@@ -28,6 +34,8 @@ un punto è fatto.
   `feedback-deploy.yml`.
 - Utente tester in sola lettura + controllo owner centrale sulle API.
 - Collaudatore Playwright (`collaudo.yml`), in attesa dei secret.
+- Sviluppatore notturno: Routine di Claude Code che segue `.claude/skills/sviluppatore-feedback/SKILL.md`
+  (testo originale da Supabase via `scripts/feedback.mjs`, una PR per feedback, `Feedback-id` nel corpo).
 
 ## Convenzioni per chi sistema i feedback (sviluppatore notturno, anche futuro)
 
@@ -60,8 +68,8 @@ un punto è fatto.
 ## Prossimi pezzi (ritmo scelto: intenso, tutto ogni notte)
 
 1. Tester con Claude: esplora il sito come Lorenzo, issue `dal-tester`.
-2. Sviluppatore notturno (una PR `agente` per notte, priorità `dal-lorenzo` → `dal-collaudo` →
-   `dal-tester`) e Revisore sulle PR `agente`.
+2. Revisore sulle PR dello sviluppatore notturno; estendere lo sviluppatore a `dal-collaudo` →
+   `dal-tester` dopo i feedback di Lorenzo.
 3. Diario condiviso degli agenti (`.claude/diario-agenti.md`) + lezione dalle PR chiuse senza merge.
 4. Product domenicale (retrospettiva, una proposta, docs, salute tecnica) + Dependabot.
 

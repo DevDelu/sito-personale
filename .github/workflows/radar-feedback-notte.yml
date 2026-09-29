@@ -55,6 +55,7 @@ jobs:
       # Solo se c'è qualcosa da parafrasare: niente quota Claude nelle notti
       # vuote (i soli riaperti senza note non ne hanno bisogno).
       - name: Claude scrive titoli e parafrasi
+        id: claude
         if: steps.scarica.outputs.da_parafrasare != '0'
         continue-on-error: true
         env:
@@ -64,9 +65,11 @@ jobs:
         # la categoria dell'errore (.github/scripts/diagnosi-claude.mjs).
         run: |
           if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
-            echo "::warning::CLAUDE_CODE_OAUTH_TOKEN mancante: le issue avranno il corpo generico."
+            echo "::error::CLAUDE_CODE_OAUTH_TOKEN mancante: le issue avranno il corpo generico."
+            echo "claude_fallito=1" >> "$GITHUB_OUTPUT"
           elif ! npm install -g @anthropic-ai/claude-code >/dev/null 2>&1 || ! command -v claude >/dev/null; then
-            echo "::warning::Installazione di Claude Code fallita: le issue avranno il corpo generico."
+            echo "::error::Installazione di Claude Code fallita: le issue avranno il corpo generico."
+            echo "claude_fallito=1" >> "$GITHUB_OUTPUT"
           else
             set +e
             claude -p "$(cat .github/scripts/prompt-feedback-notte.md)" \
@@ -78,7 +81,8 @@ jobs:
             if [ "$esito" -eq 0 ]; then
               echo "Claude ha terminato."
             else
-              echo "::warning::Claude non ha terminato ($(node .github/scripts/diagnosi-claude.mjs "$RUNNER_TEMP/claude.log" "$esito")): le issue avranno il corpo generico."
+              echo "::error::Claude non ha terminato ($(node .github/scripts/diagnosi-claude.mjs "$RUNNER_TEMP/claude.log" "$esito")): le issue avranno il corpo generico."
+              echo "claude_fallito=1" >> "$GITHUB_OUTPUT"
             fi
             rm -f "$RUNNER_TEMP/claude.log"
           fi
@@ -91,3 +95,13 @@ jobs:
           FEEDBACK_AGENTE_SECRET: ${{ secrets.FEEDBACK_AGENTE_SECRET || secrets.FEEDBACK_AGENT_SECRET }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node .github/scripts/feedback-notte.mjs pubblica
+
+      # Le issue sono comunque create (col rimando a Supabase), ma il job
+      # diventa rosso: GitHub avvisa Lorenzo via email invece di lasciare
+      # issue vuote in silenzio come il 27-29/09. Lo sviluppatore notturno
+      # legge in ogni caso il testo originale da Supabase.
+      - name: Segnala Claude fallito
+        if: steps.claude.outputs.claude_fallito == '1'
+        run: |
+          echo "::error::Parafrasi non generate: controlla CLAUDE_CODE_OAUTH_TOKEN (rigeneralo con 'claude setup-token' e aggiorna il secret)."
+          exit 1

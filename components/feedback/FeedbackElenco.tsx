@@ -9,57 +9,71 @@ import { aggiungiNota, correggiTesto, rispondi, scarta, segnaNonRisolto, segnaVe
 import { notificaDaVerificareCambiati, preparaEvidenziazione } from "@/lib/feedback/bus";
 import { etichettaArea } from "@/lib/feedback/aree";
 import { etaInNotti } from "@/lib/feedback/riepilogo";
-import { ETICHETTA_STATO, STATI_APERTI, isNonChiuso } from "@/lib/feedback/stati";
-import type { FeedbackEvento, FeedbackRow, FeedbackStato, FeedbackTipo } from "@/lib/feedback/types";
+import { PASSI, fase, scheda, type Scheda } from "@/lib/feedback/fasi";
+import { ETICHETTA_STATO, isNonChiuso } from "@/lib/feedback/stati";
+import { EVENTO_TESTO_MAX, FEEDBACK_TESTO_MAX, type FeedbackEvento, type FeedbackRow, type FeedbackTipo } from "@/lib/feedback/types";
+import { useWakeLock } from "@/hooks/useWakeLock";
 
 const REPO = "https://github.com/DevDelu/sito-personale";
 
-type Gruppo = "aperti" | "da-verificare" | "chiusi";
-
-const GRUPPI: { value: Gruppo; label: string }[] = [
-  { value: "aperti", label: "Aperti" },
-  { value: "da-verificare", label: "Da verificare" },
+// Per te: domanda, PR da approvare, verifica (lib/feedback/fasi.ts).
+const SCHEDE: { value: Scheda; label: string }[] = [
+  { value: "per-te", label: "Per te" },
+  { value: "in-corso", label: "In corso" },
   { value: "chiusi", label: "Chiusi" },
 ];
 
+const VUOTO: Record<Scheda, string> = {
+  "per-te": "Niente che aspetti te.",
+  "in-corso": "Nessun feedback in corso.",
+  chiusi: "Nessun feedback chiuso.",
+};
+
 const TIPO: Record<FeedbackTipo, string> = { problema: "Problema", complicato: "Complicato", idea: "Idea" };
 
-function gruppo(stato: FeedbackStato): Gruppo {
-  if (stato === "da-verificare") return "da-verificare";
-  return STATI_APERTI.includes(stato) ? "aperti" : "chiusi";
-}
-
-// Colore del badge di stato: ambra dove serve Lorenzo, verde a buon fine.
-function toneStato(stato: FeedbackStato): string {
-  if (stato === "serve-info" || stato === "da-verificare" || stato === "riaperto") return "bg-amber-500/15 text-amber-700 dark:text-amber-300";
-  if (stato === "verificato") return "bg-entrata/15 text-entrata";
+// Colore del badge: ambra dove serve Lorenzo, verde a buon fine.
+function toneStato(f: FeedbackRow): string {
+  if (fase(f).perTe || f.stato === "riaperto") return "bg-amber-500/15 text-amber-700 dark:text-amber-300";
+  if (f.stato === "verificato") return "bg-entrata/15 text-entrata";
   return "bg-surface-hover text-muted";
 }
+
+// Ordine in "Per te": prima le domande, poi le PR da approvare, poi le
+// verifiche; a parità, il più vecchio.
+const PRIORITA_PER_TE: Record<string, number> = { "serve-info": 0, "in-lavorazione": 1, "da-verificare": 2 };
 
 function dove(f: Pick<FeedbackRow, "area" | "route">): string {
   return etichettaArea(f.area) ?? f.route;
 }
 
 export function FeedbackElenco({ righe, owner }: { righe: FeedbackRow[]; owner: boolean }) {
-  const daVerificare = righe.filter((r) => r.stato === "da-verificare").length;
-  const [scelto, setScelto] = useState<Gruppo>(daVerificare > 0 ? "da-verificare" : "aperti");
+  const conteggi = useMemo(() => {
+    const c: Record<Scheda, number> = { "per-te": 0, "in-corso": 0, chiusi: 0 };
+    for (const r of righe) c[scheda(r)]++;
+    return c;
+  }, [righe]);
+  const [scelto, setScelto] = useState<Scheda>(conteggi["per-te"] > 0 ? "per-te" : "in-corso");
   const [dettaglioId, setDettaglioId] = useState<string | null>(null);
   const dettaglio = righe.find((r) => r.id === dettaglioId) ?? null;
 
   const visibili = useMemo(() => {
-    const lista = righe.filter((r) => gruppo(r.stato) === scelto);
-    // "Serve una tua risposta" in cima agli Aperti.
-    return lista.sort((a, b) => Number(b.stato === "serve-info") - Number(a.stato === "serve-info"));
+    const lista = righe.filter((r) => scheda(r) === scelto);
+    if (scelto === "per-te") {
+      return lista.sort(
+        (a, b) => PRIORITA_PER_TE[a.stato] - PRIORITA_PER_TE[b.stato] || a.created_at.localeCompare(b.created_at)
+      );
+    }
+    return lista;
   }, [righe, scelto]);
+
+  const schede = SCHEDE.map((s) => (s.value === "chiusi" || conteggi[s.value] === 0 ? s : { ...s, label: `${s.label} (${conteggi[s.value]})` }));
 
   return (
     <>
-      <SegmentedPicker label="Stato dei feedback" items={GRUPPI} value={scelto} onChange={setScelto} />
+      <SegmentedPicker label="Stato dei feedback" items={schede} value={scelto} onChange={setScelto} />
 
       {visibili.length === 0 ? (
-        <p className="py-8 text-center text-[15px] text-muted">
-          {scelto === "da-verificare" ? "Niente da verificare." : scelto === "aperti" ? "Nessun feedback aperto." : "Nessun feedback chiuso."}
-        </p>
+        <p className="py-8 text-center text-[15px] text-muted">{VUOTO[scelto]}</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {visibili.map((f) => (
@@ -71,11 +85,12 @@ export function FeedbackElenco({ righe, owner }: { righe: FeedbackRow[]; owner: 
               >
                 <span className="flex items-center justify-between gap-2">
                   <span className="text-[13px] font-medium text-muted">{TIPO[f.tipo]}</span>
-                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[12px] font-medium ${toneStato(f.stato)}`}>
-                    {ETICHETTA_STATO[f.stato]}
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[12px] font-medium ${toneStato(f)}`}>
+                    {fase(f).etichetta}
                   </span>
                 </span>
-                <span className="line-clamp-2 text-[17px]">{f.testo}</span>
+                <span className="line-clamp-3 text-[17px]">{f.testo}</span>
+                {scelto === "per-te" && <span className="text-[15px] text-amber-700 dark:text-amber-300">{fase(f).adesso}</span>}
                 <span className="flex items-center justify-between gap-2 text-[13px] text-muted">
                   <span className="min-w-0 truncate">{dove(f)}</span>
                   <span className="shrink-0">{etaInNotti(f.created_at)}</span>
@@ -110,6 +125,9 @@ function FeedbackDettaglio({ f, owner, onClose }: { f: FeedbackRow; owner: boole
   const [testo, setTesto] = useState("");
   const [errore, setErrore] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  // Anche note e risposte si dettano: schermo acceso mentre il campo è aperto.
+  const schermo = useWakeLock(modo !== null);
+  const passo = fase(f);
 
   useEffect(() => {
     let attivo = true;
@@ -169,12 +187,24 @@ function FeedbackDettaglio({ f, owner, onClose }: { f: FeedbackRow; owner: boole
           <span className="text-[13px] font-medium text-muted">
             {TIPO[f.tipo]} · {etaInNotti(f.created_at)}
           </span>
-          <span className={`rounded-full px-2 py-0.5 text-[12px] font-medium ${toneStato(f.stato)}`}>
-            {ETICHETTA_STATO[f.stato]}
+          <span className={`rounded-full px-2 py-0.5 text-[12px] font-medium ${toneStato(f)}`}>
+            {passo.etichetta}
           </span>
         </div>
 
-        <p className="text-[17px] whitespace-pre-wrap">{f.testo}</p>
+        <Percorso passo={passo.passo} chiuso={f.stato === "scartato" ? "Scartato" : null} />
+
+        <div className={`rounded-xl p-3 text-[15px] ${passo.perTe ? "bg-amber-500/10" : "bg-surface-hover"}`}>
+          <span className={`block text-[13px] font-medium ${passo.perTe ? "text-amber-700 dark:text-amber-300" : "text-muted"}`}>
+            {passo.perTe ? "Tocca a te" : "Adesso"}
+          </span>
+          {passo.adesso}
+        </div>
+
+        <section className="flex flex-col gap-1">
+          <h3 className="text-[13px] font-medium text-muted uppercase">Cosa hai scritto</h3>
+          <p className="text-[17px] whitespace-pre-wrap">{f.testo}</p>
+        </section>
 
         {f.stato === "serve-info" && domanda && (
           <div className="rounded-xl bg-amber-500/10 p-3 text-[15px]">
@@ -224,7 +254,7 @@ function FeedbackDettaglio({ f, owner, onClose }: { f: FeedbackRow; owner: boole
               rel="noreferrer"
               className="btn-secondary flex items-center gap-1.5 !px-3 !py-1.5"
             >
-              PR #{f.pr_number} <ExternalLink className="h-3.5 w-3.5" aria-label="(nuova scheda)" />
+              {passo.etichetta === "Da approvare" ? `Approva la PR #${f.pr_number}` : `PR #${f.pr_number}`} <ExternalLink className="h-3.5 w-3.5" aria-label="(nuova scheda)" />
             </a>
           )}
         </div>
@@ -257,8 +287,9 @@ function FeedbackDettaglio({ f, owner, onClose }: { f: FeedbackRow; owner: boole
               autoFocus
               rows={3}
               value={testo}
-              maxLength={modo === "correggi" ? 500 : 1000}
+              maxLength={modo === "correggi" ? FEEDBACK_TESTO_MAX : EVENTO_TESTO_MAX}
               onChange={(e) => setTesto(e.target.value)}
+              onPointerDown={() => void schermo.requestNow()}
               placeholder={placeholder[modo]}
               aria-label={placeholder[modo]}
               className="field-input w-full resize-none text-[17px]"
@@ -333,5 +364,25 @@ function FeedbackDettaglio({ f, owner, onClose }: { f: FeedbackRow; owner: boole
         )}
       </div>
     </Sheet>
+  );
+}
+
+// Il percorso di ogni feedback, con il passo attuale evidenziato.
+function Percorso({ passo, chiuso }: { passo: number; chiuso: string | null }) {
+  return (
+    <ol className="flex items-start gap-1" aria-label="Percorso del feedback">
+      {PASSI.map((nome, i) => {
+        const etichetta = i === PASSI.length - 1 && chiuso ? chiuso : nome;
+        const stato = i < passo ? "fatto" : i === passo ? "attuale" : "dopo";
+        return (
+          <li key={nome} aria-current={stato === "attuale" ? "step" : undefined} className="flex min-w-0 flex-1 flex-col gap-1">
+            <span
+              className={`h-1 rounded-full ${stato === "dopo" ? "bg-surface-hover" : stato === "attuale" ? "bg-accent" : "bg-accent/40"}`}
+            />
+            <span className={`text-[12px] leading-tight ${stato === "attuale" ? "font-semibold" : "text-muted"}`}>{etichetta}</span>
+          </li>
+        );
+      })}
+    </ol>
   );
 }

@@ -99,5 +99,9 @@ export type FeedbackEvento = {
   riportato_at: string | null;
 };
 
-export const FEEDBACK_TESTO_MAX = 500;
-export const EVENTO_TESTO_MAX = 1000;
+// Alti per la dettatura vocale (migration 034). Prima di 034 il database
+// accetta 500/1000: inserisciFeedback() e aggiungiEvento() spezzano il testo
+// invece di perderlo (vedi LIMITI_PRIMA_DI_034).
+export const FEEDBACK_TESTO_MAX = 5000;
+export const EVENTO_TESTO_MAX = 5000;
+export const LIMITI_PRIMA_DI_034 = { feedback: 500, evento: 1000 } as const;

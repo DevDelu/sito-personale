@@ -1,6 +1,8 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isNonChiuso, verificaTransizione } from "./stati";
+import { spezzaTesto } from "./testo";
+import { EVENTO_TESTO_MAX, LIMITI_PRIMA_DI_034 } from "./types";
 import type {
   EventoAutore,
   EventoTipo,
@@ -37,10 +39,16 @@ export async function aggiungiEvento(evento: {
   stato_a?: FeedbackStato | null;
 }) {
   const admin = createAdminClient();
-  const { error } = await admin.from("feedback_eventi").insert({
-    ...evento,
-    testo: evento.testo?.slice(0, 1000) ?? null,
-  });
+  const testo = evento.testo?.slice(0, EVENTO_TESTO_MAX) ?? null;
+  const { error } = await admin.from("feedback_eventi").insert({ ...evento, testo });
+  // 23514 = check_violation: migration 034 non ancora applicata e testo
+  // oltre il limite vecchio. Lo si salva in più righe invece di perderlo.
+  if (error?.code === "23514" && testo && testo.length > LIMITI_PRIMA_DI_034.evento) {
+    const righe = spezzaTesto(testo, LIMITI_PRIMA_DI_034.evento).map((parte) => ({ ...evento, testo: parte }));
+    const { error: errParti } = await admin.from("feedback_eventi").insert(righe);
+    if (errParti) throw errParti;
+    return;
+  }
   if (error) throw error;
 }
 
@@ -61,16 +69,29 @@ export async function inserisciFeedback(payload: FeedbackPayload): Promise<Esito
   }
 
   const contesto = { ...campi.contesto, versione: process.env.VERCEL_GIT_COMMIT_SHA ?? null };
-  const riga = { ...campi, contesto };
+  let riga = { ...campi, contesto };
+  // Testo oltre il limite di 031 quando la migration 034 manca: i primi 500
+  // caratteri nel feedback, il resto in note consecutive (mai perso).
+  let seguito: string[] = [];
   let { data, error } = await admin.from("feedback").insert(riga).select("id").single();
-  // 23514 = check_violation: migration 032 (origine 'pulsante') non ancora
-  // applicata. Meglio salvare il feedback con un'origine vicina che perderlo.
+  // 23514 = check_violation: una migration non ancora applicata. Meglio
+  // salvare il feedback adattato che perderlo.
+  if (error?.code === "23514" && riga.testo.length > LIMITI_PRIMA_DI_034.feedback) {
+    const [primo, ...resto] = spezzaTesto(riga.testo, LIMITI_PRIMA_DI_034.feedback);
+    riga = { ...riga, testo: primo };
+    seguito = resto;
+    ({ data, error } = await admin.from("feedback").insert(riga).select("id").single());
+  }
+  // Migration 032 (origine 'pulsante') non ancora applicata.
   if (error?.code === "23514" && payload.origine === "pulsante") {
     ({ data, error } = await admin.from("feedback").insert({ ...riga, origine: "tab" }).select("id").single());
   }
   if (error) throw error;
   const id = (data as { id: string }).id;
   await aggiungiEvento({ feedback_id: id, autore: "lorenzo", tipo: "cambio-stato", stato_da: null, stato_a: "nuovo" });
+  if (seguito.length) {
+    await aggiungiEvento({ feedback_id: id, autore: "lorenzo", tipo: "nota", testo: `(seguito del testo) ${seguito.join(" ")}` });
+  }
   return { ok: true, id };
 }
 
@@ -161,6 +182,14 @@ export async function listaFeedback(): Promise<FeedbackRow[]> {
   return (data ?? []) as FeedbackRow[];
 }
 
+// Feedback con tutta la sua storia (note, risposte, nota-fix): quello che
+// l'agente sviluppatore legge prima di lavorarci.
+export async function feedbackCompleto(id: string): Promise<{ feedback: FeedbackRow; eventi: FeedbackEvento[] } | null> {
+  const [feedback] = await trova({ id });
+  if (!feedback) return null;
+  return { feedback, eventi: await eventiFeedback(id) };
+}
+
 export type FeedbackBreve = Pick<FeedbackRow, "id" | "tipo" | "testo" | "stato" | "created_at" | "area">;
 
 // "Qui hai già N segnalazioni aperte": feedback non chiusi sulla stessa route.
@@ -209,12 +238,14 @@ export async function feedbackDaVerificare(): Promise<FeedbackDaVerificare[]> {
   }));
 }
 
-export async function contaDaVerificare(): Promise<number> {
+// Feedback che aspettano Lorenzo (scheda "Per te" di /feedback, vedi
+// lib/feedback/fasi.ts): una domanda, una PR da approvare, una verifica.
+export async function contaPerTe(): Promise<number> {
   const admin = createAdminClient();
   const { count, error } = await admin
     .from("feedback")
     .select("id", { count: "exact", head: true })
-    .eq("stato", "da-verificare");
+    .or("stato.in.(serve-info,da-verificare),and(stato.eq.in-lavorazione,pr_number.not.is.null)");
   if (error) throw error;
   return count ?? 0;
 }

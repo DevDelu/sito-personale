@@ -37,7 +37,7 @@ export default async function FeedbackPage() {
 
       <div className="hidden flex-col gap-1 md:flex">
         <h1 className="font-display text-2xl font-semibold tracking-tight">I miei feedback</h1>
-        <p className="text-sm text-muted">Cosa hai segnalato, a che punto è, cosa aspetta una tua conferma.</p>
+        <p className="text-sm text-muted">Cosa hai scritto, a che punto è e cosa aspetta te: una risposta, una PR da approvare o una verifica.</p>
       </div>
 
       {nonConfigurato ? (

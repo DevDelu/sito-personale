@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronRight, Crosshair, X } from "lucide-react";
 import { Sheet } from "@/components/ui/Sheet";
 import { SegmentedPicker } from "@/components/ui/SegmentedControl";
+import { useWakeLock } from "@/hooks/useWakeLock";
 import { registraFocusCampoFeedback } from "@/lib/feedback/bus";
 import { FEEDBACK_TESTO_MAX, type FeedbackTipo } from "@/lib/feedback/types";
 import type { FeedbackBreve } from "@/lib/feedback/queries";
@@ -61,9 +62,16 @@ export function FeedbackSheet({
   const campo = useRef<HTMLTextAreaElement>(null);
   const vuoto = bozza.testo.trim().length === 0;
   const puoInviare = riapertura || !vuoto;
+  // Dettatura vocale: senza tocchi iOS spegne lo schermo a metà frase e la
+  // dettatura si interrompe. L'effetto copre desktop/Android; su iOS la
+  // richiesta deve partire da un gesto, quindi anche al tocco del campo.
+  const { requestNow: tieniSchermoAcceso } = useWakeLock(true);
 
   useEffect(() => {
-    registraFocusCampoFeedback(() => campo.current?.focus({ preventScroll: true }));
+    registraFocusCampoFeedback(() => {
+      campo.current?.focus({ preventScroll: true });
+      void tieniSchermoAcceso();
+    });
     const el = campo.current;
     return () => {
       registraFocusCampoFeedback(null);
@@ -71,7 +79,7 @@ export function FeedbackSheet({
       // mentre ha il focus può lasciare la pagina scrollata/spostata.
       el?.blur();
     };
-  }, []);
+  }, [tieniSchermoAcceso]);
 
   function invia() {
     if (puoInviare) onInvia();
@@ -176,6 +184,7 @@ export function FeedbackSheet({
             maxLength={FEEDBACK_TESTO_MAX}
             value={bozza.testo}
             onChange={(e) => onBozza({ ...bozza, testo: e.target.value })}
+            onPointerDown={() => void tieniSchermoAcceso()}
             onKeyDown={(e) => {
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
