@@ -291,8 +291,10 @@ ancora?" (facoltativo, diventa nota). Regole in `lib/feedback/regole-verifica.ts
 sessione, mai in `/allenamenti/sessione/*`, con un campo in focus o sopra uno Sheet; sparisce
 dopo 6 s. Solo owner (il tester non lo vede). Nessuna chiusura automatica.
 
-Pagina **`/feedback`** (da `/altro`, con contatore dei da verificare, e dalla sidebar desktop):
-Aperti / Da verificare / Chiusi, `serve-info` in cima, card con area leggibile ed età, Sheet di
+Pagina **`/feedback`** (da `/altro`, con contatore di quelli che aspettano Lorenzo, e dalla sidebar
+desktop): schede **Per te** (domanda dell'agente, PR da approvare = `in-lavorazione` con PR, da
+verificare) / In corso / Chiusi, percorso a 5 passi e frase "Adesso" per ogni feedback
+(`lib/feedback/fasi.ts`, testata), testo integrale, card con area leggibile ed età, Sheet di
 dettaglio con contesto, "Vai al punto", timeline, link issue/PR e azioni; card riepilogo (contatori,
 tempo medio fino a `verificato`, tasso di riapertura).
 
@@ -312,6 +314,31 @@ dell'entità e testi originali restano in Supabase. Ogni parafrasi passa da
 `.github/scripts/privacy.mjs` (importi, valute, date, email, numeri lunghi, 6+ parole copiate →
 testo generico che rimanda a Supabase). Idempotente: il marcatore `<!-- feedback-id -->` evita
 doppioni. Nelle notti senza testi da parafrasare Claude non parte (niente quota).
+
+Se Claude non riesce a parafrasare (es. `CLAUDE_CODE_OAUTH_TOKEN` scaduto) le issue escono col corpo
+generico e il job diventa **rosso** (email di GitHub), non più verde in silenzio.
+
+#### Sviluppatore notturno (feedback → PR)
+
+Le issue sono solo il registro pubblico: **chi sistema i feedback legge il testo originale da
+Supabase**, mai la parafrasi. `scripts/feedback.mjs` (`elenco`, `mostra <id>` con tutta la storia,
+`stato`, `domanda`) chiama `GET /api/feedback/agente` (`?stato=tutti`, `?id=<uuid>` con eventi) con
+`RADAR_URL` + `FEEDBACK_AGENTE_SECRET`: in una sessione Claude Code con queste variabili "cosa ho
+scritto nei feedback?" ha una risposta esatta. Stampa testi privati: mai in Actions.
+
+Procedura in `.claude/skills/sviluppatore-feedback/SKILL.md`, eseguita da una **Routine di Claude Code**
+(sessione cloud privata, ogni notte dopo il job delle issue, avviabile anche a mano da claude.ai/code →
+Routines → Run now): coda riaperti → presi in carico → nuovi; per ognuno o una domanda
+(`serve-info`) o una PR da `main` con `Feedback-id: <uuid>` e `Nota per Lorenzo:` nel corpo (più
+`Closes #N` se c'è la issue). `feedback-pr.yml` collega la PR al feedback dalle righe `Feedback-id`
+(precedenza sulle issue chiuse, così funziona anche per feedback lavorati di giorno, senza issue). Lorenzo
+approva facendo merge; dopo il deploy il feedback è "Da verificare". Mai merge né stati di Lorenzo.
+
+Testi lunghi (dettatura): 5000 caratteri per feedback e note (migration `034_feedback_testo_lungo.sql`);
+senza 034 `inserisciFeedback()`/`aggiungiEvento()` spezzano il testo invece di perderlo
+(`lib/feedback/testo.ts`). Con lo sheet di feedback (e i campi del dettaglio) aperti lo schermo resta
+acceso (`useWakeLock`, richiesto anche al tocco del campo perché iOS lo vuole da un gesto): la dettatura
+non si interrompe più per il blocco automatico.
 
 Priorità e convenzioni per gli agenti che sistemano i feedback: `docs/agenti-da-fare.md`.
 

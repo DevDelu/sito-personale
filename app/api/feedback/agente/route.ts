@@ -4,7 +4,9 @@ import {
   aggiungiEventoA,
   cambiaStato,
   eventiDaRiportare,
+  feedbackCompleto,
   isTabellaMancante,
+  listaFeedback,
   listaFeedbackPerStato,
   segnaRiportati,
 } from "@/lib/feedback/queries";
@@ -49,8 +51,13 @@ function controlla(request: Request) {
 }
 
 // GET /api/feedback/agente?stato=nuovo            → feedback in quello stato
+// GET /api/feedback/agente?stato=tutti            → tutti (ultimi 300)
+// GET /api/feedback/agente?id=<uuid>              → un feedback + tutta la
+//                                                   sua storia (note, risposte)
 // GET /api/feedback/agente?eventi=da-riportare    → note/risposte di Lorenzo
 //                                                   da riportare nella issue
+// Il testo è sempre quello originale, completo: chi ha il secret legge
+// esattamente cosa ha scritto Lorenzo (scripts/feedback.mjs).
 export async function GET(request: Request) {
   const negato = controlla(request);
   if (negato) return negato;
@@ -59,6 +66,16 @@ export async function GET(request: Request) {
   try {
     if (params.get("eventi") === "da-riportare") {
       return NextResponse.json({ eventi: await eventiDaRiportare() });
+    }
+    const id = params.get("id");
+    if (id !== null) {
+      if (!isUuid(id)) return NextResponse.json({ error: "Id non valido." }, { status: 400 });
+      const completo = await feedbackCompleto(id);
+      if (!completo) return NextResponse.json({ error: "Feedback non trovato." }, { status: 404 });
+      return NextResponse.json(completo);
+    }
+    if (params.get("stato") === "tutti") {
+      return NextResponse.json({ feedback: await listaFeedback() });
     }
     const stato = params.get("stato") ?? "nuovo";
     if (!FEEDBACK_STATI.includes(stato as FeedbackStato)) {

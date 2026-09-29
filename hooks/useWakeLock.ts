@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 type WakeLockNavigator = Navigator & {
   wakeLock?: { request: (type: "screen") => Promise<{ release: () => Promise<void> }> };
@@ -19,7 +19,9 @@ export function useWakeLock(active: boolean) {
   const requestingRef = useRef(false);
   const cancelledRef = useRef(false);
 
-  async function request() {
+  // Stabile (usa solo ref): i componenti possono metterla nelle dipendenze
+  // dei loro effetti senza riattivarli a ogni render.
+  const request = useCallback(async () => {
     if (requestingRef.current || lockRef.current) return;
     requestingRef.current = true;
     try {
@@ -36,7 +38,7 @@ export function useWakeLock(active: boolean) {
     } finally {
       requestingRef.current = false;
     }
-  }
+  }, []);
 
   useEffect(() => {
     if (!active) return;
@@ -55,7 +57,7 @@ export function useWakeLock(active: boolean) {
       lockRef.current?.release().catch(() => {});
       lockRef.current = null;
     };
-  }, [active]);
+  }, [active, request]);
 
   // Esposto per essere chiamato direttamente dentro un handler di click:
   // iOS Safari richiede che navigator.wakeLock.request() parta nello stesso

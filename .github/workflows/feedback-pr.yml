@@ -1,6 +1,8 @@
-# Collega le PR ai feedback di Lorenzo (vedi CLAUDE.md > "Feedback"), per
-# ogni issue `dal-lorenzo` che la PR chiude ("Closes #N" o collegata dalla
-# sidebar):
+# Collega le PR ai feedback di Lorenzo (vedi CLAUDE.md > "Feedback"). Il
+# feedback si riconosce dalle righe "Feedback-id: <uuid>" nel corpo della PR
+# (le scrive lo sviluppatore notturno, anche per feedback senza issue); se
+# non ce ne sono, da ogni issue `dal-lorenzo` che la PR chiude ("Closes #N"
+# o collegata dalla sidebar):
 # - PR aperta (anche bozza) → feedback `in-lavorazione` con il numero della PR;
 # - PR mergiata → resta `in-lavorazione` (diventa `da-verificare` solo dopo
 #   il deploy di produzione, feedback-deploy.yml) e riceve la `nota-fix`:
@@ -56,7 +58,13 @@ jobs:
             const issue = risposta.repository.pullRequest.closingIssuesReferences.nodes
               .filter((i) => i.labels.nodes.some((l) => l.name === "dal-lorenzo"))
               .map((i) => i.number);
-            if (issue.length === 0) return;
+            // Le righe Feedback-id hanno la precedenza: con entrambe la
+            // nota-fix arriverebbe due volte allo stesso feedback.
+            const ids = [...(pull.body ?? "").matchAll(/^\s*(?:[-*]\s*)?Feedback-id\s*:\s*`?([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})`?\s*$/gim)].map((m) => m[1].toLowerCase());
+            const bersagli = ids.length
+              ? ids.map((id) => ({ chiave: { id } }))
+              : issue.map((n) => ({ chiave: { issue_number: n } }));
+            if (bersagli.length === 0) return;
 
             async function radar(body) {
               const res = await fetch(`${RADAR_URL.replace(/\/$/, "")}/api/feedback/agente`, {
@@ -66,26 +74,27 @@ jobs:
               });
               // 409: transizione non valida per lo stato attuale (es. il
               // feedback è già da verificare): nulla da fare, non è un errore.
+              const nome = body.id ? `Feedback ${body.id}` : `Issue #${body.issue_number}`;
               if (res.status === 409) {
-                core.notice(`Issue #${body.issue_number}: ${(await res.json()).error}`);
+                core.notice(`${nome}: ${(await res.json()).error}`);
                 return;
               }
-              if (!res.ok) throw new Error(`Issue #${body.issue_number}: ${res.status} ${await res.text()}`);
-              core.info(`Issue #${body.issue_number}: ${JSON.stringify(await res.json())}`);
+              if (!res.ok) throw new Error(`${nome}: ${res.status} ${await res.text()}`);
+              core.info(`${nome}: ${JSON.stringify(await res.json())}`);
             }
 
             // Una frase per Lorenzo, dal corpo della PR (testo non loggato).
             const nota = /^\s*(?:[-*]\s*)?(?:\*\*)?Nota per Lorenzo(?:\*\*)?\s*:\s*(?:\*\*)?\s*(.+?)\s*$/im.exec(pull.body ?? "")?.[1];
 
-            for (const numero of issue) {
+            for (const { chiave } of bersagli) {
               if (context.payload.action !== "closed") {
-                await radar({ issue_number: numero, stato: "in-lavorazione", pr_number: pr });
+                await radar({ ...chiave, stato: "in-lavorazione", pr_number: pr });
               } else if (pull.merged) {
                 // Idempotente: copre anche una PR aperta prima di questo workflow.
-                await radar({ issue_number: numero, stato: "in-lavorazione", pr_number: pr });
-                if (nota) await radar({ issue_number: numero, evento: "nota-fix", testo: nota });
+                await radar({ ...chiave, stato: "in-lavorazione", pr_number: pr });
+                if (nota) await radar({ ...chiave, evento: "nota-fix", testo: nota });
                 else core.notice(`PR #${pr}: manca la riga "Nota per Lorenzo:" nel corpo.`);
               } else {
-                await radar({ issue_number: numero, stato: "preso-in-carico" });
+                await radar({ ...chiave, stato: "preso-in-carico" });
               }
             }
