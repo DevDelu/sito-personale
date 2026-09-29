@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ChevronRight, Plus } from "lucide-react";
 import { Sheet } from "@/components/ui/Sheet";
-import { categoryColor } from "@/lib/category-style";
+import { useColoriCategorie } from "@/hooks/useColoriCategorie";
 import { useCategoriaMutations } from "@/hooks/useCategoriaMutations";
 import type { Categoria, TipoCategoria } from "@/lib/types";
 
@@ -33,6 +33,7 @@ export function CategoriaPickerSheet({
   const [nuovaNome, setNuovaNome] = useState("");
   const [nuovaErrore, setNuovaErrore] = useState<string | null>(null);
   const { creaCategoria, pending: creandoCategoria } = useCategoriaMutations();
+  const coloreDi = useColoriCategorie(categorie);
 
   const categorieFiltrate = categorie.filter((c) => c.tipo === tipo);
   const selezionata = categorieFiltrate.find((c) => c.id === value);
@@ -77,7 +78,7 @@ export function CategoriaPickerSheet({
           <span className="flex min-w-0 items-center gap-2">
             <span
               className="h-2.5 w-2.5 shrink-0 rounded-full"
-              style={{ backgroundColor: selezionata.colore || categoryColor(selezionata.nome) }}
+              style={{ backgroundColor: coloreDi(selezionata.nome, selezionata.colore) }}
               aria-hidden
             />
             <span className="truncate">{selezionata.nome}</span>
@@ -98,7 +99,7 @@ export function CategoriaPickerSheet({
             ) : (
               <div className="grid grid-cols-3 gap-2">
                 {categorieFiltrate.map((c) => {
-                  const colore = c.colore || categoryColor(c.nome);
+                  const colore = coloreDi(c.nome, c.colore);
                   const attiva = c.id === value;
                   return (
                     <button

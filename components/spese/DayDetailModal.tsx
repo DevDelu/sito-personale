@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { CategoryBadge } from "@/components/category-badge";
+import { useColoriCategorie } from "@/hooks/useColoriCategorie";
 import { Sheet } from "@/components/ui/Sheet";
 import { formatCurrency, formatFonte } from "@/lib/spese-utils";
 import { TransactionDetailModal } from "./TransactionDetailModal";
@@ -38,6 +39,7 @@ export function DayDetailModal({
   onChanged: () => void;
 }) {
   const [dettaglio, setDettaglio] = useState<TransactionListItem | null>(null);
+  const coloreDi = useColoriCategorie(categorie);
 
   function handleChanged() {
     onChanged();
@@ -74,7 +76,7 @@ export function DayDetailModal({
                     >
                       {item.tipo === "entrata" ? "Entrata" : "Uscita"}
                     </span>
-                    <CategoryBadge nome={item.categoria_nome} colore={item.categoria_colore} />
+                    <CategoryBadge nome={item.categoria_nome} colore={coloreDi(item.categoria_nome, item.categoria_colore)} />
                     <span className="min-w-0 flex-1 truncate text-foreground">
                       {item.titolo ?? item.descrizione ?? "—"}
                     </span>

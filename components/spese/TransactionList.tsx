@@ -58,10 +58,13 @@ export function TransactionList({
   items,
   emptyLabel = "Nessuna transazione.",
   onItemClick,
+  coloreDi,
 }: {
   items: TransactionListItem[];
   emptyLabel?: string;
   onItemClick?: (item: TransactionListItem) => void;
+  // Da useColoriCategorie: stesso colore dei grafici.
+  coloreDi?: (nome: string | null, salvato: string | null) => string;
 }) {
   if (items.length === 0) {
     return <p className="text-xs text-muted">{emptyLabel}</p>;
@@ -70,7 +73,9 @@ export function TransactionList({
   return (
     <ul className="flex max-h-56 flex-col gap-1.5 overflow-y-auto">
       {items.map((item) => {
-        const colore = item.categoria_colore || categoryColor(item.categoria_nome);
+        const colore = coloreDi
+          ? coloreDi(item.categoria_nome, item.categoria_colore)
+          : item.categoria_colore || categoryColor(item.categoria_nome);
         const rowContent = (
           <>
             <span

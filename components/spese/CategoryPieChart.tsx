@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { resolveCategoryColor } from "@/lib/category-style";
 import { mappaColoriCategorie } from "@/lib/category-palette";
+import { useColoriCategorie } from "@/hooks/useColoriCategorie";
 import { categorieOrdinatePerTotale, formatCurrency, type CategoriaTotale } from "@/lib/spese-utils";
 import {
   TransactionList,
@@ -165,6 +166,7 @@ export function CategoryPieChart({
   // Un colore diverso per ogni fetta, calcolato su tutte le categorie (non
   // solo quelle nel periodo) così resta stabile cambiando filtri.
   const colori = useMemo(() => mappaColoriCategorie(categorie), [categorie]);
+  const coloreDiCategoria = useColoriCategorie(categorie);
   const coloreDi = (c: CategoriaTotale) => colori.get(c.nome) ?? resolveCategoryColor(c.nome, c.colore);
 
   function handleSliceClick(index: number) {
@@ -282,12 +284,12 @@ export function CategoryPieChart({
               {gruppi.map((gruppo) => (
                 <div key={gruppo.label} className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium text-muted">{gruppo.label}</span>
-                  <TransactionList items={gruppo.items} onItemClick={setDettaglio} />
+                  <TransactionList items={gruppo.items} onItemClick={setDettaglio} coloreDi={coloreDiCategoria} />
                 </div>
               ))}
             </div>
           ) : (
-            <TransactionList items={itemsSelezionati} onItemClick={setDettaglio} />
+            <TransactionList items={itemsSelezionati} onItemClick={setDettaglio} coloreDi={coloreDiCategoria} />
           )}
         </div>
       )}
