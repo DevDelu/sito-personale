@@ -207,7 +207,7 @@ layout desktop dell'area privata non cambiano.
 
 ### Feedback (Radar, POTENZIAMENTO 1 + ciclo chiuso)
 
-Lorenzo lascia un feedback in meno di 5 secondi, senza ingombro visivo permanente. Tre accessi,
+Lorenzo lascia un feedback in meno di 5 secondi, senza ingombro visivo permanente. Più accessi,
 tutti verso lo stesso sheet (`components/feedback/FeedbackSheet.tsx`, ospitato da
 `FeedbackProvider` nel layout privato e aperto via `apriFeedback()` in `lib/feedback/bus.ts`):
 - **Pressione lunga (~500 ms) sulla tab già attiva** della tab bar (`hooks/usePressioneLunga.ts`).
@@ -218,7 +218,11 @@ tutti verso lo stesso sheet (`components/feedback/FeedbackSheet.tsx`, ospitato d
   scatta su `errore_api` (risposte 5xx da `/api/*`, via `fetch` osservata) ed `errore_js`; gli
   altri tipi arriveranno col tracciamento d'uso. Regole anti-invadenza pure e testate in
   `lib/feedback/regole-suggerimento.ts`.
-- **Riserva**: pulsante flottante in Spese (`FeedbackFAB`, origine `pulsante`, migration 032), riga in `/altro` (allega l'ultima pagina visitata prima di Altro), voce "Feedback"
+- **Pulsante su ogni pagina** (`FeedbackPulsante`, montato da `FeedbackProvider`, origine `pulsante`,
+  migration 032): il feedback prende come riferimento la pagina in cui è toccato. Mobile in basso a
+  sinistra sopra la tab bar (i FAB delle pagine stanno a destra), desktop in basso a destra; nascosto
+  con sheet/avvisi aperti e in `/allenamenti/sessione/*`.
+- **Riserva**: riga in `/altro` (allega l'ultima pagina visitata prima di Altro), voce "Feedback"
   in fondo alla sidebar desktop, scorciatoia `F` senza campi a fuoco.
 
 Su mobile lo sheet scende **dall'alto** (`<Sheet posizione="alto">`): ancorato in basso veniva

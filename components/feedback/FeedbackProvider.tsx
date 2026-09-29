@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { CheckCircle2, MessageCircle } from "lucide-react";
 import { Toast } from "@/components/toast";
 import { FeedbackSheet, type BozzaFeedback } from "@/components/feedback/FeedbackSheet";
+import { FeedbackPulsante } from "@/components/feedback/FeedbackAccessi";
 import { segnaNonRisolto, segnaVerificato } from "@/app/(private)/feedback/actions";
 import {
   accodaFeedback,
@@ -465,8 +466,14 @@ export function FeedbackProvider({ owner }: { owner: boolean }) {
   const inBasso =
     "pointer-events-none fixed inset-x-0 bottom-[calc(var(--app-tabbar-height)+max(env(safe-area-inset-bottom),20px)+0.75rem)] z-40 flex justify-center px-4 md:bottom-6";
 
+  // Il pulsante sparisce mentre lo sheet, la barra "Tocca l'elemento" o un
+  // avviso in basso sono visibili, e durante la sessione di allenamento.
+  const mostraPulsante = !apertura && !suggerimento && !verifica && !inSessioneAllenamento(pathname);
+
   return (
     <>
+      {mostraPulsante && <FeedbackPulsante />}
+
       {apertura && !puntando && (
         <FeedbackSheet
           bozza={bozza}
