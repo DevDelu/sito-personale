@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { etichettaSenzaCifre, percentualeScroll, ruoloElemento, tipoEntita, validaEntita, validaPunto } from "./punto.ts";
+import { areaPiuVicina, etichettaSenzaCifre, percentualeScroll, ruoloElemento, tipoEntita, validaEntita, validaPunto } from "./punto.ts";
 import { isAreaFeedback, etichettaArea, etichettaAreaBreve } from "./aree.ts";
 
 test("etichetta senza cifre: niente importi, max 60 caratteri", () => {
@@ -48,4 +48,18 @@ test("aree: etichette leggibili", () => {
   assert.equal(isAreaFeedback("inesistente"), false);
   assert.equal(etichettaArea("spese.gestione.tabella"), "Spese › Gestione › Tabella movimenti");
   assert.equal(etichettaAreaBreve("spese.gestione.tabella"), "Tabella movimenti");
+});
+
+test("area più vicina al centro quando il centro cade tra due sezioni", () => {
+  const vp = { width: 400, height: 800 };
+  const candidati = [
+    { area: "investimenti.overview.riepilogo", rettangoli: [{ left: 16, top: 100, right: 384, bottom: 380 }] },
+    { area: "investimenti.overview.grafici", rettangoli: [{ left: 16, top: 410, right: 384, bottom: 700 }] },
+    { area: "investimenti.posizioni", rettangoli: [{ left: 16, top: 900, right: 384, bottom: 1400 }] },
+  ];
+  // Centro (200, 400): 20px dal riepilogo, 10px dai grafici.
+  assert.equal(areaPiuVicina(candidati, 200, 400, vp), "investimenti.overview.grafici");
+  // Solo aree fuori schermo o vuote: nessuna.
+  assert.equal(areaPiuVicina([candidati[2]], 200, 400, vp), null);
+  assert.equal(areaPiuVicina([{ area: "x.y", rettangoli: [{ left: 0, top: 0, right: 0, bottom: 0 }] }], 200, 400, vp), null);
 });

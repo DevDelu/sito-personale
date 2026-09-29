@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
 import { CategoryBadge } from "@/components/category-badge";
-import { categoryColor } from "@/lib/category-style";
+import { useColoriCategorie } from "@/hooks/useColoriCategorie";
 import { formatCurrency } from "@/lib/spese-utils";
 import { useExpenseMutations, type MovimentoPatch } from "@/hooks/useExpenseMutations";
 import {
@@ -51,6 +51,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
   const [editing, setEditing] = useState<Movimento | null>(null);
   const [deleting, setDeleting] = useState<Movimento | null>(null);
   const [categorieList, setCategorieList] = useState(categorie);
+  const coloreDi = useColoriCategorie(categorieList);
   const [prevCategorie, setPrevCategorie] = useState(categorie);
   const [selezionati, setSelezionati] = useState<Set<string>>(new Set());
   const [modalitaSelezione, setModalitaSelezione] = useState(false);
@@ -178,7 +179,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
                   {gruppo.righe.map((r) => {
                     const key = rowKey(r);
                     const selezionata = selezionati.has(key);
-                    const colore = r.categoria_colore || categoryColor(r.categoria_nome);
+                    const colore = coloreDi(r.categoria_nome, r.categoria_colore);
                     return (
                       <button
                         key={key}
@@ -333,7 +334,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
                       {extra && <div className="text-xs text-muted">{extra}</div>}
                     </td>
                     <td className="px-3 py-2">
-                      <CategoryBadge nome={r.categoria_nome} colore={r.categoria_colore} />
+                      <CategoryBadge nome={r.categoria_nome} colore={coloreDi(r.categoria_nome, r.categoria_colore)} />
                     </td>
                     <td className="px-3 py-2 text-muted capitalize">{r.tipo}</td>
                     <td className="px-3 py-2 text-xs text-muted/70">{r.fonte}</td>

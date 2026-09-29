@@ -2,7 +2,7 @@
 
 import { isAreaFeedback } from "./aree";
 import { paginaTemplate } from "./pagina";
-import { etichettaSenzaCifre, percentualeScroll, ruoloElemento, validaEntita } from "./punto";
+import { areaPiuVicina, etichettaSenzaCifre, percentualeScroll, ruoloElemento, validaEntita, type Rettangolo } from "./punto";
 import type { FeedbackPunto } from "./types";
 
 // Cattura automatica del contesto all'apertura dello sheet di feedback, e
@@ -31,9 +31,27 @@ function entita(el: Element | null): string | null {
   return validaEntita(el?.closest(SEL_ENTITA)?.getAttribute("data-fb-entita"));
 }
 
+// Riquadri di un'area: i wrapper `display: contents` non hanno un box
+// proprio, contano quelli dei figli.
+function rettangoli(el: Element): Rettangolo[] {
+  if (el.getClientRects().length > 0) return [el.getBoundingClientRect()];
+  return Array.from(el.children).flatMap(rettangoli);
+}
+
+function areaVicinaAlCentro(): string | null {
+  const candidati = Array.from(document.querySelectorAll(SEL_AREA))
+    .filter((el) => !el.closest(".modal-overlay"))
+    .map((el) => ({ area: el.getAttribute("data-fb-area") ?? "", rettangoli: rettangoli(el) }))
+    .filter((c) => isAreaFeedback(c.area));
+  return areaPiuVicina(candidati, window.innerWidth / 2, window.innerHeight / 2, {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+}
+
 // Area: il modale/Sheet aperto più in alto se c'è (con la sua entità, sul
-// pannello o sull'elemento al centro del pannello), altrimenti l'area più
-// visibile al centro dello schermo.
+// pannello o sull'elemento al centro del pannello), altrimenti l'area al
+// centro dello schermo o, se lì c'è uno spazio vuoto, la più vicina.
 export function catturaContesto(): ContestoCatturato {
   // Solo pannelli visibili (un modale nascosto con CSS non conta).
   const pannelli = Array.from(document.querySelectorAll(SEL_PANNELLO)).filter((p) => p.getClientRects().length > 0);
@@ -47,7 +65,7 @@ export function catturaContesto(): ContestoCatturato {
     e = validaEntita(pannello.getAttribute("data-fb-entita")) ?? (pannello.contains(centro) ? entita(centro) : null);
   } else {
     const centro = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
-    a = area(centro);
+    a = area(centro) ?? areaVicinaAlCentro();
     e = entita(centro);
   }
   return {

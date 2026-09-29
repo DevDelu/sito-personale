@@ -85,3 +85,33 @@ export function percentualeScroll(scrollY: number, altezzaPagina: number, altezz
   if (scorribile <= 0) return 0;
   return Math.round(Math.min(100, Math.max(0, (scrollY / scorribile) * 100)));
 }
+
+export type Rettangolo = { left: number; top: number; right: number; bottom: number };
+
+// Distanza (px) da un punto a un rettangolo: 0 se il punto è dentro.
+function distanza(x: number, y: number, r: Rettangolo): number {
+  const dx = Math.max(r.left - x, 0, x - r.right);
+  const dy = Math.max(r.top - y, 0, y - r.bottom);
+  return Math.hypot(dx, dy);
+}
+
+// Riserva quando al centro dello schermo non c'è nessuna area (spazio vuoto
+// tra due sezioni): l'area con un riquadro visibile più vicino al centro.
+// Riquadri fuori dal viewport o vuoti non contano.
+export function areaPiuVicina(
+  candidati: { area: string; rettangoli: Rettangolo[] }[],
+  x: number,
+  y: number,
+  viewport: { width: number; height: number }
+): string | null {
+  let migliore: { area: string; d: number } | null = null;
+  for (const c of candidati) {
+    for (const r of c.rettangoli) {
+      const visibile = r.right > r.left && r.bottom > r.top && r.bottom > 0 && r.top < viewport.height && r.right > 0 && r.left < viewport.width;
+      if (!visibile) continue;
+      const d = distanza(x, y, r);
+      if (!migliore || d < migliore.d) migliore = { area: c.area, d };
+    }
+  }
+  return migliore?.area ?? null;
+}

@@ -59,15 +59,29 @@ jobs:
         continue-on-error: true
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        # L'output di Claude contiene ragionamenti sul testo privato: finisce
+        # in un file che non viene mai stampato né caricato, e nel log va solo
+        # la categoria dell'errore (.github/scripts/diagnosi-claude.mjs).
         run: |
-          npm install -g @anthropic-ai/claude-code >/dev/null 2>&1
-          # Output rediretto: contiene ragionamenti sul testo privato.
-          claude -p "$(cat .github/scripts/prompt-feedback-notte.md)" \
-            --allowedTools "Read,Glob,Grep,Write" \
-            --disallowedTools "Bash,WebFetch,WebSearch" \
-            --max-turns 40 > /dev/null 2>&1 \
-            && echo "Claude ha terminato." \
-            || echo "Claude non ha terminato: le issue avranno il corpo generico."
+          if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "::warning::CLAUDE_CODE_OAUTH_TOKEN mancante: le issue avranno il corpo generico."
+          elif ! npm install -g @anthropic-ai/claude-code >/dev/null 2>&1 || ! command -v claude >/dev/null; then
+            echo "::warning::Installazione di Claude Code fallita: le issue avranno il corpo generico."
+          else
+            set +e
+            claude -p "$(cat .github/scripts/prompt-feedback-notte.md)" \
+              --allowedTools "Read,Glob,Grep,Write" \
+              --disallowedTools "Bash,WebFetch,WebSearch" \
+              --max-turns 40 > "$RUNNER_TEMP/claude.log" 2>&1
+            esito=$?
+            set -e
+            if [ "$esito" -eq 0 ]; then
+              echo "Claude ha terminato."
+            else
+              echo "::warning::Claude non ha terminato ($(node .github/scripts/diagnosi-claude.mjs "$RUNNER_TEMP/claude.log" "$esito")): le issue avranno il corpo generico."
+            fi
+            rm -f "$RUNNER_TEMP/claude.log"
+          fi
           test -f .radar-tmp/proposte.json && echo "proposte.json presente." || echo "proposte.json assente."
 
       - name: Crea/riapre le issue, riporta le note e aggiorna lo stato

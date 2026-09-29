@@ -4,7 +4,6 @@ import { Overview } from "./overview";
 import { Toast } from "@/components/toast";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { FeedbackFAB } from "@/components/feedback/FeedbackAccessi";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
 
 // Le voci Overview/Gestione/Importa del segmented control mobile vengono da
@@ -64,8 +63,6 @@ export default async function SpesePage({
       </div>
 
       <Overview spese={spese} categorie={categorie} depositi={depositi} range={range} />
-
-      <FeedbackFAB />
     </div>
   );
 }

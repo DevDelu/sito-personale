@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Pencil, Trash2, X } from "lucide-react";
 import { CategoryBadge } from "@/components/category-badge";
+import { useColoriCategorie } from "@/hooks/useColoriCategorie";
 import { formatCurrency } from "@/lib/spese-utils";
 import { useExpenseMutations } from "@/hooks/useExpenseMutations";
 import { useMovimentoForm } from "@/hooks/useMovimentoForm";
@@ -31,6 +32,7 @@ export function TransactionDetailModal({
   const [confermaEliminazione, setConfermaEliminazione] = useState(false);
   const { updateExpense, deleteExpense, pending, error } = useExpenseMutations();
   const form = useMovimentoForm(transazione, categorie);
+  const coloreDi = useColoriCategorie(categorie);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -87,7 +89,7 @@ export function TransactionDetailModal({
               <Row
                 label="Categoria"
                 value={
-                  <CategoryBadge nome={transazione.categoria_nome} colore={transazione.categoria_colore} />
+                  <CategoryBadge nome={transazione.categoria_nome} colore={coloreDi(transazione.categoria_nome, transazione.categoria_colore)} />
                 }
               />
               {transazione.descrizione && <Row label="Descrizione" value={transazione.descrizione} />}
