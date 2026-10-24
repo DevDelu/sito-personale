@@ -42,4 +42,5 @@ Salta le issue che hanno già una PR aperta collegata
    `node .github/scripts/privacy.mjs <file>`.
 7. Torna a `main` pulito prima della issue successiva. Una PR per issue.
 
-Mai merge, mai approvare, mai push su `main`.
+Mai merge da questa skill (lo fa il giro del team, fase 5, solo per le PR a rischio basso), mai
+approvare, mai push su `main`.

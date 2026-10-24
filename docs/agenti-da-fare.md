@@ -16,7 +16,14 @@ un punto è fatto.
 - [ ] **Giro notturno (priorità massima)**: dal 30/09 la routine notturna si fermava dopo ~20
   secondi perché nell'ambiente cloud mancano `RADAR_URL` e `FEEDBACK_AGENTE_SECRET`. Senza, i
   feedback restano fermi (le altre fasi del giro ora girano comunque). Per il tester esploratore
-  aggiungere anche `TESTER_EMAIL`, `TESTER_PASSWORD`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
+  aggiungere anche `TESTER_EMAIL`, `TESTER_PASSWORD`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`; per la
+  newsletter con screenshot `RESEND_API_KEY`, `RESEND_FROM_EMAIL` (stessi valori di Vercel) e
+  `NEWSLETTER_TO`.
+- [ ] **Rete dell'ambiente cloud**: l'ambiente di Claude Code blocca i siti fuori da una lista
+  (il 24/10 `lorenzo-de-luca.com` e `api.resend.com` non erano raggiungibili). Senza accesso, la
+  routine non può leggere i feedback, fare screenshot né mandare la newsletter. In claude.ai/code →
+  ambiente → Edit → accesso alla rete: aggiungere `lorenzo-de-luca.com`, `*.vercel.app`,
+  `*.supabase.co`, `api.resend.com` (o accesso completo).
 - [ ] **Sviluppatore notturno**: nell'ambiente cloud di Claude Code (claude.ai/code → menu
   dell'ambiente → Edit → variabili) aggiungere `RADAR_URL` e `FEEDBACK_AGENTE_SECRET`, stessi valori
   dei secret GitHub. Senza, la routine si ferma e lo dice.
@@ -41,9 +48,10 @@ un punto è fatto.
 - Sviluppatore notturno: Routine di Claude Code che segue `.claude/skills/sviluppatore-feedback/SKILL.md`
   (testo originale da Supabase via `scripts/feedback.mjs`, una PR per feedback, `Feedback-id` nel corpo).
 
-- **Team del giro notturno** (`.claude/skills/giro-notturno/SKILL.md`): una sola routine ogni
-  notte coordina manutenzione PR → feedback → issue → revisore/designer → tester, designer e
-  scout in parallelo → documentarista la domenica; chiude con il resoconto che arriva per email.
+- **Team in turni** (`.claude/skills/giro-notturno/SKILL.md`): una routine ogni 5 ore coordina
+  manutenzione PR → feedback → issue → revisione → merge delle PR a rischio basso con rollback →
+  tester, designer, prestazioni/sicurezza e scout in parallelo → documentarista la domenica →
+  newsletter con screenshot quando ci sono novità; chiude con il resoconto che arriva per email.
   Agenti in `.claude/agents/`, sviluppo issue in `.claude/skills/sviluppatore-issue/`.
 
 ## Convenzioni per chi sistema i feedback (sviluppatore notturno, anche futuro)

@@ -107,7 +107,7 @@ Se Lorenzo ti ha indicato feedback precisi, lavora solo quelli.
 
 ## 3. Regole
 
-- **Mai** fare merge, approvare PR, né impostare `verificato`, `scartato`,
+- **Mai** fare merge (lo fa solo il giro del team, fase 5, per le PR a rischio basso), approvare PR, né impostare `verificato`, `scartato`,
   `da-verificare` o `riaperto`: li decide Lorenzo o il sistema.
 - Mai stampare testi dei feedback in posti pubblici: issue, PR, commit,
   commenti GitHub, log di Actions. Il resoconto della sessione (privata) sì.

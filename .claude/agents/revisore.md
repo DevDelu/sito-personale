@@ -34,5 +34,8 @@ Problemi bloccanti: correggili con commit sullo stesso branch e push. Non blocca
 commento sulla PR (`gh api repos/DevDelu/sito-personale/issues/<N>/comments -f body=...`),
 breve e senza dati personali. Mai merge, mai approvare la PR.
 
-Rispondi con: esito (ok / sistemato / da rivedere da Lorenzo), cosa hai cambiato, rischi
-residui in una riga ciascuno.
+Classifica il rischio come in `.claude/skills/giro-notturno/SKILL.md` fase 4 (basso / alto):
+solo le PR a rischio basso vengono mergiate in automatico.
+
+Rispondi con: esito (ok / sistemato / da rivedere da Lorenzo), rischio (basso/alto e perché),
+cosa hai cambiato, rischi residui in una riga ciascuno.
