@@ -62,6 +62,12 @@ Se il prompt non dice il tipo, è il turno principale.
 ### 0. Preparazione
 - Repo nella sessione e clonato (`add_repo` owner `devdelu`, repo `sito-personale`, access
   `push`, poi il clone che ti indica). Leggi `CLAUDE.md` e `docs/lezioni-agenti.md`. `npm ci`.
+- Le routine girano nel progetto claude.ai, senza variabili d'ambiente proprie: se il prompt
+  della routine contiene un blocco `VARIABILI` (righe `NOME=valore`), scrivilo in un file nella
+  scratchpad (mai nel repo) e caricalo con `set -a; . <file>; set +a` in ogni comando che serve.
+  Sempre `export NODE_USE_ENV_PROXY=1`: senza, il `fetch` di Node non passa dal proxy di rete
+  della sessione e gli script (`scripts/feedback.mjs`, `scripts/newsletter.mjs`) falliscono.
+  **Mai** stampare, citare o scrivere i valori in issue, PR, commit, log o resoconto.
 - Annota quali variabili ci sono (solo presente/assente, mai il valore): `RADAR_URL`,
   `FEEDBACK_AGENTE_SECRET`, `TESTER_EMAIL`, `TESTER_PASSWORD`, `SUPABASE_URL`,
   `SUPABASE_ANON_KEY`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NEWSLETTER_TO`. Quelle mancanti
