@@ -40,12 +40,12 @@ settimana per gli agenti, il resto della quota settimanale resta a Lorenzo.
 | Turno | Quando | Durata | Fasi |
 |---|---|---|---|
 | **Principale** | ogni notte 02:47 | 2h | tutte (0-8); la domenica anche la 7 |
-| **Qualità** | ogni mattina 07:47 | 1h30 | 0, 1, 4, 5, 6 **senza tester** (prestazioni e sicurezza, designer, scout), poi 3 sulle issue `dal-collaudo` e su quelle appena aperte; niente fase 2 né newsletter: questo turno non ha le chiavi |
+| **Qualità** | ogni mattina 07:47 | 1h30 | 0, 1, 4, 5, 6 (tester sempre, più prestazioni/sicurezza o designer a rotazione), poi 3 sulle issue `dal-tester`/`dal-collaudo` appena aperte, 8 (al massimo una newsletter al giorno) |
 | **Manutenzione** | lun-ven 12:47 | 1h | 0, 1, 4, 5, poi 3 solo con issue `pronta` di effort S; niente fase 6, niente newsletter |
 
 Se il prompt non dice il tipo, è il turno principale.
-Solo il turno principale ha il blocco `VARIABILI`: il tester esploratore e la newsletter girano lì,
-ogni notte (il tester insieme agli altri due agenti della rotazione).
+Tutti e tre i turni hanno il blocco `VARIABILI` nel prompt (dal 24/10). Se manca, salta le fasi che
+ne hanno bisogno e scrivilo in cima al resoconto.
 
 ## Tempo e quota
 
