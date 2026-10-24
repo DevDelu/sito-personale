@@ -5,6 +5,7 @@ un punto è fatto.
 
 ## Passi manuali di Lorenzo (aperti)
 
+- [x] Utente tester creato in Supabase e `TESTER_EMAIL` su Vercel (24/10).
 - [ ] **Secret GitHub del tester**: in Settings → Secrets and variables → Actions, scheda
   **Secrets** (non Variables, non Environments), sotto "Repository secrets" devono esserci:
   `TESTER_EMAIL`, `TESTER_PASSWORD`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`. Il 27/09 il collaudo li
