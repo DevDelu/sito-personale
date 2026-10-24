@@ -29,7 +29,7 @@ un punto è fatto.
   dei secret GitHub. Senza, la routine si ferma e lo dice.
 - [ ] `CLAUDE_CODE_OAUTH_TOKEN` probabilmente scaduto: il 29/09 Claude si è fermato dopo 6 secondi e le
   issue #67/#68 sono uscite senza parafrasi. Rigenerarlo con `claude setup-token` e aggiornare il secret.
-- [ ] `FEEDBACK_AGENTE_SECRET` (o l'alias `FEEDBACK_AGENT_SECRET`, stesso valore) su Vercel **e**
+- [ ] (24/10: rigenerato e aggiornato su Vercel e GitHub; manca l'ambiente cloud) `FEEDBACK_AGENTE_SECRET` (o l'alias `FEEDBACK_AGENT_SECRET`, stesso valore) su Vercel **e**
   nei secret GitHub: ora lo usano anche `feedback-pr.yml` e `feedback-deploy.yml`.
 - [ ] Al primo deploy di produzione dopo il merge: Actions → feedback-deploy deve partire (evento
   `deployment_status`, ambiente Production) e non essere "skipped".
