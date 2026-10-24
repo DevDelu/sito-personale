@@ -2,8 +2,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 import { DownloadCvButton } from "@/components/home/download-cv-button";
 import { HeroHeadline } from "@/components/home/hero-headline";
+import { LINKEDIN_URL } from "@/lib/seo";
 
-const LINKEDIN_URL = "https://www.linkedin.com/in/lorenzo-de-luca-83819a277/";
 // Un CV per lingua: quello inglese non è solo il testo tradotto, ha un
 // taglio pensato per il mercato anglofono (AI Product Engineering).
 const CV_URL_BY_LOCALE: Record<string, string> = {

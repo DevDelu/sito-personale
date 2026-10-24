@@ -1,13 +1,17 @@
-import type { Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { PublicHeader } from "@/components/public-header";
+import { baseUrlPubblica } from "@/lib/seo";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
+
+// URL assoluti per og:image e canonical delle pagine pubbliche (lib/seo.ts).
+export const metadata: Metadata = { metadataBase: new URL(baseUrlPubblica()) };
 
 // Sovrascrive il theme-color di base (app/layout.tsx, palette dell'app
 // privata) con quello di .site-public: sono due palette diverse, usare

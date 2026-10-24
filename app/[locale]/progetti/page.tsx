@@ -4,10 +4,16 @@ import { getProjects } from "@/lib/projects";
 import { ProjectCard } from "@/components/progetti/project-card";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 import { Link } from "@/i18n/navigation";
+import { metadataPubblica } from "@/lib/seo";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("Progetti");
-  return { title: t("title"), description: t("description") };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Progetti" });
+  return metadataPubblica({ locale, percorso: "/progetti", title: `${t("title")} — Lorenzo De Luca`, description: t("description") });
 }
 
 export default async function ProgettiPage({

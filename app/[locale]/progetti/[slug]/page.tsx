@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getProjectBySlug, getProjects } from "@/lib/projects";
 import { CaseStudyLayout } from "@/components/progetti/case-study-layout";
+import { metadataPubblica } from "@/lib/seo";
 
 export async function generateStaticParams({ params }: { params: { locale: string } }) {
   return getProjects(params.locale).map((project) => ({ slug: project.slug }));
@@ -16,7 +17,12 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const project = getProjectBySlug(slug, locale);
   if (!project) return {};
-  return { title: project.title, description: project.summary };
+  return metadataPubblica({
+    locale,
+    percorso: `/progetti/${slug}`,
+    title: project.title,
+    description: project.summary,
+  });
 }
 
 export default async function ProjectPage({
