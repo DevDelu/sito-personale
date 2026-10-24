@@ -19,6 +19,9 @@ skill è per tutto il resto del lavoro tracciato su GitHub.
 Salta le issue che hanno già una PR aperta collegata
 (`gh api "repos/DevDelu/sito-personale/pulls?state=open"` e cerca `Closes #N` nel corpo).
 
+Mentre scrivi codice segui le skill del repo che si applicano: `react-best-practices` sempre per
+React/Next.js, `supabase` per query/auth/RLS, `web-design-guidelines` per l'interfaccia.
+
 ## Per ogni issue
 
 1. Leggi la issue e i commenti, poi il codice coinvolto e `CLAUDE.md`.

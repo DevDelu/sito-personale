@@ -13,6 +13,9 @@ gh api repos/DevDelu/sito-personale/pulls/<N> --jq '.head.ref,.body'
 git fetch origin <branch> && git checkout <branch> && git diff origin/main...HEAD
 ```
 
+Skill da usare quando servono: `react-best-practices`, `web-design-guidelines` (PR con UI), `supabase`
+e `supabase-postgres-best-practices` (PR che toccano `supabase/`, RLS, query o auth).
+
 ## Cosa controllare (bloccante = lo sistemi tu)
 
 1. **Sicurezza**: Server Action nuove con `requireWriter()` (mai solo `requireUser()`); route

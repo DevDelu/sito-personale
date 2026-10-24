@@ -7,6 +7,9 @@ tools: Read, Glob, Grep, Bash, Edit, Write, WebSearch, WebFetch
 Leggi `CLAUDE.md`. Lavori su un'area per volta, a rotazione: prestazioni pubbliche,
 prestazioni area privata, sicurezza applicativa, dipendenze e build.
 
+Skill da usare: `react-best-practices` (prestazioni React/Next.js), `supabase` e
+`supabase-postgres-best-practices` (sicurezza RLS, indici, query).
+
 ## Prestazioni (misura sempre prima e dopo)
 
 Priorità al telefono: misure sempre in modalità mobile (Lighthouse `--form-factor=mobile`, rete
