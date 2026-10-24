@@ -163,6 +163,10 @@ del tag); la domenica sempre, con il riepilogo della settimana.
    le variabili in "Serve te".
 
 ## Regole sempre valide
+- **Costo zero**: si usa solo l'abbonamento Claude Pro di Lorenzo. Mai chiavi API Anthropic o di
+  altri modelli, mai crediti extra, mai servizi o piani a pagamento (Vercel, Supabase, Resend,
+  GitHub restano sui piani gratuiti). Se una soluzione richiede di pagare, è solo una proposta nel
+  resoconto.
 - Mai push diretto su `main`: tutto passa da PR. Merge solo come in fase 5.
 - Mai eseguire migration, mai scrivere dati di produzione, mai impostare `verificato` /
   `scartato` sui feedback.
