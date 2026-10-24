@@ -17,7 +17,10 @@ const UNLOCALIZED_PREFIXES = [
   "/altro",
   "/feedback",
 ];
-const UNLOCALIZED_EXACT_ROUTES = ["/login"];
+// Login e recupero password vivono fuori da app/[locale]/: senza queste voci
+// next-intl le prende per pagine pubbliche e risponde 404 (link "Password
+// dimenticata?", link dell'email di recupero e pagina della nuova password).
+const UNLOCALIZED_EXACT_ROUTES = ["/login", "/login/recupera-password", "/auth/callback", "/reset-password"];
 
 const intlMiddleware = createMiddleware(routing);
 
