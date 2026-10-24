@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronRight, Plus } from "lucide-react";
+import { Check, ChevronRight, Plus } from "lucide-react";
 import { Sheet } from "@/components/ui/Sheet";
 import { useColoriCategorie } from "@/hooks/useColoriCategorie";
 import { useCategoriaMutations } from "@/hooks/useCategoriaMutations";
@@ -64,9 +64,7 @@ export function CategoriaPickerSheet({
   return (
     <>
       {/* type="hidden" è escluso dalla validazione nativa del browser (spec
-          WHATWG): categoria_id mancante viene comunque bloccato lato server
-          in aggiungiMovimento(), che mostra l'errore "Seleziona una
-          categoria." tramite state.error. */}
+          WHATWG): categoria_id vuoto è ammesso: aggiungiMovimento() usa "Altro". */}
       {name && <input type="hidden" name={name} value={value} />}
 
       <button
@@ -75,16 +73,16 @@ export function CategoriaPickerSheet({
         className="field-input flex items-center justify-between gap-2 bg-surface text-left"
       >
         {selezionata ? (
-          <span className="flex min-w-0 items-center gap-2">
-            <span
-              className="h-2.5 w-2.5 shrink-0 rounded-full"
-              style={{ backgroundColor: coloreDi(selezionata.nome, selezionata.colore) }}
-              aria-hidden
-            />
-            <span className="truncate">{selezionata.nome}</span>
+          <span
+            className="min-w-0 truncate rounded-lg px-2 py-0.5"
+            style={{
+              backgroundColor: `color-mix(in srgb, ${coloreDi(selezionata.nome, selezionata.colore)} 22%, transparent)`,
+            }}
+          >
+            {selezionata.nome}
           </span>
         ) : (
-          <span className="text-muted">Seleziona categoria</span>
+          <span className="text-muted">Nessuna (Altro)</span>
         )}
         <ChevronRight className="h-4 w-4 shrink-0 text-muted" />
       </button>
@@ -97,7 +95,19 @@ export function CategoriaPickerSheet({
             {categorieFiltrate.length === 0 ? (
               <p className="text-sm text-muted">Nessuna categoria per questo tipo.</p>
             ) : (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="flex max-h-[50dvh] flex-col gap-1.5 overflow-y-auto">
+                {value && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onChange("");
+                      chiudi();
+                    }}
+                    className="rounded-xl border border-dashed border-border px-3 py-2.5 text-left text-[15px] text-muted active:scale-[0.99]"
+                  >
+                    Nessuna (verrà messa su Altro)
+                  </button>
+                )}
                 {categorieFiltrate.map((c) => {
                   const colore = coloreDi(c.nome, c.colore);
                   const attiva = c.id === value;
@@ -109,17 +119,15 @@ export function CategoriaPickerSheet({
                         onChange(c.id);
                         chiudi();
                       }}
-                      className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-all duration-150 ease-out active:scale-95 ${
-                        attiva ? "border-accent bg-accent/10" : "border-border"
-                      }`}
+                      style={{
+                        backgroundColor: `color-mix(in srgb, ${colore} ${attiva ? 28 : 14}%, transparent)`,
+                        borderColor: attiva ? colore : "transparent",
+                      }}
+                      className="flex items-center justify-between rounded-xl border-2 px-3 py-3 text-left text-[17px] font-medium transition-all duration-150 ease-out active:scale-[0.99]"
+                      aria-pressed={attiva}
                     >
-                      <span
-                        className="flex h-9 w-9 items-center justify-center rounded-full"
-                        style={{ backgroundColor: `color-mix(in srgb, ${colore} 18%, transparent)` }}
-                      >
-                        <span className="h-3 w-3 rounded-full" style={{ backgroundColor: colore }} aria-hidden />
-                      </span>
-                      <span className="w-full truncate text-[13px]">{c.nome}</span>
+                      <span className="truncate">{c.nome}</span>
+                      {attiva && <Check className="h-4 w-4 shrink-0" />}
                     </button>
                   );
                 })}

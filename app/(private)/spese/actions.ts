@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireWriter } from "@/lib/supabase/dal";
+import { risolviCategoriaId } from "@/lib/spese/categoria-default";
 
 export type AggiungiMovimentoState = { error?: string } | undefined;
 
@@ -28,16 +29,25 @@ export async function aggiungiMovimento(
     return { error: "L'importo deve essere un numero positivo." };
   }
   if (!data) return { error: "La data è obbligatoria." };
-  if (!categoriaId) return { error: "Seleziona una categoria." };
 
   const admin = createAdminClient();
+  let categoriaFinale = categoriaId;
+  if (!categoriaFinale) {
+    const { data: categorie, error: errCat } = await admin
+      .from("categorie")
+      .select("id, nome, tipo");
+    if (errCat) return { error: errCat.message };
+    const trovata = risolviCategoriaId("", categorie ?? [], tipo);
+    if (!trovata) return { error: 'Manca la categoria "Altro": creala o scegline una.' };
+    categoriaFinale = trovata;
+  }
   const tabella = tipo === "spesa" ? "spese" : "depositi";
 
   const { error } = await admin.from(tabella).insert({
     importo,
     titolo,
     descrizione,
-    categoria_id: categoriaId,
+    categoria_id: categoriaFinale,
     nominativo,
     dettaglio,
     data,
