@@ -16,6 +16,8 @@ export type Fase = {
   passo: number;
   etichetta: string;
   adesso: string;
+  // Versione di una riga per le card della lista (la frase lunga sta nel dettaglio).
+  breve: string;
   // true = serve un'azione di Lorenzo (scheda "Per te", badge ambra).
   perTe: boolean;
 };
@@ -28,6 +30,7 @@ export function fase(f: Pick<FeedbackRow, "stato" | "pr_number" | "riaperture">)
         passo: 0,
         etichetta: "Ricevuto",
         adesso: "Salvato parola per parola. L'agente lo prende nel prossimo giro (stanotte, o quando lo avvii tu).",
+        breve: "In attesa di essere letto.",
         perTe: false,
       };
     case "preso-in-carico":
@@ -35,6 +38,7 @@ export function fase(f: Pick<FeedbackRow, "stato" | "pr_number" | "riaperture">)
         passo: 1,
         etichetta: "In coda",
         adesso: "L'agente l'ha letto e ci lavora nel prossimo giro.",
+        breve: "In coda.",
         perTe: false,
       };
     case "riaperto":
@@ -42,6 +46,7 @@ export function fase(f: Pick<FeedbackRow, "stato" | "pr_number" | "riaperture">)
         passo: 1,
         etichetta: "Riaperto",
         adesso: `Hai detto che non è sistemato${f.riaperture > 1 ? ` (${f.riaperture} volte)` : ""}: ha la precedenza nel prossimo giro.`,
+        breve: "Riaperto: ha la precedenza.",
         perTe: false,
       };
     case "serve-info":
@@ -49,6 +54,7 @@ export function fase(f: Pick<FeedbackRow, "stato" | "pr_number" | "riaperture">)
         passo: 1,
         etichetta: "Serve una tua risposta",
         adesso: "L'agente ha una domanda: rispondi e riparte.",
+        breve: "Rispondi alla domanda.",
         perTe: true,
       };
     case "in-lavorazione":
@@ -57,12 +63,14 @@ export function fase(f: Pick<FeedbackRow, "stato" | "pr_number" | "riaperture">)
             passo: 2,
             etichetta: "Da approvare",
             adesso: `La modifica è pronta nella PR #${f.pr_number}: aprila, prova l'anteprima e, se va bene, fai Merge. Dopo il deploy te la chiedo da verificare.`,
+            breve: `PR #${f.pr_number} da approvare.`,
             perTe: true,
           }
         : {
             passo: 1,
             etichetta: "In lavorazione",
             adesso: "L'agente sta preparando la modifica.",
+            breve: "In preparazione.",
             perTe: false,
           };
     case "da-verificare":
@@ -70,12 +78,13 @@ export function fase(f: Pick<FeedbackRow, "stato" | "pr_number" | "riaperture">)
         passo: 3,
         etichetta: "Da verificare",
         adesso: "È online. Provala sul sito: se è sistemato tocca Verificato, altrimenti Non risolto.",
+        breve: "È online: provalo.",
         perTe: true,
       };
     case "verificato":
-      return { passo: 4, etichetta: "Verificato", adesso: "Chiuso: hai confermato che è sistemato.", perTe: false };
+      return { passo: 4, etichetta: "Verificato", adesso: "Chiuso: hai confermato che è sistemato.", breve: "Chiuso.", perTe: false };
     case "scartato":
-      return { passo: 4, etichetta: "Scartato", adesso: "Chiuso senza modifiche.", perTe: false };
+      return { passo: 4, etichetta: "Scartato", adesso: "Chiuso senza modifiche.", breve: "Chiuso senza modifiche.", perTe: false };
   }
 }
 

@@ -26,3 +26,10 @@ test("per te: domanda, approvazione e verifica; il resto è in corso o chiuso", 
   assert.equal(scheda(f("verificato")), "chiusi");
   assert.equal(scheda(f("scartato")), "chiusi");
 });
+
+test("ogni fase ha una frase breve (per le card della lista)", () => {
+  for (const s of ["nuovo", "preso-in-carico", "riaperto", "serve-info", "in-lavorazione", "da-verificare", "verificato", "scartato"] as const) {
+    const x = fase({ stato: s, pr_number: null, riaperture: 0 });
+    assert.ok(x.breve.length > 0 && x.breve.length <= 40, s);
+  }
+});

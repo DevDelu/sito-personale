@@ -90,7 +90,7 @@ export function FeedbackElenco({ righe, owner }: { righe: FeedbackRow[]; owner: 
                   </span>
                 </span>
                 <span className="line-clamp-3 text-[17px]">{f.testo}</span>
-                {scelto === "per-te" && <span className="text-[15px] text-amber-700 dark:text-amber-300">{fase(f).adesso}</span>}
+                {scelto === "per-te" && <span className="text-[15px] text-amber-700 dark:text-amber-300">{fase(f).breve}</span>}
                 <span className="flex items-center justify-between gap-2 text-[13px] text-muted">
                   <span className="min-w-0 truncate">{dove(f)}</span>
                   <span className="shrink-0">{etaInNotti(f.created_at)}</span>
@@ -141,6 +141,7 @@ function FeedbackDettaglio({ f, owner, onClose }: { f: FeedbackRow; owner: boole
   }, [f.id, f.updated_at]);
 
   const domanda = eventi?.filter((e) => e.tipo === "domanda").at(-1)?.testo ?? null;
+  const cosaECambiato = eventi?.filter((e) => e.tipo === "nota-fix").at(-1)?.testo ?? null;
 
   function esegui(azione: () => Promise<{ ok: true } | { ok: false; errore: string }>, chiudiDopo = false) {
     setErrore(null);
@@ -205,6 +206,13 @@ function FeedbackDettaglio({ f, owner, onClose }: { f: FeedbackRow; owner: boole
           <h3 className="text-[13px] font-medium text-muted uppercase">Cosa hai scritto</h3>
           <p className="text-[17px] whitespace-pre-wrap">{f.testo}</p>
         </section>
+
+        {cosaECambiato && (
+          <section className="flex flex-col gap-1 rounded-xl bg-surface-hover p-3">
+            <h3 className="text-[13px] font-medium text-muted uppercase">Cosa è cambiato · {f.route}</h3>
+            <p className="text-[17px] whitespace-pre-wrap">{cosaECambiato}</p>
+          </section>
+        )}
 
         {f.stato === "serve-info" && domanda && (
           <div className="rounded-xl bg-amber-500/10 p-3 text-[15px]">
