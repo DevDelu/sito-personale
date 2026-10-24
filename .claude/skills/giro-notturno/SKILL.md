@@ -1,6 +1,6 @@
 ---
 name: giro-notturno
-description: Coordina il team di agenti di Radar per un turno di lavoro (manutenzione PR, feedback di Lorenzo, issue, revisione, merge a basso rischio con rollback, design, test, prestazioni e sicurezza, ricerca prodotto, documentazione, newsletter) e chiude con il resoconto per Lorenzo. Usala nella routine del team (un turno ogni notte) o quando Lorenzo chiede "fai un giro completo".
+description: Coordina il team di agenti di Radar per un turno di lavoro (manutenzione PR, feedback di Lorenzo, issue, revisione, merge a basso rischio con rollback, design, test, prestazioni e sicurezza, ricerca prodotto, documentazione, newsletter) e chiude con il resoconto per Lorenzo. Usala nelle routine del team (turno principale, qualità e manutenzione) o quando Lorenzo chiede "fai un giro completo".
 ---
 
 # Turno del team di Radar
@@ -10,8 +10,8 @@ prudente e lasci le domande nel resoconto o come `serve-info` / `serve-lorenzo`.
 
 Lorenzo ha chiesto che il team porti in produzione da solo i cambiamenti a basso rischio e che
 la quota dell'abbonamento Pro basti per tutta la settimana, lasciando spazio alle sue chat. Per
-questo c'è **un turno al giorno, di notte**, con durata limitata: ogni turno lascia il sito sempre
-in uno stato sano.
+questo ci sono **tre tipi di turno**, ognuno in una finestra d'uso diversa (le finestre del Pro
+durano 5 ore), con durata limitata: ogni turno lascia il sito sempre in uno stato sano.
 
 ## Il team
 
@@ -32,16 +32,29 @@ agente `general-purpose` con il contenuto del file come istruzioni):
 Gli agenti delle fasi 4 e 6 sono indipendenti: lanciali in parallelo. Sviluppo, git e merge
 li fai tu, in sequenza, un branch alla volta.
 
+## Tipi di turno
+
+Il prompt della routine dice quale turno è. Budget calcolato su Sonnet: circa 30 ore a
+settimana per gli agenti, il resto della quota settimanale resta a Lorenzo.
+
+| Turno | Quando | Durata | Fasi |
+|---|---|---|---|
+| **Principale** | ogni notte 02:47 | 2h | tutte (0-8); la domenica anche la 7 |
+| **Qualità** | ogni mattina 07:47 | 1h30 | 0, 1, 4, 5, 6 (esplorazione a rotazione), poi 3 sulle issue `dal-tester`/`dal-collaudo` appena aperte, 8 |
+| **Manutenzione** | lun-ven 12:47 | 1h | 0, 1, 4, 5, poi 3 solo con issue `pronta` di effort S; niente fase 6, niente newsletter |
+
+Se il prompt non dice il tipo, è il turno principale.
+
 ## Tempo e quota
 
-- Annota l'ora di inizio (`TZ=Europe/Rome date`). Dopo **2 ore e 30 minuti** non iniziare
-  lavoro nuovo (se il prompt della routine indica un'altra durata, vale quella): chiudi quello
+- Annota l'ora di inizio (`TZ=Europe/Rome date`). Alla durata del tuo tipo di turno (tabella
+  sopra; se il prompt indica un'altra durata, vale quella) non iniziare lavoro nuovo: chiudi quello
   in corso, fai la fase 8 e il resoconto. Il budget è settimanale: un turno che sfora toglie
   quota a Lorenzo per i giorni successivi.
 - Se compaiono avvisi di limite d'uso: fermati, sistema lo stato (nessun branch a metà, nessun
   merge in sospeso) e scrivi subito il resoconto.
 - Quando le fasi 1-6 sono finite e resta tempo, ricomincia dalla fase 1 con il lavoro nuovo
-  (proposte `pronta`, issue appena aperte dagli agenti). Massimo **5 PR nuove** per turno.
+  (proposte `pronta`, issue appena aperte dagli agenti). Massimo PR nuove per turno: 5 principale, 3 qualità, 2 manutenzione.
 - Le fasi sono in ordine di valore: se il tempo finisce si perdono le ultime.
 
 ## Fasi

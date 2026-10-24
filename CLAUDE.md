@@ -344,7 +344,7 @@ Priorità e convenzioni per gli agenti che sistemano i feedback: `docs/agenti-da
 
 #### Team del giro notturno
 
-Una Routine con un turno ogni notte (2h30, budget settimanale dell'abbonamento Pro) segue `.claude/skills/giro-notturno/SKILL.md`: manutenzione
+Tre Routine (principale 02:47 2h, qualità 07:47 1h30, manutenzione lun-ven 12:47 1h; Sonnet, ~30 h/settimana) seguono `.claude/skills/giro-notturno/SKILL.md`: manutenzione
 delle PR aperte, feedback (`sviluppatore-feedback`), issue (`sviluppatore-issue`: `dal-collaudo` →
 `dal-tester` → `bug` → `proposta` + `pronta`), revisione e rischio, poi gli agenti in
 `.claude/agents/` (`revisore`, `designer-ux`, `tester-esploratore`, `ingegnere-prestazioni-sicurezza`,
