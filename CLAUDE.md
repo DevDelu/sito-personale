@@ -344,6 +344,9 @@ Priorità e convenzioni per gli agenti che sistemano i feedback: `docs/agenti-da
 
 #### Team del giro notturno
 
+**Mobile prima di tutto**: Lorenzo usa Radar soprattutto da iPhone; agenti e PR giudicano ogni
+schermata prima a 390/375px, poi a desktop.
+
 Tre Routine (principale 02:47 2h, qualità 07:47 1h30, manutenzione lun-ven 12:47 1h; Sonnet, ~30 h/settimana) seguono `.claude/skills/giro-notturno/SKILL.md`: manutenzione
 delle PR aperte, feedback (`sviluppatore-feedback`), issue (`sviluppatore-issue`: `dal-collaudo` →
 `dal-tester` → `bug` → `proposta` + `pronta`), revisione e rischio, poi gli agenti in
