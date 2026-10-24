@@ -342,6 +342,15 @@ non si interrompe più per il blocco automatico.
 
 Priorità e convenzioni per gli agenti che sistemano i feedback: `docs/agenti-da-fare.md`.
 
+#### Team del giro notturno
+
+Una sola Routine notturna segue `.claude/skills/giro-notturno/SKILL.md`: manutenzione delle PR
+aperte, feedback (`sviluppatore-feedback`), issue (`sviluppatore-issue`: `dal-collaudo` →
+`dal-tester` → `bug` → `proposta` + `pronta`), poi gli agenti in `.claude/agents/` (`revisore`,
+`designer-ux`, `tester-esploratore`, `scout-prodotto`, `documentarista` la domenica). Massimo 4 PR
+nuove per notte, mai merge. L'ultimo messaggio della routine è il resoconto che Lorenzo riceve
+per email. Lezioni dagli errori in `docs/lezioni-agenti.md`.
+
 ### Decision log (dal README)
 
 - **Overview/Gestione separate in Spese**: Overview è sola lettura (aggregati, grafici);

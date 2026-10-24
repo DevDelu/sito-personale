@@ -13,6 +13,10 @@ un punto è fatto.
   al job notturno feedback → issue).
 - [ ] Eseguire `supabase/033_feedback_ciclo.sql` nell'SQL editor (dopo 031 e 032).
 - [ ] Eseguire `supabase/034_feedback_testo_lungo.sql` (feedback fino a 5000 caratteri).
+- [ ] **Giro notturno (priorità massima)**: dal 30/09 la routine notturna si fermava dopo ~20
+  secondi perché nell'ambiente cloud mancano `RADAR_URL` e `FEEDBACK_AGENTE_SECRET`. Senza, i
+  feedback restano fermi (le altre fasi del giro ora girano comunque). Per il tester esploratore
+  aggiungere anche `TESTER_EMAIL`, `TESTER_PASSWORD`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
 - [ ] **Sviluppatore notturno**: nell'ambiente cloud di Claude Code (claude.ai/code → menu
   dell'ambiente → Edit → variabili) aggiungere `RADAR_URL` e `FEEDBACK_AGENTE_SECRET`, stessi valori
   dei secret GitHub. Senza, la routine si ferma e lo dice.
@@ -36,6 +40,11 @@ un punto è fatto.
 - Collaudatore Playwright (`collaudo.yml`), in attesa dei secret.
 - Sviluppatore notturno: Routine di Claude Code che segue `.claude/skills/sviluppatore-feedback/SKILL.md`
   (testo originale da Supabase via `scripts/feedback.mjs`, una PR per feedback, `Feedback-id` nel corpo).
+
+- **Team del giro notturno** (`.claude/skills/giro-notturno/SKILL.md`): una sola routine ogni
+  notte coordina manutenzione PR → feedback → issue → revisore/designer → tester, designer e
+  scout in parallelo → documentarista la domenica; chiude con il resoconto che arriva per email.
+  Agenti in `.claude/agents/`, sviluppo issue in `.claude/skills/sviluppatore-issue/`.
 
 ## Convenzioni per chi sistema i feedback (sviluppatore notturno, anche futuro)
 
