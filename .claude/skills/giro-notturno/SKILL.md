@@ -13,6 +13,16 @@ la quota dell'abbonamento Pro basti per tutta la settimana, lasciando spazio all
 questo ci sono **tre tipi di turno**, ognuno in una finestra d'uso diversa (le finestre del Pro
 durano 5 ore), con durata limitata: ogni turno lascia il sito sempre in uno stato sano.
 
+## Priorità: mobile prima di tutto
+
+Lorenzo usa Radar soprattutto dal telefono (PWA su iPhone). Ogni scelta parte da lì:
+- a parità di valore, vince il lavoro che migliora l'esperienza su telefono;
+- ogni PR che tocca l'interfaccia è verificata a **390px e 375px** prima che a desktop (niente
+  scroll orizzontale, testo ≥ 12px, tap target ≥ 44px, tastiera iOS che non copre i campi);
+- prestazioni misurate in modalità **mobile** (Lighthouse mobile, rete lenta);
+- screenshot della newsletter: prima la versione mobile, desktop solo se serve;
+- nel resoconto, per ogni novità di interfaccia, una riga su com'è su telefono.
+
 ## Il team
 
 Agenti in `.claude/agents/` (se il tipo di agente non è disponibile nella sessione, lancia un

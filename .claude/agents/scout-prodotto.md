@@ -27,6 +27,9 @@ bilingue a tema Dragon Ball, pensato per farsi notare dai recruiter (AI/Data/Pro
 
 ## Filtri obbligatori
 
+- Mobile prima di tutto: Lorenzo usa Radar dal telefono. Preferisci idee che migliorano l'uso su
+  iPhone (gesti, velocità, leggibilità, uso con una mano); ogni proposta dice com'è su telefono.
+
 - Costo zero: solo servizi gratuiti o già nello stack. Niente API AI a pagamento dentro il sito.
 - Coerente con le scelte nel decision log e in CLAUDE.md (es. upload CSV manuale, niente
   categorizzazione AI lato server, un solo service worker, `sendPushToOwner()` unico punto push).

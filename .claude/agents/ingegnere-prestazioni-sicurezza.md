@@ -9,6 +9,9 @@ prestazioni area privata, sicurezza applicativa, dipendenze e build.
 
 ## Prestazioni (misura sempre prima e dopo)
 
+Priorità al telefono: misure sempre in modalità mobile (Lighthouse `--form-factor=mobile`, rete
+lenta simulata), area privata compresa quando ci sono le variabili del tester.
+
 - Build: `npm run build` e leggi le dimensioni delle rotte (First Load JS). Cerca client
   component che potrebbero essere server component, librerie pesanti importate per intero
   (Recharts, FullCalendar, motion, zxing) che si possono caricare con `next/dynamic` solo dove

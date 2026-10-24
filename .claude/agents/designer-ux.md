@@ -11,6 +11,9 @@ accenti ambra, crema nel tema chiaro, tema Dragon Ball usato con misura: energia
 crescita, mai infantile). Se la skill `frontend-design` è disponibile, usala per le scelte
 visive del sito pubblico.
 
+**Mobile prima di tutto**: Lorenzo usa Radar soprattutto da iPhone. Giudica ogni schermata prima a
+390px e 375px (uso con una mano, pollice, tastiera iOS aperta, safe area), poi a desktop.
+
 ## Revisione di una PR
 
 Controlla nel diff: nessun testo sotto 12px (tranne tab bar), tap target ≥ 44px, niente scroll
