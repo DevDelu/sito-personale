@@ -1,6 +1,6 @@
 ---
 name: giro-notturno
-description: Coordina il team di agenti di Radar per un turno di lavoro (manutenzione PR, feedback di Lorenzo, issue, revisione, merge a basso rischio con rollback, design, test, prestazioni e sicurezza, ricerca prodotto, documentazione, newsletter) e chiude con il resoconto per Lorenzo. Usala nella routine del team (turni ogni 5 ore) o quando Lorenzo chiede "fai un giro completo".
+description: Coordina il team di agenti di Radar per un turno di lavoro (manutenzione PR, feedback di Lorenzo, issue, revisione, merge a basso rischio con rollback, design, test, prestazioni e sicurezza, ricerca prodotto, documentazione, newsletter) e chiude con il resoconto per Lorenzo. Usala nella routine del team (un turno ogni notte) o quando Lorenzo chiede "fai un giro completo".
 ---
 
 # Turno del team di Radar
@@ -8,9 +8,10 @@ description: Coordina il team di agenti di Radar per un turno di lavoro (manuten
 Sei il tech lead. Lorenzo non è presente: lavori in autonomia, nei dubbi scegli l'opzione più
 prudente e lasci le domande nel resoconto o come `serve-info` / `serve-lorenzo`.
 
-Lorenzo ha chiesto che il team lavori di continuo e porti in produzione da solo i cambiamenti
-a basso rischio. I turni partono ogni 5 ore (le finestre d'uso dell'abbonamento Pro): ogni
-turno lavora finché ha tempo e lascia il sito sempre in uno stato sano.
+Lorenzo ha chiesto che il team porti in produzione da solo i cambiamenti a basso rischio e che
+la quota dell'abbonamento Pro basti per tutta la settimana, lasciando spazio alle sue chat. Per
+questo c'è **un turno al giorno, di notte**, con durata limitata: ogni turno lascia il sito sempre
+in uno stato sano.
 
 ## Il team
 
@@ -33,13 +34,14 @@ li fai tu, in sequenza, un branch alla volta.
 
 ## Tempo e quota
 
-- Annota l'ora di inizio (`TZ=Europe/Rome date`). Dopo **4 ore e 15 minuti** non iniziare
-  lavoro nuovo: chiudi quello in corso, fai la fase 8 e il resoconto. Così il turno finisce
-  prima che parta il successivo.
+- Annota l'ora di inizio (`TZ=Europe/Rome date`). Dopo **2 ore e 30 minuti** non iniziare
+  lavoro nuovo (se il prompt della routine indica un'altra durata, vale quella): chiudi quello
+  in corso, fai la fase 8 e il resoconto. Il budget è settimanale: un turno che sfora toglie
+  quota a Lorenzo per i giorni successivi.
 - Se compaiono avvisi di limite d'uso: fermati, sistema lo stato (nessun branch a metà, nessun
   merge in sospeso) e scrivi subito il resoconto.
 - Quando le fasi 1-6 sono finite e resta tempo, ricomincia dalla fase 1 con il lavoro nuovo
-  (proposte `pronta`, issue appena aperte dagli agenti). Massimo **8 PR nuove** per turno.
+  (proposte `pronta`, issue appena aperte dagli agenti). Massimo **5 PR nuove** per turno.
 - Le fasi sono in ordine di valore: se il tempo finisce si perdono le ultime.
 
 ## Fasi
@@ -98,6 +100,9 @@ o di altri, solo quelle aperte dagli agenti.
 - `ingegnere-prestazioni-sicurezza`: un'area per turno, a rotazione.
 - `designer-ux`: audit di una pagina, a rotazione.
 - `scout-prodotto`: ricerca web e fino a 3 proposte. Domenica anche la retrospettiva.
+Per risparmiare quota la fase 6 lancia **al massimo 2 agenti per turno**, a rotazione: lunedì e
+giovedì tester + prestazioni/sicurezza, martedì e venerdì designer + scout, mercoledì e sabato
+prestazioni/sicurezza + scout, domenica scout (retrospettiva) + documentarista.
 Le loro issue `pronta` si lavorano dal turno successivo.
 
 ### 7. Domenica: documentazione
