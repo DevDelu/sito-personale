@@ -48,7 +48,7 @@ un punto è fatto.
 - Sviluppatore notturno: Routine di Claude Code che segue `.claude/skills/sviluppatore-feedback/SKILL.md`
   (testo originale da Supabase via `scripts/feedback.mjs`, una PR per feedback, `Feedback-id` nel corpo).
 
-- **Team in turni** (`.claude/skills/giro-notturno/SKILL.md`): una routine ogni 5 ore coordina
+- **Team in turni** (`.claude/skills/giro-notturno/SKILL.md`): una routine ogni notte (2h30) coordina
   manutenzione PR → feedback → issue → revisione → merge delle PR a rischio basso con rollback →
   tester, designer, prestazioni/sicurezza e scout in parallelo → documentarista la domenica →
   newsletter con screenshot quando ci sono novità; chiude con il resoconto che arriva per email.
