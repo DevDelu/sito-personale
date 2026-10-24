@@ -50,7 +50,7 @@ const GITHUB_API_URL = process.env.GITHUB_API_URL ?? "https://api.github.com";
 
 function richiedi(nome, valore) {
   if (!valore) {
-    console.error(`Variabile ${nome} mancante.`);
+    console.log(`::error::Variabile ${nome} mancante.`);
     process.exit(1);
   }
   return valore;
@@ -198,10 +198,18 @@ async function pubblica() {
   await pubblicaEventi(eventi, lista, issuePerFeedback);
 }
 
+// Gli errori diventano annotazioni (::error::), leggibili dal riepilogo della
+// run e dall'API dei check anche senza aprire i log. Contengono solo metodo,
+// percorso e stato HTTP: nessun secret né testo dei feedback.
 const fase = process.argv[2];
-if (fase === "scarica") await scarica();
-else if (fase === "pubblica") await pubblica();
-else {
-  console.error("Uso: node feedback-notte.mjs scarica|pubblica");
+try {
+  if (fase === "scarica") await scarica();
+  else if (fase === "pubblica") await pubblica();
+  else {
+    console.error("Uso: node feedback-notte.mjs scarica|pubblica");
+    process.exit(1);
+  }
+} catch (e) {
+  console.log(`::error::feedback-notte ${fase}: ${e.message}`);
   process.exit(1);
 }
