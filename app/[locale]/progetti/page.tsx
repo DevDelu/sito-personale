@@ -13,7 +13,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Progetti" });
-  return metadataPubblica({ locale, percorso: "/progetti", title: t("title"), description: t("description") });
+  return metadataPubblica({ locale, percorso: "/progetti", title: `${t("title")} — Lorenzo De Luca`, description: t("description") });
 }
 
 export default async function ProgettiPage({
