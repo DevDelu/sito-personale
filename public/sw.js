@@ -34,15 +34,30 @@ self.addEventListener("push", (event) => {
   const { title, body, tag, url } = data;
 
   event.waitUntil(
-    self.registration.showNotification(title || "Radar", {
-      body: body || "",
-      icon: "/icons/icon-192.png",
-      badge: "/icons/icon-192.png",
-      tag,
-      data: { url },
-    })
+    self.registration
+      .showNotification(title || "Radar", {
+        body: body || "",
+        icon: "/icons/icon-192.png",
+        badge: "/icons/icon-192.png",
+        tag,
+        data: { url },
+      })
+      .then(aggiornaBadge)
   );
 });
+
+// Numero sull'icona in Home (Badging API, iOS 16.4+): quante notifiche di
+// Radar sono ancora in attesa. Dove l'API non esiste non succede nulla, e un
+// errore qui non deve mai impedire la notifica (già mostrata).
+async function aggiornaBadge() {
+  try {
+    if (!("setAppBadge" in self.navigator)) return;
+    const pendenti = await self.registration.getNotifications();
+    await self.navigator.setAppBadge(Math.max(pendenti.length, 1));
+  } catch {
+    // Badge non disponibile o negato: ignorato.
+  }
+}
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
