@@ -1,7 +1,8 @@
 # Archivio personale
 
-Sito personale con area pubblica (portfolio, in arrivo) e area privata (spese, in questa fase).
-Next.js (App Router) + Supabase + Vercel.
+Sito personale con area pubblica (portfolio bilingue IT/EN) e area privata a singolo utente
+(spese, investimenti, carte, allenamenti, agenda, alimentazione, feedback). Next.js (App Router)
++ Supabase + Vercel. Stato e prossimi passi per modulo: `docs/roadmap.md`.
 
 > Nota per chi tocca il codice con un assistente AI: questo progetto usa Next.js 16, con
 > `middleware.ts` rinominato in `proxy.ts` (funzione `proxy()`). Vedi `AGENTS.md`/`CLAUDE.md`
@@ -18,9 +19,8 @@ Next.js (App Router) + Supabase + Vercel.
 2. Crea un progetto su [supabase.com](https://supabase.com) (piano free).
 
 3. Nell'SQL Editor di Supabase, esegui **in ordine** tutti i file in `supabase/`:
-   `schema.sql` → `002_spese_v2.sql` → `003_archivio_redesign.sql` →
-   `004_import_excel.sql` → `005_gestione_movimenti.sql`. Ogni file ha un commento in testa
-   che spiega cosa cambia; sono pensati per essere eseguiti una volta sola, in sequenza.
+   `schema.sql` e poi le migration numerate (`002_...` fino alla `034_feedback_testo_lungo.sql`,
+   in ordine). Ogni file ha un commento in testa che spiega cosa cambia; sono pensati per essere eseguiti una volta sola, in sequenza.
 
 4. In Supabase, vai su **Authentication > Users** e crea manualmente il tuo utente
    (email + password). Non esiste un flusso di registrazione pubblico: l'unico account
@@ -45,6 +45,19 @@ Next.js (App Router) + Supabase + Vercel.
 
    Apri [http://localhost:3000](http://localhost:3000). `/` è la homepage pubblica,
    `/login` porta all'area privata, `/spese` è protetta e richiede login.
+
+## Altri moduli e automazioni
+
+- **Feedback (Radar)**: Lorenzo lascia un feedback in pochi secondi da ogni pagina; un job notturno
+  lo trasforma in issue (parafrasi senza dati), un agente sviluppatore apre la PR, Lorenzo approva
+  col merge e poi verifica in produzione. Pagina `/feedback` con lo stato di ognuno.
+- **Team di agenti notturni**: tre routine di Claude Code (principale, qualità, manutenzione) con
+  agenti per revisione, design, test, prestazioni/sicurezza, ricerca e documentazione. Le PR a
+  rischio basso sono mergiate con rollback automatico. Dettagli per gli agenti in `CLAUDE.md` e
+  `.claude/skills/giro-notturno/SKILL.md`; lezioni in `docs/lezioni-agenti.md`.
+- **Collaudatore e2e**: `npm run test:e2e` (Playwright, utente tester in sola lettura), a ogni
+  deploy e ogni notte. Vedi `tests/e2e/README.md`.
+- **Portfolio pubblico**: homepage e `/progetti` in IT/EN, con metadata tradotti, hreflang e JSON-LD.
 
 ## Modulo Spese
 
@@ -182,6 +195,25 @@ serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `m
   ingrandire il sito pubblico o il desktop dell'area privata. Il resto dei moduli (Carte,
   Agenda, Allenamenti, Alimentazione) eredita queste fondamenta ma non è stato ridisegnato
   pagina per pagina in questa fase: restano backlog ordinato (vedi PR).
+
+- **Agenti a costo zero (solo abbonamento Claude Pro)**: nessuna chiave API, nessun credito extra,
+  nessun servizio a pagamento; una soluzione che costa è solo una proposta nel resoconto. Il progetto
+  deve restare sostenibile con Hobby/free tier.
+- **PR a rischio basso mergiate dagli agenti, con rollback automatico**: Lorenzo non deve approvare
+  ogni ritocco; migration, auth, proxy, workflow e calcoli su importi restano a lui. Un deploy
+  rotto genera in automatico una PR "Revert".
+- **Tre turni invece di uno, su budget Sonnet**: la quota Pro basta per tutta la settimana lasciando
+  spazio alle chat di Lorenzo; ogni turno lascia il sito in stato sano.
+- **Mobile prima di tutto per agenti e PR**: l'area privata si usa soprattutto da iPhone (PWA),
+  quindi ogni interfaccia si giudica a 390/375px prima che a desktop.
+- **Issue pubbliche solo con parafrasi senza dati; testo originale solo in Supabase**: il repo è
+  pubblico, chi sistema i feedback legge il testo vero via API con secret, mai dai log o dalle issue.
+- **Skill di terze parti copiate nel repo, lette per intero e aggiornate a mano**: niente download
+  automatici (rischio di istruzioni non controllate); provenienza in `.claude/skills/ESTERNE.md`.
+- **Recupero password fuori da next-intl**: `/login/recupera-password`, `/auth/callback` e
+  `/reset-password` stanno fuori da `app/[locale]/`, quindi vanno in `UNLOCALIZED_EXACT_ROUTES`,
+  altrimenti `next-intl` risponde 404.
+- **Next.js 16.4.3**: aggiornato per chiudere vulnerabilità note, senza cambi di API.
 
 ## Cosa manca volutamente in questa fase
 

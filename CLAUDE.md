@@ -48,6 +48,10 @@ Tienilo a mente prima di toccare routing/auth: cercare `middleware.ts` o la funz
   `/alimentazione`, `/impostazioni`, `/altro`, `/feedback`, `/login`, `/api/*`) → gestite da
   `updateSession()` in `lib/supabase/proxy.ts` (refresh sessione
   Supabase).
+- Anche `/login/recupera-password`, `/auth/callback` e `/reset-password` sono non localizzate
+  (`UNLOCALIZED_EXACT_ROUTES`). **Gotcha**: una pagina fuori da `app/[locale]/` non elencata in
+  `UNLOCALIZED_*` riceve 404 da `next-intl`; il recupero password era rotto per questo (test e2e
+  `tests/e2e/recupero-password.spec.ts`).
 - Tutto il resto (area pubblica sotto `app/[locale]/`) → middleware `next-intl` per il routing
   bilingue.
 
@@ -78,6 +82,9 @@ Tienilo a mente prima di toccare routing/auth: cercare `middleware.ts` o la funz
 `as-needed` (IT senza prefisso, EN con `/en`). Solo l'area pubblica sotto `app/[locale]/` è
 localizzata; l'area privata e le route elencate in `UNLOCALIZED_PREFIXES`/`UNLOCALIZED_EXACT_ROUTES`
 in `proxy.ts` restano fuori dal routing next-intl.
+
+Le pagine pubbliche hanno metadata tradotti (title, description, Open Graph/Twitter), `hreflang`
+IT/EN/x-default e un JSON-LD `Person` in homepage: una pagina pubblica nuova li deve avere.
 
 ### Struttura per dominio
 
@@ -358,6 +365,14 @@ rischio alto (migration, auth, proxy, workflow, calcoli su importi...) restano a
 Newsletter con screenshot via `scripts/screenshot.mjs` + `scripts/newsletter.mjs` (Resend; le
 immagini mostrano dati reali: solo nella scratchpad e nell'email privata, mai nel repo). Lezioni
 dagli errori in `docs/lezioni-agenti.md`.
+
+Regole per gli agenti: **costo zero** (solo abbonamento Claude Pro; mai chiavi API, crediti extra o
+servizi a pagamento: se serve pagare è solo una proposta nel resoconto). Le routine non hanno
+variabili d'ambiente proprie: arrivano da un blocco `VARIABILI` nel prompt della routine, caricate da
+un file nella scratchpad con `NODE_USE_ENV_PROXY=1` (dettagli in `giro-notturno/SKILL.md`). Tester e
+newsletter (max una al giorno) nei turni principale e qualità, se le variabili ci sono. Skill di terze parti (React/Next, Supabase,
+design) in `.claude/skills/`, provenienza e licenze in `.claude/skills/ESTERNE.md`: aggiornate solo
+a mano rileggendo il diff, mai scaricate in automatico.
 
 ### Decision log (dal README)
 

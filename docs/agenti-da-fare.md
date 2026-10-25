@@ -15,7 +15,9 @@ un punto è fatto.
 - [ ] Eseguire `supabase/033_feedback_ciclo.sql` nell'SQL editor (dopo 031 e 032).
 - [ ] Eseguire `supabase/034_feedback_testo_lungo.sql` (feedback fino a 5000 caratteri).
 - [ ] **Giro notturno (priorità massima)**: dal 30/09 la routine notturna si fermava dopo ~20
-  secondi perché nell'ambiente cloud mancano `RADAR_URL` e `FEEDBACK_AGENTE_SECRET`. Senza, i
+  secondi perché mancano `RADAR_URL` e `FEEDBACK_AGENTE_SECRET`. Dal 24/10 le variabili si passano
+  in un blocco `VARIABILI` nel prompt di ciascuna routine (righe `NOME=valore`), non più
+  nell'ambiente cloud: controllare che ci sia in tutte e tre. Senza, i
   feedback restano fermi (le altre fasi del giro ora girano comunque). Per il tester esploratore
   aggiungere anche `TESTER_EMAIL`, `TESTER_PASSWORD`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`; per la
   newsletter con screenshot `RESEND_API_KEY`, `RESEND_FROM_EMAIL` (stessi valori di Vercel) e
@@ -25,9 +27,8 @@ un punto è fatto.
   routine non può leggere i feedback, fare screenshot né mandare la newsletter. In claude.ai/code →
   ambiente → Edit → accesso alla rete: aggiungere `lorenzo-de-luca.com`, `*.vercel.app`,
   `*.supabase.co`, `api.resend.com` (o accesso completo).
-- [ ] **Sviluppatore notturno**: nell'ambiente cloud di Claude Code (claude.ai/code → menu
-  dell'ambiente → Edit → variabili) aggiungere `RADAR_URL` e `FEEDBACK_AGENTE_SECRET`, stessi valori
-  dei secret GitHub. Senza, la routine si ferma e lo dice.
+- [ ] **Sviluppatore notturno**: `RADAR_URL` e `FEEDBACK_AGENTE_SECRET` (stessi valori dei secret
+  GitHub) nel blocco `VARIABILI` del prompt delle routine. Senza, la fase feedback si salta e lo dice.
 - [ ] `CLAUDE_CODE_OAUTH_TOKEN` probabilmente scaduto: il 29/09 Claude si è fermato dopo 6 secondi e le
   issue #67/#68 sono uscite senza parafrasi. Rigenerarlo con `claude setup-token` e aggiornare il secret.
 - [ ] (24/10: rigenerato e aggiornato su Vercel e GitHub, ricreato da zero alle 15:12; manca l'ambiente cloud) `FEEDBACK_AGENTE_SECRET` (o l'alias `FEEDBACK_AGENT_SECRET`, stesso valore) su Vercel **e**
@@ -54,6 +55,9 @@ un punto è fatto.
   tester, designer, prestazioni/sicurezza e scout in parallelo → documentarista la domenica →
   newsletter con screenshot quando ci sono novità; chiude con il resoconto che arriva per email.
   Agenti in `.claude/agents/`, sviluppo issue in `.claude/skills/sviluppatore-issue/`.
+- Skill esterne (React/Next, Supabase, design) in `.claude/skills/`, vedi `ESTERNE.md`.
+- Nessuna casella spuntabile in questo giro: i passi aperti riguardano secret e impostazioni fuori
+  dal repo (GitHub, Vercel, Supabase, claude.ai), non verificabili da qui.
 
 ## Convenzioni per chi sistema i feedback (sviluppatore notturno, anche futuro)
 
