@@ -31,16 +31,10 @@ export async function aggiornaPrezzi(): Promise<EsitoAggiornamentoPrezzi> {
         let fonte: "yahoo" | "coingecko" | null = null;
 
         if (asset.coingecko_id) {
-          try {
-            quote = await fetchCoinGeckoPrice(asset.coingecko_id);
-            fonte = "coingecko";
-          } catch (e) {
-            // CoinGecko non risponde: se l'asset ha anche un simbolo Yahoo si usa quello,
-            // altrimenti resta l'ultimo prezzo salvato (nessuna scrittura) e l'errore è segnalato.
-            if (!asset.price_symbol) throw e;
-            quote = await fetchYahooPrice(asset.price_symbol);
-            fonte = "yahoo";
-          }
+          // Se CoinGecko non risponde non si ripiega su un'altra fonte (valuta diversa = prezzo sbagliato):
+          // resta l'ultimo prezzo salvato e l'errore viene segnalato.
+          quote = await fetchCoinGeckoPrice(asset.coingecko_id);
+          fonte = "coingecko";
         } else if (asset.price_symbol) {
           quote = await fetchYahooPrice(asset.price_symbol);
           fonte = "yahoo";
