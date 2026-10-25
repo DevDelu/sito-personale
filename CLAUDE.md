@@ -96,8 +96,9 @@ Supabase vivono in `lib/<dominio>/queries.ts`, mai inline nei componenti.
 ### Cron job (Vercel)
 
 Tre cron definiti in `vercel.json`, protetti da `CRON_SECRET` (header
-`Authorization: Bearer <CRON_SECRET>` — se assente in env, le route restano invocabili senza
-auth, vedi commento in `.env.example`):
+`Authorization: Bearer <CRON_SECRET>` — se assente in env, le route rispondono 401 a tutti
+(fail-closed, helper unico `rifiutaSeNonCron()` in `lib/cron/auth.ts`, usato da ogni route cron;
+una route cron nuova deve chiamarlo; senza `CRON_SECRET` in Production i cron smettono di girare):
 - `/api/cron/update-portfolio-prices` — aggiorna prezzi investimenti. Stessa logica
   (`aggiornaPrezzi()` in `lib/investimenti/aggiorna-prezzi.ts`) anche on demand: `/investimenti`
   chiama `POST /api/investimenti/aggiorna-prezzi` all'apertura se l'ultimo aggiornamento ha più
@@ -143,8 +144,8 @@ Punti da tenere a mente:
 
 Cinque cron in più (`vercel.json`), oltre ai tre di "Cron job" sopra, agganciati a
 `sendPushToOwner()` (più un push non-cron sul login sospetto). Stesso pattern
-`CRON_SECRET`/`Authorization: Bearer` delle altre route cron: se `CRON_SECRET` non è impostata,
-restano invocabili senza autenticazione (vedi commento in `.env.example`).
+`CRON_SECRET`/`Authorization: Bearer` delle altre route cron: se `CRON_SECRET` non è impostata
+rispondono 401 (fail-closed, vedi sopra).
 
 Singolo utente (Lorenzo è l'unico owner): nessun filtro `user_id` nelle query di questi cron,
 stesso principio già usato da `sendPushToOwner()`.

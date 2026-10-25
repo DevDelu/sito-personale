@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rifiutaSeNonCron } from "@/lib/cron/auth";
 import { getPastiByData, getRiepilogoTdee } from "@/lib/alimentazione/queries";
 import { oggiItaliaISO } from "@/lib/cron/data-italia";
 import { sendPushToOwner } from "@/lib/push/send";
@@ -12,13 +13,8 @@ const SOGLIA_SCOSTAMENTO_PERCENTUALE = 20;
 // effettivamente loggate oggi con il target TDEE di fase. Zero pasti loggati
 // non genera alert (già coperto dai promemoria pranzo/cena, evita doppioni).
 export async function GET(request: Request) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: "Non autorizzato." }, { status: 401 });
-    }
-  }
+  const rifiutata = rifiutaSeNonCron(request);
+  if (rifiutata) return rifiutata;
 
   const oggi = oggiItaliaISO();
   const pasti = await getPastiByData(oggi);
