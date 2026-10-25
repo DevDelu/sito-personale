@@ -16,7 +16,7 @@ function formatDataLunga(data: string): string {
   });
 }
 
-// Il contenuto è HTML (editor rich-text di NotaModal): "vuoto" può comunque
+// Il contenuto è HTML (editor rich-text di NotaInline): "vuoto" può comunque
 // contenere markup residuo (es. "<br>", "<p></p>") lasciato dal
 // contentEditable. Si spoglia via regex (niente DOM lato server) solo per
 // decidere se c'è testo vero, non per l'email (lì l'HTML va mandato intero).
