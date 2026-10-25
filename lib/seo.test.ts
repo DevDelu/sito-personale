@@ -27,6 +27,12 @@ test("og nella lingua della pagina", () => {
   assert.equal((m.openGraph as { url?: string }).url, "/en");
 });
 
+test("twitter card grande, immagine dalla convenzione opengraph-image", () => {
+  const m = metadataPubblica({ locale: "it", percorso: "/", title: "T", description: "D" });
+  assert.equal((m.twitter as { card?: string }).card, "summary_large_image");
+  assert.equal((m.openGraph as { images?: unknown }).images, undefined);
+});
+
 test("base url: dominio di produzione invece dell'URL del deploy", () => {
   assert.equal(baseUrlPubblica({ NEXT_PUBLIC_SITE_URL: "https://a.example" }), "https://a.example");
   assert.equal(
