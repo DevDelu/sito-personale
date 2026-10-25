@@ -33,6 +33,8 @@ async function headers() {
 }
 
 const nextConfig: NextConfig = {
+  // Non dichiarare il framework/versione a ogni risposta (X-Powered-By).
+  poweredByHeader: false,
   headers,
   images: {
     remotePatterns: supabaseHostname
