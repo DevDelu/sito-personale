@@ -23,7 +23,7 @@ export function RecurringCard({ ricorrenti }: { ricorrenti: Ricorrente[] }) {
       <section className="card flex flex-col gap-1 px-4 py-4">
         <h2 className="text-[22px] font-semibold md:text-lg">Ricorrenti</h2>
         <p className="text-[15px] text-muted md:text-sm">
-          Nessuna uscita ricorrente trovata negli ultimi 13 mesi. Ne servono almeno tre addebiti regolari con lo stesso
+          Nessuna uscita ricorrente trovata negli ultimi 25 mesi. Ne servono almeno tre addebiti regolari con lo stesso
           titolo e lo stesso importo.
         </p>
       </section>
@@ -44,7 +44,7 @@ export function RecurringCard({ ricorrenti }: { ricorrenti: Ricorrente[] }) {
           <ListRow
             key={`${r.titolo}-${r.cadenza}`}
             title={r.titolo}
-            subtitle={`${ETICHETTA_CADENZA[r.cadenza]}${r.importoAumentato ? " · importo aumentato" : ""} · prossimo ${formatData(r.prossimaData)}`}
+            subtitle={`Prossimo ${formatData(r.prossimaData)} · ${ETICHETTA_CADENZA[r.cadenza]}${r.importoAumentato ? " · aumentato" : ""}`}
             value={
               <span className={r.importoAumentato ? "text-spesa" : undefined}>
                 {r.importoAumentato ? "▲ " : ""}

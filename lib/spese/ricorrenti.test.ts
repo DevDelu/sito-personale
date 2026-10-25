@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { normalizzaTitolo, totaleAnnuo, trovaRicorrenti, type SpesaGrezza } from "./ricorrenti.ts";
+import { aggiungiMesi, normalizzaTitolo, totaleAnnuo, trovaRicorrenti, type SpesaGrezza } from "./ricorrenti.ts";
 
 function s(titolo: string, importo: number, data: string): SpesaGrezza {
   return { titolo, importo, data };
@@ -112,4 +112,9 @@ test("cifre nel titolo non separano il gruppo", () => {
     OGGI
   );
   assert.equal(r.length, 1);
+});
+
+test("finestra di 25 mesi: l'annuale con 3 addebiti rientra, mesi negativi e fine mese", () => {
+  assert.equal(aggiungiMesi("2026-06-20", -25), "2024-05-20");
+  assert.equal(aggiungiMesi("2026-03-31", -13), "2025-02-28");
 });

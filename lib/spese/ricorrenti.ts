@@ -79,7 +79,7 @@ function intervalloAmmesso(intervallo: number, r: Regola): boolean {
 }
 
 /** Somma `n` mesi a una data ISO, riducendo il giorno se il mese è più corto. */
-function aggiungiMesi(iso: string, n: number): string {
+export function aggiungiMesi(iso: string, n: number): string {
   const [a, m, g] = iso.split("-").map(Number);
   const totale = a * 12 + (m - 1) + n;
   const anno = Math.floor(totale / 12);

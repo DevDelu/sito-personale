@@ -1,7 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Categoria, Deposito, Movimento, Spesa } from "@/lib/types";
-import type { SpesaGrezza } from "./ricorrenti";
+import { aggiungiMesi, type SpesaGrezza } from "./ricorrenti";
 
 export async function getCategorie(): Promise<Categoria[]> {
   const admin = createAdminClient();
@@ -53,13 +53,12 @@ export async function getOverviewData(
   };
 }
 
-// Ultimi 13 mesi di spese (solo titolo, importo, data) per il rilevamento delle
+// Ultimi 25 mesi (servono 3 addebiti annuali) di spese (solo titolo, importo, data) per il rilevamento delle
 // ricorrenti, indipendente dal periodo scelto nella Overview. Paginata:
 // PostgREST restituisce al massimo 1000 righe per richiesta.
 export async function getSpesePerRicorrenti(oggiIso: string): Promise<SpesaGrezza[]> {
   const admin = createAdminClient();
-  const [a, m, g] = oggiIso.split("-").map(Number);
-  const da = new Date(Date.UTC(a, m - 1 - 13, g)).toISOString().slice(0, 10);
+  const da = aggiungiMesi(oggiIso, -25);
   const PAGINA = 1000;
   const righe: SpesaGrezza[] = [];
   for (let from = 0; ; from += PAGINA) {
