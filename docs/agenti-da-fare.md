@@ -39,6 +39,12 @@ un punto è fatto.
   anteprime, creare "Protection Bypass for Automation" e salvarlo come secret `VERCEL_BYPASS_SECRET`.
 - [ ] Dopo aver sistemato i secret: Actions → collaudo → Run workflow, deve diventare verde.
 
+- [ ] **Resend**: verificare il dominio `lorenzo-de-luca.com` su resend.com/domains (DNS). Finché non è
+  verificato la newsletter degli agenti (e ogni email del sito da quel mittente) risponde 403.
+- [ ] **Utente tester**: il login con `TESTER_EMAIL`/`TESTER_PASSWORD` del blocco `VARIABILI` risulta
+  "Invalid login credentials" (25/10): controllare la password in Supabase → Authentication → Users e
+  allinearla ai prompt delle routine e ai secret GitHub. Senza, niente tester notturno né screenshot privati.
+
 ## Già attivo
 
 - Feedback dall'app (pressione lunga sulla tab, pulsante in Spese, `/altro`, tasto F).

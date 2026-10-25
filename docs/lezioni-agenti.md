@@ -27,4 +27,14 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
   token Vercel o Python senza bisogno). Mai installarle in automatico dal web.
 - Costo zero: nessuna soluzione può richiedere chiavi API o piani a pagamento; se serve, è una
   proposta nel resoconto, non un'azione.
+- Metadata Next.js: l'immagine `opengraph-image` della convenzione non è ereditata dalle pagine annidate che
+  definiscono il proprio `openGraph` (la home sì). Dopo un cambio ai metadata controlla `og:image` anche su
+  `/progetti/<slug>` in produzione (25/10: #115 aveva tolto l'immagine ai progetti, corretto da #116).
+- Un file di convenzione in root (`sitemap.xml`, `robots.txt`) passa dal matcher di `proxy.ts`: senza
+  esclusione next-intl lo rende 404 (vedi #113).
+- La newsletter non partiva per due motivi, non per mancanza di novità: il tag `newsletter/ultima` non
+  esiste mai stato creato e Resend risponde 403 perché il dominio `lorenzo-de-luca.com` non è verificato
+  su resend.com/domains. Con il 403 l'invio fallisce comunque: il resoconto passa da Gmail.
+- Nelle worktree degli agenti: mai `git add -A` dal checkout principale con `.claude/worktrees` presente
+  (finiscono come repository incorporati nel commit); rimuovi le worktree prima del commit.
 - Nessuna PR chiusa senza merge né feedback `ostinato` negli ultimi 7 giorni: nulla da imparare da lì.
