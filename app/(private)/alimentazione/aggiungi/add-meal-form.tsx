@@ -189,7 +189,7 @@ export function AddMealForm({
         <button
           type="button"
           onClick={duplicaUltimo}
-          className="btn-secondary self-start !px-3 !py-1.5 text-xs"
+          className="btn-secondary min-h-[44px] self-start !px-3 !py-1.5 text-sm"
         >
           Duplica ultimo {TIPI.find((t) => t.value === tipoPasto)?.label.toLowerCase()} ({ultimoSimile.alimento_nome},{" "}
           {ultimoSimile.quantita_g}g)
@@ -250,10 +250,10 @@ export function AddMealForm({
       )}
 
       <div className="flex gap-3">
-        <button type="submit" disabled={pending || !alimentoId} className="btn-primary">
+        <button type="submit" disabled={pending || !alimentoId} className="btn-primary min-h-[44px]">
           {pending ? "Salvataggio..." : "Aggiungi"}
         </button>
-        <button type="button" onClick={() => router.back()} className="btn-secondary">
+        <button type="button" onClick={() => router.back()} className="btn-secondary min-h-[44px]">
           Annulla
         </button>
       </div>
@@ -328,7 +328,7 @@ function TemplatePanel({
         </p>
       )}
 
-      <button type="submit" disabled={pending} className="btn-primary self-start">
+      <button type="submit" disabled={pending} className="btn-primary min-h-[44px] self-start">
         {pending ? "Registrazione..." : "Registra pasto da template"}
       </button>
     </form>
