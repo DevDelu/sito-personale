@@ -141,7 +141,7 @@ export function PortfolioHistoryChart({
   gruppi: GruppoStorico[];
 }) {
   const [granularita, setGranularita] = useState<Granularita>("giorno");
-  const [intervallo, setIntervallo] = useState<IntervalloRapido>("3m");
+  const [intervallo, setIntervallo] = useState<IntervalloRapido>("tutto");
   const [serieVisibili, setSerieVisibili] = useState<Set<string>>(
     () => new Set([TOTALE_CHIAVE, ...gruppi.map((g) => g.chiave)])
   );
