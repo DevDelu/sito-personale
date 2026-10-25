@@ -58,9 +58,9 @@ export function metadataPubblica({
       url: percorsoLocalizzato(percorso, locale),
       title,
       description,
-      images: [{ url: IMMAGINE_OG, width: 738, height: 1145, alt: "Lorenzo De Luca" }],
+      // images: le aggiunge Next dalla convenzione app/[locale]/opengraph-image.tsx
     },
-    twitter: { card: "summary", title, description, images: [IMMAGINE_OG] },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
