@@ -16,8 +16,9 @@ import { formatCurrency } from "@/lib/investimenti/format";
 import { adaptiveTickInterval } from "@/lib/spese-utils";
 import type { GruppoStorico, PuntoPortafoglio } from "@/lib/investimenti/queries";
 import { PortfolioDateRangeFilter } from "@/components/investimenti/PortfolioDateRangeFilter";
+import { filtraPerIntervallo, INTERVALLI_RAPIDI, type IntervalloRapido } from "@/lib/investimenti/intervalli";
 
-const axisTick = { fill: "var(--muted)", fontSize: 11, fontFamily: "var(--font-mono)" };
+const axisTick = { fill: "var(--muted)", fontSize: 12, fontFamily: "var(--font-mono)" };
 
 const TOTALE_CHIAVE = "totale";
 const TOTALE_COLORE = "var(--accent)";
@@ -114,7 +115,7 @@ function SerieToggle({
       type="button"
       onClick={onClick}
       aria-pressed={attivo}
-      className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
+      className={`flex items-center gap-1.5 min-h-11 rounded-full border px-3 text-[13px] font-medium transition-all md:min-h-0 md:px-2.5 md:py-1.5 md:text-xs duration-150 ease-out active:scale-95 ${
         attivo ? "border-transparent shadow-sm" : "border-border text-muted hover:text-foreground"
       }`}
       style={
@@ -140,6 +141,7 @@ export function PortfolioHistoryChart({
   gruppi: GruppoStorico[];
 }) {
   const [granularita, setGranularita] = useState<Granularita>("giorno");
+  const [intervallo, setIntervallo] = useState<IntervalloRapido>("tutto");
   const [serieVisibili, setSerieVisibili] = useState<Set<string>>(
     () => new Set([TOTALE_CHIAVE, ...gruppi.map((g) => g.chiave)])
   );
@@ -155,17 +157,43 @@ export function PortfolioHistoryChart({
 
   const data = useMemo(
     () =>
-      aggrega(punti, granularita).map((p) => ({
+      aggrega(filtraPerIntervallo(punti, intervallo), granularita).map((p) => ({
         ...p,
         label: formatLabel(p.data, granularita),
       })),
-    [punti, granularita]
+    [punti, granularita, intervallo]
   );
 
   return (
-    <div className="card flex h-80 w-full flex-col p-4">
+    <div className="card flex min-h-[26rem] w-full flex-col p-4 md:h-96">
       <div className="mb-3 flex flex-col gap-2">
-        <PortfolioDateRangeFilter />
+        <div
+          role="group"
+          aria-label="Periodo"
+          className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none]"
+        >
+          {INTERVALLI_RAPIDI.map((i) => (
+            <button
+              key={i.value}
+              type="button"
+              onClick={() => setIntervallo(i.value)}
+              aria-pressed={intervallo === i.value}
+              className={`min-h-11 shrink-0 rounded-full border px-3.5 text-[13px] font-medium transition-all duration-150 ease-out active:scale-95 md:min-h-0 md:py-1.5 ${
+                intervallo === i.value
+                  ? "border-transparent bg-accent text-accent-foreground shadow-sm"
+                  : "border-border text-muted hover:text-foreground"
+              }`}
+            >
+              {i.label}
+            </button>
+          ))}
+        </div>
+        <details className="text-[13px] text-muted">
+          <summary className="min-h-11 cursor-pointer py-2 md:min-h-0 md:py-0">Intervallo personalizzato</summary>
+          <div className="pt-2">
+            <PortfolioDateRangeFilter />
+          </div>
+        </details>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-1.5">
             <SerieToggle
@@ -190,7 +218,7 @@ export function PortfolioHistoryChart({
                 key={g.value}
                 type="button"
                 onClick={() => setGranularita(g.value)}
-                className={`rounded-full px-2.5 py-1.5 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
+                className={`min-h-11 rounded-full px-3 text-[13px] font-medium transition-all duration-150 ease-out active:scale-95 md:min-h-0 md:px-2.5 md:py-1.5 md:text-xs ${
                   granularita === g.value
                     ? "bg-accent text-accent-foreground shadow-sm"
                     : "text-muted hover:text-foreground"
