@@ -686,3 +686,19 @@ body {
 .agenda-calendar .agenda-day-selezionato {
   box-shadow: inset 0 0 0 2px var(--accent);
 }
+
+/* Chi ha attivato "riduci movimento" nel sistema non vede animazioni di
+   ingresso né transizioni su pulsanti e link. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-up,
+  .animate-fade-in {
+    animation: none !important;
+  }
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  button,
+  a {
+    transition-duration: 0.01ms !important;
+  }
+}
