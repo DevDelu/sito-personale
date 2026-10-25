@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getAlimenti, getPasti } from "@/lib/alimentazione/queries";
+import { getAlimenti, getPasti, getPastiTraDate } from "@/lib/alimentazione/queries";
 import { getTemplatePasti } from "@/lib/alimentazione/template";
 import { AddMealForm } from "./add-meal-form";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -7,9 +7,14 @@ import { PageHeader } from "@/components/ui/PageHeader";
 export const metadata: Metadata = { title: "Alimentazione · Aggiungi pasto" };
 
 export default async function AggiungiPastoPage() {
-  const [alimenti, { rows: recenti }, templates] = await Promise.all([
+  const adesso = new Date();
+  const oggi = adesso.toISOString().slice(0, 10);
+  adesso.setUTCDate(adesso.getUTCDate() - 30);
+  const da = adesso.toISOString().slice(0, 10);
+  const [alimenti, { rows: recenti }, pastiMese, templates] = await Promise.all([
     getAlimenti(),
     getPasti({ page: 1, pageSize: 20 }),
+    getPastiTraDate(da, oggi),
     getTemplatePasti(),
   ]);
 
@@ -24,7 +29,7 @@ export default async function AggiungiPastoPage() {
         </p>
       </div>
       <div data-fb-area="alimentazione.aggiungi.form" className="contents">
-        <AddMealForm alimenti={alimenti} pastiRecenti={recenti} templates={templates} />
+        <AddMealForm alimenti={alimenti} pastiRecenti={recenti} pastiMese={pastiMese} oggi={oggi} templates={templates} />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { useActionState, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { aggiungiPasto, registraPastoDaTemplate, type AggiungiPastoState } from "../actions";
 import { AlimentoSelector } from "@/components/alimentazione/AlimentoSelector";
+import { alimentiFrequenti } from "@/lib/alimentazione/frequenti";
 import type { Alimento, Pasto, TemplatePasto, TipoPasto } from "@/lib/alimentazione/types";
 
 const oggi = () => new Date().toISOString().slice(0, 10);
@@ -26,10 +27,14 @@ const TIPI: { value: TipoPasto; label: string }[] = [
 export function AddMealForm({
   alimenti,
   pastiRecenti,
+  pastiMese,
+  oggi: oggiIso,
   templates,
 }: {
   alimenti: Alimento[];
   pastiRecenti: Pasto[];
+  pastiMese: Pasto[];
+  oggi: string;
   templates: TemplatePasto[];
 }) {
   const router = useRouter();
@@ -66,6 +71,16 @@ export function AddMealForm({
   // migration). Precompila alimento e quantità senza uscire dal flusso.
   const ultimoSimile = pastiRecenti.find(
     (p) => p.tipo_pasto === tipoPasto && p.alimento_id && alimentiList.some((a) => a.id === p.alimento_id)
+  );
+
+  // "Usati di recente": chip per il tipo pasto scelto, solo alimenti ancora
+  // in catalogo. Un tap precompila alimento e quantità, "Aggiungi" salva.
+  const frequenti = useMemo(
+    () =>
+      alimentiFrequenti(pastiMese, tipoPasto, oggiIso, 12)
+        .filter((f) => f.alimentoId && alimentiList.some((a) => a.id === f.alimentoId))
+        .slice(0, 6),
+    [pastiMese, tipoPasto, oggiIso, alimentiList]
   );
 
   function duplicaUltimo() {
@@ -145,6 +160,30 @@ export function AddMealForm({
       <form action={formAction} className="flex flex-col gap-4 animate-slide-up">
       <input type="hidden" name="tipo_pasto" value={tipoPasto} />
       <input type="hidden" name="alimento_id" value={alimentoId} />
+
+      {frequenti.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-muted">Usati di recente</span>
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+            {frequenti.map((f) => (
+              <button
+                key={f.alimentoId}
+                type="button"
+                onClick={() => {
+                  setAlimentoId(f.alimentoId!);
+                  setQuantita(String(f.ultimaQuantitaG));
+                }}
+                className={`flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm transition-all duration-200 ease-out active:scale-95 ${
+                  alimentoId === f.alimentoId ? "border-accent bg-accent/10 text-foreground" : "border-border text-muted"
+                }`}
+              >
+                <span className="font-medium">{f.nome}</span>
+                <span className="font-figures text-xs">{f.ultimaQuantitaG}g</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {ultimoSimile && (
         <button
