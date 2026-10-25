@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Categoria, Deposito, Movimento, Spesa } from "@/lib/types";
+import type { SpesaGrezza } from "./ricorrenti";
 
 export async function getCategorie(): Promise<Categoria[]> {
   const admin = createAdminClient();
@@ -50,6 +51,31 @@ export async function getOverviewData(
     categorie: categorieRes.data ?? [],
     depositi: (depositiRes.data ?? []).map((r) => ({ ...r, importo: Number(r.importo) })),
   };
+}
+
+// Ultimi 13 mesi di spese (solo titolo, importo, data) per il rilevamento delle
+// ricorrenti, indipendente dal periodo scelto nella Overview. Paginata:
+// PostgREST restituisce al massimo 1000 righe per richiesta.
+export async function getSpesePerRicorrenti(oggiIso: string): Promise<SpesaGrezza[]> {
+  const admin = createAdminClient();
+  const [a, m, g] = oggiIso.split("-").map(Number);
+  const da = new Date(Date.UTC(a, m - 1 - 13, g)).toISOString().slice(0, 10);
+  const PAGINA = 1000;
+  const righe: SpesaGrezza[] = [];
+  for (let from = 0; ; from += PAGINA) {
+    const { data, error } = await admin
+      .from("spese_con_categoria")
+      .select("titolo, importo, data")
+      .gte("data", da)
+      .lte("data", oggiIso)
+      .order("data", { ascending: true })
+      .order("id", { ascending: true })
+      .range(from, from + PAGINA - 1);
+    if (error) throw new Error(error.message);
+    for (const r of data ?? []) righe.push({ titolo: r.titolo, importo: Number(r.importo), data: r.data });
+    if (!data || data.length < PAGINA) break;
+  }
+  return righe;
 }
 
 export type MovimentiFiltri = {
