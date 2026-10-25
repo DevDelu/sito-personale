@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { CalendarDays, ExternalLink, Mail, Pencil, Plus, StickyNote, Trash2, X } from "lucide-react";
 import { useAgendaMutations } from "@/hooks/useAgendaMutations";
 import { EventoFormModal } from "./EventoFormModal";
-import { NotaModal } from "./NotaModal";
+import { NotaInline } from "./NotaInline";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { coloreEvento } from "@/lib/agenda/colori";
 import type { EventoPatch } from "@/app/(private)/agenda/actions";
@@ -63,8 +63,6 @@ export function DayPanel({
   const [eventoDaEliminare, setEventoDaEliminare] = useState<Evento | null>(null);
 
   const [nota, setNota] = useState(notaIniziale?.contenuto ?? "");
-  const [salvandoNota, setSalvandoNota] = useState(false);
-  const [notaModaleAperta, setNotaModaleAperta] = useState(false);
   // Il contenuto è HTML (editor rich-text): "vuoto" può comunque contenere
   // markup residuo (es. "<br>"), quindi si spoglia dai tag prima di decidere
   // se mostrare badge/anteprima.
@@ -81,7 +79,6 @@ export function DayPanel({
   if (data !== dataCorrente) {
     setDataCorrente(data);
     setNota(notaIniziale?.contenuto ?? "");
-    setNotaModaleAperta(false);
     setMail(null);
     setMailCaricata(false);
     setMailErrore(null);
@@ -89,20 +86,8 @@ export function DayPanel({
   }
 
   async function handleSalvaNota(contenutoHtml: string) {
-    setSalvandoNota(true);
-    try {
-      await salvaNota(dataCorrente, contenutoHtml);
-      setNota(contenutoHtml);
-      setNotaModaleAperta(false);
-    } catch {
-      // errore già mostrato via `error` dell'hook, il popup resta aperto
-    } finally {
-      setSalvandoNota(false);
-    }
-  }
-
-  async function handleRimuoviNota() {
-    await handleSalvaNota("");
+    await salvaNota(dataCorrente, contenutoHtml);
+    setNota(contenutoHtml);
   }
 
   async function caricaMail() {
@@ -251,22 +236,11 @@ export function DayPanel({
 
       {tab === "note" && (
         <div className="flex flex-col gap-3">
-          {notaHaContenuto ? (
-            <div
-              className="field-input text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-              dangerouslySetInnerHTML={{ __html: nota }}
-            />
-          ) : (
-            <p className="text-sm text-muted">Nessuna nota per questo giorno.</p>
-          )}
-          <button
-            type="button"
-            onClick={() => setNotaModaleAperta(true)}
-            className="btn-secondary flex w-fit items-center gap-1.5"
-          >
-            {notaHaContenuto ? <Pencil className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-            {notaHaContenuto ? "Modifica nota" : "Scrivi una nota"}
-          </button>
+          <NotaInline
+            key={dataCorrente}
+            contenutoIniziale={nota}
+            onSave={handleSalvaNota}
+          />
         </div>
       )}
 
@@ -303,17 +277,6 @@ export function DayPanel({
             setFormAperto(false);
             setEventoInModifica(null);
           }}
-        />
-      )}
-
-      {notaModaleAperta && (
-        <NotaModal
-          data={dataCorrente}
-          contenutoIniziale={nota}
-          pending={salvandoNota}
-          onSave={handleSalvaNota}
-          onRimuovi={handleRimuoviNota}
-          onClose={() => setNotaModaleAperta(false)}
         />
       )}
 
