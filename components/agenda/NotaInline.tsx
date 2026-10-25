@@ -24,6 +24,9 @@ export function NotaInline({
   const editorRef = useRef<HTMLDivElement>(null);
   const ultimoSalvato = useRef(contenutoIniziale);
   const barraToccata = useRef(false);
+  // Ultimo HTML digitato: allo smontaggio React ha già staccato il ref del DOM, senza questo
+  // il salvataggio al cambio giorno/scheda non vedrebbe il testo ancora non salvato.
+  const htmlCorrente = useRef(contenutoIniziale);
   const [attiva, setAttiva] = useState(false);
   const [stato, setStato] = useState<"fermo" | "salvataggio" | "salvato" | "errore">("fermo");
 
@@ -57,8 +60,7 @@ export function NotaInline({
   }, []);
 
   async function salva() {
-    if (!editorRef.current) return;
-    const html = editorRef.current.innerHTML;
+    const html = editorRef.current?.innerHTML ?? htmlCorrente.current;
     const testo = html.replace(/<[^>]*>/g, "").trim();
     const daSalvare = testo.length === 0 ? "" : html;
     if (daSalvare === ultimoSalvato.current) return;
@@ -86,6 +88,8 @@ export function NotaInline({
     >
       {attiva && (
         <div
+          role="toolbar"
+          aria-label="Formattazione nota"
           className="flex flex-wrap items-center gap-1 rounded-lg border border-border p-1"
           onPointerDown={() => {
             barraToccata.current = true;
@@ -122,7 +126,8 @@ export function NotaInline({
           setStato("fermo");
         }}
         className="field-input min-h-[120px] text-[17px] empty:before:text-muted empty:before:content-[attr(data-placeholder)] md:text-sm [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
-        onInput={() => {
+        onInput={(e) => {
+          htmlCorrente.current = e.currentTarget.innerHTML;
           if (timer.current) clearTimeout(timer.current);
           timer.current = setTimeout(() => void salva(), 1500);
         }}
