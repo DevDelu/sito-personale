@@ -46,3 +46,11 @@ test("base url: dominio di produzione invece dell'URL del deploy", () => {
 test("json-ld senza < letterali", () => {
   assert.equal(jsonLdSicuro({ a: "</script>" }), '{"a":"\\u003c/script>"}');
 });
+
+test("pagine annidate: immagine og esplicita nella lingua giusta", () => {
+  const it = metadataPubblica({ locale: "it", percorso: "/progetti/radar", title: "T", description: "D" });
+  const en = metadataPubblica({ locale: "en", percorso: "/progetti/radar", title: "T", description: "D" });
+  assert.equal((it.openGraph as { images: { url: string }[] }).images[0].url, "/opengraph-image");
+  assert.equal((en.openGraph as { images: { url: string }[] }).images[0].url, "/en/opengraph-image");
+  assert.deepEqual((en.twitter as { images: string[] }).images, ["/en/opengraph-image"]);
+});
