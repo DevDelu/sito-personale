@@ -20,10 +20,13 @@ function file(dir: string): string[] {
   });
 }
 
-test("nessun text-[9|10|11px] fuori dalle eccezioni", () => {
+// Anche i grafici Recharts: fontSize numerico sotto 12 (es. fontSize: 11).
+const PICCOLO = /text-\[(9|10|11)px\]|fontSize:\s*(9|10|11)\b/;
+
+test("nessun testo sotto i 12px fuori dalle eccezioni", () => {
   const trovati = ["app", "components"]
     .flatMap(file)
     .filter((p) => !ECCEZIONI.has(p))
-    .filter((p) => /text-\[(9|10|11)px\]/.test(readFileSync(p, "utf8")));
+    .filter((p) => PICCOLO.test(readFileSync(p, "utf8")));
   assert.deepEqual(trovati, []);
 });
