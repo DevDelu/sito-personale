@@ -144,7 +144,7 @@ export function CardEditModal({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Quantità">
             <input
-              type="number"
+              type="number" inputMode="numeric"
               min="1"
               step="1"
               value={quantity}
@@ -180,7 +180,7 @@ export function CardEditModal({
           </Field>
           <Field label="Prezzo di acquisto (€)">
             <input
-              type="number"
+              type="number" inputMode="decimal"
               min="0"
               step="0.01"
               value={purchasePrice}
@@ -195,7 +195,7 @@ export function CardEditModal({
           hint="Registrato come prezzo di oggi: modificandolo più volte nei giorni successivi costruisci l'andamento nel grafico."
         >
           <input
-            type="number"
+            type="number" inputMode="decimal"
             min="0"
             step="0.01"
             value={manualPrice}

@@ -30,7 +30,7 @@ export function MovimentoFormFields({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Importo (€)">
           <input
-            type="number"
+            type="number" inputMode="decimal"
             step="0.01"
             min="0.01"
             value={form.importo}

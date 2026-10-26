@@ -70,7 +70,7 @@ export function PastoEditModal({
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-muted">Quantità (g)</span>
             <input
-              type="number"
+              type="number" inputMode="numeric"
               min="1"
               value={quantita}
               onChange={(e) => setQuantita(e.target.value)}

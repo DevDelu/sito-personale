@@ -28,7 +28,7 @@ export function ProfiloForm({ profilo }: { profilo: ProfiloNutrizionale | null }
         <Field label="Altezza (cm)">
           <input
             name="altezza_cm"
-            type="number"
+            type="number" inputMode="decimal"
             min="1"
             step="0.1"
             required
@@ -39,7 +39,7 @@ export function ProfiloForm({ profilo }: { profilo: ProfiloNutrizionale | null }
         <Field label="Età">
           <input
             name="eta"
-            type="number"
+            type="number" inputMode="numeric"
             min="1"
             step="1"
             required
@@ -90,7 +90,7 @@ export function ProfiloForm({ profilo }: { profilo: ProfiloNutrizionale | null }
           <Field label={`Percentuale ${fase} (%)`}>
             <input
               name="percentuale_fase"
-              type="number"
+              type="number" inputMode="numeric"
               min="0"
               max="100"
               step="1"
