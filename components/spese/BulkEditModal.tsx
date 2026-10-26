@@ -207,7 +207,7 @@ export function BulkEditModal({
 
             <CampoRiga attivo={campiAttivi.importo} onToggle={() => toggleCampo("importo")} label="Importo (€)">
               <input
-                type="number"
+                type="number" inputMode="decimal"
                 step="0.01"
                 min="0.01"
                 value={importo}

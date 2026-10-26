@@ -64,7 +64,7 @@ export function BulkEditSessioniModal({
 
         <CampoRiga attivo={campiAttivi.durata_min} onToggle={() => toggleCampo("durata_min")} label="Durata (min)">
           <input
-            type="number"
+            type="number" inputMode="numeric"
             min="0"
             value={durataMin}
             onChange={(e) => setDurataMin(e.target.value)}

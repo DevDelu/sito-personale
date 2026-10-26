@@ -15,7 +15,7 @@ export function PesoForm() {
           <input name="data" type="date" required defaultValue={oggi()} className="field-input bg-background" />
         </Field>
         <Field label="Peso (kg)">
-          <input name="peso_kg" type="number" min="1" step="0.1" required className="field-input bg-background" />
+          <input name="peso_kg" type="number" inputMode="decimal" min="1" step="0.1" required className="field-input bg-background" />
         </Field>
       </div>
       <Field label="Note (opzionale)">

@@ -152,7 +152,7 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-muted">Durata (min)</span>
             <input
-              type="number"
+              type="number" inputMode="numeric"
               min="0"
               value={durataMin}
               onChange={(e) => setDurataMin(e.target.value)}
@@ -214,7 +214,7 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
                       <td className="py-2 pr-3 whitespace-nowrap">{r.esercizio_nome}</td>
                       <td className="py-2 pr-3">
                         <input
-                          type="number"
+                          type="number" inputMode="numeric"
                           value={form[r.id].serie}
                           onChange={(e) => setForm((f) => ({ ...f, [r.id]: { ...f[r.id], serie: e.target.value } }))}
                           className="field-input w-16 !py-1"
@@ -222,7 +222,7 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
                       </td>
                       <td className="py-2 pr-3">
                         <input
-                          type="number"
+                          type="number" inputMode="numeric"
                           value={form[r.id].rip}
                           onChange={(e) => setForm((f) => ({ ...f, [r.id]: { ...f[r.id], rip: e.target.value } }))}
                           className="field-input w-16 !py-1"
@@ -230,7 +230,7 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
                       </td>
                       <td className="py-2 pr-3">
                         <input
-                          type="number"
+                          type="number" inputMode="decimal"
                           step="0.5"
                           value={form[r.id].peso}
                           onChange={(e) => setForm((f) => ({ ...f, [r.id]: { ...f[r.id], peso: e.target.value } }))}
@@ -239,7 +239,7 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
                       </td>
                       <td className="py-2 pr-3">
                         <input
-                          type="number"
+                          type="number" inputMode="numeric"
                           value={form[r.id].tempo}
                           onChange={(e) => setForm((f) => ({ ...f, [r.id]: { ...f[r.id], tempo: e.target.value } }))}
                           className="field-input w-20 !py-1"

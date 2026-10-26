@@ -48,7 +48,7 @@ export function AddCardForm() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Quantità">
-          <input name="quantity" type="number" min="1" step="1" required defaultValue={1} className="field-input bg-surface" />
+          <input name="quantity" type="number" inputMode="numeric" min="1" step="1" required defaultValue={1} className="field-input bg-surface" />
         </Field>
         <Field label="Condizione">
           <select name="condition" defaultValue="NM" className="field-input bg-surface">
@@ -72,7 +72,7 @@ export function AddCardForm() {
           </select>
         </Field>
         <Field label="Prezzo di acquisto (€)">
-          <input name="purchase_price" type="number" min="0" step="0.01" className="field-input bg-surface" />
+          <input name="purchase_price" type="number" inputMode="decimal" min="0" step="0.01" className="field-input bg-surface" />
         </Field>
       </div>
 
@@ -80,7 +80,7 @@ export function AddCardForm() {
         label="Prezzo attuale manuale (€)"
         hint="Se compilato, sovrascrive il prezzo automatico da Cardmarket e viene registrato come prezzo di oggi — utile per Energy Marker o carte senza storico prezzo."
       >
-        <input name="manual_price" type="number" min="0" step="0.01" className="field-input bg-surface" />
+        <input name="manual_price" type="number" inputMode="decimal" min="0" step="0.01" className="field-input bg-surface" />
       </Field>
 
       <Field label="Note (opzionale)">
