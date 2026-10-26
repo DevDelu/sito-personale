@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "motion/react";
+import { m, useReducedMotion, type Variants } from "motion/react";
 import type { ReactNode } from "react";
 
 const itemVariants: Variants = {
@@ -19,7 +19,7 @@ export function RevealGroup({ children, className }: { children: ReactNode; clas
   const reduceMotion = useReducedMotion();
 
   return (
-    <motion.div
+    <m.div
       className={className}
       initial="hidden"
       animate="visible"
@@ -29,7 +29,7 @@ export function RevealGroup({ children, className }: { children: ReactNode; clas
       }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -50,7 +50,7 @@ export function RevealItem({
 
   if (inView) {
     return (
-      <motion.div
+      <m.div
         className={className}
         variants={variants}
         initial="hidden"
@@ -58,13 +58,13 @@ export function RevealItem({
         viewport={{ once: true }}
       >
         {children}
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
-    <motion.div className={className} variants={variants}>
+    <m.div className={className} variants={variants}>
       {children}
-    </motion.div>
+    </m.div>
   );
 }

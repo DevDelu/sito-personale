@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { MotionProvider } from "@/components/motion/MotionProvider";
 import { PublicHeader } from "@/components/public-header";
 import { baseUrlPubblica } from "@/lib/seo";
 
@@ -44,8 +45,10 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="site-public flex min-h-full flex-1 flex-col bg-background text-foreground">
-        <PublicHeader />
-        {children}
+        <MotionProvider>
+          <PublicHeader />
+          {children}
+        </MotionProvider>
       </div>
     </NextIntlClientProvider>
   );

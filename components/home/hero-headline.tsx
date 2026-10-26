@@ -2,7 +2,7 @@
 
 import { useRef, type PointerEvent } from "react";
 import {
-  motion,
+  m,
   useMotionValue,
   useSpring,
   useMotionTemplate,
@@ -57,25 +57,25 @@ export function HeroHeadline({ text }: { text: string }) {
   }
 
   return (
-    <motion.div
+    <m.div
       ref={containerRef}
       className="relative max-w-xl [perspective:800px]"
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
     >
-      <motion.h1
+      <m.h1
         className="font-sans text-5xl font-bold leading-[1.1] tracking-tight sm:text-6xl"
         style={{ rotateX: tiltX, rotateY: tiltY }}
       >
         {text}
-      </motion.h1>
-      <motion.h1
+      </m.h1>
+      <m.h1
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 font-sans text-5xl font-bold leading-[1.1] tracking-tight text-accent sm:text-6xl"
         style={{ rotateX: tiltX, rotateY: tiltY, WebkitMaskImage: maskImage, maskImage }}
       >
         {text}
-      </motion.h1>
-    </motion.div>
+      </m.h1>
+    </m.div>
   );
 }
