@@ -25,7 +25,7 @@ export function QuizLauncher() {
   return (
     <>
       <div className="flex flex-wrap gap-3 pt-2">
-        <button type="button" onClick={() => setOpen(true)} className="btn-primary !px-6 !py-3 text-base">
+        <button type="button" onClick={() => setOpen(true)} className="btn-primary min-h-[44px] !px-6 !py-3 text-base">
           Gioca
         </button>
       </div>
