@@ -663,6 +663,13 @@ body {
   color: var(--accent-foreground);
 }
 
+/* FullCalendar azzera l'outline sui suoi pulsanti (`.fc .fc-button:focus`):
+   senza questa regola da tastiera non si vede dove si è (issue #152). */
+.agenda-calendar .fc-button:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px;
+}
+
 .agenda-calendar a {
   color: inherit;
 }
