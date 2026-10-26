@@ -55,7 +55,7 @@ export function GestioneFilters({ categorie }: { categorie: Categoria[] }) {
         >
           <SlidersHorizontal className="h-5 w-5" />
           {filtriAttivi > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-foreground">
+            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[12px] font-semibold text-accent-foreground">
               {filtriAttivi}
             </span>
           )}

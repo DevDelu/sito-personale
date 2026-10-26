@@ -87,7 +87,7 @@ export function PositionsTable({
                       )}
                       {p.datiIncompleti && (
                         <span
-                          className="rounded-full border px-1.5 py-0.5 text-[10px] font-sans uppercase tracking-wide"
+                          className="rounded-full border px-1.5 py-0.5 text-[12px] font-sans uppercase tracking-wide"
                           style={{ borderColor: "var(--invest-stock)", color: "var(--invest-stock)" }}
                           title="La quantità reale è nota da un riferimento manuale, ma non tutte le transazioni sono ancora caricate: costo medio e plusvalenza restano parziali."
                         >
