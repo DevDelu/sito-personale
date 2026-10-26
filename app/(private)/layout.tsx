@@ -6,6 +6,7 @@ import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sidebar } from "@/components/sidebar";
 import { TabBar } from "@/components/shell/TabBar";
+import { RefreshAlRitorno } from "@/components/shell/RefreshAlRitorno";
 import { FeedbackProvider } from "@/components/feedback/FeedbackProvider";
 import { appViewport } from "@/lib/app-viewport";
 
@@ -59,6 +60,7 @@ export default async function PrivateLayout({
         </div>
       </div>
       <TabBar />
+      <RefreshAlRitorno />
       <FeedbackProvider owner={isOwner(user.email)} />
     </div>
   );
