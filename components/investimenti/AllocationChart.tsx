@@ -133,7 +133,7 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
               textAnchor="middle"
               dominantBaseline="middle"
               fill="currentColor"
-              className="text-muted text-[10px] uppercase tracking-wide"
+              className="text-muted text-[12px]"
             >
               Valore attuale
             </text>
