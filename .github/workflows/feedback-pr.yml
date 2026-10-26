@@ -30,7 +30,7 @@ jobs:
   aggiorna-stato:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v9
         env:
           RADAR_URL: ${{ secrets.RADAR_URL }}
           FEEDBACK_AGENTE_SECRET: ${{ secrets.FEEDBACK_AGENTE_SECRET || secrets.FEEDBACK_AGENT_SECRET }}
