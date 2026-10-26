@@ -103,3 +103,19 @@ for (const percorso of PAGINE) {
     expect(errori, "errori JS, console, 404 o 5xx").toEqual([]);
   });
 }
+
+// iPhone più stretti (375px): nessuna pagina deve allargarsi oltre lo schermo
+// (regressione #134: il SegmentedControl di Alimentazione sforava di 5px).
+for (const percorso of PAGINE) {
+  test(`${percorso} non scorre in orizzontale a 375px`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    const risposta = await page.goto(percorso, { waitUntil: "domcontentloaded" });
+    expect(risposta?.status(), "status HTTP").toBeLessThan(400);
+    await page.waitForLoadState("networkidle").catch(() => {});
+    const larghezze = await page.evaluate(() => ({
+      pagina: document.documentElement.scrollWidth,
+      schermo: window.innerWidth,
+    }));
+    expect(larghezze.pagina, "scroll orizzontale a 375px").toBeLessThanOrEqual(larghezze.schermo + 1);
+  });
+}
