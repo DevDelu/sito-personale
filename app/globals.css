@@ -502,6 +502,35 @@ body {
   }
 }
 
+/* Tap target ≥ 44px (linee guida iOS, issue #151) nell'area privata mobile:
+   pulsanti del design system, icone di riga, sottomenu di modulo e toolbar
+   del calendario. Il padding visivo non cambia: cresce solo l'area tocco,
+   con il contenuto centrato. Desktop e mouse restano invariati. */
+@media (max-width: 767px) and (pointer: coarse) {
+  .app-shell .btn-primary,
+  .app-shell .btn-secondary,
+  .app-shell .btn-danger,
+  .app-shell .btn-icon,
+  .app-shell [role="tab"],
+  .app-shell .agenda-calendar .fc-button {
+    min-height: 44px;
+  }
+  .app-shell .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+  }
+  .app-shell [role="tab"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .app-shell .agenda-calendar .fc-button {
+    min-width: 44px;
+  }
+}
+
 @layer components {
 
   /* Superficie a carta (grafici, pannelli, modali) con lieve elevazione */
