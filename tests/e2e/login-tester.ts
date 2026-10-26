@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import type { FullConfig } from "@playwright/test";
 import { writeFileSync, mkdirSync } from "node:fs";
+import { diagnosiAccesso } from "./diagnosi-accesso";
 
 // globalSetup: sessione dell'utente tester (sola lettura, vedi CLAUDE.md >
 // "Tester in sola lettura") senza passare dal form di /login, che ha
@@ -38,6 +39,23 @@ export default async function loginTester(config: FullConfig) {
     password: richiedi("TESTER_PASSWORD"),
   });
   if (error) throw new Error(`Login tester fallito: ${error.message}`);
+
+  // Prova unica: se il sito non fa entrare il tester, fermati con il motivo.
+  // Errori di rete della prova non bloccano nulla (ci pensano i test).
+  try {
+    const bypass = process.env.VERCEL_BYPASS_SECRET;
+    const risposta = await fetch(new URL("/spese", baseURL), {
+      redirect: "manual",
+      headers: {
+        cookie: cookie.map((c) => `${c.name}=${c.value}`).join("; "),
+        ...(bypass ? { "x-vercel-protection-bypass": bypass } : {}),
+      },
+    });
+    const motivo = diagnosiAccesso(baseURL, { status: risposta.status, location: risposta.headers.get("location") }, !!bypass);
+    if (motivo) throw new Error(motivo);
+  } catch (e) {
+    if (e instanceof Error && e.message.startsWith("Collaudo fermato")) throw e;
+  }
 
   const { hostname, protocol } = new URL(baseURL);
   mkdirSync("tests/e2e/.auth", { recursive: true });
