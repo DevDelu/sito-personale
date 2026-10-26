@@ -41,10 +41,13 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
 - Password con caratteri speciali (`!`): nel file delle variabili vanno tra virgolette singole e il JSON
   del login si costruisce con `JSON.stringify` in node, mai a mano nella shell. Il rifiuto "Invalid login
   credentials" del 26/10 (#133) non era una password sbagliata: con le variabili del prompt il login dà 200.
-- Il collaudo su GitHub Actions usa i secret del repo, non il blocco `VARIABILI` delle routine: se il
-  tester viene rifiutato solo lì (dal 26/10 le pagine private rimandano a `/login`, test pubblici verdi),
-  il secret `TESTER_PASSWORD` (e `TESTER_EMAIL`) del repo non coincide con la password attuale. Finché è
-  rosso nessuna PR può essere mergiata dal giro (regola: check verdi).
+- Collaudo rosso solo sulle anteprime Vercel (26/10, dalle 09:54): il login del tester riusciva (i test
+  partivano, la produzione passava a mano con `workflow_dispatch`) ma le pagine private finivano su un
+  percorso `/login`. I secret del tester non erano il problema. Da controllare nell'ordine:
+  `VERCEL_BYPASS_SECRET` (GitHub e Vercel > Deployment Protection) e `TESTER_EMAIL`/`OWNER_EMAIL` anche per
+  l'ambiente Preview. Le variabili di Vercel valgono solo per i deploy nuovi: per verificare serve
+  un'anteprima fresca, non il rilancio di una vecchia. Con il collaudo delle anteprime rosso il giro
+  non mergia, salvo via libera esplicito di Lorenzo (26/10: dato, merge con controllo su produzione).
 - Nella sandbox `gh pr create` fallisce (GraphQL): usare gli strumenti GitHub MCP o `gh api repos/.../pulls`.
   `npm run dev` richiede `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` fittizie, e il build
   locale non raggiunge Google Fonts: la verifica del build è la CI.
