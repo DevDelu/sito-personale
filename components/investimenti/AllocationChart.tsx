@@ -1,6 +1,6 @@
 "use client";
 
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import type { PieLabelRenderProps } from "recharts";
 import { formatCurrency } from "@/lib/investimenti/format";
 import type { Posizione } from "@/lib/investimenti/types";
@@ -94,8 +94,8 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
   const totaleValore = data.reduce((s, d) => s + d.totale, 0);
 
   return (
-    <div className="card flex h-80 w-full flex-col gap-1 p-4">
-      <div className="min-h-0 flex-1">
+    <div className="card flex w-full flex-col gap-3 p-4">
+      <div className="h-60 md:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -137,10 +137,25 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
             >
               Valore attuale
             </text>
-            <Legend wrapperStyle={{ color: "var(--muted)", fontSize: 12 }} />
           </PieChart>
         </ResponsiveContainer>
       </div>
+      {/* Legenda leggibile: nome, quota e valore per ogni tipo (le etichette
+          nella ciambella spariscono sotto il 4% e non danno gli importi). */}
+      <ul className="flex flex-col divide-y divide-border" aria-label="Allocazione per tipo">
+        {data.map((d) => (
+          <li key={d.gruppo} className="flex min-h-11 items-center gap-2 py-2 text-sm">
+            <span
+              className="h-3 w-3 shrink-0 rounded-full"
+              style={{ backgroundColor: `var(${GRUPPO_COLOR_VAR[d.gruppo]})` }}
+              aria-hidden="true"
+            />
+            <span className="font-medium">{d.nome}</span>
+            <span className="font-figures ml-auto text-muted">{d.percentuale.toFixed(1).replace(".", ",")}%</span>
+            <span className="font-figures w-28 text-right">{formatCurrency(d.totale)}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
