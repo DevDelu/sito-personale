@@ -115,7 +115,7 @@ export default async function AlimentazionePage({
       <section data-fb-area="alimentazione.overview.pasti-oggi" className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-sm font-medium text-muted">Pasti di oggi</h2>
-          <Link href="/alimentazione/aggiungi" className="btn-primary !px-3 !py-1.5">
+          <Link href="/alimentazione/aggiungi" className="btn-primary inline-flex min-h-[44px] items-center !px-3 !py-1.5">
             + Aggiungi pasto
           </Link>
         </div>
@@ -133,7 +133,7 @@ function AderenzaCard({ settimana, mese }: { settimana: number | null; mese: num
     <div data-fb-area="alimentazione.overview.aderenza" className="card flex flex-col gap-3 p-4">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-sm font-medium text-muted">Aderenza al piano</h2>
-        <Link href="/alimentazione/template" className="text-xs font-medium text-accent hover:underline">
+        <Link href="/alimentazione/template" className="inline-flex min-h-[44px] items-center text-xs font-medium text-accent hover:underline">
           Gestisci template
         </Link>
       </div>

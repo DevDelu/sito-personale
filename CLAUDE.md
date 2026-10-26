@@ -133,6 +133,7 @@ Punti da tenere a mente:
   `push_subscriptions`, migration `030_push_subscriptions.sql`), `sendPushToOwner()` restituisce
   `{ ok: false, reason: ... }` invece di lanciare — build, altre pagine e le route
   `app/api/push/*` restano funzionanti, la UI in `/impostazioni` mostra "non configurato".
+- **Badge sull'icona**: `public/sw.js` chiama `setAppBadge` dopo ogni push (numero di notifiche in attesa), `ServiceWorkerRegister` lo azzera in primo piano; API assente = nessun effetto.
 - **Owner-only**: tutte le route `app/api/push/*` controllano `getUser()` **+**
   `isOwner(user.email)`, non solo la sessione — un giocatore del quiz con login Google ha
   comunque una sessione Supabase valida (vedi sopra). `runtime = "nodejs"` obbligatorio (web-push

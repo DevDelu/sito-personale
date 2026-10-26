@@ -14,7 +14,7 @@ const CV_URL_BY_LOCALE: Record<string, string> = {
 // Stesso stile per i 3 bottoni (contattami, LinkedIn, CV): nessuno dei tre
 // deve spiccare come azione "primaria", sono alternative equivalenti.
 const HERO_BUTTON_CLASS =
-  "shrink-0 whitespace-nowrap rounded-md border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover sm:px-6 sm:py-3 sm:text-base";
+  "inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-md border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover sm:px-6 sm:py-3 sm:text-base";
 
 export async function Hero() {
   const t = await getTranslations("Hero");
@@ -25,9 +25,11 @@ export async function Hero() {
     <div className="relative w-full flex-1 overflow-hidden">
       <main className="relative z-10 mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-2xl flex-col items-center justify-center gap-8 px-6 py-20 text-center">
         <RevealGroup className="flex flex-col items-center gap-8">
-          <RevealItem>
+          {/* Fuori da RevealItem di proposito: l'HTML server partirebbe a opacity 0
+              e il titolo (LCP) comparirebbe solo dopo l'idratazione di JS. */}
+          <div>
             <HeroHeadline text={t("headline")} />
-          </RevealItem>
+          </div>
           <RevealItem className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto pt-2 sm:gap-3">
             <a href="#contatti" className={HERO_BUTTON_CLASS}>
               {t("ctaContact")}

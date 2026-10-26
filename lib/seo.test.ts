@@ -28,6 +28,12 @@ test("og nella lingua della pagina", () => {
   assert.equal((m.openGraph as { url?: string }).url, "/en");
 });
 
+test("twitter card grande, immagine dalla convenzione opengraph-image", () => {
+  const m = metadataPubblica({ locale: "it", percorso: "/", title: "T", description: "D" });
+  assert.equal((m.twitter as { card?: string }).card, "summary_large_image");
+  assert.equal((m.openGraph as { images?: unknown }).images, undefined);
+});
+
 test("base url: dominio di produzione invece dell'URL del deploy", () => {
   assert.equal(baseUrlPubblica({ NEXT_PUBLIC_SITE_URL: "https://a.example" }), "https://a.example");
   assert.equal(
@@ -55,4 +61,12 @@ test("vociSitemap: home e progetti in IT ed EN con alternative, niente rotte pri
   ]);
   assert.equal(voci[0].alternates.languages.en, "https://a.example/en");
   assert.ok(!urls.some((u) => /spese|login|api/.test(u)));
+});
+
+test("pagine annidate: immagine og esplicita nella lingua giusta", () => {
+  const it = metadataPubblica({ locale: "it", percorso: "/progetti/radar", title: "T", description: "D" });
+  const en = metadataPubblica({ locale: "en", percorso: "/progetti/radar", title: "T", description: "D" });
+  assert.equal((it.openGraph as { images: { url: string }[] }).images[0].url, "/opengraph-image");
+  assert.equal((en.openGraph as { images: { url: string }[] }).images[0].url, "/en/opengraph-image");
+  assert.deepEqual((en.twitter as { images: string[] }).images, ["/en/opengraph-image"]);
 });

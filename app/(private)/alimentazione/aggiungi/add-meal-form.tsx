@@ -4,6 +4,7 @@ import { useActionState, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { aggiungiPasto, registraPastoDaTemplate, type AggiungiPastoState } from "../actions";
 import { AlimentoSelector } from "@/components/alimentazione/AlimentoSelector";
+import { alimentiFrequenti } from "@/lib/alimentazione/frequenti";
 import type { Alimento, Pasto, TemplatePasto, TipoPasto } from "@/lib/alimentazione/types";
 
 const oggi = () => new Date().toISOString().slice(0, 10);
@@ -26,10 +27,14 @@ const TIPI: { value: TipoPasto; label: string }[] = [
 export function AddMealForm({
   alimenti,
   pastiRecenti,
+  pastiMese,
+  oggi: oggiIso,
   templates,
 }: {
   alimenti: Alimento[];
   pastiRecenti: Pasto[];
+  pastiMese: Pasto[];
+  oggi: string;
   templates: TemplatePasto[];
 }) {
   const router = useRouter();
@@ -68,6 +73,16 @@ export function AddMealForm({
     (p) => p.tipo_pasto === tipoPasto && p.alimento_id && alimentiList.some((a) => a.id === p.alimento_id)
   );
 
+  // "Usati di recente": chip per il tipo pasto scelto, solo alimenti ancora
+  // in catalogo. Un tap precompila alimento e quantità, "Aggiungi" salva.
+  const frequenti = useMemo(
+    () =>
+      alimentiFrequenti(pastiMese, tipoPasto, oggiIso, 12)
+        .filter((f) => f.alimentoId && alimentiList.some((a) => a.id === f.alimentoId))
+        .slice(0, 6),
+    [pastiMese, tipoPasto, oggiIso, alimentiList]
+  );
+
   function duplicaUltimo() {
     if (!ultimoSimile || !ultimoSimile.alimento_id) return;
     setAlimentoId(ultimoSimile.alimento_id);
@@ -99,11 +114,12 @@ export function AddMealForm({
           <button
             key={t.value}
             type="button"
+            aria-pressed={tipoPasto === t.value}
             onClick={() => {
               setTipoPasto(t.value);
               setJollyId("");
             }}
-            className={`rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-95 ${
+            className={`min-h-[44px] rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-95 ${
               tipoPasto === t.value
                 ? "border-accent bg-accent text-accent-foreground shadow-sm"
                 : "border-border text-muted hover:-translate-y-0.5 hover:text-foreground"
@@ -146,11 +162,36 @@ export function AddMealForm({
       <input type="hidden" name="tipo_pasto" value={tipoPasto} />
       <input type="hidden" name="alimento_id" value={alimentoId} />
 
+      {frequenti.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-muted">Usati di recente</span>
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+            {frequenti.map((f) => (
+              <button
+                key={f.alimentoId}
+                type="button"
+                aria-pressed={alimentoId === f.alimentoId}
+                onClick={() => {
+                  setAlimentoId(f.alimentoId!);
+                  setQuantita(String(f.ultimaQuantitaG));
+                }}
+                className={`flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm transition-all duration-200 ease-out active:scale-95 ${
+                  alimentoId === f.alimentoId ? "border-accent bg-accent/10 text-foreground" : "border-border text-muted"
+                }`}
+              >
+                <span className="font-medium">{f.nome}</span>
+                <span className="font-figures text-xs">{f.ultimaQuantitaG}g</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {ultimoSimile && (
         <button
           type="button"
           onClick={duplicaUltimo}
-          className="btn-secondary self-start !px-3 !py-1.5 text-xs"
+          className="btn-secondary min-h-[44px] self-start !px-3 !py-1.5 text-sm"
         >
           Duplica ultimo {TIPI.find((t) => t.value === tipoPasto)?.label.toLowerCase()} ({ultimoSimile.alimento_nome},{" "}
           {ultimoSimile.quantita_g}g)
@@ -211,10 +252,10 @@ export function AddMealForm({
       )}
 
       <div className="flex gap-3">
-        <button type="submit" disabled={pending || !alimentoId} className="btn-primary">
+        <button type="submit" disabled={pending || !alimentoId} className="btn-primary min-h-[44px]">
           {pending ? "Salvataggio..." : "Aggiungi"}
         </button>
-        <button type="button" onClick={() => router.back()} className="btn-secondary">
+        <button type="button" onClick={() => router.back()} className="btn-secondary min-h-[44px]">
           Annulla
         </button>
       </div>
@@ -289,7 +330,7 @@ function TemplatePanel({
         </p>
       )}
 
-      <button type="submit" disabled={pending} className="btn-primary self-start">
+      <button type="submit" disabled={pending} className="btn-primary min-h-[44px] self-start">
         {pending ? "Registrazione..." : "Registra pasto da template"}
       </button>
     </form>

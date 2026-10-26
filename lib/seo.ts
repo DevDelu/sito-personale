@@ -47,20 +47,25 @@ export function metadataPubblica({
   title: string;
   description: string;
 }): Metadata {
+  // La home prende l'immagine dalla convenzione app/[locale]/opengraph-image;
+  // le pagine annidate, con il loro openGraph, non la ereditano: indirizzo esplicito.
+  const immagine =
+    percorso === "/" ? undefined : [{ url: percorsoLocalizzato("/opengraph-image", locale), width: 1200, height: 630 }];
   return {
     title,
     description,
     alternates: alternatesPubbliche(percorso, locale),
     openGraph: {
+      ...(immagine && { images: immagine }),
       type: "website",
       siteName: "Lorenzo De Luca",
       locale: OG_LOCALE[locale] ?? OG_LOCALE[LOCALE_DEFAULT],
       url: percorsoLocalizzato(percorso, locale),
       title,
       description,
-      images: [{ url: IMMAGINE_OG, width: 738, height: 1145, alt: "Lorenzo De Luca" }],
+      // images: le aggiunge Next dalla convenzione app/[locale]/opengraph-image.tsx
     },
-    twitter: { card: "summary", title, description, images: [IMMAGINE_OG] },
+    twitter: { card: "summary_large_image", title, description, ...(immagine && { images: immagine.map((i) => i.url) }) },
   };
 }
 
