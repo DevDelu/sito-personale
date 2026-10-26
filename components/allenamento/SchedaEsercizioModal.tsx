@@ -6,6 +6,7 @@ import type {
   SchedaEsercizioFields,
 } from "@/app/(private)/allenamenti/actions";
 import type { Esercizio, SchedaEsercizioConNome, TipoMetrica, TipoRiga } from "@/lib/allenamento/types";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 const NUOVO_BLOCCO = "__nuovo_blocco__";
 const NUOVO_ESERCIZIO = "__nuovo_esercizio__";
@@ -150,7 +151,7 @@ export function SchedaEsercizioModal({
   }
 
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onCancel}>
       <form data-fb-area="allenamenti.esercizio-scheda" onSubmit={handleSubmit} className="modal-panel flex w-full max-w-lg flex-col gap-4 overflow-y-auto p-5">
         <h2 className="font-display text-base font-semibold">
           {riga ? `Modifica ${riga.esercizio_nome}` : "Aggiungi esercizio"}
@@ -400,7 +401,7 @@ export function SchedaEsercizioModal({
           </button>
         </div>
       </form>
-    </div>
+    </ModalDialog>
   );
 }
 

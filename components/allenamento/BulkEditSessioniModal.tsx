@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { BulkSessionePatch } from "@/app/(private)/allenamenti/actions";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 type CampoBulk = "durata_min" | "sensazione" | "note";
 
@@ -52,7 +53,7 @@ export function BulkEditSessioniModal({
   }
 
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onCancel}>
       <form data-fb-area="allenamenti.modifica-sessioni-multipla" onSubmit={handleSubmit} className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
         <div>
           <h2 className="font-display text-base font-semibold">Modifica in blocco</h2>
@@ -114,7 +115,7 @@ export function BulkEditSessioniModal({
           </button>
         </div>
       </form>
-    </div>
+    </ModalDialog>
   );
 }
 

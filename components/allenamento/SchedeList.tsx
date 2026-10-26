@@ -7,6 +7,7 @@ import { Archive, ArchiveRestore, Copy, Pencil, Plus, Trash2 } from "lucide-reac
 import { useSchedeMutations } from "@/hooks/useSchedeMutations";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import type { SchedaConMeta } from "@/lib/allenamento/queries";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 function formatUltimoUtilizzo(iso: string | null): string {
   if (!iso) return "Mai usata";
@@ -160,7 +161,7 @@ export function SchedeList({ schede }: { schede: SchedaConMeta[] }) {
       )}
 
       {nuovaAperta && (
-        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setNuovaAperta(false)}>
+        <ModalDialog onClose={() => setNuovaAperta(false)}>
           <form data-fb-area="allenamenti.nuova-scheda" onSubmit={handleCrea} className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
             <h2 className="font-display text-base font-semibold">Nuova scheda</h2>
             <label className="flex flex-col gap-1.5">
@@ -196,7 +197,7 @@ export function SchedeList({ schede }: { schede: SchedaConMeta[] }) {
               </button>
             </div>
           </form>
-        </div>
+        </ModalDialog>
       )}
 
       {eliminando && (

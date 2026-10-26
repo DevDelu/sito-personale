@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AssetSelector } from "./AssetSelector";
 import type { TransazionePatch } from "@/hooks/useTransazioneMutations";
 import type { Asset, CostoTipo, TipoTransazione, Transazione } from "@/lib/investimenti/types";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 const COSTO_TIPI: { value: CostoTipo; label: string; hint: string }[] = [
   { value: "verificato", label: "Verificato", hint: "Prezzo/quantità noti con certezza (estratto conto, exchange)." },
@@ -75,7 +76,7 @@ export function TransazioneFormModal({
   }
 
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onCancel}>
       <form data-fb-area="investimenti.transazione-form" data-fb-entita={transazione ? `transazione-investimento:${transazione.id}` : undefined} onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">{titolo}</h2>
 
@@ -177,6 +178,6 @@ export function TransazioneFormModal({
           </button>
         </div>
       </form>
-    </div>
+    </ModalDialog>
   );
 }
