@@ -25,9 +25,11 @@ export async function Hero() {
     <div className="relative w-full flex-1 overflow-hidden">
       <main className="relative z-10 mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-2xl flex-col items-center justify-center gap-8 px-6 py-20 text-center">
         <RevealGroup className="flex flex-col items-center gap-8">
-          <RevealItem>
+          {/* Fuori da RevealItem di proposito: l'HTML server partirebbe a opacity 0
+              e il titolo (LCP) comparirebbe solo dopo l'idratazione di JS. */}
+          <div>
             <HeroHeadline text={t("headline")} />
-          </RevealItem>
+          </div>
           <RevealItem className="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto pt-2 sm:gap-3">
             <a href="#contatti" className={HERO_BUTTON_CLASS}>
               {t("ctaContact")}
