@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { getImpostazioniAgenda, getNotaGiorno } from "@/lib/agenda/queries";
+import { getEventiRange, getImpostazioniAgenda, getNotaGiorno } from "@/lib/agenda/queries";
+import { componiPushAgenda } from "@/lib/agenda/digest";
+import { oggiItaliaISO } from "@/lib/cron/data-italia";
+import { sendPushToOwner } from "@/lib/push/send";
 
 function siteUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
@@ -24,15 +27,18 @@ function haTestoVero(html: string): boolean {
   return html.replace(/<[^>]*>/g, "").trim().length > 0;
 }
 
-function oggiISO(): string {
-  return new Date().toISOString().slice(0, 10);
+function spostaGiorno(data: string, giorni: number): string {
+  const d = new Date(`${data}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + giorni);
+  return d.toISOString().slice(0, 10);
 }
 
 // Cron mattutino (vercel.json, 7:00 UTC ≈ 9:00 in Italia — Vercel Cron non
 // supporta timezone, quindi con l'ora legale l'orario reale scala di 1h,
 // stesso limite già accettato per gli altri cron di questo progetto).
-// Manda un promemoria via email SOLO se esiste una nota non vuota per la
-// data odierna, e solo se il promemoria è attivo (interruttore in
+// Manda una push con il riepilogo di oggi (eventi + cenno alla nota) se c'è
+// almeno una delle due cose, e un'email SOLO se esiste una nota non vuota per
+// la data odierna; entrambe solo se il promemoria è attivo (interruttore in
 // agenda_impostazioni, gestito dalla pagina Agenda).
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET;
@@ -48,10 +54,26 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: true, inviata: false, motivo: "promemoria disattivato" });
   }
 
-  const data = oggiISO();
+  const data = oggiItaliaISO();
   const nota = await getNotaGiorno(data);
-  if (!nota || !haTestoVero(nota.contenuto)) {
-    return NextResponse.json({ ok: true, inviata: false, motivo: "nessuna nota per oggi" });
+  const haNota = !!nota && haTestoVero(nota.contenuto);
+
+  // Push: il testo non finisce nei log. Un errore qui non blocca l'email.
+  let pushInviata = false;
+  try {
+    // Margine di un giorno per parte: il filtro esatto (fuso Roma) è in componiPushAgenda.
+    const eventi = await getEventiRange(spostaGiorno(data, -1), spostaGiorno(data, 2));
+    const messaggio = componiPushAgenda(eventi, data, haNota);
+    if (messaggio) {
+      const esito = await sendPushToOwner({ ...messaggio, url: "/agenda", tag: "agenda-oggi" });
+      pushInviata = esito.ok;
+    }
+  } catch (e) {
+    console.error("Agenda note-reminder: push fallita.", (e as Error).message);
+  }
+
+  if (!nota || !haNota) {
+    return NextResponse.json({ ok: true, inviata: false, push: pushInviata, motivo: "nessuna nota per oggi" });
   }
 
   const apiKey = process.env.RESEND_API_KEY;
@@ -80,5 +102,5 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: (e as Error).message }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, inviata: true });
+  return NextResponse.json({ ok: true, inviata: true, push: pushInviata });
 }
