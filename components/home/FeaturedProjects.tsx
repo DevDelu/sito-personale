@@ -23,7 +23,7 @@ export async function FeaturedProjects() {
           </div>
           <Link
             href="/progetti"
-            className="group/link inline-flex shrink-0 items-center gap-1.5 font-mono text-sm text-muted transition-colors hover:text-foreground"
+            className="group/link inline-flex min-h-[44px] shrink-0 items-center gap-1.5 font-mono text-sm text-muted transition-colors hover:text-foreground"
           >
             {t("viewAll")}
             <ArrowRight

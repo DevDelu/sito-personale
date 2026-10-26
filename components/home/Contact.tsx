@@ -8,7 +8,7 @@ import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 import { SectionHeading } from "@/components/home/section-heading";
 
 const inputClass =
-  "w-full min-h-11 border-0 border-b border-border bg-transparent px-0 py-2 text-base text-foreground outline-none transition-colors placeholder:text-muted/60 focus:border-accent";
+  "w-full min-h-[44px] border-0 border-b border-border bg-transparent px-0 py-2 text-base text-foreground outline-none transition-colors placeholder:text-muted/60 focus:border-accent";
 
 export function Contact() {
   const t = useTranslations("Contact");
@@ -78,7 +78,7 @@ export function Contact() {
               <button
                 type="submit"
                 disabled={pending}
-                className="mt-2 min-h-11 self-start rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md disabled:pointer-events-none disabled:opacity-50"
+                className="mt-2 min-h-[44px] self-start rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md disabled:pointer-events-none disabled:opacity-50"
               >
                 {pending ? t("sending") : t("send")}
               </button>
