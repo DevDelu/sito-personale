@@ -14,7 +14,7 @@ const CV_URL_BY_LOCALE: Record<string, string> = {
 // Stesso stile per i 3 bottoni (contattami, LinkedIn, CV): nessuno dei tre
 // deve spiccare come azione "primaria", sono alternative equivalenti.
 const HERO_BUTTON_CLASS =
-  "shrink-0 whitespace-nowrap rounded-md border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover sm:px-6 sm:py-3 sm:text-base";
+  "inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-md border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover sm:px-6 sm:py-3 sm:text-base";
 
 export async function Hero() {
   const t = await getTranslations("Hero");
