@@ -56,6 +56,9 @@ export function ModalDialog({
       // Con più modali impilati risponde solo quello in cima.
       const tutti = document.querySelectorAll(".modal-overlay");
       if (tutti[tutti.length - 1] !== radice) return;
+      // "Indica il punto" del feedback: l'Esc serve a annullare la selezione
+      // (listener su window), non a chiudere il modale sotto e perdere i dati.
+      if (document.querySelector("[data-fb-barra-punto]")) return;
       if (e.key === "Escape") {
         e.stopPropagation();
         onCloseRef.current();
