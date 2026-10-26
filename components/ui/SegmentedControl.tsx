@@ -12,7 +12,7 @@ export function SegmentedControl({ items }: { items: SegmentedItem[] }) {
   const pathname = usePathname();
 
   return (
-    <div role="tablist" className="app-static flex gap-0.5 rounded-[10px] bg-surface-hover p-0.5 md:hidden">
+    <div role="tablist" className="app-static flex min-w-0 gap-0.5 rounded-[10px] bg-surface-hover p-0.5 md:hidden">
       {items.map((item) => {
         const attivo = pathname === item.href;
         return (
@@ -21,7 +21,7 @@ export function SegmentedControl({ items }: { items: SegmentedItem[] }) {
             href={item.href}
             role="tab"
             aria-selected={attivo}
-            className={`flex-1 rounded-[8px] px-3 py-1.5 text-center text-[15px] font-medium transition-all duration-150 ease-out active:scale-[0.97] ${
+            className={`min-w-0 flex-1 truncate rounded-[8px] px-2 py-1.5 text-center text-[15px] font-medium transition-all duration-150 ease-out active:scale-[0.97] ${
               attivo ? "bg-surface text-foreground shadow-sm" : "text-muted"
             }`}
           >
@@ -58,7 +58,7 @@ export function SegmentedPicker<T extends string>({
             role="radio"
             aria-checked={attivo}
             onClick={() => onChange(item.value)}
-            className={`flex-1 rounded-[8px] px-3 py-1.5 text-center text-[15px] font-medium transition-all duration-150 ease-out active:scale-[0.97] ${
+            className={`min-w-0 flex-1 truncate rounded-[8px] px-2 py-1.5 text-center text-[15px] font-medium transition-all duration-150 ease-out active:scale-[0.97] ${
               attivo ? "bg-surface text-foreground shadow-sm" : "text-muted"
             }`}
           >
