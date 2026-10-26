@@ -26,7 +26,7 @@ export async function Skills() {
                   {group.items.map((item) => (
                     <span
                       key={item}
-                      className="rounded-md border border-border px-2.5 py-1 font-mono text-[11px] text-muted"
+                      className="rounded-md border border-border px-2.5 py-1 font-mono text-[12px] text-muted"
                     >
                       {item}
                     </span>
