@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "motion/react";
+import { m, useReducedMotion, type Variants } from "motion/react";
 import Image from "next/image";
 import type { ReactNode } from "react";
 
@@ -29,7 +29,7 @@ export function MdxH2({ children }: { children?: ReactNode }) {
   const variants = useSectionVariants();
 
   return (
-    <motion.h2
+    <m.h2
       className="font-display mt-12 mb-4 border-l-[3px] border-solid pl-4 text-2xl font-medium italic text-foreground"
       initial="hidden"
       whileInView="visible"
@@ -37,7 +37,7 @@ export function MdxH2({ children }: { children?: ReactNode }) {
       variants={variants}
     >
       {children}
-    </motion.h2>
+    </m.h2>
   );
 }
 
@@ -45,7 +45,7 @@ export function MdxP({ children }: { children?: ReactNode }) {
   const variants = useSectionVariants();
 
   return (
-    <motion.p
+    <m.p
       className="mb-4 text-[15px] leading-[1.75] text-muted"
       initial="hidden"
       whileInView="visible"
@@ -53,7 +53,7 @@ export function MdxP({ children }: { children?: ReactNode }) {
       variants={variants}
     >
       {children}
-    </motion.p>
+    </m.p>
   );
 }
 
@@ -61,7 +61,7 @@ export function MdxUl({ children }: { children?: ReactNode }) {
   const variants = useSectionVariants();
 
   return (
-    <motion.ul
+    <m.ul
       className="mb-4 list-disc space-y-2 pl-5 text-[15px] leading-[1.75] text-muted"
       initial="hidden"
       whileInView="visible"
@@ -69,7 +69,7 @@ export function MdxUl({ children }: { children?: ReactNode }) {
       variants={variants}
     >
       {children}
-    </motion.ul>
+    </m.ul>
   );
 }
 
@@ -83,7 +83,7 @@ export function MdxImg({ src, alt, title }: { src?: string; alt?: string; title?
   if (!src) return null;
 
   return (
-    <motion.figure
+    <m.figure
       className="mb-6"
       initial="hidden"
       whileInView="visible"
@@ -100,6 +100,6 @@ export function MdxImg({ src, alt, title }: { src?: string; alt?: string; title?
         />
       </div>
       {title ? <figcaption className="mt-2 text-center text-xs text-muted">{title}</figcaption> : null}
-    </motion.figure>
+    </m.figure>
   );
 }
