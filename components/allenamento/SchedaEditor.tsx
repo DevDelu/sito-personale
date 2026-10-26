@@ -25,6 +25,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { SchedaEsercizioModal } from "./SchedaEsercizioModal";
 import type { SchedaEsercizioFields, NuovoSchedaEsercizioInput } from "@/app/(private)/allenamenti/actions";
 import type { Esercizio, Scheda, SchedaEsercizioConNome } from "@/lib/allenamento/types";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 type CampiModale = SchedaEsercizioFields &
   Pick<NuovoSchedaEsercizioInput, "esercizio_id" | "nuovo_esercizio_nome" | "nuovo_esercizio_tipo_metrica">;
@@ -382,7 +383,7 @@ export function SchedaEditor({
       )}
 
       {rinominandoBlocco && (
-        <div className="modal-overlay">
+        <ModalDialog onClose={() => setRinominandoBlocco(null)}>
           <div data-fb-area="allenamenti.rinomina-blocco" className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
             <h2 className="font-display text-base font-semibold">Rinomina blocco</h2>
             <label className="flex flex-col gap-1.5">
@@ -403,7 +404,7 @@ export function SchedaEditor({
               </button>
             </div>
           </div>
-        </div>
+        </ModalDialog>
       )}
     </div>
   );

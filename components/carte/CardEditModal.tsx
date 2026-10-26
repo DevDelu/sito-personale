@@ -5,6 +5,7 @@ import { CardPlaceholder } from "./CardPlaceholder";
 import { aggiornaImmagineCarta } from "@/app/(private)/carte/actions";
 import type { CardCondition, CollectionCard } from "@/lib/carte/types";
 import type { ModificaCartaPatch } from "@/app/(private)/carte/actions";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 const CONDITIONS: CardCondition[] = ["NM", "EX", "GD", "LP", "PL", "PO"];
 
@@ -99,7 +100,7 @@ export function CardEditModal({
   }
 
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onCancel}>
       <form data-fb-area="collezione.modifica-carta" data-fb-entita={`carta:${carta.id}`} onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">Modifica {carta.name}</h2>
 
@@ -223,7 +224,7 @@ export function CardEditModal({
           </button>
         </div>
       </form>
-    </div>
+    </ModalDialog>
   );
 }
 

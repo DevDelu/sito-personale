@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 // Overlay fotocamera per la scansione di un barcode EAN/UPC, usato solo
 // nella creazione inline di un alimento nel catalogo (vedi AlimentoSelector)
@@ -104,7 +105,7 @@ export function BarcodeScanner({
   }, []);
 
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onClose}>
       <div data-fb-area="alimentazione.scanner" className="modal-panel flex w-full max-w-md flex-col gap-3 p-5">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-base font-semibold">Cerca da barcode</h2>
@@ -133,6 +134,6 @@ export function BarcodeScanner({
           Annulla
         </button>
       </div>
-    </div>
+    </ModalDialog>
   );
 }

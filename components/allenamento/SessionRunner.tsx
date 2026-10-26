@@ -12,6 +12,7 @@ import { SessionRowNormale } from "./SessionRowNormale";
 import { SessionRowCircuito } from "./SessionRowCircuito";
 import { SessionRowStretching } from "./SessionRowStretching";
 import type { Scheda, SchedaEsercizioConNome, Sessione, SessioneLog } from "@/lib/allenamento/types";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 type Step =
   | { kind: "normale-solo"; row: SchedaEsercizioConNome }
@@ -390,7 +391,7 @@ function ConfermaDialog({
   onAnnulla: () => void;
 }) {
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onAnnulla}>
       <div data-fb-area="allenamenti.sessione.conferma" className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5 text-center">
         <h2 className="font-display text-base font-semibold">{titolo}</h2>
         <p className="text-sm text-muted">{messaggio}</p>
@@ -403,7 +404,7 @@ function ConfermaDialog({
           </button>
         </div>
       </div>
-    </div>
+    </ModalDialog>
   );
 }
 

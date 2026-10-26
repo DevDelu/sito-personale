@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { EventoPatch } from "@/app/(private)/agenda/actions";
 import { PALETTE_COLORI_EVENTO } from "@/lib/agenda/colori";
 import type { CategoriaEvento, Evento } from "@/lib/agenda/types";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 const CATEGORIE: { value: CategoriaEvento; label: string }[] = [
   { value: "ferie", label: "Ferie" },
@@ -83,7 +84,7 @@ export function EventoFormModal({
   }
 
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onCancel}>
       <form data-fb-area="agenda.evento-form" data-fb-entita={evento ? `evento:${evento.id}` : undefined} onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">{evento ? "Modifica evento" : "Nuovo evento"}</h2>
 
@@ -194,7 +195,7 @@ export function EventoFormModal({
           </button>
         </div>
       </form>
-    </div>
+    </ModalDialog>
   );
 }
 

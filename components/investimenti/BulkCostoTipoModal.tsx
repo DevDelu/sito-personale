@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { CostoTipo } from "@/lib/investimenti/types";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 const COSTO_TIPI: { value: CostoTipo; label: string }[] = [
   { value: "verificato", label: "Verificato" },
@@ -25,7 +26,7 @@ export function BulkCostoTipoModal({
   const [costoTipo, setCostoTipo] = useState<CostoTipo>("verificato");
 
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onCancel}>
       <div data-fb-area="investimenti.modifica-costo-multipla" className="modal-panel w-full max-w-sm p-5">
         <h2 className="font-display text-base font-semibold">Modifica qualità del costo in blocco</h2>
         <p className="mt-1 text-sm text-muted">
@@ -67,6 +68,6 @@ export function BulkCostoTipoModal({
           </button>
         </div>
       </div>
-    </div>
+    </ModalDialog>
   );
 }

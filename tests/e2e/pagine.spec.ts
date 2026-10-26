@@ -150,3 +150,17 @@ test("/agenda: i pulsanti della toolbar mostrano il focus da tastiera", async ({
   });
   expect(stile.outline !== "none" || stile.ombra !== "none", "focus visibile").toBe(true);
 });
+
+// Regressione #150: i modali grezzi sono dialoghi accessibili (role, focus
+// dentro il pannello, Esc chiude).
+test("/investimenti/gestione: il modale Aggiungi transazione è un dialogo e Esc lo chiude", async ({ page }) => {
+  await page.goto("/investimenti/gestione", { waitUntil: "domcontentloaded" });
+  await page.waitForLoadState("networkidle").catch(() => {});
+  await page.getByRole("button", { name: /Aggiungi transazione/i }).first().click();
+  const dialogo = page.locator('.modal-panel[role="dialog"]');
+  await expect(dialogo).toBeVisible();
+  await expect(dialogo).toHaveAttribute("aria-modal", "true");
+  expect(await dialogo.evaluate((el) => el.contains(document.activeElement)), "focus dentro il modale").toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(dialogo).toHaveCount(0);
+});
