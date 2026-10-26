@@ -271,6 +271,15 @@ html {
   font-size: 80%;
 }
 
+/* Sito pubblico su telefono: all'80% text-sm scende a ~11px e text-xs a
+   ~9,6px, sotto il minimo di 12px del progetto. Sotto 768px la radice torna
+   al 100% (come già fa l'area privata); il desktop resta com'era. */
+@media (max-width: 767px) {
+  html {
+    font-size: 100%;
+  }
+}
+
 /* UI mobile (area privata, PWA iOS): sotto 768px, quando il wrapper del
    layout privato (.app-shell, vedi app/(private)/layout.tsx) è nel DOM,
    riporta la radice al 100% così le misure iOS della scala tipografica
