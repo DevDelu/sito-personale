@@ -80,6 +80,19 @@ for (const percorso of PAGINE) {
       expect(Math.min(box.w, box.h), `tap target "${box.nome}"`).toBeGreaterThanOrEqual(44);
     }
 
+    // Pulsanti del design system, icone di riga, sottomenu e toolbar del
+    // calendario: area tocco ≥ 44px (issue #151). I checkbox restano fuori.
+    const piccoli = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>(
+        ".btn-primary, .btn-secondary, .btn-danger, .btn-icon, [role='tab'], .agenda-calendar .fc-button"
+      )]
+        .map((el) => ({ el, r: el.getBoundingClientRect() }))
+        .filter(({ r }) => r.width > 0 && r.height > 0 && Math.min(r.width, r.height) < 43.5)
+        .slice(0, 5)
+        .map(({ el, r }) => `<${el.tagName.toLowerCase()} class="${el.className.toString().slice(0, 50)}"> ${Math.round(r.width)}x${Math.round(r.height)}`)
+    );
+    expect(piccoli, "tap target sotto 44px").toEqual([]);
+
     // Nessun testo sotto i 12px fuori dalla tab bar (regola di CLAUDE.md).
     const testiPiccoli = await page.evaluate(() => {
       const nav = document.querySelector('nav[aria-label="Navigazione principale"]');
@@ -119,3 +132,21 @@ for (const percorso of PAGINE) {
     expect(larghezze.pagina, "scroll orizzontale a 375px").toBeLessThanOrEqual(larghezze.schermo + 1);
   });
 }
+
+// Regressione #152: i pulsanti della toolbar del calendario devono mostrare
+// il focus da tastiera (FullCalendar azzera l'outline di suo).
+test("/agenda: i pulsanti della toolbar mostrano il focus da tastiera", async ({ page }) => {
+  await page.goto("/agenda", { waitUntil: "domcontentloaded" });
+  await page.waitForLoadState("networkidle").catch(() => {});
+  const bottone = page.locator(".agenda-calendar .fc-button").first();
+  await expect(bottone).toBeVisible();
+  await page.keyboard.press("Tab");
+  await bottone.focus({ timeout: 5000 });
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  const stile = await bottone.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { outline: s.outlineStyle, ombra: s.boxShadow };
+  });
+  expect(stile.outline !== "none" || stile.ombra !== "none", "focus visibile").toBe(true);
+});

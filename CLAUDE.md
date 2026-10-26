@@ -104,7 +104,8 @@ auth, vedi commento in `.env.example`):
   di 15 minuti (il piano Hobby permette un solo cron al giorno, troppo poco da solo)
 - `/api/agenda/cron-sync` — sync agenda Google, notifica via email (Resend) se il refresh token
   è scaduto
-- `/api/agenda/note-reminder` — reminder note agenda
+- `/api/agenda/note-reminder` — reminder note agenda (email se c'è una nota) e push "Agenda di oggi" (numero di
+  eventi, primo evento, cenno alla nota; testo composto da `lib/agenda/digest.ts`, nessun push se non c'è nulla)
 
 ### PWA e notifiche push
 
