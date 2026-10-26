@@ -55,3 +55,13 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
   locale non raggiunge Google Fonts: la verifica del build è la CI.
 - Un agente che pusha da una worktree con un branch già esistente può includere commit altrui (successo
   con `audit/home-ux`): partire sempre da `origin/main` con `git checkout -B <nuovo> origin/main`.
+- `git fetch origin` prima di ogni `git checkout -B <branch> origin/main`: il 26/10 (sera) un branch creato da un
+  `origin/main` locale vecchio non aveva le PR appena mergiate, e il collaudo (che esegue i test dell'unione con
+  `main` contro l'anteprima del solo branch) è andato rosso con 18 test falliti (#159). Si sistema con un merge di
+  `origin/main` nel branch, non con un workaround nei test.
+- Prima del merge di una PR guarda che anche `collaudo` (non solo `controlli`) sia concluso: il 26/10 #154 è stata
+  mergiata con `collaudo` ancora in corso (è poi risultato verde, ma la regola resta).
+- Worktree degli agenti: `node_modules` come symlink fa fallire Turbopack (`next build`); per un build in worktree
+  serve `npm ci` dentro la worktree. Il build locale non raggiunge Google Fonts: la verifica è la CI.
+- Log del collaudo: `gh api .../actions/jobs/<id>/logs` è bloccato dal proxy; usa lo strumento GitHub MCP
+  `get_job_logs` con `run_id`, `failed_only` e `return_content`.
