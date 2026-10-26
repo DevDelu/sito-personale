@@ -62,7 +62,7 @@ export function Contact() {
                 <textarea id="message" name="message" required rows={5} className={`${inputClass} resize-none`} />
               </div>
 
-              <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+              <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
               <div
                 className="cf-turnstile"
                 data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
