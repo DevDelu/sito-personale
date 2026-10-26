@@ -119,3 +119,21 @@ for (const percorso of PAGINE) {
     expect(larghezze.pagina, "scroll orizzontale a 375px").toBeLessThanOrEqual(larghezze.schermo + 1);
   });
 }
+
+// Regressione #152: i pulsanti della toolbar del calendario devono mostrare
+// il focus da tastiera (FullCalendar azzera l'outline di suo).
+test("/agenda: i pulsanti della toolbar mostrano il focus da tastiera", async ({ page }) => {
+  await page.goto("/agenda", { waitUntil: "domcontentloaded" });
+  await page.waitForLoadState("networkidle").catch(() => {});
+  const bottone = page.locator(".agenda-calendar .fc-button").first();
+  await expect(bottone).toBeVisible();
+  await page.keyboard.press("Tab");
+  await bottone.focus({ timeout: 5000 });
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  const stile = await bottone.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { outline: s.outlineStyle, ombra: s.boxShadow };
+  });
+  expect(stile.outline !== "none" || stile.ombra !== "none", "focus visibile").toBe(true);
+});
