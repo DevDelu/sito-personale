@@ -86,3 +86,64 @@ export function personaJsonLd({ base, jobTitle }: { base: string; jobTitle: stri
     knowsLanguage: ["it", "en"],
   };
 }
+
+const ETICHETTE_BREADCRUMB: Record<string, { home: string; progetti: string }> =
+  {
+    it: { home: "Home", progetti: "Progetti" },
+    en: { home: "Home", progetti: "Projects" },
+  };
+
+// Dati strutturati di un case study: CreativeWork + BreadcrumbList
+// (Home > Progetti > progetto). URL assoluti, lingua della pagina.
+export function progettoJsonLd({
+  base,
+  locale,
+  slug,
+  nome,
+  descrizione,
+}: {
+  base: string;
+  locale: string;
+  slug: string;
+  nome: string;
+  descrizione: string;
+}) {
+  const etichette =
+    ETICHETTE_BREADCRUMB[locale] ?? ETICHETTE_BREADCRUMB[LOCALE_DEFAULT];
+  const url = (percorso: string) =>
+    new URL(percorsoLocalizzato(percorso, locale), base).toString();
+  const urlProgetto = url(`/progetti/${slug}`);
+  const opera = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: nome,
+    ...(descrizione && { description: descrizione }),
+    url: urlProgetto,
+    inLanguage: locale,
+    author: {
+      "@type": "Person",
+      name: "Lorenzo De Luca",
+      url: new URL(base).toString(),
+    },
+  };
+  const briciole = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: etichette.home,
+        item: url("/"),
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: etichette.progetti,
+        item: url("/progetti"),
+      },
+      { "@type": "ListItem", position: 3, name: nome, item: urlProgetto },
+    ],
+  };
+  return { opera, briciole };
+}
