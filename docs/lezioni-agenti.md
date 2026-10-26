@@ -38,3 +38,15 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
 - Nelle worktree degli agenti: mai `git add -A` dal checkout principale con `.claude/worktrees` presente
   (finiscono come repository incorporati nel commit); rimuovi le worktree prima del commit.
 - Nessuna PR chiusa senza merge né feedback `ostinato` negli ultimi 7 giorni: nulla da imparare da lì.
+- Password con caratteri speciali (`!`): nel file delle variabili vanno tra virgolette singole e il JSON
+  del login si costruisce con `JSON.stringify` in node, mai a mano nella shell. Il rifiuto "Invalid login
+  credentials" del 26/10 (#133) non era una password sbagliata: con le variabili del prompt il login dà 200.
+- Il collaudo su GitHub Actions usa i secret del repo, non il blocco `VARIABILI` delle routine: se il
+  tester viene rifiutato solo lì (dal 26/10 le pagine private rimandano a `/login`, test pubblici verdi),
+  il secret `TESTER_PASSWORD` (e `TESTER_EMAIL`) del repo non coincide con la password attuale. Finché è
+  rosso nessuna PR può essere mergiata dal giro (regola: check verdi).
+- Nella sandbox `gh pr create` fallisce (GraphQL): usare gli strumenti GitHub MCP o `gh api repos/.../pulls`.
+  `npm run dev` richiede `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` fittizie, e il build
+  locale non raggiunge Google Fonts: la verifica del build è la CI.
+- Un agente che pusha da una worktree con un branch già esistente può includere commit altrui (successo
+  con `audit/home-ux`): partire sempre da `origin/main` con `git checkout -B <nuovo> origin/main`.
