@@ -43,11 +43,13 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
   credentials" del 26/10 (#133) non era una password sbagliata: con le variabili del prompt il login dà 200.
 - Collaudo rosso solo sulle anteprime Vercel (26/10, dalle 09:54): il login del tester riusciva (i test
   partivano, la produzione passava a mano con `workflow_dispatch`) ma le pagine private finivano su un
-  percorso `/login`. I secret del tester non erano il problema. Da controllare nell'ordine:
-  `VERCEL_BYPASS_SECRET` (GitHub e Vercel > Deployment Protection) e `TESTER_EMAIL`/`OWNER_EMAIL` anche per
-  l'ambiente Preview. Le variabili di Vercel valgono solo per i deploy nuovi: per verificare serve
-  un'anteprima fresca, non il rilancio di una vecchia. Con il collaudo delle anteprime rosso il giro
-  non mergia, salvo via libera esplicito di Lorenzo (26/10: dato, merge con controllo su produzione).
+  percorso `/login`. Causa vera: il secret GitHub era stato salvato con il nome sbagliato
+  (`VERCEL_BYPASSS_SECRET`, tre S), quindi il workflow leggeva `VERCEL_BYPASS_SECRET` vuoto e Vercel
+  mandava il test al suo login (le anteprime sono protette). Non erano i secret del tester né il codice.
+  Un secret GitHub non si rinomina: si crea quello giusto e si cancella l'altro. Da allora il collaudo
+  si ferma subito con un messaggio che dice il motivo (`tests/e2e/diagnosi-accesso.ts`), e nel log
+  Actions la riga `VERCEL_BYPASS_SECRET:` vuota è il segnale. Le variabili di Vercel valgono solo per i
+  deploy nuovi: per verificare serve un'anteprima fresca, non il rilancio di una vecchia.
 - Nella sandbox `gh pr create` fallisce (GraphQL): usare gli strumenti GitHub MCP o `gh api repos/.../pulls`.
   `npm run dev` richiede `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` fittizie, e il build
   locale non raggiunge Google Fonts: la verifica del build è la CI.
