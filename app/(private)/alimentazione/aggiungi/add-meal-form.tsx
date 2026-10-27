@@ -191,7 +191,7 @@ export function AddMealForm({
         <button
           type="button"
           onClick={duplicaUltimo}
-          className="btn-secondary min-h-[44px] self-start !px-3 !py-1.5 text-sm"
+          className="btn-secondary min-h-[44px] self-stretch !px-3 !py-1.5 text-left text-[15px] !whitespace-normal md:self-start"
         >
           Duplica ultimo {TIPI.find((t) => t.value === tipoPasto)?.label.toLowerCase()} ({ultimoSimile.alimento_nome},{" "}
           {ultimoSimile.quantita_g}g)
@@ -315,9 +315,10 @@ function TemplatePanel({
                   value={riga.quantita}
                   onChange={(e) => aggiornaQuantita(index, e.target.value)}
                   inputMode="decimal"
-                  className="field-input w-20 bg-surface text-right"
+                  aria-label={`Quantità in grammi di ${alimento?.nome ?? "alimento"}`}
+                  className="field-input min-h-[44px] w-20 bg-surface text-right"
                 />
-                <span className="text-xs text-muted">g</span>
+                <span className="text-[13px] text-muted">g</span>
               </div>
             </div>
           );
