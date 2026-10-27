@@ -33,7 +33,7 @@ export function AddCardForm() {
       </Field>
 
       <Field label="Immagine" hint="Opzionale — foto della carta.">
-        <input name="image" type="file" accept="image/*" className="field-input bg-surface file:mr-3 file:rounded-md file:border-0 file:bg-[var(--accent)]/15 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent" />
+        <input name="image" type="file" accept="image/*" className="field-input max-md:min-h-11 bg-surface file:mr-3 file:rounded-md file:border-0 file:bg-[var(--accent)]/15 file:px-3 file:py-2 file:text-sm file:font-medium file:text-accent" />
       </Field>
 
       <Field label="Tipo prodotto">
@@ -110,7 +110,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
     <label className="flex flex-col gap-1.5">
       <span className="text-sm font-medium text-muted">
         {label}
-        {hint && <span className="ml-1.5 text-xs font-normal text-muted/70">{hint}</span>}
+        {hint && <span className="ml-1.5 text-[13px] font-normal text-muted/70">{hint}</span>}
       </span>
       {children}
     </label>
