@@ -29,7 +29,9 @@ export function PositionsTable({
   }
 
   return (
-    <div className="card overflow-x-auto">
+    <>
+      <PositionsCards posizioni={posizioni} transazioni={transazioni} />
+      <div className="card hidden overflow-x-auto md:block">
       <table className="w-full min-w-[720px] text-sm">
         <thead>
           <tr className="border-b border-border text-left text-xs text-muted">
@@ -182,6 +184,113 @@ export function PositionsTable({
           })}
         </tbody>
       </table>
-    </div>
+      </div>
+    </>
+  );
+}
+
+// Sotto i 768px la tabella a 7 colonne obbligava a scorrere in orizzontale
+// (prezzo, valore e plus/minusvalenza restavano fuori schermo): qui una scheda
+// per posizione, con gli stessi valori già calcolati dalla tabella.
+function PositionsCards({
+  posizioni,
+  transazioni,
+}: {
+  posizioni: Posizione[];
+  transazioni: TransazioneConAsset[];
+}) {
+  const [espansa, setEspansa] = useState<string | null>(null);
+
+  return (
+    <ul className="card divide-y divide-border md:hidden">
+      {posizioni.map((p) => {
+        const gainColor =
+          p.plusvalenzaAssoluta === null
+            ? "var(--muted)"
+            : p.plusvalenzaAssoluta >= 0
+              ? "var(--entrata)"
+              : "var(--spesa)";
+        const tipoColorVar = TIPO_ASSET_COLOR_VAR[p.asset.tipo] ?? "--muted";
+        const aperta = espansa === p.asset.id;
+        const transazioniAsset = transazioni.filter((t) => t.asset_id === p.asset.id);
+
+        return (
+          <li key={p.asset.id} data-fb-entita={`asset:${p.asset.isin ?? p.asset.ticker}`}>
+            <button
+              type="button"
+              aria-expanded={aperta}
+              onClick={() => setEspansa(aperta ? null : p.asset.id)}
+              className="flex min-h-11 w-full flex-col gap-2 px-4 py-3 text-left"
+            >
+              <span className="flex items-center gap-2">
+                <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: `var(${tipoColorVar})` }} />
+                <span className="min-w-0 flex-1 truncate font-medium">{p.asset.nome}</span>
+                {p.hasStimato && <AlertTriangle aria-label="Include costi stimati" className="h-4 w-4 shrink-0 text-accent" />}
+                {p.hasSconosciuto && (
+                  <HelpCircle aria-label="Include quantità a costo sconosciuto" className="h-4 w-4 shrink-0 text-muted" />
+                )}
+                {aperta ? (
+                  <ChevronDown className="h-4 w-4 shrink-0 text-muted" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 shrink-0 text-muted" />
+                )}
+              </span>
+              <span className="text-xs text-muted">
+                {p.asset.ticker} · {TIPO_ASSET_LABEL[p.asset.tipo] ?? p.asset.tipo}
+                {p.datiIncompleti && " · storico incompleto"}
+              </span>
+              <span className="font-figures flex items-baseline justify-between gap-3">
+                <span className="text-base font-semibold">
+                  {p.valoreAttuale === null ? "n/d" : formatCurrency(p.valoreAttuale)}
+                </span>
+                <span className="text-sm" style={{ color: gainColor }}>
+                  {p.plusvalenzaAssoluta === null
+                    ? "n/d"
+                    : `${formatCurrency(p.plusvalenzaAssoluta)} (${formatPercent(p.plusvalenzaPercentuale ?? 0)})`}
+                </span>
+              </span>
+              <span className="font-figures grid grid-cols-3 gap-2 text-xs text-muted">
+                <span>
+                  Quantità
+                  <br />
+                  <span className="text-foreground">{formatQuantita(p.quantitaValore)}</span>
+                </span>
+                <span>
+                  Medio carico
+                  <br />
+                  <span className="text-foreground">
+                    {p.costoMedioCarico === null ? "n/d" : formatCurrency(p.costoMedioCarico)}
+                  </span>
+                </span>
+                <span>
+                  Prezzo
+                  <br />
+                  <span className="text-foreground">
+                    {p.prezzoAttuale === null ? "n/d" : formatCurrency(p.prezzoAttuale)}
+                  </span>
+                </span>
+              </span>
+            </button>
+            {aperta && (
+              <ul className="font-figures divide-y divide-border bg-background px-4 text-sm">
+                {transazioniAsset.map((t) => (
+                  <li key={t.id} data-fb-entita={`transazione-investimento:${t.id}`} className="flex justify-between gap-3 py-2">
+                    <span className="text-muted">
+                      {new Date(`${t.data}T00:00:00Z`).toLocaleDateString("it-IT")} · {t.tipo === "buy" ? "Acquisto" : "Vendita"}
+                    </span>
+                    <span>
+                      {formatQuantita(t.quantita)} × {t.prezzo_unitario === null ? "n/d" : formatCurrency(t.prezzo_unitario)}
+                    </span>
+                  </li>
+                ))}
+                {transazioniAsset.length === 0 && (
+                  <li className="py-3 text-center font-sans text-muted">Nessuna transazione caricata per questo asset.</li>
+                )}
+              </ul>
+            )}
+          </li>
+        );
+      })}
+    </ul>
   );
 }
