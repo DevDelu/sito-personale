@@ -161,7 +161,7 @@ export function ProgressTable({ sessioni, log }: { sessioni: Sessione[]; log: Lo
             type="button"
             onClick={() => toggleColonna(nome)}
             aria-pressed={colonneAttive.includes(nome)}
-            className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
+            className={`rounded-full border px-2.5 py-1 text-xs font-medium max-md:min-h-11 max-md:px-4 max-md:text-[13px] transition-all duration-150 ease-out active:scale-95 ${
               colonneAttive.includes(nome)
                 ? "border-accent bg-accent text-accent-foreground shadow-sm"
                 : "border-border text-muted hover:text-foreground"
@@ -235,7 +235,7 @@ export function ProgressTable({ sessioni, log }: { sessioni: Sessione[]; log: Lo
               type="button"
               onClick={() => toggleMetricaGrafico(nome)}
               aria-pressed={metrichGrafico.includes(nome)}
-              className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-all duration-150 ease-out active:scale-95 ${
+              className={`rounded-full border px-2.5 py-1 text-xs font-medium max-md:min-h-11 max-md:px-4 max-md:text-[13px] transition-all duration-150 ease-out active:scale-95 ${
                 metrichGrafico.includes(nome) ? "opacity-100" : "opacity-40"
               }`}
               style={{
