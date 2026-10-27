@@ -1,4 +1,11 @@
 import "server-only";
+import { fetchConRetry } from "@/lib/investimenti/retry";
+
+// Chiave "demo" gratuita di CoinGecko (facoltativa): alza il limite di richieste.
+function headerCoinGecko(): HeadersInit {
+  const key = process.env.COINGECKO_DEMO_API_KEY;
+  return key ? { "x-cg-demo-api-key": key } : {};
+}
 
 export type PriceQuote = { prezzo: number; data: string };
 
@@ -24,8 +31,10 @@ export async function fetchYahooPrice(symbol: string): Promise<PriceQuote> {
 }
 
 export async function fetchCoinGeckoPrice(id: string, vsCurrency = "eur"): Promise<PriceQuote> {
-  const res = await fetch(
-    `https://api.coingecko.com/api/v3/simple/price?ids=${encodeURIComponent(id)}&vs_currencies=${vsCurrency}`
+  const res = await fetchConRetry(() =>
+    fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${encodeURIComponent(id)}&vs_currencies=${vsCurrency}`, {
+      headers: headerCoinGecko(),
+    })
   );
   if (!res.ok) throw new Error(`CoinGecko: HTTP ${res.status} per ${id}`);
 
@@ -78,8 +87,11 @@ export async function fetchCoinGeckoHistory(
 ): Promise<PriceQuote[]> {
   const from = Math.floor(new Date(`${fromDate}T00:00:00Z`).getTime() / 1000);
   const to = Math.floor(Date.now() / 1000);
-  const res = await fetch(
-    `https://api.coingecko.com/api/v3/coins/${encodeURIComponent(id)}/market_chart/range?vs_currency=${vsCurrency}&from=${from}&to=${to}`
+  const res = await fetchConRetry(() =>
+    fetch(
+      `https://api.coingecko.com/api/v3/coins/${encodeURIComponent(id)}/market_chart/range?vs_currency=${vsCurrency}&from=${from}&to=${to}`,
+      { headers: headerCoinGecko() }
+    )
   );
   if (!res.ok) throw new Error(`CoinGecko: HTTP ${res.status} per ${id}`);
 
