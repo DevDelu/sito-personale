@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rifiutaSeNonCron } from "@/lib/cron/auth";
 import { sendPushToOwner } from "@/lib/push/send";
 
 // Cron settimanale (vercel.json, domenica ~18:00 Italia): promemoria "alla
@@ -8,13 +9,8 @@ import { sendPushToOwner } from "@/lib/push/send";
 // caricata. Se in futuro serve renderlo condizionale (es. controllando
 // l'ultima transazione importata), è un lavoro a parte.
 export async function GET(request: Request) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: "Non autorizzato." }, { status: 401 });
-    }
-  }
+  const rifiutata = rifiutaSeNonCron(request);
+  if (rifiutata) return rifiutata;
 
   const risultato = await sendPushToOwner({
     title: "Upload spese settimanale",

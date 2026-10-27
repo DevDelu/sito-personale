@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rifiutaSeNonCron } from "@/lib/cron/auth";
 import { Resend } from "resend";
 import { GoogleReauthRequiredError } from "@/lib/agenda/google-client";
 import { GoogleNotConnectedError, runGoogleSync } from "@/lib/agenda/sync";
@@ -42,13 +43,8 @@ async function inviaAvvisoRiconnessione(): Promise<void> {
 // POST /api/agenda/sync (lib/agenda/sync.ts). Se il refresh fallisce con
 // invalid_grant, invia un'email di avviso e logga comunque l'errore.
 export async function GET(request: Request) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: "Non autorizzato." }, { status: 401 });
-    }
-  }
+  const rifiutata = rifiutaSeNonCron(request);
+  if (rifiutata) return rifiutata;
 
   try {
     const result = await runGoogleSync();

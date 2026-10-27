@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rifiutaSeNonCron } from "@/lib/cron/auth";
 import { Resend } from "resend";
 import { getEventiRange, getImpostazioniAgenda, getNotaGiorno } from "@/lib/agenda/queries";
 import { componiPushAgenda } from "@/lib/agenda/digest";
@@ -41,13 +42,8 @@ function spostaGiorno(data: string, giorni: number): string {
 // la data odierna; entrambe solo se il promemoria è attivo (interruttore in
 // agenda_impostazioni, gestito dalla pagina Agenda).
 export async function GET(request: Request) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: "Non autorizzato." }, { status: 401 });
-    }
-  }
+  const rifiutata = rifiutaSeNonCron(request);
+  if (rifiutata) return rifiutata;
 
   const impostazioni = await getImpostazioniAgenda();
   if (impostazioni && !impostazioni.promemoria_note_attivo) {
