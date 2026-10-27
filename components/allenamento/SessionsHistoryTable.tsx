@@ -174,7 +174,10 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: Sessione[] }) {
                       />
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap capitalize">
-                      <Link href={`/allenamenti/storico/${s.id}`} className="hover:text-accent hover:underline">
+                      <Link
+                        href={`/allenamenti/storico/${s.id}`}
+                        className="inline-flex min-h-11 items-center hover:text-accent hover:underline md:min-h-0"
+                      >
                         {formatData(s.data)}
                       </Link>
                     </td>
