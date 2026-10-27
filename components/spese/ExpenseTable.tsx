@@ -234,13 +234,13 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
             <span className="mr-auto text-[15px] font-medium">
               {righeSelezionate.length} {righeSelezionate.length === 1 ? "selezionato" : "selezionati"}
             </span>
-            <button type="button" onClick={() => setModificaBulk(true)} className="btn-secondary !px-3 !py-1.5">
+            <button type="button" onClick={() => setModificaBulk(true)} className="btn-secondary !px-3 !py-1.5 max-md:min-h-11">
               Modifica
             </button>
             <button
               type="button"
               onClick={() => setEliminaBulk(true)}
-              className="btn-secondary !px-3 !py-1.5 hover:!text-spesa"
+              className="btn-secondary !px-3 !py-1.5 max-md:min-h-11 hover:!text-spesa"
             >
               Elimina
             </button>
@@ -256,20 +256,20 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
               {righeSelezionate.length} {righeSelezionate.length === 1 ? "selezionato" : "selezionati"}
             </span>
             <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
-              <button type="button" onClick={() => setModificaBulk(true)} className="btn-primary !px-3 !py-1.5">
+              <button type="button" onClick={() => setModificaBulk(true)} className="btn-primary !px-3 !py-1.5 max-md:min-h-11">
                 Modifica in blocco
               </button>
               <button
                 type="button"
                 onClick={() => setEliminaBulk(true)}
-                className="btn-secondary !px-3 !py-1.5 hover:!text-spesa"
+                className="btn-secondary !px-3 !py-1.5 max-md:min-h-11 hover:!text-spesa"
               >
                 Elimina selezionate
               </button>
               <button
                 type="button"
                 onClick={() => setSelezionati(new Set())}
-                className="btn-secondary !px-3 !py-1.5"
+                className="btn-secondary !px-3 !py-1.5 max-md:min-h-11"
               >
                 Deseleziona
               </button>
