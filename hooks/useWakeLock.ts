@@ -1,9 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+type WakeLockSentinelLike = {
+  release: () => Promise<void>;
+  addEventListener: (type: "release", listener: () => void) => void;
+  removeEventListener: (type: "release", listener: () => void) => void;
+};
 
 type WakeLockNavigator = Navigator & {
-  wakeLock?: { request: (type: "screen") => Promise<{ release: () => Promise<void> }> };
+  wakeLock?: { request: (type: "screen") => Promise<WakeLockSentinelLike> };
 };
 
 // navigator.wakeLock.request('screen') all'avvio sessione, rilasciato alla
@@ -14,10 +20,15 @@ type WakeLockNavigator = Navigator & {
 // `hidden` (cambio app, blocco manuale, screen timeout) e NON lo riacquisisce
 // da sola al ritorno: senza il listener sotto, dopo un solo cambio app lo
 // schermo tornava a spegnersi per il resto della sessione.
+//
+// `isSupported`/`isActive` servono a mostrare un indicatore discreto
+// (WakeLockIndicator): chi si allena deve capire se lo schermo resterà acceso.
 export function useWakeLock(active: boolean) {
-  const lockRef = useRef<{ release: () => Promise<void> } | null>(null);
+  const lockRef = useRef<WakeLockSentinelLike | null>(null);
   const requestingRef = useRef(false);
   const cancelledRef = useRef(false);
+  const [isActive, setIsActive] = useState(false);
+  const [isSupported] = useState(() => typeof navigator !== "undefined" && "wakeLock" in navigator);
 
   // Stabile (usa solo ref): i componenti possono metterla nelle dipendenze
   // dei loro effetti senza riattivarli a ogni render.
@@ -33,6 +44,12 @@ export function useWakeLock(active: boolean) {
         return;
       }
       lockRef.current = lock;
+      lock.addEventListener("release", () => {
+        // Rilasciato dal browser (schermo spento, cambio app): lo stato resta onesto.
+        if (lockRef.current === lock) lockRef.current = null;
+        setIsActive(false);
+      });
+      setIsActive(true);
     } catch {
       // Negato o non disponibile: nessun impatto sul resto della sessione.
     } finally {
@@ -44,6 +61,9 @@ export function useWakeLock(active: boolean) {
     if (!active) return;
     cancelledRef.current = false;
 
+    // setState dentro request() avviene solo dopo l'await della richiesta
+    // (mai in modo sincrono nell'effetto): la regola non lo distingue.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     request();
 
     function onVisibilityChange() {
@@ -56,6 +76,7 @@ export function useWakeLock(active: boolean) {
       document.removeEventListener("visibilitychange", onVisibilityChange);
       lockRef.current?.release().catch(() => {});
       lockRef.current = null;
+      setIsActive(false);
     };
   }, [active, request]);
 
@@ -65,5 +86,5 @@ export function useWakeLock(active: boolean) {
   // cambio di stato (stesso motivo per cui qui accanto audio.unlock() viene
   // chiamato nel click e non in un effetto). L'effetto sopra resta comunque
   // la rete di sicurezza per il riaggancio dopo un cambio app.
-  return { requestNow: request };
+  return { requestNow: request, isSupported, isActive };
 }
