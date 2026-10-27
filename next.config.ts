@@ -5,6 +5,8 @@ const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
   : undefined;
 
+const CACHE_ASSET_PUBBLICI = "public, max-age=86400, stale-while-revalidate=604800";
+
 // Header di sicurezza applicati a ogni risposta: Vercel imposta alcuni
 // default ma non tutti, meglio esplicitarli qui. Niente Content-Security-
 // Policy globale in questo giro (rischio di rompere Framer Motion / script
@@ -20,6 +22,18 @@ async function headers() {
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
       ],
+    },
+    {
+      // Immagini e icone di public/ non hanno hash nel nome: oggi escono con
+      // "max-age=0, must-revalidate", quindi ogni visita le riconvalida.
+      // 1 giorno di cache + stale-while-revalidate (no immutable: il nome puo' restare uguale
+      // con contenuto nuovo).
+      source: "/images/:path*",
+      headers: [{ key: "Cache-Control", value: CACHE_ASSET_PUBBLICI }],
+    },
+    {
+      source: "/icons/:path*",
+      headers: [{ key: "Cache-Control", value: CACHE_ASSET_PUBBLICI }],
     },
     {
       // Il service worker non va mai servito da cache: un browser che tiene
