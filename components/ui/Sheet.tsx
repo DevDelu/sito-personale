@@ -26,6 +26,7 @@ export function Sheet({
   posizione = "basso",
   area,
   entita,
+  chiudiSuSfondo = true,
 }: {
   onClose: () => void;
   children: React.ReactNode;
@@ -33,6 +34,9 @@ export function Sheet({
   posizione?: "basso" | "alto";
   area: string;
   entita?: string;
+  // false per i form: un tocco sbagliato fuori dal pannello non deve far
+  // perdere i dati inseriti (si chiude con Esc, Annulla o trascinando).
+  chiudiSuSfondo?: boolean;
 }) {
   const alto = posizione === "alto";
   const [trascinabile, setTrascinabile] = useState(false);
@@ -62,7 +66,7 @@ export function Sheet({
     <div
       className={`modal-overlay ${alto ? "modal-overlay--alto" : ""}`}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (chiudiSuSfondo && e.target === e.currentTarget) onClose();
       }}
     >
       <motion.div
