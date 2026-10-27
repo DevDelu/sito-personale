@@ -202,7 +202,7 @@ export function CategoryPieChart({
               key={t.id}
               type="button"
               onClick={() => setTipoFiltro(t.id)}
-              className={`rounded-full px-3 py-1 text-sm transition-all duration-200 ease-out active:scale-95 ${
+              className={`rounded-full px-3 py-1 text-sm max-md:min-h-11 max-md:px-4 transition-all duration-200 ease-out active:scale-95 ${
                 tipoFiltro === t.id
                   ? "bg-accent text-accent-foreground shadow-sm"
                   : "text-muted hover:text-foreground"
@@ -271,7 +271,7 @@ export function CategoryPieChart({
             <button
               type="button"
               onClick={() => setCategoriaSelezionata(null)}
-              className="rounded-full px-2 py-1 text-xs text-muted transition-colors hover:bg-surface-hover hover:text-foreground"
+              className="rounded-full px-2 py-1 text-xs text-muted max-md:min-h-11 max-md:px-4 transition-colors hover:bg-surface-hover hover:text-foreground"
             >
               Chiudi
             </button>
