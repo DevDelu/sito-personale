@@ -71,7 +71,7 @@ export function AddTransactionForm({
           min="0.01"
           required
           autoFocus
-          className="field-input bg-surface text-center text-[32px] font-bold max-md:py-4 md:text-left md:text-base md:font-normal"
+          className="field-input bg-surface text-center text-[24px] font-semibold max-md:py-3 md:text-left md:text-base md:font-normal"
         />
       </Field>
 
@@ -94,7 +94,7 @@ export function AddTransactionForm({
         />
       </Field>
 
-      <Field label="Categoria">
+      <Field label="Categoria (facoltativa, di default Altro)">
         <CategoriaPickerSheet
           categorie={categorieList}
           tipo={tipo}
