@@ -10,6 +10,10 @@ export function HtmlLangSync() {
   const locale = useLocale();
   useEffect(() => {
     document.documentElement.lang = locale;
+    // Uscendo dall'area pubblica (layout radice persistente) si torna a "it".
+    return () => {
+      document.documentElement.lang = "it";
+    };
   }, [locale]);
   return null;
 }
