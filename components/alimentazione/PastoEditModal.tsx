@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Pasto, TipoPasto } from "@/lib/alimentazione/types";
 import type { PastoPatch } from "@/hooks/usePastoMutations";
-import { ModalDialog } from "@/components/ui/ModalDialog";
+import { Sheet } from "@/components/ui/Sheet";
 
 const TIPI: { value: TipoPasto; label: string }[] = [
   { value: "colazione", label: "Colazione" },
@@ -41,8 +41,8 @@ export function PastoEditModal({
   }
 
   return (
-    <ModalDialog onClose={onCancel}>
-      <form data-fb-area="alimentazione.modifica-pasto" data-fb-entita={`pasto:${pasto.id}`} onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
+    <Sheet onClose={onCancel} className="max-w-md p-5" area="alimentazione.modifica-pasto" entita={`pasto:${pasto.id}`} chiudiSuSfondo={false}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <h2 className="font-display text-base font-semibold">Modifica pasto</h2>
         <p className="text-sm text-muted">
           {pasto.alimento_nome} — la quantità aggiorna kcal/macro in proporzione allo snapshot originale.
@@ -100,6 +100,6 @@ export function PastoEditModal({
           </button>
         </div>
       </form>
-    </ModalDialog>
+    </Sheet>
   );
 }
