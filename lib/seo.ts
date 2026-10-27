@@ -87,6 +87,39 @@ export function personaJsonLd({ base, jobTitle }: { base: string; jobTitle: stri
   };
 }
 
+// Voci della sitemap: ogni pagina pubblica in IT ed EN, con le alternative di
+// lingua. Pura (riceve gli slug) così si testa senza leggere i file MDX.
+export function vociSitemap(base: string, slugProgetti: string[]) {
+  const percorsi = ["/", "/progetti", ...slugProgetti.map((s) => `/progetti/${s}`)];
+  const assoluto = (percorso: string, locale: string) =>
+    new URL(percorsoLocalizzato(percorso, locale), base).toString();
+  return percorsi.flatMap((percorso) =>
+    LOCALI_PUBBLICHE.map((locale) => ({
+      url: assoluto(percorso, locale),
+      alternates: {
+        languages: Object.fromEntries(LOCALI_PUBBLICHE.map((l) => [l, assoluto(percorso, l)])),
+      },
+    }))
+  );
+}
+
+// Rotte che i crawler non devono visitare (area privata, login, API).
+export const PERCORSI_NON_INDICIZZABILI = [
+  "/spese",
+  "/investimenti",
+  "/carte",
+  "/allenamenti",
+  "/agenda",
+  "/alimentazione",
+  "/impostazioni",
+  "/altro",
+  "/feedback",
+  "/login",
+  "/reset-password",
+  "/auth",
+  "/api",
+];
+
 const ETICHETTE_BREADCRUMB: Record<string, { home: string; progetti: string }> =
   {
     it: { home: "Home", progetti: "Progetti" },

@@ -6,6 +6,7 @@ import {
   jsonLdSicuro,
   metadataPubblica,
   percorsoLocalizzato,
+  vociSitemap,
   progettoJsonLd,
 } from "./seo.ts";
 
@@ -46,6 +47,21 @@ test("base url: dominio di produzione invece dell'URL del deploy", () => {
 
 test("json-ld senza < letterali", () => {
   assert.equal(jsonLdSicuro({ a: "</script>" }), '{"a":"\\u003c/script>"}');
+});
+
+test("vociSitemap: home e progetti in IT ed EN con alternative, niente rotte private", () => {
+  const voci = vociSitemap("https://a.example", ["radar"]);
+  const urls = voci.map((v) => v.url);
+  assert.deepEqual(urls, [
+    "https://a.example/",
+    "https://a.example/en",
+    "https://a.example/progetti",
+    "https://a.example/en/progetti",
+    "https://a.example/progetti/radar",
+    "https://a.example/en/progetti/radar",
+  ]);
+  assert.equal(voci[0].alternates.languages.en, "https://a.example/en");
+  assert.ok(!urls.some((u) => /spese|login|api/.test(u)));
 });
 
 test("pagine annidate: immagine og esplicita nella lingua giusta", () => {
