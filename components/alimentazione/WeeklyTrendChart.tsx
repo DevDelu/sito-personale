@@ -48,7 +48,7 @@ export function WeeklyTrendChart({
               y={targetKcal}
               stroke="var(--muted)"
               strokeDasharray="4 4"
-              label={{ value: "Target", position: "insideTopRight", fill: "var(--muted)", fontSize: 11 }}
+              label={{ value: "Target", position: "insideTopRight", fill: "var(--muted)", fontSize: 12 }}
             />
           )}
           <Area

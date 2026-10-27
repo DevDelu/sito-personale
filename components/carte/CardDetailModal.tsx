@@ -15,6 +15,7 @@ import {
 import { getStoricoPrezzo } from "@/app/(private)/carte/actions";
 import type { PricePoint } from "@/lib/carte/queries";
 import type { CollectionCard } from "@/lib/carte/types";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 // recharts (~400KB) resta fuori dal bundle principale di /carte: il grafico
 // serve solo quando il popup di dettaglio è aperto, non al caricamento pagina.
@@ -54,7 +55,7 @@ export function CardDetailModal({
   }, [carta.id, carta.id_product]);
 
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onClose}>
       <div data-fb-area="collezione.dettaglio-carta" data-fb-entita={`carta:${carta.id}`} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <div className="flex items-start justify-between gap-2">
           <h2 className="font-display text-base font-semibold">{carta.name}</h2>
@@ -114,7 +115,7 @@ export function CardDetailModal({
           </button>
         </div>
       </div>
-    </div>
+    </ModalDialog>
   );
 }
 

@@ -211,7 +211,7 @@ export function AddMealForm({
         <Field label="Quantità (g)">
           <input
             name="quantita_g"
-            type="number"
+            type="number" inputMode="numeric"
             min="1"
             step="1"
             required

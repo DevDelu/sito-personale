@@ -134,7 +134,7 @@ export function SessionRowNormale({
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-medium text-muted">Ripetizioni</span>
               <input
-                type="number"
+                type="number" inputMode="numeric"
                 value={rip}
                 onChange={(e) => setRip(e.target.value)}
                 className="field-input w-24"
@@ -144,7 +144,7 @@ export function SessionRowNormale({
               <label className="flex flex-col gap-1.5">
                 <span className="text-xs font-medium text-muted">Peso (kg)</span>
                 <input
-                  type="number"
+                  type="number" inputMode="decimal"
                   step="0.5"
                   value={peso}
                   onChange={(e) => setPeso(e.target.value)}

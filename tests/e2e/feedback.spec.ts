@@ -22,6 +22,8 @@ test("pressione lunga sulla tab attiva apre il feedback e Annulla lo chiude", as
 
   await expect(page.getByRole("heading", { name: "Feedback" })).toBeVisible();
   await expect(page.locator("textarea")).toBeFocused();
+  // Accessibilità (#140): lo sheet è un dialogo modale annunciato da VoiceOver.
+  await expect(page.getByRole("dialog")).toBeVisible();
   expect(new URL(page.url()).pathname, "la pressione lunga non deve navigare").toBe("/spese");
 
   await page.getByRole("button", { name: "Annulla" }).click();

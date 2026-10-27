@@ -6,6 +6,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useImpegniMutations } from "@/hooks/useImpegniMutations";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import type { ImpegnoFisso } from "@/lib/allenamento/types";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 const GIORNI = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
 
@@ -126,7 +127,7 @@ function ImpegnoFormModal({
   }
 
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onCancel}>
       <form data-fb-area="allenamenti.impegno-fisso" onSubmit={handleSubmit} className="modal-panel flex w-full max-w-sm flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">Nuovo impegno fisso</h2>
 
@@ -182,6 +183,6 @@ function ImpegnoFormModal({
           </button>
         </div>
       </form>
-    </div>
+    </ModalDialog>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Pasto, TipoPasto } from "@/lib/alimentazione/types";
 import type { PastoPatch } from "@/hooks/usePastoMutations";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 const TIPI: { value: TipoPasto; label: string }[] = [
   { value: "colazione", label: "Colazione" },
@@ -40,7 +41,7 @@ export function PastoEditModal({
   }
 
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onCancel}>
       <form data-fb-area="alimentazione.modifica-pasto" data-fb-entita={`pasto:${pasto.id}`} onSubmit={handleSubmit} className="modal-panel flex w-full max-w-md flex-col gap-4 p-5">
         <h2 className="font-display text-base font-semibold">Modifica pasto</h2>
         <p className="text-sm text-muted">
@@ -70,7 +71,7 @@ export function PastoEditModal({
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-muted">Quantità (g)</span>
             <input
-              type="number"
+              type="number" inputMode="numeric"
               min="1"
               value={quantita}
               onChange={(e) => setQuantita(e.target.value)}
@@ -99,6 +100,6 @@ export function PastoEditModal({
           </button>
         </div>
       </form>
-    </div>
+    </ModalDialog>
   );
 }

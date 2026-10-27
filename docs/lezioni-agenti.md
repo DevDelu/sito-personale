@@ -38,3 +38,30 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
 - Nelle worktree degli agenti: mai `git add -A` dal checkout principale con `.claude/worktrees` presente
   (finiscono come repository incorporati nel commit); rimuovi le worktree prima del commit.
 - Nessuna PR chiusa senza merge né feedback `ostinato` negli ultimi 7 giorni: nulla da imparare da lì.
+- Password con caratteri speciali (`!`): nel file delle variabili vanno tra virgolette singole e il JSON
+  del login si costruisce con `JSON.stringify` in node, mai a mano nella shell. Il rifiuto "Invalid login
+  credentials" del 26/10 (#133) non era una password sbagliata: con le variabili del prompt il login dà 200.
+- Collaudo rosso solo sulle anteprime Vercel (26/10, dalle 09:54): il login del tester riusciva (i test
+  partivano, la produzione passava a mano con `workflow_dispatch`) ma le pagine private finivano su un
+  percorso `/login`. Causa vera: il secret GitHub era stato salvato con il nome sbagliato
+  (`VERCEL_BYPASSS_SECRET`, tre S), quindi il workflow leggeva `VERCEL_BYPASS_SECRET` vuoto e Vercel
+  mandava il test al suo login (le anteprime sono protette). Non erano i secret del tester né il codice.
+  Un secret GitHub non si rinomina: si crea quello giusto e si cancella l'altro. Da allora il collaudo
+  si ferma subito con un messaggio che dice il motivo (`tests/e2e/diagnosi-accesso.ts`), e nel log
+  Actions la riga `VERCEL_BYPASS_SECRET:` vuota è il segnale. Le variabili di Vercel valgono solo per i
+  deploy nuovi: per verificare serve un'anteprima fresca, non il rilancio di una vecchia.
+- Nella sandbox `gh pr create` fallisce (GraphQL): usare gli strumenti GitHub MCP o `gh api repos/.../pulls`.
+  `npm run dev` richiede `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` fittizie, e il build
+  locale non raggiunge Google Fonts: la verifica del build è la CI.
+- Un agente che pusha da una worktree con un branch già esistente può includere commit altrui (successo
+  con `audit/home-ux`): partire sempre da `origin/main` con `git checkout -B <nuovo> origin/main`.
+- `git fetch origin` prima di ogni `git checkout -B <branch> origin/main`: il 26/10 (sera) un branch creato da un
+  `origin/main` locale vecchio non aveva le PR appena mergiate, e il collaudo (che esegue i test dell'unione con
+  `main` contro l'anteprima del solo branch) è andato rosso con 18 test falliti (#159). Si sistema con un merge di
+  `origin/main` nel branch, non con un workaround nei test.
+- Prima del merge di una PR guarda che anche `collaudo` (non solo `controlli`) sia concluso: il 26/10 #154 è stata
+  mergiata con `collaudo` ancora in corso (è poi risultato verde, ma la regola resta).
+- Worktree degli agenti: `node_modules` come symlink fa fallire Turbopack (`next build`); per un build in worktree
+  serve `npm ci` dentro la worktree. Il build locale non raggiunge Google Fonts: la verifica è la CI.
+- Log del collaudo: `gh api .../actions/jobs/<id>/logs` è bloccato dal proxy; usa lo strumento GitHub MCP
+  `get_job_logs` con `run_id`, `failed_only` e `return_content`.

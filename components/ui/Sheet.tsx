@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, type PanInfo } from "motion/react";
+import { etichettaAreaBreve } from "@/lib/feedback/aree";
 
 // Oltre questa distanza (px) o con un flick abbastanza veloce, trascinare
 // verso il basso chiude il bottom sheet come farebbe un'app nativa.
@@ -66,6 +67,9 @@ export function Sheet({
     >
       <motion.div
         className={`modal-panel w-full max-w-md ${alto ? "modal-panel--alto" : ""} ${className}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={etichettaAreaBreve(area) ?? undefined}
         data-fb-area={area}
         data-fb-entita={entita}
         drag={trascinabile ? "y" : false}

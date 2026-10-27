@@ -77,7 +77,10 @@ for (const p of sorgenti) {
   for (const area of areeUsate(sorgente)) {
     if (!AREE.has(area)) errori.push(`${rel(p)}: area "${area}" non presente in lib/feedback/aree.ts`);
   }
-  const overlay = (sorgente.match(/className="modal-overlay/g) ?? []).length;
+  // I modali grezzi usano `modal-overlay` o <ModalDialog> (che lo rende); il
+  // componente stesso è l'implementazione, non un modale.
+  if (rel(p) === "components/ui/ModalDialog.tsx") continue;
+  const overlay = (sorgente.match(/className="modal-overlay|<ModalDialog[ >]/g) ?? []).length;
   if (overlay > 0) {
     const pannelliConArea = (sorgente.match(/data-fb-area=[^>]*className="modal-panel/g) ?? []).length;
     if (pannelliConArea < overlay) {

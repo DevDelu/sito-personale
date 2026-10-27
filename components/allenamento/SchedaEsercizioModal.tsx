@@ -6,6 +6,7 @@ import type {
   SchedaEsercizioFields,
 } from "@/app/(private)/allenamenti/actions";
 import type { Esercizio, SchedaEsercizioConNome, TipoMetrica, TipoRiga } from "@/lib/allenamento/types";
+import { ModalDialog } from "@/components/ui/ModalDialog";
 
 const NUOVO_BLOCCO = "__nuovo_blocco__";
 const NUOVO_ESERCIZIO = "__nuovo_esercizio__";
@@ -150,7 +151,7 @@ export function SchedaEsercizioModal({
   }
 
   return (
-    <div className="modal-overlay">
+    <ModalDialog onClose={onCancel}>
       <form data-fb-area="allenamenti.esercizio-scheda" onSubmit={handleSubmit} className="modal-panel flex w-full max-w-lg flex-col gap-4 overflow-y-auto p-5">
         <h2 className="font-display text-base font-semibold">
           {riga ? `Modifica ${riga.esercizio_nome}` : "Aggiungi esercizio"}
@@ -263,7 +264,7 @@ export function SchedaEsercizioModal({
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <Field label="Serie target">
                 <input
-                  type="number"
+                  type="number" inputMode="numeric"
                   min="0"
                   value={form.targetSerie}
                   onChange={(e) => setForm((f) => ({ ...f, targetSerie: e.target.value }))}
@@ -272,7 +273,7 @@ export function SchedaEsercizioModal({
               </Field>
               <Field label="Rip. min">
                 <input
-                  type="number"
+                  type="number" inputMode="numeric"
                   min="0"
                   value={form.targetRipMin}
                   onChange={(e) => setForm((f) => ({ ...f, targetRipMin: e.target.value }))}
@@ -281,7 +282,7 @@ export function SchedaEsercizioModal({
               </Field>
               <Field label="Rip. max">
                 <input
-                  type="number"
+                  type="number" inputMode="numeric"
                   min="0"
                   value={form.targetRipMax}
                   onChange={(e) => setForm((f) => ({ ...f, targetRipMax: e.target.value }))}
@@ -292,7 +293,7 @@ export function SchedaEsercizioModal({
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <Field label="Peso (kg)" hint="se l'esercizio lo prevede">
                 <input
-                  type="number"
+                  type="number" inputMode="decimal"
                   min="0"
                   step="0.5"
                   value={form.targetPeso}
@@ -302,7 +303,7 @@ export function SchedaEsercizioModal({
               </Field>
               <Field label="Tempo (sec)" hint="per esercizi a tempo">
                 <input
-                  type="number"
+                  type="number" inputMode="numeric"
                   min="0"
                   value={form.targetTempoSec}
                   onChange={(e) => setForm((f) => ({ ...f, targetTempoSec: e.target.value }))}
@@ -311,7 +312,7 @@ export function SchedaEsercizioModal({
               </Field>
               <Field label="Riposo (sec)">
                 <input
-                  type="number"
+                  type="number" inputMode="numeric"
                   min="0"
                   value={form.riposoSec}
                   onChange={(e) => setForm((f) => ({ ...f, riposoSec: e.target.value }))}
@@ -326,7 +327,7 @@ export function SchedaEsercizioModal({
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             <Field label="Round">
               <input
-                type="number"
+                type="number" inputMode="numeric"
                 min="0"
                 value={form.rounds}
                 onChange={(e) => setForm((f) => ({ ...f, rounds: e.target.value }))}
@@ -335,7 +336,7 @@ export function SchedaEsercizioModal({
             </Field>
             <Field label="Lavoro (sec)">
               <input
-                type="number"
+                type="number" inputMode="numeric"
                 min="0"
                 value={form.lavoroSec}
                 onChange={(e) => setForm((f) => ({ ...f, lavoroSec: e.target.value }))}
@@ -344,7 +345,7 @@ export function SchedaEsercizioModal({
             </Field>
             <Field label="Pausa (sec)">
               <input
-                type="number"
+                type="number" inputMode="numeric"
                 min="0"
                 value={form.pausaSec}
                 onChange={(e) => setForm((f) => ({ ...f, pausaSec: e.target.value }))}
@@ -358,7 +359,7 @@ export function SchedaEsercizioModal({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Tempo (sec)">
               <input
-                type="number"
+                type="number" inputMode="numeric"
                 min="0"
                 value={form.targetTempoSec}
                 onChange={(e) => setForm((f) => ({ ...f, targetTempoSec: e.target.value }))}
@@ -400,7 +401,7 @@ export function SchedaEsercizioModal({
           </button>
         </div>
       </form>
-    </div>
+    </ModalDialog>
   );
 }
 

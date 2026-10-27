@@ -80,6 +80,19 @@ for (const percorso of PAGINE) {
       expect(Math.min(box.w, box.h), `tap target "${box.nome}"`).toBeGreaterThanOrEqual(44);
     }
 
+    // Pulsanti del design system, icone di riga, sottomenu e toolbar del
+    // calendario: area tocco ≥ 44px (issue #151). I checkbox restano fuori.
+    const piccoli = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>(
+        ".btn-primary, .btn-secondary, .btn-danger, .btn-icon, [role='tab'], .agenda-calendar .fc-button"
+      )]
+        .map((el) => ({ el, r: el.getBoundingClientRect() }))
+        .filter(({ r }) => r.width > 0 && r.height > 0 && Math.min(r.width, r.height) < 43.5)
+        .slice(0, 5)
+        .map(({ el, r }) => `<${el.tagName.toLowerCase()} class="${el.className.toString().slice(0, 50)}"> ${Math.round(r.width)}x${Math.round(r.height)}`)
+    );
+    expect(piccoli, "tap target sotto 44px").toEqual([]);
+
     // Nessun testo sotto i 12px fuori dalla tab bar (regola di CLAUDE.md).
     const testiPiccoli = await page.evaluate(() => {
       const nav = document.querySelector('nav[aria-label="Navigazione principale"]');
@@ -103,3 +116,51 @@ for (const percorso of PAGINE) {
     expect(errori, "errori JS, console, 404 o 5xx").toEqual([]);
   });
 }
+
+// iPhone più stretti (375px): nessuna pagina deve allargarsi oltre lo schermo
+// (regressione #134: il SegmentedControl di Alimentazione sforava di 5px).
+for (const percorso of PAGINE) {
+  test(`${percorso} non scorre in orizzontale a 375px`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    const risposta = await page.goto(percorso, { waitUntil: "domcontentloaded" });
+    expect(risposta?.status(), "status HTTP").toBeLessThan(400);
+    await page.waitForLoadState("networkidle").catch(() => {});
+    const larghezze = await page.evaluate(() => ({
+      pagina: document.documentElement.scrollWidth,
+      schermo: window.innerWidth,
+    }));
+    expect(larghezze.pagina, "scroll orizzontale a 375px").toBeLessThanOrEqual(larghezze.schermo + 1);
+  });
+}
+
+// Regressione #152: i pulsanti della toolbar del calendario devono mostrare
+// il focus da tastiera (FullCalendar azzera l'outline di suo).
+test("/agenda: i pulsanti della toolbar mostrano il focus da tastiera", async ({ page }) => {
+  await page.goto("/agenda", { waitUntil: "domcontentloaded" });
+  await page.waitForLoadState("networkidle").catch(() => {});
+  const bottone = page.locator(".agenda-calendar .fc-button").first();
+  await expect(bottone).toBeVisible();
+  await page.keyboard.press("Tab");
+  await bottone.focus({ timeout: 5000 });
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  const stile = await bottone.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { outline: s.outlineStyle, ombra: s.boxShadow };
+  });
+  expect(stile.outline !== "none" || stile.ombra !== "none", "focus visibile").toBe(true);
+});
+
+// Regressione #150: i modali grezzi sono dialoghi accessibili (role, focus
+// dentro il pannello, Esc chiude).
+test("/investimenti/gestione: il modale Aggiungi transazione è un dialogo e Esc lo chiude", async ({ page }) => {
+  await page.goto("/investimenti/gestione", { waitUntil: "domcontentloaded" });
+  await page.waitForLoadState("networkidle").catch(() => {});
+  await page.getByRole("button", { name: /Aggiungi transazione/i }).first().click();
+  const dialogo = page.locator('.modal-panel[role="dialog"]');
+  await expect(dialogo).toBeVisible();
+  await expect(dialogo).toHaveAttribute("aria-modal", "true");
+  expect(await dialogo.evaluate((el) => el.contains(document.activeElement)), "focus dentro il modale").toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(dialogo).toHaveCount(0);
+});

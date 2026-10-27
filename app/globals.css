@@ -271,6 +271,15 @@ html {
   font-size: 80%;
 }
 
+/* Sito pubblico su telefono: all'80% text-sm scende a ~11px e text-xs a
+   ~9,6px, sotto il minimo di 12px del progetto. Sotto 768px la radice torna
+   al 100% (come già fa l'area privata); il desktop resta com'era. */
+@media (max-width: 767px) {
+  html {
+    font-size: 100%;
+  }
+}
+
 /* UI mobile (area privata, PWA iOS): sotto 768px, quando il wrapper del
    layout privato (.app-shell, vedi app/(private)/layout.tsx) è nel DOM,
    riporta la radice al 100% così le misure iOS della scala tipografica
@@ -493,6 +502,35 @@ body {
   }
 }
 
+/* Tap target ≥ 44px (linee guida iOS, issue #151) nell'area privata mobile:
+   pulsanti del design system, icone di riga, sottomenu di modulo e toolbar
+   del calendario. Il padding visivo non cambia: cresce solo l'area tocco,
+   con il contenuto centrato. Desktop e mouse restano invariati. */
+@media (max-width: 767px) and (pointer: coarse) {
+  .app-shell .btn-primary,
+  .app-shell .btn-secondary,
+  .app-shell .btn-danger,
+  .app-shell .btn-icon,
+  .app-shell [role="tab"],
+  .app-shell .agenda-calendar .fc-button {
+    min-height: 44px;
+  }
+  .app-shell .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+  }
+  .app-shell [role="tab"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .app-shell .agenda-calendar .fc-button {
+    min-width: 44px;
+  }
+}
+
 @layer components {
 
   /* Superficie a carta (grafici, pannelli, modali) con lieve elevazione */
@@ -623,6 +661,13 @@ body {
 
 .agenda-calendar .fc-button-primary:not(:disabled).fc-button-active {
   color: var(--accent-foreground);
+}
+
+/* FullCalendar azzera l'outline sui suoi pulsanti (`.fc .fc-button:focus`):
+   senza questa regola da tastiera non si vede dove si è (issue #152). */
+.agenda-calendar .fc-button:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px;
 }
 
 .agenda-calendar a {
