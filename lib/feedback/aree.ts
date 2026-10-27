@@ -14,6 +14,7 @@ export const AREE_FEEDBACK = {
   // Spese
   "spese.overview.filtri": "Spese › Overview › Periodo",
   "spese.overview.riepilogo": "Spese › Overview › Entrate e uscite",
+  "spese.overview.ricorrenti": "Spese › Overview › Ricorrenti",
   "spese.overview.trend": "Spese › Overview › Andamento giornaliero",
   "spese.overview.categorie-trend": "Spese › Overview › Andamento per categoria",
   "spese.overview.torta": "Spese › Overview › Movimenti per categoria",

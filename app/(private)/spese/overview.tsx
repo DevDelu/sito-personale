@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { SummaryCards } from "@/components/spese/SummaryCards";
 import { FilterBar, type Range } from "@/components/spese/FilterBar";
+import { RecurringCard } from "@/components/spese/RecurringCard";
+import type { Ricorrente } from "@/lib/spese/ricorrenti";
 import type { Categoria, Deposito, Spesa } from "@/lib/types";
 
 // Un solo boundary per i tre grafici (non uno a componente): recharts pesa
@@ -29,11 +31,13 @@ export function Overview({
   spese,
   categorie,
   depositi,
+  ricorrenti,
   range,
 }: {
   spese: Spesa[];
   categorie: Categoria[];
   depositi: Deposito[];
+  ricorrenti: Ricorrente[];
   range: Range;
 }) {
   const [categorieList, setCategorieList] = useState(categorie);
@@ -67,6 +71,10 @@ export function Overview({
 
       <div data-fb-area="spese.overview.riepilogo" className="contents">
         <SummaryCards entrate={totaleEntrate} uscite={totaleSpese} />
+      </div>
+
+      <div data-fb-area="spese.overview.ricorrenti" className="contents">
+        <RecurringCard ricorrenti={ricorrenti} />
       </div>
 
       <ChartsSection
