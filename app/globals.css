@@ -708,6 +708,23 @@ body {
 }
 
 @media (max-width: 767px) {
+  /* Tap target >= 44px: il link del giorno si estende a tutta la cella
+     (gli eventi restano sopra, z-index proprio di FullCalendar) e
+     l'intestazione della settimana diventa alta almeno 44px. */
+  .agenda-calendar .fc-daygrid-day-number {
+    position: static;
+  }
+  .agenda-calendar .fc-daygrid-day-number::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  .agenda-calendar .fc-col-header-cell-cushion {
+    display: block;
+    min-height: 44px;
+    line-height: 44px;
+    padding: 0 2px;
+  }
   .agenda-calendar .fc-toolbar-title {
     font-size: 1rem;
   }
