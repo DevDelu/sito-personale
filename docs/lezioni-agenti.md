@@ -65,3 +65,8 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
   serve `npm ci` dentro la worktree. Il build locale non raggiunge Google Fonts: la verifica è la CI.
 - Log del collaudo: `gh api .../actions/jobs/<id>/logs` è bloccato dal proxy; usa lo strumento GitHub MCP
   `get_job_logs` con `run_id`, `failed_only` e `return_content`.
+- `ModalDialog` → `Sheet` non è solo estetica: lo Sheet non trattiene il focus, non lo restituisce e chiude su tocco dello sfondo / Esc su `window` (il vecchio modale no, vedi #150). Per i form usa `chiudiSuSfondo={false}` e segnala il compromesso nella PR; prima di convertire molti modali conviene portare il focus trap dentro `Sheet` (PR #185, #195 aperte per questo).
+- Il collaudo di una PR può metterci da 2 a 11 minuti (27/10, #194): non è bloccato finché lo stato è `in_progress`; controlla con `gh api repos/.../actions/runs/<id> --jq .status` invece di rileggere tutto.
+- `list_workflow_runs` (MCP GitHub) restituisce decine di KB: usa `gh api ... --jq` con i soli campi che servono.
+- Cambio lingua: con `localePrefix: as-needed` il `Link` di next-intl verso l'italiano produce `href="/it"`, che il proxy reindirizza (307) a `/`: funziona, ma c'è un redirect in più. Se lo si vuole evitare, passare `href` già senza prefisso.
+- `<html lang>` fisso nel layout radice: `HtmlLangSync` lo allinea solo dopo l'idratazione; per il fix pieno servirebbe spostare `<html>` in `app/[locale]/layout.tsx` (#192 resta aperta).

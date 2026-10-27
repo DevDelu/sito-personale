@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { AlimentoSelector } from "./AlimentoSelector";
 import type { Alimento, ComposizioneItem, TemplatePasto, TipoPasto } from "@/lib/alimentazione/types";
-import { ModalDialog } from "@/components/ui/ModalDialog";
+import { Sheet } from "@/components/ui/Sheet";
 
 const LABEL_TIPO: Record<TipoPasto, string> = {
   colazione: "Colazione",
@@ -112,8 +112,8 @@ export function TemplateEditModal({
   }
 
   return (
-    <ModalDialog onClose={onCancel}>
-      <form data-fb-area="alimentazione.modifica-template" data-fb-entita={template ? `template-pasto:${template.id}` : undefined} onSubmit={handleSubmit} className="modal-panel flex w-full max-w-lg flex-col gap-4 p-5">
+    <Sheet onClose={onCancel} className="max-w-lg p-5" area="alimentazione.modifica-template" entita={template ? `template-pasto:${template.id}` : undefined} chiudiSuSfondo={false}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-0.5">
           <h2 className="font-display text-base font-semibold">
             {isJolly ? "Jolly" : `${LABEL_GIORNO[giornoSettimana] ?? giornoSettimana} · ${LABEL_TIPO[tipoPasto]}`}
@@ -210,6 +210,6 @@ export function TemplateEditModal({
           </div>
         </div>
       </form>
-    </ModalDialog>
+    </Sheet>
   );
 }
