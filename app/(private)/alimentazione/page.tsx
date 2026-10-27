@@ -75,6 +75,16 @@ export default async function AlimentazionePage({
         <p className="text-sm text-muted">TDEE stimato, consumo di oggi e trend settimanale.</p>
       </div>
 
+      <section data-fb-area="alimentazione.overview.pasti-oggi" className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-sm font-medium text-muted">Pasti di oggi</h2>
+          <Link href="/alimentazione/aggiungi" className="btn-primary inline-flex min-h-[44px] items-center !px-3 !py-1.5">
+            + Aggiungi pasto
+          </Link>
+        </div>
+        <TodayMealsList pasti={pastiOggi} />
+      </section>
+
       {!riepilogo.ok && (
         <div data-fb-area="alimentazione.overview.tdee" className="card flex flex-col gap-2 p-4 text-sm">
           {riepilogo.motivo === "profilo_incompleto" ? (
@@ -111,16 +121,6 @@ export default async function AlimentazionePage({
       </div>
 
       <AderenzaCard settimana={aderenzaSettimana} mese={aderenzaMese} />
-
-      <section data-fb-area="alimentazione.overview.pasti-oggi" className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-sm font-medium text-muted">Pasti di oggi</h2>
-          <Link href="/alimentazione/aggiungi" className="btn-primary inline-flex min-h-[44px] items-center !px-3 !py-1.5">
-            + Aggiungi pasto
-          </Link>
-        </div>
-        <TodayMealsList pasti={pastiOggi} />
-      </section>
     </div>
   );
 }
