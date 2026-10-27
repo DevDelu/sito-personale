@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { oggiItaliaISO } from "@/lib/cron/data-italia";
 import dynamic from "next/dynamic";
 import {
   getAlimenti,
@@ -30,12 +31,16 @@ const WeeklyTrendChart = dynamic(() =>
 
 export const metadata: Metadata = { title: "Alimentazione" };
 
+// Date nel fuso Europe/Rome (stesso criterio dei cron): in UTC tra mezzanotte
+// e le 1-2 italiane la pagina mostrava "ieri" come oggi.
 function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
+  return oggiItaliaISO();
 }
 
 function daysAgoIso(days: number): string {
-  return new Date(Date.now() - (days - 1) * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const d = new Date(`${oggiItaliaISO()}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - (days - 1));
+  return d.toISOString().slice(0, 10);
 }
 
 export default async function AlimentazionePage({

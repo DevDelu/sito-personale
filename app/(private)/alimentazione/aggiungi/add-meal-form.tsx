@@ -1,5 +1,6 @@
 "use client";
 
+import { oggiItaliaISO } from "@/lib/cron/data-italia";
 import { useActionState, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { aggiungiPasto, registraPastoDaTemplate, type AggiungiPastoState } from "../actions";
@@ -7,7 +8,7 @@ import { AlimentoSelector } from "@/components/alimentazione/AlimentoSelector";
 import { alimentiFrequenti } from "@/lib/alimentazione/frequenti";
 import type { Alimento, Pasto, TemplatePasto, TipoPasto } from "@/lib/alimentazione/types";
 
-const oggi = () => new Date().toISOString().slice(0, 10);
+const oggi = () => oggiItaliaISO();
 
 // 1 = lunedì .. 7 = domenica (getUTCDay() usa 0 = domenica, va rimappato) —
 // stessa logica di giornoSettimanaDaData in lib/alimentazione/template.ts,
