@@ -43,14 +43,14 @@ export function CollectionSections({
   return (
     <>
       <section className="flex flex-col gap-3">
-        <h2 className="font-display text-sm font-medium text-muted">Il podio</h2>
+        <h2 className="font-display text-sm font-medium text-muted max-md:text-[22px] max-md:font-semibold max-md:text-foreground">Il podio</h2>
         <HeroCards carte={hero} onView={setViewing} />
       </section>
 
       {metricsSlot}
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-display text-sm font-medium text-muted">Altre carte</h2>
+        <h2 className="font-display text-sm font-medium text-muted max-md:text-[22px] max-md:font-semibold max-md:text-foreground">Altre carte</h2>
         <AltreCarteList carte={resto} onView={setViewing} onEdit={setEditing} onDelete={setDeleting} />
       </section>
 
