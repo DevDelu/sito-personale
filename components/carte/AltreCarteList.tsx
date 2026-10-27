@@ -47,13 +47,21 @@ export function AltreCarteList({
             onMouseMove={(e) => handleMove(e, c)}
             onMouseLeave={() => setHover(null)}
             onClick={() => onView(c)}
-            className="animate-fade-in flex cursor-pointer items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-sm transition-colors duration-150 last:border-0 hover:bg-surface-hover"
+            onKeyDown={(e) => {
+              if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
+                e.preventDefault();
+                onView(c);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            className="animate-fade-in flex cursor-pointer items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-sm transition-colors duration-150 last:border-0 hover:bg-surface-hover focus-visible:bg-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--accent)] max-md:min-h-14"
           >
             <div className="flex min-w-0 items-center gap-2">
               <span className="font-figures shrink-0 text-xs text-muted whitespace-nowrap">×{c.quantity}</span>
               <div className="flex min-w-0 flex-col">
-                <span className="truncate">{c.name}</span>
-                {c.card_number && <span className="font-figures truncate text-xs text-muted/70">{c.card_number}</span>}
+                <span className="truncate max-md:line-clamp-2 max-md:whitespace-normal">{c.name}</span>
+                {c.card_number && <span className="font-figures truncate text-[13px] text-muted/70">{c.card_number}</span>}
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-4">
@@ -80,7 +88,7 @@ export function AltreCarteList({
                   Prezzo n/d
                 </span>
               )}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 max-md:hidden">
                 <button
                   type="button"
                   onClick={(e) => {
