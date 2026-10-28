@@ -18,12 +18,15 @@ export function PastoEditModal({
   error,
   onSave,
   onCancel,
+  onDelete,
 }: {
   pasto: Pasto;
   pending: boolean;
   error: string | null;
   onSave: (patch: PastoPatch) => void;
   onCancel: () => void;
+  // Solo su telefono la lista non ha il cestino per riga: l'eliminazione sta qui.
+  onDelete?: () => void;
 }) {
   const [data, setData] = useState(pasto.data);
   const [tipoPasto, setTipoPasto] = useState<TipoPasto>(pasto.tipo_pasto);
@@ -91,7 +94,12 @@ export function PastoEditModal({
           </p>
         )}
 
-        <div className="flex justify-end gap-3">
+        <div className="flex items-center justify-end gap-3">
+          {onDelete && (
+            <button type="button" onClick={onDelete} className="btn-secondary mr-auto text-spesa md:hidden">
+              Elimina
+            </button>
+          )}
           <button type="button" onClick={onCancel} className="btn-secondary">
             Annulla
           </button>
