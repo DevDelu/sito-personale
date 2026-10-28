@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -18,6 +18,17 @@ import type { Evento } from "@/lib/agenda/types";
 // UTC): usato per confrontare la cella del giorno col giorno selezionato.
 function dataLocale(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+// Sotto 768px la vista Mese ha celle da ~50px: tetto di 3 eventi per cella (il
+// resto in "+N"); l'aspetto a pallini è in app/globals.css (.agenda-calendar).
+function iscrivitiSchermoStretto(notifica: () => void) {
+  const mq = window.matchMedia("(max-width: 767px)");
+  mq.addEventListener("change", notifica);
+  return () => mq.removeEventListener("change", notifica);
+}
+function schermoStretto(): boolean {
+  return window.matchMedia("(max-width: 767px)").matches;
 }
 
 type SpostamentoUndo = {
@@ -41,6 +52,7 @@ export function CalendarView({
   const { aggiorna } = useAgendaMutations();
   const [undo, setUndo] = useState<SpostamentoUndo | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stretto = useSyncExternalStore(iscrivitiSchermoStretto, schermoStretto, () => false);
 
   const fcEvents = eventi.map((e) => ({
     id: e.id,
@@ -50,6 +62,8 @@ export function CalendarView({
     allDay: e.tutto_il_giorno,
     backgroundColor: coloreEvento(e),
     borderColor: coloreEvento(e),
+    // Su più giorni: in vista Mese su telefono resta una barretta, non un pallino.
+    classNames: e.data_inizio.slice(0, 10) !== e.data_fine.slice(0, 10) ? ["agenda-evento-lungo"] : [],
   }));
 
   function mostraUndo(id: string, titolo: string, precedente: { data_inizio: string; data_fine: string }) {
@@ -102,7 +116,7 @@ export function CalendarView({
           editable
           eventStartEditable
           eventDurationEditable
-          dayMaxEvents
+          dayMaxEvents={stretto ? 3 : true}
           eventDisplay="block"
           height="auto"
           locale="it"
