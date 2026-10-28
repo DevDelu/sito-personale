@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, type PanInfo } from "motion/react";
 import { etichettaAreaBreve } from "@/lib/feedback/aree";
 
@@ -40,6 +40,7 @@ export function Sheet({
 }) {
   const alto = posizione === "alto";
   const [trascinabile, setTrascinabile] = useState(false);
+  const overlay = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 639px) and (pointer: coarse)");
@@ -51,6 +52,10 @@ export function Sheet({
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
+      // Con più sheet impilati (es. scanner sopra la modifica di un template)
+      // Esc chiude solo quello in cima, senza far perdere i dati di quello sotto.
+      const tutti = document.querySelectorAll(".modal-overlay");
+      if (tutti[tutti.length - 1] !== overlay.current) return;
       if (e.key === "Escape") onClose();
     }
     window.addEventListener("keydown", onKeyDown);
@@ -64,6 +69,7 @@ export function Sheet({
 
   return (
     <div
+      ref={overlay}
       className={`modal-overlay ${alto ? "modal-overlay--alto" : ""}`}
       onClick={(e) => {
         if (chiudiSuSfondo && e.target === e.currentTarget) onClose();
