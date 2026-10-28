@@ -112,7 +112,7 @@ export function TemplateEditModal({
   }
 
   return (
-    <Sheet onClose={onCancel} className="max-w-lg p-5" area="alimentazione.modifica-template" entita={template ? `template-pasto:${template.id}` : undefined} chiudiSuSfondo={false}>
+    <Sheet onClose={onCancel} className="max-w-lg p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" area="alimentazione.modifica-template" entita={template ? `template-pasto:${template.id}` : undefined} chiudiSuSfondo={false}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-0.5">
           <h2 className="font-display text-base font-semibold">

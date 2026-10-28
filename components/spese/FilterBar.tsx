@@ -56,7 +56,7 @@ export function FilterBar({ range }: { range: Range }) {
       </button>
 
       {showCustom && (
-        <Sheet onClose={() => setShowCustom(false)} className="max-w-sm p-5" area="spese.periodo-personalizzato">
+        <Sheet onClose={() => setShowCustom(false)} className="max-w-sm p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" area="spese.periodo-personalizzato">
           <form
             className="flex flex-col gap-4"
             onSubmit={(e) => {

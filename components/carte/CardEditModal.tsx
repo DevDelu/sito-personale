@@ -100,7 +100,7 @@ export function CardEditModal({
   }
 
   return (
-    <Sheet onClose={onCancel} className="max-w-md p-5" area="collezione.modifica-carta" entita={`carta:${carta.id}`} chiudiSuSfondo={false}>
+    <Sheet onClose={onCancel} className="max-w-md p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" area="collezione.modifica-carta" entita={`carta:${carta.id}`} chiudiSuSfondo={false}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <h2 className="font-display text-base font-semibold">Modifica {carta.name}</h2>
 
