@@ -158,7 +158,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
             type="button"
             onClick={() => cambiaModalita(m)}
             disabled={stato === "parsing" || stato === "importing"}
-            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150 ${
+            className={`min-h-11 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150 ${
               modalita === m ? "bg-accent text-accent-foreground" : "text-muted hover:text-foreground"
             }`}
           >

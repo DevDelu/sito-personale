@@ -367,9 +367,13 @@ html:has(.app-shell) {
     border-radius: 12px;
   }
 
-  .app-shell select.field-input,
   .app-shell textarea.field-input {
     min-height: 0;
+  }
+
+  /* Select compatte (filtri) ma comunque 44px: soglia minima iOS per il tocco. */
+  .app-shell select.field-input {
+    min-height: 44px;
   }
 
   /* Padding superiore per la safe-area del contenuto pagina

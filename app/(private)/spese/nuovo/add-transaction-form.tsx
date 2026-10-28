@@ -47,7 +47,7 @@ export function AddTransactionForm({
               setTipo(t);
               setCategoriaId("");
             }}
-            className={`flex-1 rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-95 ${
+            className={`min-h-11 flex-1 rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-95 ${
               tipo === t
                 ? "border-accent bg-accent text-accent-foreground shadow-sm"
                 : "border-border text-muted hover:-translate-y-0.5 hover:text-foreground"
