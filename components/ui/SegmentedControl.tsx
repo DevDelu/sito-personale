@@ -22,7 +22,7 @@ export function SegmentedControl({ items }: { items: SegmentedItem[] }) {
             role="tab"
             aria-selected={attivo}
             ref={attivo ? (el) => el?.scrollIntoView({ block: "nearest", inline: "nearest" }) : undefined}
-            className={`flex-1 whitespace-nowrap rounded-[8px] px-2 py-1.5 text-center text-[15px] font-medium transition-all duration-150 ease-out active:scale-[0.97] ${
+            className={`flex-1 whitespace-nowrap rounded-[8px] px-2 py-1.5 [@media(pointer:coarse)]:py-[11px] text-center text-[15px] font-medium transition-all duration-150 ease-out active:scale-[0.97] ${
               attivo ? "bg-surface text-foreground shadow-sm" : "text-muted"
             }`}
           >
@@ -59,7 +59,7 @@ export function SegmentedPicker<T extends string>({
             role="radio"
             aria-checked={attivo}
             onClick={() => onChange(item.value)}
-            className={`min-w-0 flex-1 truncate rounded-[8px] px-2 py-1.5 text-center text-[15px] font-medium transition-all duration-150 ease-out active:scale-[0.97] ${
+            className={`min-w-0 flex-1 truncate rounded-[8px] px-2 py-1.5 [@media(pointer:coarse)]:py-[11px] text-center text-[15px] font-medium transition-all duration-150 ease-out active:scale-[0.97] ${
               attivo ? "bg-surface text-foreground shadow-sm" : "text-muted"
             }`}
           >

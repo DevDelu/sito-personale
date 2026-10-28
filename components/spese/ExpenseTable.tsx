@@ -157,7 +157,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
           <button
             type="button"
             onClick={() => (modalitaSelezione ? uscitaSelezione() : setModalitaSelezione(true))}
-            className="text-[15px] font-medium text-accent active:opacity-60"
+            className="-mr-3 flex min-h-[44px] items-center px-3 text-[15px] font-medium text-accent active:opacity-60"
           >
             {modalitaSelezione ? "Annulla" : "Seleziona"}
           </button>
