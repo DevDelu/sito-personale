@@ -27,7 +27,7 @@ export default async function CartePage() {
           resto={resto}
           metricsSlot={
             <section data-fb-area="collezione.metriche" className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <MetricCard label="Valore totale" value={formatCurrency(valoreTotale)} colorVar="--accent" />
+              <MetricCard label="Valore totale" value={formatCurrency(valoreTotale)} colorVar="--accent" importo />
               <MetricCard label="Numero carte" value={String(numeroCarte)} colorVar="--invest-stock" />
             </section>
           }

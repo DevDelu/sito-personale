@@ -37,7 +37,7 @@ function Card({ label, value, colorVar }: { label: string; value: string; colorV
       style={{ borderLeftColor: `var(${colorVar})` }}
     >
       <span className="text-xs text-muted">{label}</span>
-      <span className="font-figures text-2xl font-semibold" style={{ color: `var(${colorVar})` }}>
+      <span className="importo font-figures text-2xl font-semibold" style={{ color: `var(${colorVar})` }}>
         {value}
       </span>
     </div>
