@@ -224,7 +224,11 @@ export function PushSettings() {
           Invia notifica di prova
         </button>
       </div>
-      {messaggio && <p className="text-sm text-muted">{messaggio}</p>}
+      {messaggio && (
+        <p role="status" className="text-sm text-muted">
+          {messaggio}
+        </p>
+      )}
     </div>
   );
 }

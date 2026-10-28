@@ -243,7 +243,7 @@ function FeedbackDettaglio({ f, owner, onClose }: { f: FeedbackRow; owner: boole
 
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={vaiAlPunto} className="btn-secondary flex items-center gap-1.5 !px-3 !py-1.5">
-            <Crosshair className="h-4 w-4" /> Vai al punto
+            <Crosshair className="h-4 w-4" aria-hidden="true" /> Vai al punto
           </button>
           {f.issue_number && (
             <a
@@ -270,7 +270,7 @@ function FeedbackDettaglio({ f, owner, onClose }: { f: FeedbackRow; owner: boole
         <section className="flex flex-col gap-2">
           <h3 className="text-[13px] font-medium text-muted uppercase">Storia</h3>
           {eventi === null ? (
-            <p className="text-[15px] text-muted">Caricamento…</p>
+            <p role="status" className="text-[15px] text-muted">Caricamento…</p>
           ) : eventi.length === 0 ? (
             <p className="text-[15px] text-muted">Nessun evento.</p>
           ) : (
@@ -312,7 +312,7 @@ function FeedbackDettaglio({ f, owner, onClose }: { f: FeedbackRow; owner: boole
                 onClick={conferma}
                 className="btn-primary"
               >
-                {pending ? "…" : "Conferma"}
+                {pending ? "Salvo…" : "Conferma"}
               </button>
             </div>
           </div>
@@ -387,7 +387,10 @@ function Percorso({ passo, chiuso }: { passo: number; chiuso: string | null }) {
             <span
               className={`h-1 rounded-full ${stato === "dopo" ? "bg-surface-hover" : stato === "attuale" ? "bg-accent" : "bg-accent/40"}`}
             />
-            <span className={`text-[12px] leading-tight ${stato === "attuale" ? "font-semibold" : "text-muted"}`}>{etichetta}</span>
+            <span className={`text-[12px] leading-tight ${stato === "attuale" ? "font-semibold" : "text-muted"}`}>
+              {etichetta}
+              {stato === "attuale" && <span className="sr-only"> (passo attuale)</span>}
+            </span>
           </li>
         );
       })}
