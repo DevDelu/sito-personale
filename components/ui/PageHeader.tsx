@@ -39,9 +39,9 @@ export function PageHeader({
           ) : (
             <span />
           )}
-          <span className="app-static col-start-2 truncate text-center text-[17px] font-semibold">
+          <h1 className="app-static col-start-2 truncate text-center text-[17px] font-semibold">
             {title}
-          </span>
+          </h1>
           <div className="flex justify-self-end">{action}</div>
         </div>
       </div>
