@@ -93,7 +93,7 @@ export function TransactionList({
               </span>
             </div>
             <span
-              className={`font-figures whitespace-nowrap ${
+              className={`importo font-figures whitespace-nowrap ${
                 item.tipo === "entrata" ? "text-entrata" : "text-spesa"
               }`}
             >
