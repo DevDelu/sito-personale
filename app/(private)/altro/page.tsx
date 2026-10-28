@@ -64,6 +64,7 @@ export default async function AltroPage() {
         <ListGroup>
           <ListRowLink
             href="/"
+            prefetch={false}
             icon={<ExternalLink className="h-5 w-5" strokeWidth={1.75} />}
             title="Area pubblica"
           />
