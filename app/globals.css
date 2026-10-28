@@ -771,3 +771,54 @@ html[data-privacy="on"] .importo {
   filter: blur(9px);
   user-select: none;
 }
+
+/* Sito pubblico: animazioni guidate dallo scroll, solo CSS (nessun JS).
+   Barra "potenza" in alto che si riempie leggendo la pagina e sezioni che
+   entrano con una lieve salita + dissolvenza. Fuori da @supports (browser
+   senza animation-timeline) e con prefers-reduced-motion la pagina resta
+   identica a prima. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes potenza-scroll {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+    @keyframes sezione-entra {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .site-public::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      z-index: 40;
+      pointer-events: none;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      transform-origin: left;
+      transform: scaleX(0);
+      animation: potenza-scroll linear both;
+      animation-timeline: scroll(root block);
+    }
+
+    .site-public section[id]:not(#chi-sono) {
+      animation: sezione-entra linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
