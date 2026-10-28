@@ -105,7 +105,7 @@ export function BarcodeScanner({
   }, []);
 
   return (
-    <Sheet onClose={onClose} area="alimentazione.scanner" className="flex flex-col gap-3 p-5">
+    <Sheet onClose={onClose} area="alimentazione.scanner" className="flex flex-col gap-3 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-base font-semibold">Cerca da barcode</h2>
         <button type="button" onClick={onClose} aria-label="Chiudi" className="btn-icon">
@@ -124,12 +124,12 @@ export function BarcodeScanner({
         </div>
       )}
 
-      <p className="text-xs text-muted">
+      <p className="text-[13px] text-muted">
         Inquadra il codice a barre del prodotto (EAN/UPC). La scansione avviene sul dispositivo, nessuna immagine
         viene salvata o inviata.
       </p>
 
-      <button type="button" onClick={onClose} className="btn-secondary self-start">
+      <button type="button" onClick={onClose} className="btn-secondary w-full sm:w-auto sm:self-start">
         Annulla
       </button>
     </Sheet>
