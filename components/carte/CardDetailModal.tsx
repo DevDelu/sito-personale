@@ -55,7 +55,7 @@ export function CardDetailModal({
   }, [carta.id, carta.id_product]);
 
   return (
-    <Sheet onClose={onClose} className="max-w-md p-5" area="collezione.dettaglio-carta" entita={`carta:${carta.id}`}>
+    <Sheet onClose={onClose} className="max-w-md p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" area="collezione.dettaglio-carta" entita={`carta:${carta.id}`}>
       <div className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-2">
           <h2 className="font-display text-base font-semibold">{carta.name}</h2>

@@ -88,7 +88,7 @@ export function CategoriaPickerSheet({
       </button>
 
       {aperto && (
-        <Sheet onClose={chiudi} className="max-w-md p-5" area="spese.scegli-categoria">
+        <Sheet onClose={chiudi} className="max-w-md p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" area="spese.scegli-categoria">
           <div className="flex flex-col gap-4">
             <h2 className="font-display text-base font-semibold">Categoria</h2>
 

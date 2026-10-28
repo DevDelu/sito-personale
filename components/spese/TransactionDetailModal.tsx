@@ -58,7 +58,7 @@ export function TransactionDetailModal({
     <>
       <Sheet
         onClose={onClose}
-        className="max-w-md p-5"
+        className="max-w-md p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
         area={modalita === "modifica" ? "spese.modifica-movimento" : "spese.dettaglio-movimento"}
         entita={`transazione:${transazione.id}`}
       >
