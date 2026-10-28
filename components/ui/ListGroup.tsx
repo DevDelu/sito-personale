@@ -63,11 +63,13 @@ function ListRowContent({ icon, dot, title, subtitle, value, chevron, destructiv
 export function ListRowLink({
   href,
   onNavigate,
+  prefetch,
   ...props
-}: ListRowBaseProps & { href: string; onNavigate?: () => void }) {
+}: ListRowBaseProps & { href: string; onNavigate?: () => void; prefetch?: boolean }) {
   return (
     <Link
       href={href}
+      prefetch={prefetch}
       onClick={onNavigate}
       className="flex min-h-[56px] items-center gap-3 pr-4 transition-colors duration-150 ease-out active:bg-surface-hover"
     >
