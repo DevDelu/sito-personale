@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { InlineScript } from "@/components/inline-script";
 import { ThemeColorSync } from "@/components/theme-color-sync";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
+import { SPLASH_IPHONE, mediaSplash, percorsoSplash } from "@/lib/pwa/splash";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -32,6 +33,7 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "Radar",
+    startupImage: SPLASH_IPHONE.map((s) => ({ url: percorsoSplash(s), media: mediaSplash(s) })),
   },
   // Next genera solo il meta "mobile-web-app-capable" (lo standard più
   // recente): alcune versioni di iOS riconoscono la modalità standalone
