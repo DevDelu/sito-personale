@@ -88,7 +88,7 @@ export function PullToRefresh() {
       style={{ top: `calc(env(safe-area-inset-top) + ${y - 20}px)`, opacity: pending ? 1 : Math.min(1, tirata / 40) }}
     >
       <RefreshCw
-        className={`h-5 w-5 text-accent ${pending ? "animate-spin" : ""}`}
+        className={`h-5 w-5 text-accent ${pending ? "animate-spin motion-reduce:animate-none" : ""}`}
         style={pending ? undefined : { transform: `rotate(${tirata * 4}deg)` }}
       />
     </div>
