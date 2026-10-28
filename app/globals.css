@@ -734,6 +734,49 @@ body {
   }
 }
 
+/* Vista Mese su telefono: pallini colorati al posto dei blocchi (il titolo
+   non entrerebbe in celle da ~50px); gli eventi su più giorni restano una
+   barretta sottile che attraversa le celle (classe agenda-evento-lungo, da
+   CalendarView). Il dettaglio sta nel pannello del giorno. */
+@media (max-width: 767px) {
+  .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-day-events {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3px;
+    min-height: 0;
+    margin: 0;
+  }
+  .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-event-harness:not(:has(.agenda-evento-lungo)) {
+    margin: 0 !important;
+    position: static !important;
+    width: auto;
+  }
+  .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-event-harness:has(.agenda-evento-lungo) {
+    flex-basis: 100%;
+  }
+  .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-block-event {
+    width: 9px;
+    height: 9px;
+    margin: 0 !important;
+    padding: 0;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+  .agenda-calendar .fc-dayGridMonth-view .agenda-evento-lungo.fc-daygrid-block-event {
+    width: auto;
+    height: 6px;
+    border-radius: 3px;
+    margin: 0 2px;
+  }
+  .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-block-event .fc-event-main {
+    display: none;
+  }
+  .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-more-link {
+    font-size: 0.75rem;
+  }
+}
+
 /* headerToolbar ha 3 gruppi (nav, titolo, viste): su schermi stretti vanno
    a capo invece di stringersi/andare in overflow orizzontale. */
 .agenda-calendar .fc-header-toolbar {

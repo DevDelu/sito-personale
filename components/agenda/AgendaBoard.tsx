@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import { CalendarDays } from "lucide-react";
 import { DayPanel } from "./DayPanel";
@@ -16,6 +16,16 @@ const CalendarView = dynamic(() => import("./CalendarView").then((m) => m.Calend
 // dispositivo, lato server (UTC) darebbero un mismatch di idratazione.
 const ProssimiImpegni = dynamic(() => import("./ProssimiImpegni").then((m) => m.ProssimiImpegni), { ssr: false });
 
+// Data locale del dispositivo (non UTC). Sul server non si conosce il fuso:
+// lo snapshot è null e il giorno di default compare dopo l'idratazione.
+function nessunaSottoscrizione() {
+  return () => {};
+}
+function oggiLocale(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 // Orchestratore client: tiene lo stato del giorno selezionato (aperto dal
 // calendario o da un evento) e lo passa al pannello sotto. Il calendario è
 // l'unico riquadro di navigazione (il mini-calendario separato è stato
@@ -25,7 +35,22 @@ const ProssimiImpegni = dynamic(() => import("./ProssimiImpegni").then((m) => m.
 // laterale stretta. page.tsx resta un server component puro, tutta
 // l'interattività vive qui.
 export function AgendaBoard({ eventi, note }: { eventi: Evento[]; note: NotaGiorno[] }) {
-  const [giornoSelezionato, setGiornoSelezionato] = useState<string | null>(null);
+  // undefined = nessuna scelta ancora: vale "oggi", così il pannello non è
+  // mai vuoto all'apertura. null = chiuso esplicitamente dall'utente.
+  const [scelta, setScelta] = useState<string | null | undefined>(undefined);
+  const oggi = useSyncExternalStore(nessunaSottoscrizione, oggiLocale, () => null);
+  const giornoSelezionato = scelta === undefined ? oggi : scelta;
+  const pannello = useRef<HTMLDivElement>(null);
+
+  function setGiornoSelezionato(data: string | null) {
+    setScelta(data);
+    // Su telefono il pannello sta sotto il calendario, fuori schermo: dopo il
+    // tocco su un giorno lo si porta in vista (senza animazione se richiesto).
+    if (data && window.matchMedia("(max-width: 767px)").matches) {
+      const ridotto = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      requestAnimationFrame(() => pannello.current?.scrollIntoView({ block: "start", behavior: ridotto ? "auto" : "smooth" }));
+    }
+  }
 
   function apriEvento(evento: Evento) {
     setGiornoSelezionato(evento.data_inizio.slice(0, 10));
@@ -52,12 +77,14 @@ export function AgendaBoard({ eventi, note }: { eventi: Evento[]; note: NotaGior
       />
 
       {giornoSelezionato ? (
-        <DayPanel
-          data={giornoSelezionato}
-          eventi={eventiDelGiorno}
-          notaIniziale={notaDelGiorno}
-          onClose={() => setGiornoSelezionato(null)}
-        />
+        <div ref={pannello} className="scroll-mt-16">
+          <DayPanel
+            data={giornoSelezionato}
+            eventi={eventiDelGiorno}
+            notaIniziale={notaDelGiorno}
+            onClose={() => setScelta(null)}
+          />
+        </div>
       ) : (
         <div className="card flex flex-col items-center gap-2 p-8 text-center text-sm text-muted">
           <CalendarDays className="h-5 w-5" />
