@@ -16,7 +16,7 @@ export default async function NuovoMovimentoPage() {
         title="Nuovo movimento"
         parent={{ href: "/spese", label: "Spese" }}
         action={
-          <button type="submit" form={FORM_ID} className="text-[17px] font-semibold text-accent active:opacity-60">
+          <button type="submit" form={FORM_ID} className="-mr-2 min-h-11 px-2 text-[17px] font-semibold text-accent active:opacity-60">
             Salva
           </button>
         }
