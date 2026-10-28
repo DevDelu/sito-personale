@@ -129,10 +129,10 @@ export function PositionsTable({
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="importo px-4 py-3">
                     {p.valoreAttuale === null ? "n/d" : formatCurrency(p.valoreAttuale)}
                   </td>
-                  <td className="px-4 py-3" style={{ color: gainColor }}>
+                  <td className="importo px-4 py-3" style={{ color: gainColor }}>
                     {p.plusvalenzaAssoluta === null
                       ? "n/d"
                       : `${formatCurrency(p.plusvalenzaAssoluta)} (${formatPercent(p.plusvalenzaPercentuale ?? 0)})`}
@@ -240,10 +240,10 @@ function PositionsCards({
                 {p.datiIncompleti && " · storico incompleto"}
               </span>
               <span className="font-figures flex items-baseline justify-between gap-3">
-                <span className="text-base font-semibold">
+                <span className="importo text-base font-semibold">
                   {p.valoreAttuale === null ? "n/d" : formatCurrency(p.valoreAttuale)}
                 </span>
-                <span className="text-sm" style={{ color: gainColor }}>
+                <span className="importo text-sm" style={{ color: gainColor }}>
                   {p.plusvalenzaAssoluta === null
                     ? "n/d"
                     : `${formatCurrency(p.plusvalenzaAssoluta)} (${formatPercent(p.plusvalenzaPercentuale ?? 0)})`}

@@ -213,7 +213,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
                           </span>
                         </span>
                         <span
-                          className={`font-figures shrink-0 text-[17px] ${
+                          className={`importo font-figures shrink-0 text-[17px] ${
                             r.tipo === "entrata" ? "text-entrata" : "text-spesa"
                           }`}
                         >
@@ -338,7 +338,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
                     </td>
                     <td className="px-3 py-2 text-muted capitalize">{r.tipo}</td>
                     <td className="px-3 py-2 text-xs text-muted/70">{r.fonte}</td>
-                    <td className="px-3 py-2 text-right font-figures">{formatCurrency(r.importo)}</td>
+                    <td className="importo px-3 py-2 text-right font-figures">{formatCurrency(r.importo)}</td>
                     <td className="px-3 py-2">
                       <div className="flex items-center justify-end gap-2">
                         <button
