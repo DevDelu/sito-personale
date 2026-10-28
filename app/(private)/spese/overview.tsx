@@ -33,12 +33,14 @@ export function Overview({
   depositi,
   ricorrenti,
   range,
+  totaliPrecedenti,
 }: {
   spese: Spesa[];
   categorie: Categoria[];
   depositi: Deposito[];
   ricorrenti: Ricorrente[];
   range: Range;
+  totaliPrecedenti: { spese: number; entrate: number } | null;
 }) {
   const [categorieList, setCategorieList] = useState(categorie);
   const [prevCategorie, setPrevCategorie] = useState(categorie);
@@ -70,7 +72,7 @@ export function Overview({
       </div>
 
       <div data-fb-area="spese.overview.riepilogo" className="contents">
-        <SummaryCards entrate={totaleEntrate} uscite={totaleSpese} />
+        <SummaryCards entrate={totaleEntrate} uscite={totaleSpese} precedenti={totaliPrecedenti} />
       </div>
 
       <div data-fb-area="spese.overview.ricorrenti" className="contents">
