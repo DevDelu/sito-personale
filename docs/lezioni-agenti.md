@@ -70,3 +70,20 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
 - `list_workflow_runs` (MCP GitHub) restituisce decine di KB: usa `gh api ... --jq` con i soli campi che servono.
 - Cambio lingua: con `localePrefix: as-needed` il `Link` di next-intl verso l'italiano produce `href="/it"`, che il proxy reindirizza (307) a `/`: funziona, ma c'è un redirect in più. Se lo si vuole evitare, passare `href` già senza prefisso.
 - `<html lang>` fisso nel layout radice: `HtmlLangSync` lo allinea solo dopo l'idratazione; per il fix pieno servirebbe spostare `<html>` in `app/[locale]/layout.tsx` (#192 resta aperta).
+- `npm run dev` riscrive `AGENTS.md` nella working tree (blocco "nextjs-agent-rules"): prima di `git add`/commit
+  ripristinalo con `git checkout AGENTS.md`, non va incluso nelle PR (28/10).
+- `Sheet` con `className="p-5"` (o altre utility di padding) annulla il `pb` con `env(safe-area-inset-bottom)` di
+  `.modal-panel`: sull'iPhone il pulsante in fondo finisce sotto la home indicator. Usare
+  `pb-[max(1.25rem,env(safe-area-inset-bottom))]` come in `BarcodeScanner`/`PastoEditModal`. Stesso difetto ancora in
+  `DeleteConfirmDialog`, `BulkEditModal`, `FilterBar`, `CategoriaPickerSheet`, `TransactionDetailModal`: meglio
+  sistemarlo una volta in `Sheet`/CSS (28/10).
+- Più `Sheet` impilati (scanner sopra la modifica template): ora Esc chiude solo quello in cima (`Sheet.tsx`, come
+  `ModalDialog`); prima chiudeva entrambi e si perdevano i dati del form sotto (28/10, #202).
+- `eventDisplay` dentro `views` di FullCalendar non cambia lo stile degli eventi mese: per i pallini mobile
+  dell'agenda si è usato solo CSS sugli eventi `block` (`.agenda-calendar`, #216). Per provare CSS di FullCalendar
+  senza dati reali: pagina HTML con i bundle `index.global.min.js` di `node_modules/@fullcalendar/*` e Playwright
+  (il CDN non è raggiungibile dalla sandbox).
+- Test e2e in sandbox: serve `PW_CHROMIUM_PATH` (il Chromium preinstallato ha una versione diversa da quella attesa da
+  Playwright) e `E2E_BASE_URL=<RADAR_URL>`; la routine ha un limite di ~2 min per comando, usa `-g` per sottoinsiemi.
+- Resend risponde ancora 403 (dominio `lorenzo-de-luca.com` non verificato): confermato il 28/10, la newsletter non
+  può partire finché non lo verifichi su resend.com/domains.
