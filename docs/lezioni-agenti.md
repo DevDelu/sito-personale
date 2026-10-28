@@ -75,8 +75,7 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
 - `Sheet` con `className="p-5"` (o altre utility di padding) annulla il `pb` con `env(safe-area-inset-bottom)` di
   `.modal-panel`: sull'iPhone il pulsante in fondo finisce sotto la home indicator. Usare
   `pb-[max(1.25rem,env(safe-area-inset-bottom))]` come in `BarcodeScanner`/`PastoEditModal`. Stesso difetto ancora in
-  `DeleteConfirmDialog`, `BulkEditModal`, `FilterBar`, `CategoriaPickerSheet`, `TransactionDetailModal`: meglio
-  sistemarlo una volta in `Sheet`/CSS (28/10).
+  Corretto (verificato il 28/10): `DeleteConfirmDialog`, `BulkEditModal`, `FilterBar`, `CategoriaPickerSheet`, `TransactionDetailModal` usano già il `pb` con safe-area; per i nuovi Sheet con padding proprio ricordalo (28/10).
 - Più `Sheet` impilati (scanner sopra la modifica template): ora Esc chiude solo quello in cima (`Sheet.tsx`, come
   `ModalDialog`); prima chiudeva entrambi e si perdevano i dati del form sotto (28/10, #202).
 - `eventDisplay` dentro `views` di FullCalendar non cambia lo stile degli eventi mese: per i pallini mobile
