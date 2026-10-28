@@ -18,12 +18,15 @@ export function PastoEditModal({
   error,
   onSave,
   onCancel,
+  onDelete,
 }: {
   pasto: Pasto;
   pending: boolean;
   error: string | null;
   onSave: (patch: PastoPatch) => void;
   onCancel: () => void;
+  // Solo su telefono la lista non ha il cestino per riga: l'eliminazione sta qui.
+  onDelete?: () => void;
 }) {
   const [data, setData] = useState(pasto.data);
   const [tipoPasto, setTipoPasto] = useState<TipoPasto>(pasto.tipo_pasto);
@@ -41,11 +44,11 @@ export function PastoEditModal({
   }
 
   return (
-    <Sheet onClose={onCancel} className="max-w-md p-5" area="alimentazione.modifica-pasto" entita={`pasto:${pasto.id}`} chiudiSuSfondo={false}>
+    <Sheet onClose={onCancel} className="max-w-md p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" area="alimentazione.modifica-pasto" entita={`pasto:${pasto.id}`} chiudiSuSfondo={false}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <h2 className="font-display text-base font-semibold">Modifica pasto</h2>
         <p className="text-sm text-muted">
-          {pasto.alimento_nome} — la quantità aggiorna kcal/macro in proporzione allo snapshot originale.
+          {pasto.alimento_nome} (P {Math.round(pasto.proteine_g)} · C {Math.round(pasto.carboidrati_g)} · G {Math.round(pasto.grassi_g)}) — la quantità aggiorna kcal/macro in proporzione allo snapshot originale.
         </p>
 
         <label className="flex flex-col gap-1.5">
@@ -91,7 +94,12 @@ export function PastoEditModal({
           </p>
         )}
 
-        <div className="flex justify-end gap-3">
+        <div className="flex items-center justify-end gap-3">
+          {onDelete && (
+            <button type="button" onClick={onDelete} className="btn-secondary mr-auto text-spesa md:hidden">
+              Elimina
+            </button>
+          )}
           <button type="button" onClick={onCancel} className="btn-secondary">
             Annulla
           </button>

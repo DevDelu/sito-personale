@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
 import { usePastoMutations, type PastoPatch } from "@/hooks/usePastoMutations";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
+import { ListGroup, ListRowButton } from "@/components/ui/ListGroup";
 import { PastoEditModal } from "./PastoEditModal";
 import type { Pasto } from "@/lib/alimentazione/types";
 
@@ -45,7 +46,24 @@ export function PastoTable({ rows }: { rows: Pasto[] }) {
 
   return (
     <>
-      <div className="card overflow-x-auto">
+      {/* Telefono: lista a righe (tap = modifica, elimina dentro lo sheet), niente scroll orizzontale. */}
+      <div className="md:hidden">
+        <ListGroup>
+          {rows.map((p) => (
+            <div key={p.id} data-fb-entita={`pasto:${p.id}`}>
+              <ListRowButton
+                title={p.alimento_nome}
+                subtitle={`${LABEL_TIPO[p.tipo_pasto] ?? p.tipo_pasto} · ${p.data.slice(8, 10)}/${p.data.slice(5, 7)} · ${p.quantita_g}g`}
+                value={`${Math.round(p.kcal)} kcal`}
+                chevron
+                onClick={() => setEditing(p)}
+              />
+            </div>
+          ))}
+        </ListGroup>
+      </div>
+
+      <div className="card hidden overflow-x-auto md:block">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
             <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted">
@@ -105,6 +123,10 @@ export function PastoTable({ rows }: { rows: Pasto[] }) {
           error={error}
           onSave={handleSave}
           onCancel={() => setEditing(null)}
+          onDelete={() => {
+            setDeleting(editing);
+            setEditing(null);
+          }}
         />
       )}
 
