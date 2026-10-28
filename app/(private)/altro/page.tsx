@@ -3,6 +3,7 @@ import { ExternalLink, Layers, LogOut, Dumbbell, Apple, Bell, Inbox } from "luci
 import { contaPerTe } from "@/lib/feedback/queries";
 import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { PrivacyToggle } from "@/components/privacy-toggle";
 import { ListGroup, ListRow, ListRowLink } from "@/components/ui/ListGroup";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FeedbackRigaAltro } from "@/components/feedback/FeedbackAccessi";
@@ -57,6 +58,7 @@ export default async function AltroPage() {
             chevron
           />
           <ListRow title="Aspetto" subtitle="Tema chiaro o scuro" trailing={<ThemeToggle />} />
+          <ListRow title="Nascondi importi" subtitle="Sfoca i totali se usi Radar in pubblico" trailing={<PrivacyToggle />} />
         </ListGroup>
 
         <ListGroup>

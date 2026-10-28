@@ -764,3 +764,10 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Modalità discreta (Altro > Privacy): sfoca gli importi in euro dei riepiloghi.
+   L'attributo su <html> è impostato prima dell'idratazione (app/layout.tsx). */
+html[data-privacy="on"] .importo {
+  filter: blur(9px);
+  user-select: none;
+}

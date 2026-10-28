@@ -12,7 +12,7 @@ export function SummaryCards({ entrate, uscite }: { entrate: number; uscite: num
         <div className="flex flex-col gap-0.5">
           <span className="text-[13px] text-muted">Saldo del periodo</span>
           <span
-            className={`font-figures text-[32px] font-bold ${saldo >= 0 ? "text-entrata" : "text-spesa"}`}
+            className={`importo font-figures text-[32px] font-bold ${saldo >= 0 ? "text-entrata" : "text-spesa"}`}
           >
             {formatCurrency(saldo)}
           </span>
@@ -20,13 +20,13 @@ export function SummaryCards({ entrate, uscite }: { entrate: number; uscite: num
         <div className="flex gap-6 border-t border-[var(--app-hairline)] pt-3">
           <div className="flex flex-col gap-0.5">
             <span className="text-[13px] text-muted">Entrate</span>
-            <span className="font-figures text-[17px] font-semibold text-entrata">
+            <span className="importo font-figures text-[17px] font-semibold text-entrata">
               {formatCurrency(entrate)}
             </span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-[13px] text-muted">Uscite</span>
-            <span className="font-figures text-[17px] font-semibold text-spesa">
+            <span className="importo font-figures text-[17px] font-semibold text-spesa">
               {formatCurrency(uscite)}
             </span>
           </div>
@@ -48,7 +48,7 @@ function Card({ label, value, colorVar }: { label: string; value: number; colorV
       style={{ borderLeftColor: `var(${colorVar})` }}
     >
       <span className="text-xs text-muted">{label}</span>
-      <span className="font-figures text-2xl font-semibold" style={{ color: `var(${colorVar})` }}>
+      <span className="importo font-figures text-2xl font-semibold" style={{ color: `var(${colorVar})` }}>
         {formatCurrency(value)}
       </span>
     </div>

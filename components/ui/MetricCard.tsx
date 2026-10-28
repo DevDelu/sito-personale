@@ -6,11 +6,14 @@ export function MetricCard({
   value,
   colorVar,
   note,
+  importo = false,
 }: {
   label: string;
   value: string;
   colorVar: string;
   note?: string;
+  // true se il valore è un importo in euro: con la modalità discreta è sfocato.
+  importo?: boolean;
 }) {
   return (
     <div
@@ -18,7 +21,7 @@ export function MetricCard({
       style={{ borderLeftColor: `var(${colorVar})` }}
     >
       <span className="text-xs text-muted">{label}</span>
-      <span className="font-figures text-2xl font-semibold" style={{ color: `var(${colorVar})` }}>
+      <span className={`${importo ? "importo " : ""}font-figures text-2xl font-semibold`} style={{ color: `var(${colorVar})` }}>
         {value}
       </span>
       {note && <span className="text-xs text-muted">{note}</span>}

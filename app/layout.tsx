@@ -83,7 +83,7 @@ export default function RootLayout({
     >
       <head>
         <InlineScript
-          html={`(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);else if(window.matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.setAttribute("data-theme","dark")}catch(e){}})()`}
+          html={`(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);else if(window.matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.setAttribute("data-theme","dark");if(localStorage.getItem("privacy")==="on")document.documentElement.setAttribute("data-privacy","on")}catch(e){}})()`}
         />
       </head>
       <body className="min-h-full flex flex-col overflow-x-hidden bg-background text-foreground">
