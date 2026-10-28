@@ -60,6 +60,8 @@ for (const percorso of PAGINE) {
 
     // Barra superiore (PageHeader) e tab bar presenti.
     await expect(page.locator(".app-page-header").first(), "PageHeader").toBeVisible();
+    // Ogni pagina ha un titolo (h1) per i lettori di schermo.
+    expect(await page.getByRole("heading", { level: 1 }).count(), "titolo h1").toBeGreaterThan(0);
     const tabBar = page.getByRole("navigation", { name: "Navigazione principale" });
     await expect(tabBar, "tab bar").toBeVisible();
 
