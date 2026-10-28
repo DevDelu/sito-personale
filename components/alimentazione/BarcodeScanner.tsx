@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
-import { ModalDialog } from "@/components/ui/ModalDialog";
+import { Sheet } from "@/components/ui/Sheet";
 
 // Overlay fotocamera per la scansione di un barcode EAN/UPC, usato solo
 // nella creazione inline di un alimento nel catalogo (vedi AlimentoSelector)
@@ -105,35 +105,33 @@ export function BarcodeScanner({
   }, []);
 
   return (
-    <ModalDialog onClose={onClose}>
-      <div data-fb-area="alimentazione.scanner" className="modal-panel flex w-full max-w-md flex-col gap-3 p-5">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold">Cerca da barcode</h2>
-          <button type="button" onClick={onClose} aria-label="Chiudi" className="btn-icon">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        {errore ? (
-          <p className="text-sm text-spesa" role="alert">
-            {errore}
-          </p>
-        ) : (
-          <div className="relative overflow-hidden rounded-xl border border-border bg-black">
-            <video ref={videoRef} className="aspect-[4/3] w-full object-cover" muted playsInline />
-            <div className="pointer-events-none absolute inset-8 rounded-lg border-2 border-accent" />
-          </div>
-        )}
-
-        <p className="text-xs text-muted">
-          Inquadra il codice a barre del prodotto (EAN/UPC). La scansione avviene sul dispositivo, nessuna immagine
-          viene salvata o inviata.
-        </p>
-
-        <button type="button" onClick={onClose} className="btn-secondary self-start">
-          Annulla
+    <Sheet onClose={onClose} area="alimentazione.scanner" className="flex flex-col gap-3 p-5">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-base font-semibold">Cerca da barcode</h2>
+        <button type="button" onClick={onClose} aria-label="Chiudi" className="btn-icon">
+          <X className="h-4 w-4" />
         </button>
       </div>
-    </ModalDialog>
+
+      {errore ? (
+        <p className="text-sm text-spesa" role="alert">
+          {errore}
+        </p>
+      ) : (
+        <div className="relative overflow-hidden rounded-xl border border-border bg-black">
+          <video ref={videoRef} className="aspect-[4/3] w-full object-cover" muted playsInline />
+          <div className="pointer-events-none absolute inset-8 rounded-lg border-2 border-accent" />
+        </div>
+      )}
+
+      <p className="text-xs text-muted">
+        Inquadra il codice a barre del prodotto (EAN/UPC). La scansione avviene sul dispositivo, nessuna immagine
+        viene salvata o inviata.
+      </p>
+
+      <button type="button" onClick={onClose} className="btn-secondary self-start">
+        Annulla
+      </button>
+    </Sheet>
   );
 }
