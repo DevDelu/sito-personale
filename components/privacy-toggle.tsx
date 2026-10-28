@@ -38,8 +38,8 @@ export function PrivacyToggle() {
       onClick={cambia}
       role="switch"
       aria-checked={attiva}
-      aria-label={attiva ? "Mostra gli importi" : "Nascondi gli importi"}
-      className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-border text-foreground active:scale-90"
+      aria-label="Nascondi importi"
+      className={`flex h-[44px] w-[44px] items-center justify-center rounded-full border text-foreground active:scale-90 ${attiva ? "border-accent bg-accent/15" : "border-border"}`}
     >
       {attiva ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
     </button>
