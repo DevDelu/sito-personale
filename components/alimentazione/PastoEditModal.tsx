@@ -44,11 +44,11 @@ export function PastoEditModal({
   }
 
   return (
-    <Sheet onClose={onCancel} className="max-w-md p-5" area="alimentazione.modifica-pasto" entita={`pasto:${pasto.id}`} chiudiSuSfondo={false}>
+    <Sheet onClose={onCancel} className="max-w-md p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" area="alimentazione.modifica-pasto" entita={`pasto:${pasto.id}`} chiudiSuSfondo={false}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <h2 className="font-display text-base font-semibold">Modifica pasto</h2>
         <p className="text-sm text-muted">
-          {pasto.alimento_nome} — la quantità aggiorna kcal/macro in proporzione allo snapshot originale.
+          {pasto.alimento_nome} (P {Math.round(pasto.proteine_g)} · C {Math.round(pasto.carboidrati_g)} · G {Math.round(pasto.grassi_g)}) — la quantità aggiorna kcal/macro in proporzione allo snapshot originale.
         </p>
 
         <label className="flex flex-col gap-1.5">

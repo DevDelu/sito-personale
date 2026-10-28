@@ -53,7 +53,7 @@ export function PastoTable({ rows }: { rows: Pasto[] }) {
             <div key={p.id} data-fb-entita={`pasto:${p.id}`}>
               <ListRowButton
                 title={p.alimento_nome}
-                subtitle={`${LABEL_TIPO[p.tipo_pasto] ?? p.tipo_pasto} · ${p.data} · ${p.quantita_g}g · P ${Math.round(p.proteine_g)} C ${Math.round(p.carboidrati_g)} G ${Math.round(p.grassi_g)}`}
+                subtitle={`${LABEL_TIPO[p.tipo_pasto] ?? p.tipo_pasto} · ${p.data.slice(8, 10)}/${p.data.slice(5, 7)} · ${p.quantita_g}g`}
                 value={`${Math.round(p.kcal)} kcal`}
                 chevron
                 onClick={() => setEditing(p)}
