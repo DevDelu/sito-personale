@@ -11,6 +11,15 @@ import { distanzaTirata, puoIniziarePull, superaSoglia } from "@/lib/pull-to-ref
 // il preventDefault scatta solo quando si sta davvero tirando verso il basso.
 const ESCLUSI = "input, textarea, select, [data-no-pull], .recharts-wrapper, .fc";
 
+// Un contenitore interno già scrollato (lista con overflow-y) deve poter tornare
+// in cima prima che il gesto diventi un "tira per aggiornare".
+function dentroScrollInterno(el: Element | null): boolean {
+  for (let n = el; n && n !== document.body; n = n.parentElement) {
+    if (n.scrollTop > 0) return true;
+  }
+  return false;
+}
+
 export function PullToRefresh() {
   const router = useRouter();
   const percorso = usePathname();
@@ -42,7 +51,7 @@ export function PullToRefresh() {
         dialogoAperto: document.querySelector(".modal-overlay") !== null,
         percorso: percorsoRef.current,
         campoConFocus: attivo instanceof HTMLElement && (attivo.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(attivo.tagName)),
-        bersaglioEscluso: !bersaglio || bersaglio.closest(ESCLUSI) !== null || !document.querySelector(".app-shell"),
+        bersaglioEscluso: !bersaglio || bersaglio.closest(ESCLUSI) !== null || dentroScrollInterno(bersaglio) || !document.querySelector(".app-shell"),
       });
       inizioY = ok ? e.touches[0].clientY : null;
     }
