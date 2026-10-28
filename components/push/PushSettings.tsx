@@ -166,15 +166,15 @@ export function PushSettings() {
     }
   }
 
-  if (stato === "loading") return null;
+  if (stato === "loading") return <p role="status" className="text-sm text-muted">Controllo delle notifiche…</p>;
 
   if (stato === "non_supportato") {
-    return <p className="text-sm text-muted">Le notifiche push non sono supportate da questo browser.</p>;
+    return <p className="text-[15px] text-muted">Le notifiche push non sono supportate da questo browser.</p>;
   }
 
   if (stato === "ios_non_installata") {
     return (
-      <p className="text-sm text-muted">
+      <p className="text-[15px] text-muted">
         Apri Radar in Safari → Condividi → Aggiungi a Home, poi riaprila da lì per attivare le notifiche.
       </p>
     );
@@ -183,13 +183,13 @@ export function PushSettings() {
   if (stato === "server_non_configurato") {
     return (
       <div className="flex flex-col gap-3">
-        <p className="text-sm text-muted">Notifiche non ancora configurate sul server.</p>
+        <p className="text-[15px] text-muted">Notifiche non ancora configurate sul server.</p>
         <div className="flex flex-wrap gap-2">
           <button type="button" className="btn-secondary" disabled>
             Attiva notifiche
           </button>
           <button type="button" className="btn-secondary" disabled>
-            Disattiva
+            Disattiva notifiche
           </button>
           <button type="button" className="btn-secondary" disabled>
             Invia notifica di prova
@@ -201,7 +201,7 @@ export function PushSettings() {
 
   if (stato === "permesso_negato") {
     return (
-      <p className="text-sm text-muted">
+      <p className="text-[15px] text-muted">
         Il permesso per le notifiche è stato negato. Riattivalo dalle impostazioni di sistema (su iPhone:
         Impostazioni → Radar → Notifiche) e ricarica questa pagina.
       </p>
@@ -210,7 +210,7 @@ export function PushSettings() {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-muted">
+      <p className="text-[15px] text-muted">
         {subscribed ? "Notifiche attive su questo dispositivo." : "Notifiche non ancora attivate su questo dispositivo."}
       </p>
       <div className="flex flex-wrap gap-2">
@@ -218,7 +218,7 @@ export function PushSettings() {
           Attiva notifiche
         </button>
         <button type="button" className="btn-secondary" disabled={busy || !subscribed} onClick={disattiva}>
-          Disattiva
+          Disattiva notifiche
         </button>
         <button type="button" className="btn-secondary" disabled={busy} onClick={invioProva}>
           Invia notifica di prova
