@@ -64,7 +64,7 @@ export function AltreCarteList({
                 {c.card_number && <span className="font-figures truncate text-[13px] text-muted/70">{c.card_number}</span>}
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-4">
+            <div className="flex shrink-0 items-center gap-4 max-md:flex-col-reverse max-md:items-end max-md:gap-0.5">
               {c.current_price !== null ? (
                 <>
                   <span
