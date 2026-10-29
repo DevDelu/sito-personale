@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { TooltipContentProps } from "recharts";
 import type { PuntoTrendGiornaliero } from "@/lib/alimentazione/queries";
@@ -22,6 +23,14 @@ function TrendTooltip({ active, payload, label }: Partial<TooltipContentProps<nu
   );
 }
 
+// Senza animazione di disegno con "riduci movimento" (stesso schema di CardPriceChart).
+const RIDUCI_MOVIMENTO = "(prefers-reduced-motion: reduce)";
+function iscrivi(cb: () => void) {
+  const mq = window.matchMedia(RIDUCI_MOVIMENTO);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+}
+
 export function WeeklyTrendChart({
   punti,
   targetKcal,
@@ -29,6 +38,11 @@ export function WeeklyTrendChart({
   punti: PuntoTrendGiornaliero[];
   targetKcal: number | null;
 }) {
+  const riduciMovimento = useSyncExternalStore(
+    iscrivi,
+    () => window.matchMedia(RIDUCI_MOVIMENTO).matches,
+    () => false,
+  );
   return (
     <div
       role="img"
@@ -59,7 +73,7 @@ export function WeeklyTrendChart({
             type="monotone"
             dataKey="kcal"
             name="Kcal"
-            isAnimationActive
+            isAnimationActive={!riduciMovimento}
             animationDuration={700}
             animationEasing="ease-out"
             stroke="var(--accent)"
