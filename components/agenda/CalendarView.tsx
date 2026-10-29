@@ -140,7 +140,7 @@ export function CalendarView({
             <button
               type="button"
               onClick={handleUndo}
-              className="flex items-center gap-1 rounded-full bg-background/15 px-2.5 py-1 text-xs font-semibold transition-colors hover:bg-background/25"
+              className="flex items-center gap-1 rounded-full bg-background/15 px-2.5 py-1 text-xs font-semibold max-md:min-h-11 max-md:px-4 max-md:text-[13px] transition-colors hover:bg-background/25"
             >
               <Undo2 className="h-3 w-3" />
               Annulla
