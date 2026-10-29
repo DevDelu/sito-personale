@@ -212,12 +212,13 @@ export function PortfolioHistoryChart({
               />
             ))}
           </div>
-          <div className="flex w-fit items-center gap-0.5 rounded-full border border-border p-0.5">
+          <div role="group" aria-label="Granularità" className="flex w-fit items-center gap-0.5 rounded-full border border-border p-0.5">
             {GRANULARITA.map((g) => (
               <button
                 key={g.value}
                 type="button"
                 onClick={() => setGranularita(g.value)}
+                aria-pressed={granularita === g.value}
                 className={`min-h-11 rounded-full px-3 text-[13px] font-medium transition-all duration-150 ease-out active:scale-95 md:min-h-0 md:px-2.5 md:py-1.5 md:text-xs ${
                   granularita === g.value
                     ? "bg-accent text-accent-foreground shadow-sm"

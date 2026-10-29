@@ -95,7 +95,11 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
 
   return (
     <div className="card flex w-full flex-col gap-3 p-4">
-      <div className="h-60 md:h-64">
+      <div
+        className="h-60 md:h-64"
+        role="img"
+        aria-label={`Ciambella dell'allocazione per tipo: ${data.map((d) => `${d.nome} ${d.percentuale.toFixed(1).replace(".", ",")}%`).join(", ")}`}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
