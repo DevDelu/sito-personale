@@ -78,12 +78,12 @@ export function SchedeList({ schede }: { schede: SchedaConMeta[] }) {
       </div>
 
       {numArchiviate > 0 && (
-        <label className="flex w-fit items-center gap-2 text-sm text-muted">
+        <label className="flex min-h-11 w-fit items-center gap-3 text-sm text-muted md:min-h-0 md:gap-2">
           <input
             type="checkbox"
             checked={mostraArchiviate}
             onChange={(e) => setMostraArchiviate(e.target.checked)}
-            className="h-3.5 w-3.5 accent-accent"
+            className="h-5 w-5 accent-accent md:h-3.5 md:w-3.5"
           />
           Mostra anche le schede archiviate
         </label>
@@ -108,7 +108,7 @@ export function SchedeList({ schede }: { schede: SchedaConMeta[] }) {
                 {scheda.descrizione && <p className="text-sm text-muted">{scheda.descrizione}</p>}
               </div>
 
-              <div className="flex flex-col gap-0.5 text-xs text-muted">
+              <div className="flex flex-col gap-0.5 text-[13px] text-muted">
                 <span>
                   {scheda.numBlocchi} {scheda.numBlocchi === 1 ? "blocco" : "blocchi"} ·{" "}
                   {scheda.numEsercizi} {scheda.numEsercizi === 1 ? "esercizio" : "esercizi"}
@@ -119,7 +119,7 @@ export function SchedeList({ schede }: { schede: SchedaConMeta[] }) {
               <div className="mt-auto flex items-center gap-1.5 border-t border-border pt-3">
                 <Link
                   href={`/allenamenti/scheda/${scheda.id}`}
-                  className="btn-secondary flex items-center gap-1.5 !px-2 !py-1 text-xs"
+                  className="btn-secondary flex items-center gap-1.5 !px-3 !py-1 text-sm"
                 >
                   <Pencil className="h-3.5 w-3.5" />
                   Modifica
