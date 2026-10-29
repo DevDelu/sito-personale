@@ -150,7 +150,7 @@ export function EventoFormModal({
               onClick={() => setColore(null)}
               aria-label="Usa il colore della categoria"
               title="Colore della categoria"
-              className={`flex h-7 w-7 items-center justify-center rounded-full border-2 transition-transform ${
+              className={`flex h-7 w-7 items-center justify-center rounded-full border-2 transition-transform max-md:h-11 max-md:w-11 ${
                 colore === null ? "border-foreground" : "border-border hover:scale-110"
               }`}
             >
@@ -164,7 +164,7 @@ export function EventoFormModal({
                 aria-label={c.nome}
                 title={c.nome}
                 style={{ backgroundColor: c.valore }}
-                className={`h-7 w-7 rounded-full border-2 transition-transform ${
+                className={`h-7 w-7 rounded-full border-2 transition-transform max-md:h-11 max-md:w-11 ${
                   colore === c.valore ? "border-foreground scale-110" : "border-transparent hover:scale-110"
                 }`}
               />
