@@ -14,7 +14,7 @@ import type { TooltipContentProps } from "recharts";
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { adaptiveTickInterval } from "@/lib/spese-utils";
 import type { LogConNome } from "@/lib/allenamento/queries";
-import type { Sessione } from "@/lib/allenamento/types";
+import type { SessioneElenco } from "@/lib/allenamento/types";
 
 const COLONNE_DEFAULT = ["Trazioni", "Dip", "Push up", "Dead hang", "Goblet squat", "Shoulder press"];
 const CHART_PALETTE = ["--accent", "--invest-etf", "--invest-crypto", "--invest-stock", "--invest-indice"];
@@ -71,7 +71,7 @@ function ProgressTooltip({ active, payload, label }: Partial<TooltipContentProps
   );
 }
 
-export function ProgressTable({ sessioni, log }: { sessioni: Sessione[]; log: LogConNome[] }) {
+export function ProgressTable({ sessioni, log }: { sessioni: SessioneElenco[]; log: LogConNome[] }) {
   const esercizDisponibili = useMemo(
     () => [...new Set(log.map((l) => l.esercizio_nome))].sort(),
     [log]
