@@ -800,7 +800,12 @@ body {
    ingresso né transizioni su pulsanti e link. */
 @media (prefers-reduced-motion: reduce) {
   .animate-slide-up,
-  .animate-fade-in {
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-slide-down,
+  .animate-pop-in,
+  .animate-count-up,
+  .animate-twinkle {
     animation: none !important;
   }
   .btn-primary,
