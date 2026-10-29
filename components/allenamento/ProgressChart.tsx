@@ -45,34 +45,34 @@ export function ProgressChart({
   metrichGrafico: string[];
 }) {
   return (
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={datiGrafico} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid vertical={false} stroke="var(--border)" strokeWidth={1} />
-              <XAxis
-                dataKey="label"
-                tick={axisTick}
-                axisLine={{ stroke: "var(--border)" }}
-                tickLine={false}
-                interval={adaptiveTickInterval(datiGrafico.length)}
-              />
-              <YAxis tick={axisTick} axisLine={false} tickLine={false} width={40} />
-              <Tooltip content={<ProgressTooltip />} />
-              {metrichGrafico.map((metrica, i) => (
-                <Line
-                  key={metrica}
-                  type="monotone"
-                  dataKey={metrica}
-                  name={metrica}
-                  stroke={`var(${CHART_PALETTE[i % CHART_PALETTE.length]})`}
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                  connectNulls
-                  isAnimationActive
-                  animationDuration={700}
-                  animationEasing="ease-out"
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart data={datiGrafico} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+        <CartesianGrid vertical={false} stroke="var(--border)" strokeWidth={1} />
+        <XAxis
+          dataKey="label"
+          tick={axisTick}
+          axisLine={{ stroke: "var(--border)" }}
+          tickLine={false}
+          interval={adaptiveTickInterval(datiGrafico.length)}
+        />
+        <YAxis tick={axisTick} axisLine={false} tickLine={false} width={40} />
+        <Tooltip content={<ProgressTooltip />} />
+        {metrichGrafico.map((metrica, i) => (
+          <Line
+            key={metrica}
+            type="monotone"
+            dataKey={metrica}
+            name={metrica}
+            stroke={`var(${CHART_PALETTE[i % CHART_PALETTE.length]})`}
+            strokeWidth={2}
+            dot={{ r: 3 }}
+            connectNulls
+            isAnimationActive
+            animationDuration={700}
+            animationEasing="ease-out"
+          />
+        ))}
+      </LineChart>
+    </ResponsiveContainer>
   );
 }

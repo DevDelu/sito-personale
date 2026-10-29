@@ -44,7 +44,6 @@ function migliorLogPerSessione(log: LogConNome[]): Map<string, LogConNome> {
   return map;
 }
 
-
 export function ProgressTable({ sessioni, log }: { sessioni: SessioneElenco[]; log: LogConNome[] }) {
   const esercizDisponibili = useMemo(
     () => [...new Set(log.map((l) => l.esercizio_nome))].sort(),
