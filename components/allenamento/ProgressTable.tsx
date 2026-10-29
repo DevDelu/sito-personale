@@ -1,25 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import type { TooltipContentProps } from "recharts";
+import dynamic from "next/dynamic";
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
-import { adaptiveTickInterval } from "@/lib/spese-utils";
 import type { LogConNome } from "@/lib/allenamento/queries";
 import type { SessioneElenco } from "@/lib/allenamento/types";
+import { CHART_PALETTE } from "./progress-chart-palette";
+
+const ProgressChart = dynamic(() => import("./ProgressChart").then((m) => m.ProgressChart), {
+  ssr: false,
+  loading: () => <div className="h-full w-full animate-pulse" />,
+});
 
 const COLONNE_DEFAULT = ["Trazioni", "Dip", "Push up", "Dead hang", "Goblet squat", "Shoulder press"];
-const CHART_PALETTE = ["--accent", "--invest-etf", "--invest-crypto", "--invest-stock", "--invest-indice"];
-
-const axisTick = { fill: "var(--muted)", fontSize: 12, fontFamily: "var(--font-mono)" };
 
 function formatTempo(sec: number): string {
   const m = Math.floor(sec / 60);
@@ -49,26 +42,6 @@ function migliorLogPerSessione(log: LogConNome[]): Map<string, LogConNome> {
     if (!attuale || valoreComparabile(l) > valoreComparabile(attuale)) map.set(key, l);
   }
   return map;
-}
-
-function ProgressTooltip({ active, payload, label }: Partial<TooltipContentProps<number, string>>) {
-  if (!active || !payload || payload.length === 0) return null;
-  return (
-    <div className="rounded-xl border border-border bg-surface px-3 py-2 text-xs shadow-lg">
-      <div className="mb-1 font-display text-sm font-semibold">{label}</div>
-      <ul className="flex flex-col gap-0.5">
-        {payload.map((p) => (
-          <li key={String(p.dataKey)} className="flex items-center justify-between gap-3">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: p.color }} />
-              {p.name}
-            </span>
-            <span className="font-figures whitespace-nowrap">{p.value}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
 }
 
 export function ProgressTable({ sessioni, log }: { sessioni: SessioneElenco[]; log: LogConNome[] }) {
@@ -253,35 +226,7 @@ export function ProgressTable({ sessioni, log }: { sessioni: SessioneElenco[]; l
               <p className="text-sm text-muted">Seleziona 1-2 esercizi per vedere il grafico.</p>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={datiGrafico} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid vertical={false} stroke="var(--border)" strokeWidth={1} />
-                <XAxis
-                  dataKey="label"
-                  tick={axisTick}
-                  axisLine={{ stroke: "var(--border)" }}
-                  tickLine={false}
-                  interval={adaptiveTickInterval(datiGrafico.length)}
-                />
-                <YAxis tick={axisTick} axisLine={false} tickLine={false} width={40} />
-                <Tooltip content={<ProgressTooltip />} />
-                {metrichGrafico.map((metrica, i) => (
-                  <Line
-                    key={metrica}
-                    type="monotone"
-                    dataKey={metrica}
-                    name={metrica}
-                    stroke={`var(${CHART_PALETTE[i % CHART_PALETTE.length]})`}
-                    strokeWidth={2}
-                    dot={{ r: 3 }}
-                    connectNulls
-                    isAnimationActive
-                    animationDuration={700}
-                    animationEasing="ease-out"
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
+            <ProgressChart datiGrafico={datiGrafico} metrichGrafico={metrichGrafico} />
           )}
         </div>
       </div>
