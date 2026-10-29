@@ -95,7 +95,7 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
     <>
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted">{rows.length} transazioni totali.</p>
-        <button type="button" onClick={() => setAggiungendo(true)} className="btn-primary !px-3 !py-1.5">
+        <button type="button" onClick={() => setAggiungendo(true)} className="btn-primary !px-3 !py-1.5 max-md:min-h-11">
           <Plus className="h-4 w-4" />
           Aggiungi transazione
         </button>
@@ -107,17 +107,17 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
             {righeSelezionate.length} {righeSelezionate.length === 1 ? "selezionata" : "selezionate"}
           </span>
           <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
-            <button type="button" onClick={() => setModificaBulk(true)} className="btn-primary !px-3 !py-1.5">
+            <button type="button" onClick={() => setModificaBulk(true)} className="btn-primary !px-3 !py-1.5 max-md:min-h-11">
               Modifica qualità costo
             </button>
             <button
               type="button"
               onClick={() => setEliminaBulk(true)}
-              className="btn-secondary !px-3 !py-1.5 hover:!text-spesa"
+              className="btn-secondary !px-3 !py-1.5 max-md:min-h-11 hover:!text-spesa"
             >
               Elimina selezionate
             </button>
-            <button type="button" onClick={() => setSelezionati(new Set())} className="btn-secondary !px-3 !py-1.5">
+            <button type="button" onClick={() => setSelezionati(new Set())} className="btn-secondary !px-3 !py-1.5 max-md:min-h-11">
               Deseleziona
             </button>
           </div>
