@@ -153,7 +153,7 @@ export function DayPanel({
               key={t.value}
               type="button"
               onClick={() => handleTabClick(t.value)}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-150 ease-out ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 max-md:min-h-11 max-md:px-4 text-xs font-medium transition-all duration-150 ease-out ${
                 tab === t.value ? "bg-accent text-accent-foreground shadow-sm" : "text-muted hover:text-foreground"
               }`}
             >
