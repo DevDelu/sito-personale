@@ -162,7 +162,7 @@ export function BulkEditModal({
                     key={t}
                     type="button"
                     onClick={() => setTipo(t)}
-                    className={`flex-1 rounded-full border px-3 py-1.5 text-sm font-medium transition-all duration-200 ease-out active:scale-95 ${
+                    className={`flex-1 rounded-full border px-3 py-1.5 text-sm font-medium max-md:min-h-11 transition-all duration-200 ease-out active:scale-95 ${
                       tipo === t
                         ? "border-accent bg-accent text-accent-foreground shadow-sm"
                         : "border-border text-muted hover:-translate-y-0.5 hover:text-foreground"
