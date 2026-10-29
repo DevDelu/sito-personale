@@ -536,14 +536,14 @@ export function FeedbackProvider({ owner }: { owner: boolean }) {
               <button
                 type="button"
                 onClick={() => void rispondiVerifica(false)}
-                className="min-h-[36px] rounded-full px-4 text-[15px] font-medium opacity-90 active:opacity-60"
+                className="min-h-[44px] min-w-[56px] rounded-full px-4 text-[15px] font-medium opacity-90 active:opacity-60"
               >
                 No
               </button>
               <button
                 type="button"
                 onClick={() => void rispondiVerifica(true)}
-                className="min-h-[36px] rounded-full bg-background px-4 text-[15px] font-semibold text-foreground active:opacity-80"
+                className="min-h-[44px] min-w-[56px] rounded-full bg-background px-4 text-[15px] font-semibold text-foreground active:opacity-80"
               >
                 Sì
               </button>

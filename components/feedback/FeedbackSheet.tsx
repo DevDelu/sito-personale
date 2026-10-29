@@ -126,7 +126,7 @@ export function FeedbackSheet({
                     type="button"
                     onClick={() => onNotaPer(null)}
                     aria-label="Scrivi un feedback nuovo invece di una nota"
-                    className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center text-muted active:opacity-60"
+                    className="-mr-3 -my-2 flex h-11 w-11 shrink-0 items-center justify-center text-muted active:opacity-60"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -136,7 +136,7 @@ export function FeedbackSheet({
                   type="button"
                   onClick={() => setListaAperta((v) => !v)}
                   aria-expanded={listaAperta}
-                  className="flex min-h-[40px] items-center gap-2 px-3 py-2 text-left text-[15px] active:opacity-60"
+                  className="flex min-h-[44px] items-center gap-2 px-3 py-2 text-left text-[15px] active:opacity-60"
                 >
                   <span className="flex-1">
                     Qui hai già {aperti.length === 1 ? "1 segnalazione aperta" : `${aperti.length} segnalazioni aperte`}
@@ -203,7 +203,7 @@ export function FeedbackSheet({
                 type="button"
                 onClick={onRimuoviPunto}
                 aria-label="Rimuovi il punto indicato"
-                className="flex min-h-[32px] min-w-0 items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-[13px] text-accent active:opacity-60"
+                className="flex min-h-[44px] min-w-0 items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-[13px] text-accent active:opacity-60"
               >
                 <Crosshair className="h-3.5 w-3.5 shrink-0" />
                 <span className="truncate">Punto: {punto}</span>
@@ -213,7 +213,7 @@ export function FeedbackSheet({
               <button
                 type="button"
                 onClick={onIndicaPunto}
-                className="flex min-h-[32px] items-center gap-1.5 text-[13px] text-muted underline-offset-2 active:opacity-60"
+                className="flex min-h-[44px] items-center gap-1.5 text-[13px] text-muted underline-offset-2 active:opacity-60"
               >
                 <Crosshair className="h-3.5 w-3.5" />
                 Indica il punto
