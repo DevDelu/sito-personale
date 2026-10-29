@@ -31,7 +31,7 @@ export function PageHeader({
           {parent ? (
             <Link
               href={parent.href}
-              className="app-static -ml-2 flex items-center gap-0.5 justify-self-start px-2 py-2 text-[17px] text-accent active:opacity-60"
+              className="app-static -ml-2 flex min-h-11 items-center gap-0.5 justify-self-start px-2 py-2 text-[17px] text-accent active:opacity-60"
             >
               <ChevronLeft className="h-5 w-5 shrink-0" strokeWidth={2.25} />
               <span className="max-w-[6rem] truncate">{parent.label}</span>

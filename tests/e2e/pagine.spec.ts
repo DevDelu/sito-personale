@@ -86,7 +86,7 @@ for (const percorso of PAGINE) {
     // calendario: area tocco ≥ 44px (issue #151). I checkbox restano fuori.
     const piccoli = await page.evaluate(() =>
       [...document.querySelectorAll<HTMLElement>(
-        ".btn-primary, .btn-secondary, .btn-danger, .btn-icon, [role='tab'], .agenda-calendar .fc-button"
+        ".btn-primary, .btn-secondary, .btn-danger, .btn-icon, [role='tab'], .app-page-header a, .agenda-calendar .fc-button"
       )]
         .map((el) => ({ el, r: el.getBoundingClientRect() }))
         .filter(({ r }) => r.width > 0 && r.height > 0 && Math.min(r.width, r.height) < 43.5)
