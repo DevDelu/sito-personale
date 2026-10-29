@@ -41,7 +41,7 @@ export function HeroCards({
             <button
               type="button"
               onClick={() => onView(c)}
-              aria-label={`${stile.etichetta}: ${c.name}`}
+              aria-label={`${stile.etichetta}: ${c.name}, ${prezzo !== null ? formatCurrency(prezzo) : "prezzo non disponibile"}`}
               className="animate-slide-up flex min-w-0 flex-col gap-1.5 rounded-xl p-1 text-left transition-transform active:scale-[0.97] sm:p-1.5 md:hover:-translate-y-0.5"
             >
               <CardPlaceholder
@@ -49,7 +49,7 @@ export function HeroCards({
                 imageUrl={c.image_url}
                 className="aspect-[5/7] w-full rounded-lg shadow-sm"
               />
-              <span className="line-clamp-2 min-h-[2lh] text-xs leading-tight font-semibold sm:text-sm">
+              <span className="line-clamp-2 min-h-[2lh] text-[13px] leading-tight font-semibold sm:text-sm">
                 {c.name}
               </span>
               <span className="font-figures text-sm font-bold sm:text-base">

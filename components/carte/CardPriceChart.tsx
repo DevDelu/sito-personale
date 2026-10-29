@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip } from "recharts";
 import type { TooltipContentProps } from "recharts";
 import { formatCurrency } from "@/lib/carte/format";
@@ -18,10 +19,22 @@ function ChartTooltip({ active, payload }: Partial<TooltipContentProps<number, s
   );
 }
 
+const RIDUCI_MOVIMENTO = "(prefers-reduced-motion: reduce)";
+function iscrivi(cb: () => void) {
+  const mq = window.matchMedia(RIDUCI_MOVIMENTO);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+}
+
 export function CardPriceChart({ history }: { history: PricePoint[] }) {
+  const riduciMovimento = useSyncExternalStore(
+    iscrivi,
+    () => window.matchMedia(RIDUCI_MOVIMENTO).matches,
+    () => false,
+  );
   if (history.length < 2) {
     return (
-      <p className="text-xs text-muted">
+      <p className="text-[13px] text-muted md:text-xs">
         {history.length === 0
           ? "Nessuno storico prezzo ancora disponibile."
           : "Serve almeno un secondo rilevamento per mostrare un andamento."}
@@ -34,7 +47,11 @@ export function CardPriceChart({ history }: { history: PricePoint[] }) {
   const colorVar = ultimo === primo ? "--muted" : ultimo > primo ? "--entrata" : "--spesa";
 
   return (
-    <div className="h-24 w-full">
+    <div
+      className="h-24 w-full"
+      role="img"
+      aria-label={`Andamento del prezzo: da ${formatCurrency(primo)} a ${formatCurrency(ultimo)} in ${history.length} rilevamenti`}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={history} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
           <defs>
@@ -47,7 +64,7 @@ export function CardPriceChart({ history }: { history: PricePoint[] }) {
           <Area
             type="monotone"
             dataKey="price"
-            isAnimationActive
+            isAnimationActive={!riduciMovimento}
             animationDuration={600}
             animationEasing="ease-out"
             stroke={`var(${colorVar})`}

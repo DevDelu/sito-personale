@@ -58,7 +58,7 @@ export function CardDetailModal({
     <Sheet onClose={onClose} className="max-w-md p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" area="collezione.dettaglio-carta" entita={`carta:${carta.id}`}>
       <div className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-2">
-          <h2 className="font-display text-base font-semibold">{carta.name}</h2>
+          <h2 className="font-display text-base font-semibold max-md:text-[22px]">{carta.name}</h2>
           <button type="button" onClick={onClose} aria-label="Chiudi" className="btn-icon">
             <X className="h-4 w-4" />
           </button>
@@ -76,7 +76,7 @@ export function CardDetailModal({
           <CardPriceChart history={history} />
         )}
 
-        <dl className="flex animate-fade-in flex-col gap-2 text-sm">
+        <dl className="flex animate-fade-in flex-col gap-2 text-sm max-md:text-[15px]">
           {carta.card_number && <Row label="Codice carta" value={<span className="font-figures">{carta.card_number}</span>} />}
           <Row label="Tipo" value={PRODUCT_TYPE_LABEL[carta.product_type]} />
           <Row label="Quantità" value={String(carta.quantity)} />
