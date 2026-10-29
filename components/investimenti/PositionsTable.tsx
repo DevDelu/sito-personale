@@ -225,9 +225,9 @@ function PositionsCards({
               <span className="flex items-center gap-2">
                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: `var(${tipoColorVar})` }} />
                 <span className="min-w-0 flex-1 truncate font-medium">{p.asset.nome}</span>
-                {p.hasStimato && <AlertTriangle aria-label="Include costi stimati" className="h-4 w-4 shrink-0 text-accent" />}
+                {p.hasStimato && <AlertTriangle role="img" aria-label="Include costi stimati" className="h-4 w-4 shrink-0 text-accent" />}
                 {p.hasSconosciuto && (
-                  <HelpCircle aria-label="Include quantità a costo sconosciuto" className="h-4 w-4 shrink-0 text-muted" />
+                  <HelpCircle role="img" aria-label="Include quantità a costo sconosciuto" className="h-4 w-4 shrink-0 text-muted" />
                 )}
                 {aperta ? (
                   <ChevronDown className="h-4 w-4 shrink-0 text-muted" />
