@@ -30,7 +30,11 @@ export function WeeklyTrendChart({
   targetKcal: number | null;
 }) {
   return (
-    <div className="card card-hover h-64 w-full p-4">
+    <div
+      role="img"
+      aria-label={`Kcal degli ultimi 7 giorni: ${punti.map((p) => `${p.label} ${p.kcal}`).join(", ")}${targetKcal !== null ? `. Target ${targetKcal} kcal` : ""}`}
+      className="card card-hover h-64 w-full p-4"
+    >
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={punti} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <defs>

@@ -38,9 +38,17 @@ function Bar({
           {target !== null && <span className="text-muted"> / {Math.round(target)}{unit}</span>}
         </span>
       </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-surface-hover">
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct ?? 0}
+        aria-valuetext={target !== null ? `${Math.round(value)} su ${Math.round(target)}${unit}` : `${Math.round(value)}${unit}`}
+        className="h-2 w-full overflow-hidden rounded-full bg-surface-hover"
+      >
         <div
-          className="h-full rounded-full transition-all duration-500 ease-out"
+          className="h-full rounded-full transition-all duration-500 ease-out motion-reduce:transition-none"
           style={{
             width: `${pct ?? 0}%`,
             backgroundColor: `var(${colorVar})`,
