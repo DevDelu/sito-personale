@@ -73,11 +73,11 @@ export default async function AllenamentoPage() {
           note={sessioniMese.length === 1 ? "sessione" : "sessioni"}
         />
         <div className="card flex flex-col gap-0.5 px-4 py-3">
-          <span className="text-xs text-muted">Ultimo allenamento</span>
+          <span className="text-[13px] text-muted">Ultimo allenamento</span>
           {ultimaSessione ? (
             <>
               <span className="truncate font-display text-base font-semibold">{nomeSchedaUltima}</span>
-              <span className="text-xs text-muted">{formatData(ultimaSessione.data)}</span>
+              <span className="text-[13px] text-muted">{formatData(ultimaSessione.data)}</span>
             </>
           ) : (
             <span className="font-display text-base font-semibold text-muted">Nessuno ancora</span>
@@ -100,7 +100,7 @@ export default async function AllenamentoPage() {
                   <span className="font-display text-base font-semibold">{scheda.nome}</span>
                   {scheda.descrizione && <p className="text-sm text-muted">{scheda.descrizione}</p>}
                 </div>
-                <span className="text-xs text-muted">
+                <span className="text-[13px] text-muted">
                   {scheda.numEsercizi} {scheda.numEsercizi === 1 ? "esercizio" : "esercizi"} ·{" "}
                   {formatUltimoUtilizzo(scheda.ultimoUtilizzo)}
                 </span>
@@ -114,7 +114,7 @@ export default async function AllenamentoPage() {
                     Avvia
                   </Link>
                 ) : (
-                  <p className="mt-auto text-xs text-muted">Aggiungi almeno un esercizio per poterla avviare.</p>
+                  <p className="mt-auto text-[13px] text-muted">Aggiungi almeno un esercizio per poterla avviare.</p>
                 )}
               </div>
             );
