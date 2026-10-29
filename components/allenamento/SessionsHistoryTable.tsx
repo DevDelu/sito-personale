@@ -8,7 +8,7 @@ import { useStoricoMutations } from "@/hooks/useStoricoMutations";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { BulkEditSessioniModal } from "./BulkEditSessioniModal";
 import type { BulkSessionePatch } from "@/app/(private)/allenamenti/actions";
-import type { Sessione } from "@/lib/allenamento/types";
+import type { SessioneElenco } from "@/lib/allenamento/types";
 
 const SENSAZIONE_LABEL = ["😞", "🙁", "😐", "🙂", "💪"];
 
@@ -24,7 +24,7 @@ function formatData(iso: string): string {
 // Nessun export CSV preesistente nel modulo Spese da riusare (verificato:
 // non c'è in repo), quindi è un'implementazione autonoma — download via
 // Blob lato client, pattern standard, nessuna libreria aggiuntiva.
-function esportaCsv(sessioni: Sessione[]) {
+function esportaCsv(sessioni: SessioneElenco[]) {
   const header = ["Data", "Durata (min)", "Sensazione", "Note"];
   const righe = sessioni.map((s) => [
     s.data,
@@ -46,10 +46,10 @@ function esportaCsv(sessioni: Sessione[]) {
   URL.revokeObjectURL(url);
 }
 
-export function SessionsHistoryTable({ sessioni }: { sessioni: Sessione[] }) {
+export function SessionsHistoryTable({ sessioni }: { sessioni: SessioneElenco[] }) {
   const router = useRouter();
   const { eliminaSessione, bulkAggiorna, bulkElimina, pending } = useStoricoMutations();
-  const [eliminando, setEliminando] = useState<Sessione | null>(null);
+  const [eliminando, setEliminando] = useState<SessioneElenco | null>(null);
   const [selezionati, setSelezionati] = useState<Set<string>>(new Set());
   const [modificaBulk, setModificaBulk] = useState(false);
   const [eliminaBulk, setEliminaBulk] = useState(false);

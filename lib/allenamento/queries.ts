@@ -6,6 +6,7 @@ import type {
   Scheda,
   SchedaEsercizioConNome,
   Sessione,
+  SessioneElenco,
   SessioneLog,
   TipoMetrica,
 } from "./types";
@@ -157,9 +158,16 @@ export async function getUltimoLogPerSchedaEsercizio(
   };
 }
 
-export async function getSessioni(): Promise<Sessione[]> {
+const COLONNE_SESSIONE_ELENCO = "id, data, scheda_id, durata_min, sensazione, note";
+
+// Senza `scheda_snapshot`: è un JSON per sessione, inutile negli elenchi e finiva
+// nel payload verso il client (la sessione singola usa getSessione).
+export async function getSessioni(): Promise<SessioneElenco[]> {
   const admin = createAdminClient();
-  const { data, error } = await admin.from("sessioni").select("*").order("data", { ascending: false });
+  const { data, error } = await admin
+    .from("sessioni")
+    .select(COLONNE_SESSIONE_ELENCO)
+    .order("data", { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];
 }
@@ -186,7 +194,7 @@ export type LogConNome = {
 // tabella progressi rispetto a mantenere una vista SQL).
 export async function getUltimeSessioniConLog(
   limit = 30
-): Promise<{ sessioni: Sessione[]; log: LogConNome[] }> {
+): Promise<{ sessioni: SessioneElenco[]; log: LogConNome[] }> {
   const admin = createAdminClient();
   const { data: sessioniData, error: sessioniErr } = await admin
     .from("sessioni")
@@ -251,7 +259,16 @@ export async function getUltimeSessioniConLog(
     });
   }
 
-  return { sessioni, log };
+  // Lo snapshot serve solo qui sopra: non va serializzato verso il client.
+  const sessioniElenco: SessioneElenco[] = sessioni.map((s) => ({
+    id: s.id,
+    data: s.data,
+    scheda_id: s.scheda_id,
+    durata_min: s.durata_min,
+    sensazione: s.sensazione,
+    note: s.note,
+  }));
+  return { sessioni: sessioniElenco, log };
 }
 
 export async function getLogPerSessione(sessioneId: string): Promise<SessioneLog[]> {

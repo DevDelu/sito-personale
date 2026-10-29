@@ -63,6 +63,9 @@ export type Sessione = {
   scheda_snapshot: SchedaEsercizioConNome[] | null;
 };
 
+// Sessione senza lo snapshot della scheda (JSON pesante): basta per elenchi e tabelle.
+export type SessioneElenco = Omit<Sessione, "scheda_snapshot">;
+
 export type SessioneLog = {
   id: string;
   sessione_id: string;
