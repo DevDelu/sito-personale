@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { Sfera } from "@/components/sfere/Sfera";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 import { DownloadCvButton } from "@/components/home/download-cv-button";
 import { HeroHeadline } from "@/components/home/hero-headline";
@@ -23,6 +24,7 @@ export async function Hero() {
 
   return (
     <div className="relative w-full flex-1 overflow-hidden">
+      <Sfera n={1} className="bottom-6 right-4 md:right-[15%]" />
       <main className="relative z-10 mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-2xl flex-col items-center justify-center gap-8 px-6 py-20 text-center">
         <RevealGroup className="flex flex-col items-center gap-8">
           {/* Fuori da RevealItem di proposito: l'HTML server partirebbe a opacity 0

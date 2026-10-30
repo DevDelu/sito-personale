@@ -874,3 +874,24 @@ html[data-privacy="on"] .importo {
     }
   }
 }
+
+/* Easter egg sfere del drago (components/sfere): messaggio finale con una
+   piccola comparsa; con riduci movimento resta fermo. */
+@media (prefers-reduced-motion: no-preference) {
+  .sfere-desiderio {
+    animation: sfere-comparsa 0.6s ease-out both;
+  }
+  .sfere-contatore {
+    animation: sfere-comparsa 0.3s ease-out both;
+  }
+}
+@keyframes sfere-comparsa {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

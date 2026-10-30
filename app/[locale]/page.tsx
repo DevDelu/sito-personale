@@ -5,6 +5,8 @@ import { About } from "@/components/home/About";
 import { Skills } from "@/components/home/Skills";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
 import { Contact } from "@/components/home/Contact";
+import { Sfera } from "@/components/sfere/Sfera";
+import { ContatoreSfere } from "@/components/sfere/ContatoreSfere";
 import { QuizSection } from "@/components/quiz/QuizSection";
 import { baseUrlPubblica, jsonLdSicuro, metadataPubblica, personaJsonLd } from "@/lib/seo";
 
@@ -37,11 +39,28 @@ export default async function HomePage({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdSicuro(persona) }} />
       <Hero />
-      <About />
-      <QuizSection />
-      <Skills />
-      <FeaturedProjects />
-      <Contact />
+      <div className="relative">
+        <About />
+        <Sfera n={2} className="right-3 top-24 md:right-[12%]" />
+      </div>
+      <div className="relative">
+        <QuizSection />
+        <Sfera n={3} className="bottom-6 left-[18%]" />
+      </div>
+      <div className="relative">
+        <Skills />
+        <Sfera n={4} className="right-[22%] top-10" />
+      </div>
+      <div className="relative">
+        <FeaturedProjects />
+        <Sfera n={5} className="bottom-4 right-6" />
+      </div>
+      <div className="relative">
+        <Contact />
+        <Sfera n={6} className="left-4 top-8 md:left-[8%]" />
+        <Sfera n={7} className="bottom-2 right-[35%]" />
+      </div>
+      <ContatoreSfere />
     </>
   );
 }
