@@ -10,6 +10,7 @@ export function DeleteConfirmDialog({
   onCancel,
   title,
   description,
+  error,
 }: {
   titolo: string;
   // Se >1, mostra il testo per l'eliminazione in blocco invece del singolo movimento.
@@ -21,6 +22,8 @@ export function DeleteConfirmDialog({
   // pensato per Spese/Investimenti, dove questo dialog è nato.
   title?: string;
   description?: React.ReactNode;
+  // Messaggio d'errore dell'ultima eliminazione fallita (facoltativo).
+  error?: string | null;
 }) {
   const isBulk = typeof count === "number" && count > 1;
 
@@ -37,6 +40,11 @@ export function DeleteConfirmDialog({
             <>&ldquo;{titolo}&rdquo; verrà rimosso definitivamente. L&apos;operazione non è reversibile.</>
           ))}
       </p>
+      {error && (
+        <p className="mt-3 text-sm text-spesa" role="alert">
+          {error}
+        </p>
+      )}
       <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <button type="button" onClick={onCancel} className="btn-secondary">
           Annulla
