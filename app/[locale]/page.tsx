@@ -45,7 +45,7 @@ export default async function HomePage({
       </div>
       <div className="relative">
         <QuizSection />
-        <Sfera n={3} className="bottom-6 left-[18%]" />
+        <Sfera n={3} className="bottom-1 left-[18%]" />
       </div>
       <div className="relative">
         <Skills />
@@ -53,12 +53,12 @@ export default async function HomePage({
       </div>
       <div className="relative">
         <FeaturedProjects />
-        <Sfera n={5} className="bottom-4 right-6" />
+        <Sfera n={5} className="bottom-1 right-6" />
       </div>
       <div className="relative">
         <Contact />
         <Sfera n={6} className="left-4 top-8 md:left-[8%]" />
-        <Sfera n={7} className="bottom-2 right-[35%]" />
+        <Sfera n={7} className="bottom-1 right-[35%]" />
       </div>
       <ContatoreSfere />
     </>
