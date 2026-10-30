@@ -13,7 +13,7 @@ export function Sfera({ n, className = "" }: { n: number; className?: string }) 
       aria-hidden="true"
       tabIndex={-1}
       onClick={() => prendi(n)}
-      className={`sfera-drago absolute z-10 flex h-11 w-11 items-center justify-center ${className}`}
+      className={`sfera-drago absolute z-20 flex h-11 w-11 items-center justify-center ${className}`}
     >
       <svg viewBox="0 0 24 24" width="24" height="24" className="opacity-60">
         <defs>
