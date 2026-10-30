@@ -11,6 +11,7 @@ import type { BulkSessionePatch } from "@/app/(private)/allenamenti/actions";
 import type { SessioneElenco } from "@/lib/allenamento/types";
 
 const SENSAZIONE_LABEL = ["😞", "🙁", "😐", "🙂", "💪"];
+const SENSAZIONE_TESTO = ["Pessima", "Scarsa", "Normale", "Buona", "Ottima"];
 
 function formatData(iso: string): string {
   return new Date(`${iso}T00:00:00Z`).toLocaleDateString("it-IT", {
@@ -137,19 +138,21 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: SessioneElenco[] 
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs text-muted">
-                <th className="w-8 px-4 py-2">
-                  <input
-                    type="checkbox"
-                    aria-label="Seleziona tutte"
-                    checked={sessioni.length > 0 && selezionati.size === sessioni.length}
-                    onChange={toggleTutte}
-                    className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
-                  />
+                <th className="w-8 px-2 py-2 md:px-4">
+                  <label className="flex h-11 w-11 items-center justify-center md:h-auto md:w-auto">
+                    <input
+                      type="checkbox"
+                      aria-label="Seleziona tutte"
+                      checked={sessioni.length > 0 && selezionati.size === sessioni.length}
+                      onChange={toggleTutte}
+                      className="h-5 w-5 rounded border-border accent-[var(--accent)] transition-transform active:scale-90 md:h-4 md:w-4"
+                    />
+                  </label>
                 </th>
                 <th className="px-4 py-2 font-medium">Data</th>
                 <th className="px-4 py-2 font-medium">Durata</th>
                 <th className="px-4 py-2 font-medium">Sensazione</th>
-                <th className="px-4 py-2 font-medium">Note</th>
+                <th className="hidden px-4 py-2 font-medium md:table-cell">Note</th>
                 <th className="px-4 py-2 font-medium"></th>
               </tr>
             </thead>
@@ -164,14 +167,16 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: SessioneElenco[] 
                       selezionata ? "bg-accent/5" : ""
                     }`}
                   >
-                    <td className="px-4 py-2">
-                      <input
-                        type="checkbox"
-                        aria-label="Seleziona sessione"
-                        checked={selezionata}
-                        onChange={() => toggleRiga(s.id)}
-                        className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
-                      />
+                    <td className="px-2 py-2 md:px-4">
+                      <label className="flex h-11 w-11 items-center justify-center md:h-auto md:w-auto">
+                        <input
+                          type="checkbox"
+                          aria-label="Seleziona sessione"
+                          checked={selezionata}
+                          onChange={() => toggleRiga(s.id)}
+                          className="h-5 w-5 rounded border-border accent-[var(--accent)] transition-transform active:scale-90 md:h-4 md:w-4"
+                        />
+                      </label>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap capitalize">
                       <Link
@@ -184,8 +189,16 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: SessioneElenco[] 
                     <td className="font-figures px-4 py-2 whitespace-nowrap">
                       {s.durata_min != null ? `${s.durata_min} min` : "—"}
                     </td>
-                    <td className="px-4 py-2">{s.sensazione != null ? SENSAZIONE_LABEL[s.sensazione - 1] : "—"}</td>
-                    <td className="max-w-xs truncate px-4 py-2 text-muted">{s.note ?? "—"}</td>
+                    <td className="px-4 py-2">
+                      {s.sensazione != null ? (
+                        <span role="img" aria-label={`Sensazione: ${SENSAZIONE_TESTO[s.sensazione - 1]}`}>
+                          {SENSAZIONE_LABEL[s.sensazione - 1]}
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="hidden max-w-xs truncate px-4 py-2 text-muted md:table-cell">{s.note ?? "—"}</td>
                     <td className="px-4 py-2">
                       <button
                         type="button"
