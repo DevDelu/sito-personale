@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { normalizzaTempo } from "@/lib/quiz/tempo";
 import type { QuizAnswerInput, QuizAnswerResult, QuizSubmitResponse } from "@/lib/quiz/types";
 
 const MAX_DOMANDE = 20;
@@ -25,11 +26,12 @@ export async function POST(request: Request) {
   }
 
   const answersInput = Array.isArray(body.answers) ? body.answers : [];
-  const timeMs = typeof body.timeMs === "number" && body.timeMs >= 0 ? Math.round(body.timeMs) : 0;
 
   if (answersInput.length === 0 || answersInput.length > MAX_DOMANDE) {
     return NextResponse.json({ error: "Risposte mancanti o non valide." }, { status: 400 });
   }
+
+  const timeMs = normalizzaTempo(body.timeMs, answersInput.length);
 
   const questionIds = answersInput
     .map((a) => a.questionId)
