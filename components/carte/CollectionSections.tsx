@@ -28,14 +28,22 @@ export function CollectionSections({
 
   async function handleSave(patch: ModificaCartaPatch) {
     if (!editing) return;
-    await updateCarta(editing.id, editing.card_id, patch);
+    try {
+      await updateCarta(editing.id, editing.card_id, patch);
+    } catch {
+      return; // l'errore è già in `error` e il modale lo mostra
+    }
     setEditing(null);
     router.refresh();
   }
 
   async function handleDelete() {
     if (!deleting) return;
-    await deleteCarta(deleting.id);
+    try {
+      await deleteCarta(deleting.id);
+    } catch {
+      return; // l'errore è già in `error` e il dialog lo mostra
+    }
     setDeleting(null);
     router.refresh();
   }
@@ -89,6 +97,7 @@ export function CollectionSections({
             </>
           }
           pending={pending}
+          error={error}
           onConfirm={handleDelete}
           onCancel={() => setDeleting(null)}
         />
