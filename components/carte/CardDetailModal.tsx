@@ -104,12 +104,12 @@ export function CardDetailModal({
           {carta.notes && <Row label="Note" value={carta.notes} />}
         </dl>
 
-        <div className="flex justify-end gap-3">
-          <button type="button" onClick={onDelete} className="btn-secondary hover:!text-spesa">
+        <div className="flex flex-col-reverse gap-3 md:flex-row md:justify-end">
+          <button type="button" onClick={onDelete} className="btn-secondary justify-center hover:!text-spesa">
             <Trash2 className="h-4 w-4" />
             Elimina
           </button>
-          <button type="button" onClick={onEdit} className="btn-primary">
+          <button type="button" onClick={onEdit} className="btn-primary justify-center">
             <Pencil className="h-4 w-4" />
             Modifica
           </button>
