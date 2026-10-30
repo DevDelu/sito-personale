@@ -65,5 +65,9 @@
     "title": "Lorenzo De Luca — PMO on the path to AI Product Engineering",
     "description": "Lorenzo De Luca's portfolio: a PMO with a UX/UI background building digital products across AI, data and design. Projects, skills and contacts.",
     "jobTitle": "PMO, on the path to AI Product Engineering"
+  },
+  "Sfere": {
+    "contatore": "Balls {n}/{totale}",
+    "completo": "You found all seven. Make a wish: maybe a chat together?"
   }
 }
