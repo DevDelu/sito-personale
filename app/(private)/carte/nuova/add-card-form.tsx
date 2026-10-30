@@ -108,9 +108,9 @@ export function AddCardForm() {
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-sm font-medium text-muted">
+      <span className="text-sm font-medium text-muted max-md:text-[15px]">
         {label}
-        {hint && <span className="ml-1.5 text-[13px] font-normal text-muted/70">{hint}</span>}
+        {hint && <span className="block text-[13px] font-normal text-muted/70">{hint}</span>}
       </span>
       {children}
     </label>
