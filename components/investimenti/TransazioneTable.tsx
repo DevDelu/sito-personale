@@ -129,13 +129,15 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
           <thead className="border-b border-border text-muted">
             <tr>
               <th className="w-8 px-3 py-2">
-                <input
-                  type="checkbox"
-                  aria-label="Seleziona tutto"
-                  checked={rows.length > 0 && selezionati.size === rows.length}
-                  onChange={toggleTutte}
-                  className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
-                />
+                <label className="flex items-center justify-center max-md:-m-3 max-md:h-11 max-md:w-11">
+                  <input
+                    type="checkbox"
+                    aria-label="Seleziona tutto"
+                    checked={rows.length > 0 && selezionati.size === rows.length}
+                    onChange={toggleTutte}
+                    className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
+                  />
+                </label>
               </th>
               <th className="px-3 py-2 font-medium">Data</th>
               <th className="px-3 py-2 font-medium">Asset</th>
@@ -158,13 +160,15 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
                   }`}
                 >
                   <td className="px-3 py-2">
-                    <input
-                      type="checkbox"
-                      aria-label="Seleziona riga"
-                      checked={selezionata}
-                      onChange={() => toggleRiga(r.id)}
-                      className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
-                    />
+                    <label className="flex items-center justify-center max-md:-m-3 max-md:h-11 max-md:w-11">
+                      <input
+                        type="checkbox"
+                        aria-label="Seleziona riga"
+                        checked={selezionata}
+                        onChange={() => toggleRiga(r.id)}
+                        className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
+                      />
+                    </label>
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap text-muted">
                     {new Date(`${r.data}T00:00:00Z`).toLocaleDateString("it-IT")}
