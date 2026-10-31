@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireWriter } from "@/lib/supabase/dal";
-import { getPriceHistory, type PricePoint } from "@/lib/carte/queries";
 import type { CardCondition, ProductType } from "@/lib/carte/types";
 
 export type AggiungiCartaState = { error?: string } | undefined;
@@ -227,11 +226,6 @@ export async function aggiornaImmagineCarta(cardId: number, formData: FormData):
 
   revalidatePath("/carte");
   return {};
-}
-
-export async function getStoricoPrezzo(collectionId: number, idProduct: number | null): Promise<PricePoint[]> {
-  await requireWriter();
-  return getPriceHistory(collectionId, idProduct);
 }
 
 export async function eliminaCarta(id: number): Promise<CarteActionResult> {

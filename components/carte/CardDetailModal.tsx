@@ -12,7 +12,6 @@ import {
   PRODUCT_TYPE_LABEL,
   LANGUAGE_LABEL,
 } from "@/lib/carte/format";
-import { getStoricoPrezzo } from "@/app/(private)/carte/actions";
 import type { PricePoint } from "@/lib/carte/queries";
 import type { CollectionCard } from "@/lib/carte/types";
 import { Sheet } from "@/components/ui/Sheet";
@@ -42,7 +41,10 @@ export function CardDetailModal({
 
   useEffect(() => {
     let cancelled = false;
-    getStoricoPrezzo(carta.id, carta.id_product)
+    const query = new URLSearchParams({ id: String(carta.id) });
+    if (carta.id_product !== null) query.set("prodotto", String(carta.id_product));
+    fetch(`/api/carte/storico-prezzo?${query}`)
+      .then((res) => (res.ok ? (res.json() as Promise<PricePoint[]>) : []))
       .then((data) => {
         if (!cancelled) setHistory(data);
       })
