@@ -136,7 +136,7 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
                     checked={rows.length > 0 && selezionati.size === rows.length}
                     onChange={toggleTutte}
                     className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
-                    />
+                  />
                 </label>
               </th>
               <th className="px-3 py-2 font-medium">Data</th>
@@ -167,7 +167,7 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
                         checked={selezionata}
                         onChange={() => toggleRiga(r.id)}
                         className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
-                        />
+                      />
                     </label>
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap text-muted">
