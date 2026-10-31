@@ -122,6 +122,8 @@ export function AlimentoSelector({
           }}
           onFocus={() => setMostraLista(true)}
           placeholder="Cerca un alimento..."
+          aria-label="Alimento"
+          aria-expanded={mostraLista}
           className="field-input w-full bg-surface"
         />
         {mostraLista && (
@@ -131,23 +133,23 @@ export function AlimentoSelector({
                 key={a.id}
                 type="button"
                 onClick={() => selezionaAlimento(a)}
-                className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-surface-hover"
+                className="flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-surface-hover"
               >
                 <span>{a.nome}</span>
-                <span className="font-figures text-xs text-muted">{a.kcal_100g} kcal/100g</span>
+                <span className="font-figures text-[13px] text-muted">{a.kcal_100g} kcal/100g</span>
               </button>
             ))}
             <button
               type="button"
               onClick={apriCreazione}
-              className="flex w-full items-center gap-1.5 border-t border-border px-3 py-2 text-left text-sm font-medium text-accent hover:bg-surface-hover"
+              className="flex w-full min-h-[44px] items-center gap-1.5 border-t border-border px-3 py-2 text-left text-sm font-medium text-accent hover:bg-surface-hover"
             >
               + Crea nuovo alimento{query.trim() ? ` "${query.trim()}"` : ""}
             </button>
             <button
               type="button"
               onClick={apriScanner}
-              className="flex w-full items-center gap-1.5 border-t border-border px-3 py-2 text-left text-sm font-medium text-accent hover:bg-surface-hover"
+              className="flex w-full min-h-[44px] items-center gap-1.5 border-t border-border px-3 py-2 text-left text-sm font-medium text-accent hover:bg-surface-hover"
             >
               Cerca da barcode
             </button>
@@ -165,6 +167,7 @@ export function AlimentoSelector({
             value={nome}
             onChange={(e) => setNome(e.target.value)}
             placeholder="Nome alimento"
+            aria-label="Nome alimento"
             className="field-input"
           />
           <div className="grid grid-cols-3 gap-2">
