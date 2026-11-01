@@ -61,14 +61,14 @@ export function AltreCarteList({
               <span className="font-figures shrink-0 text-xs text-muted whitespace-nowrap">×{c.quantity}</span>
               <div className="flex min-w-0 flex-col">
                 <span className="truncate max-md:line-clamp-2 max-md:whitespace-normal">{c.name}</span>
-                {c.card_number && <span className="font-figures truncate text-[13px] text-muted/70">{c.card_number}</span>}
+                {c.card_number && <span className="font-figures truncate text-[13px] text-muted">{c.card_number}</span>}
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-4 max-md:flex-col-reverse max-md:items-end max-md:gap-0.5">
               {c.current_price !== null ? (
                 <>
                   <span
-                    className={`text-xs font-medium whitespace-nowrap ${c.is_manual_price ? "text-muted/70" : ""}`}
+                    className={`text-xs font-medium whitespace-nowrap ${c.is_manual_price ? "text-muted" : ""}`}
                     style={c.is_manual_price ? undefined : { color: `var(${colorVar})` }}
                   >
                     {c.is_manual_price ? "manuale" : formatVariazione(variazione)}
@@ -77,7 +77,7 @@ export function AltreCarteList({
                 </>
               ) : c.purchase_price !== null ? (
                 <>
-                  <span className="text-xs text-muted/70 whitespace-nowrap">acquisto</span>
+                  <span className="text-xs text-muted whitespace-nowrap">acquisto</span>
                   <span className="font-figures importo w-20 text-right">{formatCurrency(c.purchase_price)}</span>
                 </>
               ) : (
