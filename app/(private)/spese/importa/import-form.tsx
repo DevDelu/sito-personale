@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CategoryBadge } from "@/components/category-badge";
@@ -33,6 +34,8 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
   const [intesaFile, setIntesaFile] = useState<File | null>(null);
 
   const duplicati = righe.filter((r) => r.duplicato).length;
+  const doppioniFuori = righe.filter((r, i) => r.duplicato && !selezionate[i]).length;
+  const nonImportate = risultato ? Math.max(0, righe.length - risultato.insertedSpese - risultato.insertedDepositi) : 0;
   const daVerificareCount = righe.filter((r) => r.daVerificare).length;
   const numeroSelezionate = selezionate.filter(Boolean).length;
 
@@ -470,6 +473,15 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
           <p className="font-medium text-entrata">
             Importate {risultato.insertedSpese} spese e {risultato.insertedDepositi} entrate.
           </p>
+          {nonImportate > 0 && (
+            <p className="mt-1 text-muted">
+              {nonImportate} {nonImportate === 1 ? "riga lasciata fuori" : "righe lasciate fuori"}
+              {doppioniFuori > 0 && <> ({doppioniFuori} già presenti)</>}.
+            </p>
+          )}
+          <Link href="/spese/gestione" className="btn-secondary mt-3 inline-flex min-h-11 items-center">
+            Rivedi in Gestione
+          </Link>
         </div>
       )}
     </div>
