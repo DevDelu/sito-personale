@@ -55,7 +55,9 @@
     "description": "Una selezione di case study: tesi, progetti personali e lavoro."
   },
   "CaseStudy": {
-    "backLink": "Home"
+    "backLink": "Home",
+    "share": "Condividi",
+    "shareCopied": "Link copiato"
   },
   "PublicNav": {
     "switchToEnglish": "Passa all'inglese",

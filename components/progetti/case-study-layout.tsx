@@ -7,6 +7,7 @@ import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 import { StatNumber } from "@/components/progetti/stat-number";
 import { MdxH2, MdxImg, MdxP, MdxUl } from "@/components/progetti/mdx-elements";
 import { Link } from "@/i18n/navigation";
+import { ShareButton } from "@/components/progetti/share-button";
 
 const mdxComponents = { h2: MdxH2, p: MdxP, ul: MdxUl, img: MdxImg };
 
@@ -45,6 +46,10 @@ export function CaseStudyLayout({
 
         <RevealItem className="mt-4">
           <p className="text-base leading-relaxed text-muted">{project.summary}</p>
+        </RevealItem>
+
+        <RevealItem className="mt-4">
+          <ShareButton title={project.title} color={accent.primary} />
         </RevealItem>
 
         {project.cover ? (
