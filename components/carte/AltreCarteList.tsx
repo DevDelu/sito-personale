@@ -73,12 +73,12 @@ export function AltreCarteList({
                   >
                     {c.is_manual_price ? "manuale" : formatVariazione(variazione)}
                   </span>
-                  <span className="font-figures w-20 text-right">{formatCurrency(c.current_price)}</span>
+                  <span className="font-figures importo w-20 text-right">{formatCurrency(c.current_price)}</span>
                 </>
               ) : c.purchase_price !== null ? (
                 <>
                   <span className="text-xs text-muted/70 whitespace-nowrap">acquisto</span>
-                  <span className="font-figures w-20 text-right">{formatCurrency(c.purchase_price)}</span>
+                  <span className="font-figures importo w-20 text-right">{formatCurrency(c.purchase_price)}</span>
                 </>
               ) : (
                 <span
