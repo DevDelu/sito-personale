@@ -15,7 +15,8 @@ export function LanguageSwitcher() {
       locale={nextLocale}
       replace
       hrefLang={nextLocale}
-      aria-label={nextLocale === "en" ? t("switchToEnglish") : t("switchToItalian")}
+      // L'etichetta accessibile contiene il testo visibile (WCAG 2.5.3).
+      aria-label={`${nextLocale.toUpperCase()}: ${nextLocale === "en" ? t("switchToEnglish") : t("switchToItalian")}`}
       className="group flex h-[44px] w-[44px] items-center justify-center rounded-full border border-border text-sm font-medium text-foreground transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover hover:shadow-sm active:scale-90 sm:h-9 sm:w-9"
     >
       {nextLocale.toUpperCase()}
