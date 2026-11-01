@@ -49,7 +49,7 @@ export default async function LocaleLayout({
         <HtmlLangSync />
         <MotionProvider>
           <PublicHeader />
-          {children}
+          <main id="contenuto" className="flex flex-1 flex-col">{children}</main>
         </MotionProvider>
       </div>
     </NextIntlClientProvider>

@@ -25,7 +25,7 @@ export async function Hero() {
   return (
     <div className="relative w-full flex-1 overflow-hidden">
       <Sfera n={1} className="bottom-6 right-4 md:right-[15%]" />
-      <main className="relative z-10 mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-2xl flex-col items-center justify-center gap-8 px-6 py-20 text-center">
+      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-2xl flex-col items-center justify-center gap-8 px-6 py-20 text-center">
         <RevealGroup className="flex flex-col items-center gap-8">
           {/* Fuori da RevealItem di proposito: l'HTML server partirebbe a opacity 0
               e il titolo (LCP) comparirebbe solo dopo l'idratazione di JS. */}
@@ -42,7 +42,7 @@ export async function Hero() {
             <DownloadCvButton href={cvUrl} filename={cvUrl.slice(1)} label={t("ctaCv")} className={HERO_BUTTON_CLASS} />
           </RevealItem>
         </RevealGroup>
-      </main>
+      </div>
     </div>
   );
 }

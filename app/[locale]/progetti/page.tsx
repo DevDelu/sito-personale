@@ -47,7 +47,7 @@ export default async function ProgettiPage({
         </RevealItem>
         <RevealItem className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(260px,340px))] gap-6">
           {projects.map((project) => (
-            <ProjectCard key={project.slug} project={project} categoryLabel={tCategory(project.category)} />
+            <ProjectCard key={project.slug} project={project} headingLevel={2} categoryLabel={tCategory(project.category)} />
           ))}
         </RevealItem>
       </RevealGroup>
