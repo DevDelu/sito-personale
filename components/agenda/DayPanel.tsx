@@ -335,7 +335,7 @@ function MailSection({
                 </a>
               </div>
               <span className="truncate text-foreground/90">{m.oggetto}</span>
-              <span className="truncate text-xs text-muted/70">{m.snippet}</span>
+              <span className="truncate text-xs text-muted">{m.snippet}</span>
             </li>
           );
         })}

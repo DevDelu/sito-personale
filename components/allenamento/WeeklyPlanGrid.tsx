@@ -48,7 +48,7 @@ export function WeeklyPlanGrid({ impegni }: { impegni: ImpegnoFisso[] }) {
           <div key={giorno} className="card flex flex-col gap-2 p-3">
             <span className="font-display text-xs font-semibold uppercase tracking-wide text-muted">{giorno}</span>
             {impegniPerGiorno[index].length === 0 ? (
-              <span className="text-xs text-muted/60">Nessun impegno</span>
+              <span className="text-xs text-muted">Nessun impegno</span>
             ) : (
               <ul className="flex flex-col gap-1.5">
                 {impegniPerGiorno[index].map((impegno) => (
