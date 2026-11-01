@@ -92,3 +92,6 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
   chiudi o riduci quella che resta; le PR con "parte di #N" non la chiudono da sole.
 - Nessuna PR chiusa senza merge né feedback `ostinato` nell'ultima settimana (PR #240-#269 tutte mergiate).
 - Una lettura fatta con POST rompe il tester in sola lettura (storico prezzi carte, #263): le letture sono GET.
+- `sr-only` (position absolute) dentro un `th`/`td` di una tabella in un contenitore `overflow-x-auto` non posizionato
+  allarga la pagina: a 375px `/allenamenti/storico` scorreva in orizzontale (418px, collaudo rosso su #283, 01/11).
+  Per un'intestazione vuota usa `aria-label` sul `th`, non un `span.sr-only`.
