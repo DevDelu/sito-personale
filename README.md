@@ -58,6 +58,12 @@ Sito personale con area pubblica (portfolio bilingue IT/EN) e area privata a sin
 - **Collaudatore e2e**: `npm run test:e2e` (Playwright, utente tester in sola lettura), a ogni
   deploy e ogni notte. Vedi `tests/e2e/README.md`.
 - **Portfolio pubblico**: homepage e `/progetti` in IT/EN, con metadata tradotti, hreflang e JSON-LD.
+  Barra di avanzamento e sezioni animate allo scroll solo con CSS; sette sfere del drago nascoste in home.
+- **Privacy e accessibilità**: modalità discreta che sfoca importi e liste; "riduci movimento"
+  disattiva animazioni e grafici animati; tap target da 44px su telefono in quasi tutti i moduli.
+- **Alimentazione, Allenamenti, Carte**: scanner barcode in uno Sheet, lista Gestione a righe su
+  telefono; countdown di preparazione configurabile con indicatore wake lock; dettaglio e modifica
+  carta in Sheet, errori di salvataggio mostrati.
 
 ## Modulo Spese
 
@@ -213,6 +219,11 @@ serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `m
 - **Recupero password fuori da next-intl**: `/login/recupera-password`, `/auth/callback` e
   `/reset-password` stanno fuori da `app/[locale]/`, quindi vanno in `UNLOCALIZED_EXACT_ROUTES`,
   altrimenti `next-intl` risponde 404.
+- **Modalità discreta lato client (sfocatura) invece di nascondere i dati**: gli importi restano nel
+  DOM ma illeggibili a colpo d'occhio in pubblico; basta un gesto, senza cambiare le query.
+- **Animazioni allo scroll solo CSS**: niente libreria, resta fluido su mobile e si spegne con
+  "riduci movimento".
+- **Storico prezzi carte con GET**: il tester in sola lettura non può fare POST, e una lettura non è una scrittura.
 - **Next.js 16.4.3**: aggiornato per chiudere vulnerabilità note, senza cambi di API.
 
 ## Cosa manca volutamente in questa fase
