@@ -134,7 +134,7 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: SessioneElenco[] 
           <p className="text-sm text-muted">Nessuna sessione registrata ancora.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-border">
+        <div tabIndex={0} role="region" aria-label="Elenco delle sessioni" className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs text-muted">
