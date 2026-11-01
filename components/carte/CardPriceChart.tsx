@@ -14,7 +14,7 @@ function ChartTooltip({ active, payload }: Partial<TooltipContentProps<number, s
   return (
     <div className="rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs shadow-lg">
       <div className="text-muted">{label}</div>
-      <span className="font-figures font-semibold">{formatCurrency(point.price)}</span>
+      <span className="font-figures importo font-semibold">{formatCurrency(point.price)}</span>
     </div>
   );
 }

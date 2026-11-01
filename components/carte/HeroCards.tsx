@@ -52,7 +52,7 @@ export function HeroCards({
               <span className="line-clamp-2 min-h-[2lh] text-[13px] leading-tight font-semibold sm:text-sm">
                 {c.name}
               </span>
-              <span className="font-figures text-sm font-bold sm:text-base">
+              <span className="font-figures importo text-sm font-bold sm:text-base">
                 {prezzo !== null ? formatCurrency(prezzo) : "n/d"}
               </span>
             </button>

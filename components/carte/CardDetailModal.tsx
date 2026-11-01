@@ -85,11 +85,11 @@ export function CardDetailModal({
           <Row label="Condizione" value={carta.condition ?? "n/d"} />
           <Row label="Lingua" value={LANGUAGE_LABEL[carta.language] ?? carta.language} />
           {carta.purchase_price !== null && (
-            <Row label="Prezzo di acquisto" value={formatCurrency(carta.purchase_price)} />
+            <Row label="Prezzo di acquisto" value={<span className="importo">{formatCurrency(carta.purchase_price)}</span>} />
           )}
           <Row
             label="Prezzo attuale"
-            value={carta.current_price !== null ? formatCurrency(carta.current_price) : "n/d"}
+            value={carta.current_price !== null ? <span className="importo">{formatCurrency(carta.current_price)}</span> : "n/d"}
           />
           {!carta.is_manual_price && carta.current_price !== null && (
             <Row
@@ -123,9 +123,9 @@ export function CardDetailModal({
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-muted">{label}</span>
-      <span className="text-right font-medium text-foreground">{value}</span>
+    <div className="flex items-baseline justify-between gap-3">
+      <span className="shrink-0 text-muted">{label}</span>
+      <span className="min-w-0 text-right font-medium break-words text-foreground">{value}</span>
     </div>
   );
 }
