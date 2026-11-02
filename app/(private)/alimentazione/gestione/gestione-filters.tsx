@@ -17,6 +17,7 @@ export function GestioneFilters() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <select
+        aria-label="Tipo di pasto"
         defaultValue={searchParams.get("tipo") ?? ""}
         onChange={(e) => setParam("tipo", e.target.value)}
         className="field-input bg-surface px-3 py-1.5 text-sm"
@@ -29,6 +30,7 @@ export function GestioneFilters() {
       </select>
       <input
         type="date"
+        aria-label="Dal giorno"
         defaultValue={searchParams.get("from") ?? ""}
         onChange={(e) => setParam("from", e.target.value)}
         className="field-input bg-surface px-2 py-1.5 text-sm"
@@ -36,6 +38,7 @@ export function GestioneFilters() {
       <span className="text-muted">–</span>
       <input
         type="date"
+        aria-label="Al giorno"
         defaultValue={searchParams.get("to") ?? ""}
         onChange={(e) => setParam("to", e.target.value)}
         className="field-input bg-surface px-2 py-1.5 text-sm"
