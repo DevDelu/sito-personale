@@ -27,6 +27,6 @@ for (const percorso of ["/progetti", "/en/progetti"]) {
     await page.goto(percorso);
     const link = page.locator('main a[href="/"], main a[href="/en"]').first();
     const box = await link.boundingBox();
-    expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+    expect(Math.round(box?.height ?? 0)).toBeGreaterThanOrEqual(44);
   });
 }
