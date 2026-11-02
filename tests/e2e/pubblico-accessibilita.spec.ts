@@ -20,3 +20,13 @@ test("/progetti: i titoli delle card sono h2 sotto l'h1", async ({ page }) => {
   await expect(page.locator("main h3")).toHaveCount(0);
   expect(await page.locator("main h2").count()).toBeGreaterThan(0);
 });
+
+// Regressione di #286: il link "← Home" dell'indice progetti era alto 36px.
+for (const percorso of ["/progetti", "/en/progetti"]) {
+  test(`${percorso}: il link di ritorno alla home è alto almeno 44px`, async ({ page }) => {
+    await page.goto(percorso);
+    const link = page.locator('main a[href="/"], main a[href="/en"]').first();
+    const box = await link.boundingBox();
+    expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+  });
+}
