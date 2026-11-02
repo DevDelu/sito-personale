@@ -36,7 +36,7 @@ export default async function ProgettiPage({
         <RevealItem>
           <Link
             href="/"
-            className="inline-block py-2 font-mono text-sm text-muted transition-colors hover:text-foreground"
+            className="inline-flex min-h-11 items-center font-mono text-sm text-muted transition-colors hover:text-foreground"
           >
             ← {tCaseStudy("backLink")}
           </Link>
