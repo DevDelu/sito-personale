@@ -123,6 +123,8 @@ export function AlimentoSelector({
           onFocus={() => setMostraLista(true)}
           placeholder="Cerca un alimento..."
           aria-label="Alimento"
+          role="combobox"
+          aria-autocomplete="list"
           aria-expanded={mostraLista}
           className="field-input w-full bg-surface"
         />
