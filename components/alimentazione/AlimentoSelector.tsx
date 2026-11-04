@@ -126,10 +126,11 @@ export function AlimentoSelector({
           role="combobox"
           aria-autocomplete="list"
           aria-expanded={mostraLista}
+          aria-controls="alimento-risultati"
           className="field-input w-full bg-surface"
         />
         {mostraLista && (
-          <div className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-border bg-surface shadow-lg animate-slide-down">
+          <div id="alimento-risultati" className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-border bg-surface shadow-lg animate-slide-down">
             {risultati.map((a) => (
               <button
                 key={a.id}
