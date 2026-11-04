@@ -41,16 +41,20 @@ export function metadataPubblica({
   percorso,
   title,
   description,
+  immagineOg = "/opengraph-image",
 }: {
   locale: string;
   percorso: string;
   title: string;
   description: string;
+  // Percorso (non localizzato) dell'immagine OG: di default quella della home,
+  // un progetto passa la sua (app/[locale]/progetti/[slug]/opengraph-image).
+  immagineOg?: string;
 }): Metadata {
   // La home prende l'immagine dalla convenzione app/[locale]/opengraph-image;
   // le pagine annidate, con il loro openGraph, non la ereditano: indirizzo esplicito.
   const immagine =
-    percorso === "/" ? undefined : [{ url: percorsoLocalizzato("/opengraph-image", locale), width: 1200, height: 630 }];
+    percorso === "/" ? undefined : [{ url: percorsoLocalizzato(immagineOg, locale), width: 1200, height: 630 }];
   return {
     title,
     description,

@@ -22,6 +22,7 @@ export async function generateMetadata({
     percorso: `/progetti/${slug}`,
     title: project.title,
     description: project.summary,
+    immagineOg: `/progetti/${slug}/opengraph-image`,
   });
 }
 
