@@ -97,3 +97,14 @@ test("JSON-LD del progetto: nessun campo vuoto", () => {
   assert.equal("description" in opera, false);
   assert.equal(opera.url, "https://esempio.it/progetti/x");
 });
+
+test("progetto: immagine og dedicata, nella lingua giusta", () => {
+  const en = metadataPubblica({
+    locale: "en",
+    percorso: "/progetti/radar",
+    title: "T",
+    description: "D",
+    immagineOg: "/progetti/radar/opengraph-image",
+  });
+  assert.equal((en.openGraph as { images: { url: string }[] }).images[0].url, "/en/progetti/radar/opengraph-image");
+});
