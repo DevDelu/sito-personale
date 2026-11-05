@@ -23,10 +23,10 @@ export async function About() {
 
         <RevealItem className="shrink-0 self-center sm:self-start">
           <Image
-            src="/images/lorenzo-about.png"
+            src="/images/lorenzo-about.webp"
             alt="Lorenzo De Luca"
-            width={738}
-            height={1145}
+            width={640}
+            height={993}
             sizes="(min-width: 640px) 320px, 240px"
             className="h-auto w-[240px] object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.25)] sm:w-[320px]"
           />
