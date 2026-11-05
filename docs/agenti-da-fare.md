@@ -62,7 +62,7 @@ un punto è fatto.
   newsletter con screenshot quando ci sono novità; chiude con il resoconto che arriva per email.
   Agenti in `.claude/agents/`, sviluppo issue in `.claude/skills/sviluppatore-issue/`.
 - Skill esterne (React/Next, Supabase, design) in `.claude/skills/`, vedi `ESTERNE.md`.
-- Nessuna casella spuntabile in questo giro: i passi aperti riguardano secret e impostazioni fuori
+- Nessuna casella spuntabile in questo giro (1/11 confermato: i passi aperti restano fuori dal repo): i passi aperti riguardano secret e impostazioni fuori
   dal repo (GitHub, Vercel, Supabase, claude.ai), non verificabili da qui.
 
 ## Convenzioni per chi sistema i feedback (sviluppatore notturno, anche futuro)

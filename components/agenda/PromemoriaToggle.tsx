@@ -38,7 +38,7 @@ export function PromemoriaToggle({ attivoIniziale }: { attivoIniziale: boolean }
       title={attivo ? "Promemoria note (ore 9) attivo" : "Promemoria note (ore 9) disattivato"}
       className="btn-icon"
     >
-      {attivo ? <Bell className="h-3.5 w-3.5" /> : <BellOff className="h-3.5 w-3.5 text-muted/60" />}
+      {attivo ? <Bell className="h-3.5 w-3.5" /> : <BellOff className="h-3.5 w-3.5 text-muted" />}
     </button>
   );
 }

@@ -6,14 +6,14 @@
   --surface-hover: #f1ead9;
   --border: #e6dcc4;
   --foreground: #191512;
-  --muted: #756d5c;
+  --muted: #6d6554;
   /* Bordeaux: stesso hue/valori dell'accento del sito pubblico (.site-public),
      ora accento unico su tutto il sito, area privata inclusa. Vedi commento
      su .site-public per provenienza e contrasto. */
   --accent: #7e2537;
   --accent-foreground: #f3f0e7;
   --spesa: #a63b3b;
-  --entrata: #2f8a63;
+  --entrata: #26795a;
 
   --cat-alimentari: #2563eb;
   --cat-benzina: #ea580c;

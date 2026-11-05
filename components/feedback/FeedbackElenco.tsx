@@ -33,7 +33,7 @@ const TIPO: Record<FeedbackTipo, string> = { problema: "Problema", complicato: "
 
 // Colore del badge: ambra dove serve Lorenzo, verde a buon fine.
 function toneStato(f: FeedbackRow): string {
-  if (fase(f).perTe || f.stato === "riaperto") return "bg-amber-500/15 text-amber-700 dark:text-amber-300";
+  if (fase(f).perTe || f.stato === "riaperto") return "bg-amber-500/15 text-amber-800 dark:text-amber-300";
   if (f.stato === "verificato") return "bg-entrata/15 text-entrata";
   return "bg-surface-hover text-muted";
 }

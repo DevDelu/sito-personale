@@ -6,6 +6,7 @@ convenzioni per gli agenti in `CLAUDE.md`, passi manuali aperti in `docs/agenti-
 ## Area pubblica (portfolio)
 - Fatto: homepage e `/progetti` bilingue IT/EN, metadata tradotti, hreflang, JSON-LD (24/10).
 - In corso: contenuti e case study (content layer in `content/projects`).
+- Fatto: animazioni allo scroll solo CSS, easter egg delle sfere del drago.
 - Prossimo: contatti e CV scaricabile, elementi interattivi del concept.
 
 ## Spese
@@ -16,14 +17,18 @@ convenzioni per gli agenti in `CLAUDE.md`, passi manuali aperti in `docs/agenti-
 ## Investimenti, Carte, Agenda, Allenamenti
 - Fatto: moduli operativi con aggiornamento prezzi (cron + on demand), sync Google Calendar,
   schede e sessioni di allenamento.
+- Fatto (24-31/10): passate mobile su Carte (Sheet, podio, errori), Allenamenti (storico, countdown
+  configurabile, wake lock), Agenda (pallini nel mese), Investimenti e Spese (tap target 44px).
 - Prossimo: ridisegno mobile pagina per pagina, un modulo alla volta, solo se richiesto.
 
 ## Alimentazione
-- Fatto: Fase A (pasti con snapshot, TDEE, riepilogo), promemoria push pranzo, cena, peso, soglia kcal.
+- Fatto: Fase A (pasti con snapshot, TDEE, riepilogo), promemoria push pranzo, cena, peso, soglia kcal,
+  scanner barcode in Sheet, Gestione a righe su telefono.
 - Prossimo: integrazione con allenamento, catalogo esterno: fuori scope per ora.
 
 ## UI mobile e PWA
-- Fatto: shell iOS, tab bar, push, installazione PWA, correzioni safe-area.
+- Fatto: shell iOS, tab bar, push, installazione PWA (schermata di avvio scura), safe-area negli Sheet,
+  riduci movimento, modalità discreta, tap target 44px diffusi.
 - Prossimo: estendere le primitive (`PageHeader`, `Sheet`...) ai moduli non ancora ridisegnati.
 
 ## Feedback (Radar)

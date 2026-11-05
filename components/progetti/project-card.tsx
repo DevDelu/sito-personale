@@ -4,7 +4,16 @@ import { Link } from "@/i18n/navigation";
 import { projectCategoryIcon } from "@/lib/project-style";
 import type { Project } from "@/types/project";
 
-export function ProjectCard({ project, categoryLabel }: { project: Project; categoryLabel: string }) {
+export function ProjectCard({
+  project,
+  categoryLabel,
+  headingLevel = 3,
+}: {
+  project: Project;
+  categoryLabel: string;
+  headingLevel?: 2 | 3;
+}) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
     <Link
       href={`/progetti/${project.slug}`}
@@ -31,7 +40,7 @@ export function ProjectCard({ project, categoryLabel }: { project: Project; cate
           {categoryLabel}
         </span>
 
-        <h3 className="font-display text-xl font-medium italic text-foreground">{project.title}</h3>
+        <Heading className="font-display text-xl font-medium italic text-foreground">{project.title}</Heading>
 
         <p className="text-sm leading-relaxed text-muted">{project.summary}</p>
 

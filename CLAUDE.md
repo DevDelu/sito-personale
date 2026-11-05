@@ -93,6 +93,17 @@ IT/EN/x-default e un JSON-LD `Person` in homepage: una pagina pubblica nuova li 
 dominio (spese, investimenti, carte, allenamento, agenda, quiz). Le query/scritture verso
 Supabase vivono in `lib/<dominio>/queries.ts`, mai inline nei componenti.
 
+### Altre convenzioni recenti
+
+- Portfolio: animazioni allo scroll solo CSS scroll-driven (nessuna libreria); le sette sfere del
+  drago nascoste in home sono un easter egg, restano nel padding in fondo alle sezioni.
+- Una lettura va fatta con GET: il tester in sola lettura riceve 403 su ogni POST (lo storico prezzi
+  delle carte era un POST).
+- Quiz: le domande estratte rispondono `Cache-Control: no-store`; il tempo inviato è normalizzato
+  prima di entrare in classifica.
+- Allenamenti: il countdown di preparazione è configurabile e c'è un indicatore wake lock; gli elenchi
+  non scaricano `scheda_snapshot`. Alimentazione: scanner barcode dentro uno `Sheet`.
+
 ### Cron job (Vercel)
 
 Tre cron definiti in `vercel.json`, protetti da `CRON_SECRET` (header
@@ -190,6 +201,13 @@ layout desktop dell'area privata non cambiano.
 - **Scala tipografica iOS** (ora a rem = px reali, vedi sopra): titolo grande 32px bold,
   titolo sezione 22px, corpo/campi 17px, secondario 15px, nota 13px, tab bar 11px. **Nessun
   testo sotto i 12px** tranne le etichette della tab bar.
+- **Tap target 44px** su telefono per ogni controllo toccabile (chip, checkbox, pulsanti dei modali,
+  link indietro del `PageHeader`): gli agenti li hanno portati a 44px in quasi tutti i moduli, i nuovi
+  controlli partono già così. Il titolo di `PageHeader` è un `h1`.
+- **Riduci movimento**: `prefers-reduced-motion` disattiva tutte le animazioni d'ingresso (pop-in,
+  scale-in, slide-down, count-up, twinkle) e le animazioni dei grafici; una animazione nuova deve rispettarlo.
+- **Modalità discreta** (`components/privacy-toggle.tsx`): sfoca importi di riepiloghi, liste movimenti
+  e posizioni; un nuovo importo mostrato in UI va incluso.
 - **Font di sistema** (`-apple-system, "SF Pro Text", system-ui`) sostituisce
   Fraunces/Space Grotesk/JetBrains Mono solo dentro `.app-shell`: scelta voluta per il
   feeling nativo, non estenderla al sito pubblico o al desktop.

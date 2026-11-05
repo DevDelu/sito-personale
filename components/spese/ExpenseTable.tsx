@@ -337,7 +337,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
                       <CategoryBadge nome={r.categoria_nome} colore={coloreDi(r.categoria_nome, r.categoria_colore)} />
                     </td>
                     <td className="px-3 py-2 text-muted capitalize">{r.tipo}</td>
-                    <td className="px-3 py-2 text-xs text-muted/70">{r.fonte}</td>
+                    <td className="px-3 py-2 text-xs text-muted">{r.fonte}</td>
                     <td className="importo px-3 py-2 text-right font-figures">{formatCurrency(r.importo)}</td>
                     <td className="px-3 py-2">
                       <div className="flex items-center justify-end gap-2">

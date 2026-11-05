@@ -53,6 +53,7 @@ export function PushSettings() {
   const [subscribed, setSubscribed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [messaggio, setMessaggio] = useState<string | null>(null);
+  const [esitoErrore, setEsitoErrore] = useState(false);
 
   const aggiornaStatoSubscription = useCallback(async () => {
     try {
@@ -86,6 +87,7 @@ export function PushSettings() {
     if (!VAPID_PUBLIC_KEY) return;
     setBusy(true);
     setMessaggio(null);
+    setEsitoErrore(false);
     try {
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
@@ -114,6 +116,7 @@ export function PushSettings() {
       setSubscribed(true);
       setMessaggio("Notifiche attivate su questo dispositivo.");
     } catch (error) {
+      setEsitoErrore(true);
       setMessaggio((error as Error).message || "Errore durante l'attivazione.");
     } finally {
       setBusy(false);
@@ -123,6 +126,7 @@ export function PushSettings() {
   async function disattiva() {
     setBusy(true);
     setMessaggio(null);
+    setEsitoErrore(false);
     try {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.getSubscription();
@@ -137,6 +141,7 @@ export function PushSettings() {
       setSubscribed(false);
       setMessaggio("Notifiche disattivate su questo dispositivo.");
     } catch (error) {
+      setEsitoErrore(true);
       setMessaggio((error as Error).message || "Errore durante la disattivazione.");
     } finally {
       setBusy(false);
@@ -146,6 +151,7 @@ export function PushSettings() {
   async function invioProva() {
     setBusy(true);
     setMessaggio(null);
+    setEsitoErrore(false);
     try {
       const res = await fetch("/api/push/test", { method: "POST" });
       const data = await res.json().catch(() => null);
@@ -155,11 +161,13 @@ export function PushSettings() {
         return;
       }
       if (!res.ok || !data?.ok) {
+        setEsitoErrore(true);
         setMessaggio(`Invio non riuscito${data?.reason ? ` (${data.reason})` : ""}.`);
         return;
       }
       setMessaggio(`Notifica di prova inviata a ${data.sent} dispositivo/i.`);
     } catch {
+      setEsitoErrore(true);
       setMessaggio("Errore di rete durante l'invio.");
     } finally {
       setBusy(false);
@@ -225,7 +233,10 @@ export function PushSettings() {
         </button>
       </div>
       {messaggio && (
-        <p role="status" className="text-sm text-muted">
+        <p
+          role={esitoErrore ? "alert" : "status"}
+          className={`text-[15px] ${esitoErrore ? "text-spesa" : "text-muted"}`}
+        >
           {messaggio}
         </p>
       )}

@@ -145,7 +145,7 @@ export function ProgressTable({ sessioni, log }: { sessioni: SessioneElenco[]; l
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-border">
+      <div tabIndex={0} role="region" aria-label="Tabella dei progressi" className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border text-left text-xs text-muted">
@@ -189,7 +189,7 @@ export function ProgressTable({ sessioni, log }: { sessioni: SessioneElenco[]; l
                           {t === "pari" && <Minus className="h-3 w-3 text-muted" />}
                         </span>
                       ) : (
-                        <span className="text-muted/50">—</span>
+                        <span className="text-muted">—</span>
                       )}
                     </td>
                   );

@@ -205,7 +205,7 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
                     <th className="py-2 pr-3 font-medium">Rip.</th>
                     <th className="py-2 pr-3 font-medium">Peso (kg)</th>
                     <th className="py-2 pr-3 font-medium">Tempo (sec)</th>
-                    <th className="py-2 pr-3 font-medium"></th>
+                    <th aria-label="Azioni" className="py-2 pr-3 font-medium" />
                   </tr>
                 </thead>
                 <tbody>

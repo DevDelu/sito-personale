@@ -120,6 +120,11 @@ export function CalendarView({
           eventDisplay="block"
           height="auto"
           locale="it"
+          // Le frecce della toolbar hanno già il nome dal pulsante (buttonHints): l'icona
+          // role="img" senza testo alternativo è decorativa.
+          viewDidMount={(arg) => {
+            arg.el.closest(".fc")?.querySelectorAll(".fc-icon[role='img']").forEach((el) => el.setAttribute("aria-hidden", "true"));
+          }}
           firstDay={1}
           buttonText={{ today: "Oggi", month: "Mese", week: "Settimana", list: "Lista" }}
           dayCellClassNames={(arg) => (dataLocale(arg.date) === selezionata ? ["agenda-day-selezionato"] : [])}

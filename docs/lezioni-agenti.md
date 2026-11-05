@@ -86,3 +86,12 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
   Playwright) e `E2E_BASE_URL=<RADAR_URL>`; la routine ha un limite di ~2 min per comando, usa `-g` per sottoinsiemi.
 - Resend risponde ancora 403 (dominio `lorenzo-de-luca.com` non verificato): confermato il 28/10, la newsletter non
   può partire finché non lo verifichi su resend.com/domains.
+- Issue stale (1/11): #193 (tap target piccoli) e #181 (lista "Altre carte") risultano già in gran parte
+  risolte da PR successive (#199, #200, #212, #223, #239, #241, #260, #265 per la prima; #230, #235 per la
+  seconda) ma sono ancora aperte. Prima di lavorare su una issue vecchia, confrontala con `git log` e
+  chiudi o riduci quella che resta; le PR con "parte di #N" non la chiudono da sole.
+- Nessuna PR chiusa senza merge né feedback `ostinato` nell'ultima settimana (PR #240-#269 tutte mergiate).
+- Una lettura fatta con POST rompe il tester in sola lettura (storico prezzi carte, #263): le letture sono GET.
+- `sr-only` (position absolute) dentro un `th`/`td` di una tabella in un contenitore `overflow-x-auto` non posizionato
+  allarga la pagina: a 375px `/allenamenti/storico` scorreva in orizzontale (418px, collaudo rosso su #283, 01/11).
+  Per un'intestazione vuota usa `aria-label` sul `th`, non un `span.sr-only`.
