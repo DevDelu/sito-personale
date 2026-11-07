@@ -53,6 +53,37 @@ export async function getOverviewData(
   };
 }
 
+// Somma degli importi di un periodo, per il confronto col periodo precedente
+// nel riepilogo. Paginata (PostgREST: max 1000 righe per richiesta); solo
+// lettura. In caso di errore restituisce null: il confronto è accessorio e
+// non deve rompere la pagina.
+export async function getTotaliPeriodo(from: string, to: string): Promise<{ spese: number; entrate: number } | null> {
+  const admin = createAdminClient();
+  const PAGINA = 1000;
+  async function somma(vista: "spese_con_categoria" | "depositi_con_categoria"): Promise<number> {
+    let totale = 0;
+    for (let da = 0; ; da += PAGINA) {
+      const { data, error } = await admin
+        .from(vista)
+        .select("importo, id")
+        .gte("data", from)
+        .lte("data", to)
+        .order("id", { ascending: true })
+        .range(da, da + PAGINA - 1);
+      if (error) throw new Error(error.message);
+      for (const r of data ?? []) totale += Number(r.importo);
+      if (!data || data.length < PAGINA) break;
+    }
+    return totale;
+  }
+  try {
+    const [spese, entrate] = await Promise.all([somma("spese_con_categoria"), somma("depositi_con_categoria")]);
+    return { spese, entrate };
+  } catch {
+    return null;
+  }
+}
+
 // Ultimi 25 mesi (servono 3 addebiti annuali) di spese (solo titolo, importo, data) per il rilevamento delle
 // ricorrenti, indipendente dal periodo scelto nella Overview. Paginata:
 // PostgREST restituisce al massimo 1000 righe per richiesta.
