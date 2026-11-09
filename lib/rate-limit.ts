@@ -7,25 +7,7 @@ import { headers } from "next/headers";
 // contro retry rapidi dallo stesso client, sufficiente per il traffico di un
 // sito personale. Se in futuro serve un limite distribuito, il passo
 // successivo è Upstash Redis (free tier, si integra bene con Vercel).
-const tentativi = new Map<string, number[]>();
-
-export function checkRateLimit(
-  key: string,
-  opts: { max: number; windowMs: number }
-): { allowed: boolean; retryAfterMs?: number } {
-  const ora = Date.now();
-  const finestra = (tentativi.get(key) ?? []).filter((t) => ora - t < opts.windowMs);
-
-  if (finestra.length >= opts.max) {
-    const retryAfterMs = opts.windowMs - (ora - finestra[0]);
-    tentativi.set(key, finestra);
-    return { allowed: false, retryAfterMs };
-  }
-
-  finestra.push(ora);
-  tentativi.set(key, finestra);
-  return { allowed: true };
-}
+export { checkRateLimit } from "./rate-limit-finestra.ts";
 
 // x-forwarded-for può contenere una lista "client, proxy1, proxy2": il primo
 // valore è il client originale. x-real-ip come fallback (alcuni proxy lo
