@@ -167,7 +167,7 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
                   key={v}
                   type="button"
                   onClick={() => setSensazione(sensazione === v ? null : v)}
-                  className={`h-8 w-8 rounded-full border text-sm font-medium transition-all duration-200 ${
+                  className={`h-11 w-11 rounded-full md:h-8 md:w-8 border text-sm font-medium transition-all duration-200 ${
                     sensazione === v
                       ? "border-accent bg-accent text-accent-foreground"
                       : "border-border text-muted hover:text-foreground"
