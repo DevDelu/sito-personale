@@ -1,5 +1,6 @@
 "use client";
 
+import { tocca } from "@/lib/haptics";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { Pause, Play, SkipForward, Square, Wrench } from "lucide-react";
@@ -240,6 +241,7 @@ export function SessionRunner({
   }
 
   function avanzaSerie(rowId: string) {
+    tocca();
     setCompletate((prev) => ({ ...prev, [rowId]: (prev[rowId] ?? 0) + 1 }));
   }
 

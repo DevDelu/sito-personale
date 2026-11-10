@@ -89,6 +89,7 @@ export const AREE_FEEDBACK = {
 
   // Impostazioni, Altro, shell
   "impostazioni.notifiche": "Impostazioni › Notifiche",
+  "impostazioni.vibrazione": "Impostazioni › Vibrazione",
   "altro.menu": "Altro",
   "shell.aggiunta-rapida": "Aggiunta rapida",
   "comune.conferma-eliminazione": "Conferma eliminazione",
