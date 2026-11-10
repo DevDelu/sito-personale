@@ -122,7 +122,7 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <Link href="/allenamenti/storico" className="flex items-center gap-1 text-sm text-muted hover:text-foreground">
+        <Link href="/allenamenti/storico" className="-ml-2 flex min-h-11 items-center gap-1 self-start px-2 text-sm text-muted hover:text-foreground md:min-h-0 md:ml-0 md:px-0">
           <ArrowLeft className="h-3.5 w-3.5" />
           Storico
         </Link>
