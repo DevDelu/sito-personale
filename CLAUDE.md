@@ -18,6 +18,7 @@ npm run start       # avvia build produzione
 npm run lint         # eslint (eslint-config-next core-web-vitals + typescript)
 npm test            # unit test node:test su lib/**/*.test.ts e .github/scripts/*.test.mjs (Node 22, nessun runner)
 npm run check:fb-aree  # ogni pagina privata ha aree di feedback, tutte presenti in lib/feedback/aree.ts
+npm run analizza:bundle  # analizzatore del bundle (Turbopack, interfaccia web locale): cosa pesa nel JS, mai in CI
 npm run test:e2e    # collaudatore Playwright sul sito vero col tester in sola lettura (vedi tests/e2e/README.md)
 ```
 
