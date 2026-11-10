@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PushSettings } from "@/components/push/PushSettings";
+import { VibrazioneSettings } from "@/components/impostazioni/VibrazioneSettings";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 export const metadata: Metadata = { title: "Impostazioni" };
@@ -22,6 +23,16 @@ export default function ImpostazioniPage() {
           </p>
         </div>
         <PushSettings />
+      </section>
+
+      <section data-fb-area="impostazioni.vibrazione" className="card flex flex-col gap-4 p-5">
+        <div className="flex flex-col gap-1">
+          <h2 className="font-display text-lg font-medium">Vibrazione</h2>
+          <p className="text-sm text-muted">
+            Un tocco leggero quando completi una serie o apri il feedback con la pressione lunga.
+          </p>
+        </div>
+        <VibrazioneSettings />
       </section>
     </div>
   );
