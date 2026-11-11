@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getOverviewData, getSpesePerRicorrenti } from "@/lib/spese/queries";
+import { getOverviewData, getSpesePerRicorrenti, getTotaliPeriodo } from "@/lib/spese/queries";
+import { periodoPrecedente } from "@/lib/spese/confronto";
 import { trovaRicorrenti } from "@/lib/spese/ricorrenti";
 import { Overview } from "./overview";
 import { Toast } from "@/components/toast";
@@ -49,9 +50,11 @@ export default async function SpesePage({
       ? { from, to, preset: null }
       : { ...presetRange(preset ?? DEFAULT_PRESET), preset: preset ?? DEFAULT_PRESET };
 
-  const [{ spese, categorie, depositi }, spesePerRicorrenti] = await Promise.all([
+  const precedente = periodoPrecedente(range.from, range.to);
+  const [{ spese, categorie, depositi }, spesePerRicorrenti, totaliPrecedenti] = await Promise.all([
     getOverviewData(range.from, range.to),
     getSpesePerRicorrenti(todayIso()),
+    precedente ? getTotaliPeriodo(precedente.from, precedente.to) : Promise.resolve(null),
   ]);
   const ricorrenti = trovaRicorrenti(spesePerRicorrenti, todayIso());
 
@@ -67,7 +70,14 @@ export default async function SpesePage({
         <p className="text-sm text-muted">Panoramica di entrate, uscite e categorie di spesa.</p>
       </div>
 
-      <Overview spese={spese} categorie={categorie} depositi={depositi} ricorrenti={ricorrenti} range={range} />
+      <Overview
+        spese={spese}
+        categorie={categorie}
+        depositi={depositi}
+        ricorrenti={ricorrenti}
+        range={range}
+        totaliPrecedenti={totaliPrecedenti}
+      />
     </div>
   );
 }
