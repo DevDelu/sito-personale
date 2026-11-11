@@ -19,6 +19,8 @@ async function headers() {
       source: "/(.*)",
       headers: [
         { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+        // Isola il contesto di navigazione: nessun popup cross-origin con accesso a window.opener.
+        { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
         { key: "Content-Security-Policy", value: "object-src 'none'; base-uri 'self'; frame-ancestors 'none'" },
         { key: "Content-Security-Policy-Report-Only", value: "form-action 'self'" },
         { key: "X-Content-Type-Options", value: "nosniff" },
