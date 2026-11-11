@@ -30,3 +30,11 @@ for (const percorso of ["/progetti", "/en/progetti"]) {
     expect(Math.round(box?.height ?? 0)).toBeGreaterThanOrEqual(44);
   });
 }
+
+// Regressione di #192: <html lang> segue la lingua della pagina (HtmlLangSync).
+for (const [percorso, lingua] of [["/", "it"], ["/en", "en"]] as const) {
+  test(`${percorso}: html lang è "${lingua}"`, async ({ page }) => {
+    await page.goto(percorso);
+    await expect(page.locator("html")).toHaveAttribute("lang", lingua);
+  });
+}
