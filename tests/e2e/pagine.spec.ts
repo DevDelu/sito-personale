@@ -166,3 +166,16 @@ test("/investimenti/gestione: il modale Aggiungi transazione è un dialogo e Esc
   await page.keyboard.press("Escape");
   await expect(dialogo).toHaveCount(0);
 });
+
+// Regressione #321: l'area di tocco del giorno copre tutta la cella del mese,
+// quindi la cella stessa deve essere alta almeno 44px su telefono.
+test("/agenda: le celle del mese sono alte almeno 44px", async ({ page }) => {
+  await page.goto("/agenda", { waitUntil: "domcontentloaded" });
+  await page.waitForLoadState("networkidle").catch(() => {});
+  const celle = page.locator(".agenda-calendar .fc-dayGridMonth-view .fc-daygrid-day");
+  if ((await celle.count()) === 0) test.skip(true, "vista mese non attiva");
+  const basse = await celle.evaluateAll((els) =>
+    els.map((el) => Math.round(el.getBoundingClientRect().height)).filter((h) => h < 44)
+  );
+  expect(basse, "celle del mese sotto 44px").toEqual([]);
+});
