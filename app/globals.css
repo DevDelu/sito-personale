@@ -723,6 +723,11 @@ body {
     position: absolute;
     inset: 0;
   }
+  /* Celle del mese alte almeno 44px: l'area di tocco del giorno (::after) copre
+     tutta la cella, che prima era alta ~27px (issue #321). */
+  .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-day-frame {
+    min-height: 44px;
+  }
   .agenda-calendar .fc-col-header-cell-cushion {
     display: block;
     min-height: 44px;
@@ -797,7 +802,8 @@ body {
 }
 
 /* Chi ha attivato "riduci movimento" nel sistema non vede animazioni di
-   ingresso né transizioni su pulsanti e link. */
+   ingresso, pulsazioni degli scheletri di caricamento né transizioni su pulsanti e
+   link (lo spinner resta: è l'unico segnale che qualcosa sta caricando). */
 @media (prefers-reduced-motion: reduce) {
   .animate-slide-up,
   .animate-fade-in,
@@ -805,7 +811,8 @@ body {
   .animate-slide-down,
   .animate-pop-in,
   .animate-count-up,
-  .animate-twinkle {
+  .animate-twinkle,
+  .animate-pulse {
     animation: none !important;
   }
   .btn-primary,

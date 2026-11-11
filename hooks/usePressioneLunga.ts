@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { tocca } from "@/lib/haptics";
 
 const DURATA_MS = 500;
 const TOLLERANZA_PX = 10;
@@ -60,7 +61,10 @@ export function usePressioneLunga({
       annulla();
       // Su touch il rilascio è gestito da touchend (vedi sotto), che iOS
       // considera un gesto utente valido per focus() e tastiera.
-      if (scattata.current && e.pointerType !== "touch") onRilascio?.();
+      if (scattata.current && e.pointerType !== "touch") {
+        tocca();
+        onRilascio?.();
+      }
     },
     onPointerCancel: annulla,
     onPointerLeave(e: React.PointerEvent) {
@@ -72,6 +76,7 @@ export function usePressioneLunga({
       // il browser invia i mouse event di compatibilità (mousedown/click)
       // all'overlay, che toglie il focus al campo appena ricevuto.
       e.preventDefault();
+      tocca();
       onRilascio?.();
     },
     onContextMenu(e: React.MouseEvent) {

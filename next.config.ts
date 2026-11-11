@@ -8,9 +8,11 @@ const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
 const CACHE_ASSET_PUBBLICI = "public, max-age=86400, stale-while-revalidate=604800";
 
 // Header di sicurezza applicati a ogni risposta: Vercel imposta alcuni
-// default ma non tutti, meglio esplicitarli qui. Niente Content-Security-
-// Policy globale in questo giro (rischio di rompere Framer Motion / script
-// inline di next-intl senza un audit dedicato dei nonce) — backlog separato.
+// default ma non tutti, meglio esplicitarli qui. CSP: per ora solo le direttive
+// che NON toccano gli script (nessun rischio di rompere le pagine): niente
+// <object>/<embed>, niente <base> iniettato, niente framing. Il vero
+// script-src richiede un nonce per richiesta dal proxy (issue #112, scelta
+// di Lorenzo); form-action resta in sola segnalazione.
 async function headers() {
   return [
     {
@@ -19,10 +21,12 @@ async function headers() {
         { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
         // Isola il contesto di navigazione: nessun popup cross-origin con accesso a window.opener.
         { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+        { key: "Content-Security-Policy", value: "object-src 'none'; base-uri 'self'; frame-ancestors 'none'" },
+        { key: "Content-Security-Policy-Report-Only", value: "form-action 'self'" },
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "X-Frame-Options", value: "DENY" },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-        { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=()" },
       ],
     },
     {

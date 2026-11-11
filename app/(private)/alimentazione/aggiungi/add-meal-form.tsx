@@ -1,6 +1,7 @@
 "use client";
 
 import { oggiItaliaISO } from "@/lib/cron/data-italia";
+import { tocca } from "@/lib/haptics";
 import { useActionState, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { aggiungiPasto, registraPastoDaTemplate, type AggiungiPastoState } from "../actions";
@@ -159,7 +160,7 @@ export function AddMealForm({
         />
       )}
 
-      <form action={formAction} className="flex flex-col gap-4 animate-slide-up">
+      <form action={formAction} onSubmit={() => tocca()} className="flex flex-col gap-4 animate-slide-up">
       <input type="hidden" name="tipo_pasto" value={tipoPasto} />
       <input type="hidden" name="alimento_id" value={alimentoId} />
 
@@ -295,7 +296,7 @@ function TemplatePanel({
   );
 
   return (
-    <form action={formAction} className="card flex animate-slide-up flex-col gap-3 p-4">
+    <form action={formAction} onSubmit={() => tocca()} className="card flex animate-slide-up flex-col gap-3 p-4">
       <div className="flex flex-col gap-0.5">
         <span className="text-sm font-medium">Usa template: {template.nome}</span>
         <span className="text-xs text-muted">Registra tutte le voci qui sotto come un unico pasto.</span>
