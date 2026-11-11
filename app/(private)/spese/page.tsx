@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { getOverviewData, getSpesePerRicorrenti } from "@/lib/spese/queries";
+import { getOverviewData, getSpesePerRicorrenti, getTotaliPeriodo } from "@/lib/spese/queries";
 import { trovaRicorrenti } from "@/lib/spese/ricorrenti";
+import { periodoPrecedente } from "@/lib/spese/confronto";
 import { Overview } from "./overview";
 import { Toast } from "@/components/toast";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -49,9 +50,12 @@ export default async function SpesePage({
       ? { from, to, preset: null }
       : { ...presetRange(preset ?? DEFAULT_PRESET), preset: preset ?? DEFAULT_PRESET };
 
-  const [{ spese, categorie, depositi }, spesePerRicorrenti] = await Promise.all([
+  const prec = periodoPrecedente(range.from, range.to);
+  const [{ spese, categorie, depositi }, spesePerRicorrenti, totaliPrec] = await Promise.all([
     getOverviewData(range.from, range.to),
     getSpesePerRicorrenti(todayIso()),
+    // Un errore nel confronto non deve rompere la pagina: la riga semplicemente non compare.
+    prec ? getTotaliPeriodo(prec.from, prec.to).catch(() => null) : Promise.resolve(null),
   ]);
   const ricorrenti = trovaRicorrenti(spesePerRicorrenti, todayIso());
 
@@ -67,7 +71,7 @@ export default async function SpesePage({
         <p className="text-sm text-muted">Panoramica di entrate, uscite e categorie di spesa.</p>
       </div>
 
-      <Overview spese={spese} categorie={categorie} depositi={depositi} ricorrenti={ricorrenti} range={range} />
+      <Overview spese={spese} categorie={categorie} depositi={depositi} ricorrenti={ricorrenti} range={range} precedente={totaliPrec} />
     </div>
   );
 }

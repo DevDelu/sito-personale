@@ -77,6 +77,31 @@ export async function getSpesePerRicorrenti(oggiIso: string): Promise<SpesaGrezz
   return righe;
 }
 
+// Somme di un periodo (per il confronto col periodo precedente): scarica solo
+// l'importo, paginato per il limite di 1000 righe di PostgREST.
+export async function getTotaliPeriodo(from: string, to: string): Promise<{ entrate: number; uscite: number }> {
+  const admin = createAdminClient();
+  const PAGINA = 1000;
+  async function somma(vista: "spese_con_categoria" | "depositi_con_categoria"): Promise<number> {
+    let totale = 0;
+    for (let da = 0; ; da += PAGINA) {
+      const { data, error } = await admin
+        .from(vista)
+        .select("importo")
+        .gte("data", from)
+        .lte("data", to)
+        .order("id", { ascending: true })
+        .range(da, da + PAGINA - 1);
+      if (error) throw new Error(error.message);
+      for (const r of data ?? []) totale += Number(r.importo);
+      if (!data || data.length < PAGINA) break;
+    }
+    return totale;
+  }
+  const [uscite, entrate] = await Promise.all([somma("spese_con_categoria"), somma("depositi_con_categoria")]);
+  return { entrate, uscite };
+}
+
 export type MovimentiFiltri = {
   search?: string;
   categoria?: string;
