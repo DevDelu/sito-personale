@@ -723,6 +723,11 @@ body {
     position: absolute;
     inset: 0;
   }
+  /* Celle del mese alte almeno 44px: l'area di tocco del giorno (::after) copre
+     tutta la cella, che prima era alta ~27px (issue #321). */
+  .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-day-frame {
+    min-height: 44px;
+  }
   .agenda-calendar .fc-col-header-cell-cushion {
     display: block;
     min-height: 44px;
