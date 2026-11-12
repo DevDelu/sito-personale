@@ -717,6 +717,9 @@ body {
      l'intestazione della settimana diventa alta almeno 44px. */
   .agenda-calendar .fc-daygrid-day-number {
     position: static;
+    min-height: 44px;
+    min-width: 44px;
+    box-sizing: border-box;
   }
   .agenda-calendar .fc-daygrid-day-number::after {
     content: "";
