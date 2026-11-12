@@ -28,6 +28,9 @@ const PAGINE = [
   "/trading",
   "/trading/candele",
   "/trading/laboratorio",
+  "/trading/glossario",
+  "/trading/ripasso",
+  "/trading/banche-centrali",
 ];
 
 // Gli errori di rete si giudicano dalle risposte (che hanno l'URL), non dai

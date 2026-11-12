@@ -94,6 +94,8 @@ export const AREE_FEEDBACK = {
   "trading.lezione.quiz": "Trading › Lezione › Verifica",
   "trading.laboratorio.grafico": "Trading › Laboratorio › Grafico",
   "trading.laboratorio.esercizi": "Trading › Laboratorio › Esercizi",
+  "trading.glossario.elenco": "Trading › Glossario",
+  "trading.ripasso.quiz": "Trading › Ripasso",
 
   // Impostazioni, Altro, shell
   "impostazioni.notifiche": "Impostazioni › Notifiche",

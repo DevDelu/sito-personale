@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Circle, CircleCheck, FlaskConical } from "lucide-react";
-import { LEZIONI, LIVELLI } from "@/lib/trading/lezioni";
+import { BookOpen, Circle, CircleCheck, Repeat } from "lucide-react";
+import { LEZIONI, MODULI } from "@/lib/trading/lezioni";
 import { useProgressiTrading } from "@/hooks/useProgressiTrading";
 import { ListGroup, ListRowLink } from "@/components/ui/ListGroup";
 
@@ -38,20 +38,24 @@ export function ElencoLezioni() {
                 {fatte === 0 ? "Inizia" : "Continua"}: {prossima.titolo}
               </Link>
             ) : (
-              <span className="text-[15px] text-entrata">Corso completato. Ora allenati nel laboratorio.</span>
+              <span className="text-[15px] text-entrata">Corso completato. Tieni il ripasso come allenamento.</span>
             )}
-            <Link href="/trading/laboratorio" className="btn-secondary flex min-h-11 items-center gap-1.5">
-              <FlaskConical className="h-4 w-4" />
-              Laboratorio
+            <Link href="/trading/ripasso" className="btn-secondary flex min-h-11 items-center gap-1.5">
+              <Repeat className="h-4 w-4" />
+              Ripasso
+            </Link>
+            <Link href="/trading/glossario" className="btn-secondary flex min-h-11 items-center gap-1.5">
+              <BookOpen className="h-4 w-4" />
+              Glossario
             </Link>
           </div>
         </section>
       </div>
 
       <div className="contents">
-        {([1, 2, 3] as const).map((livello) => (
-          <ListGroup key={livello} title={`Livello ${livello} · ${LIVELLI[livello].titolo}`}>
-            {LEZIONI.filter((l) => l.livello === livello).map((l) => {
+        {MODULI.map((m, n) => (
+          <ListGroup key={m.id} title={`${n + 1} · ${m.titolo}`}>
+            {LEZIONI.filter((l) => l.modulo === m.id).map((l) => {
               const fatta = completate.includes(l.slug);
               return (
                 <ListRowLink

@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ContenutoLezione } from "@/components/trading/ContenutoLezione";
 import { QuizLezione } from "@/components/trading/QuizLezione";
-import { LEZIONI, LIVELLI, adiacenti, lezione } from "@/lib/trading/lezioni";
+import { LEZIONI, adiacenti, lezione, modulo } from "@/lib/trading/lezioni";
 
 export function generateStaticParams() {
   return LEZIONI.map((l) => ({ slug: l.slug }));
@@ -29,10 +29,10 @@ export default async function LezionePage({ params }: { params: Promise<{ slug: 
 
       <header className="flex flex-col gap-1">
         <Link href="/trading" className="hidden text-sm text-muted hover:text-foreground md:inline">
-          ← Scuola di trading
+          ← Scuola di mercati
         </Link>
         <span className="text-[13px] font-medium uppercase tracking-wide text-accent">
-          Lezione {numero} · Livello {l.livello} {LIVELLI[l.livello].titolo} · {l.minuti} min
+          Lezione {numero} di {LEZIONI.length} · {modulo(l.modulo).titolo} · {l.minuti} min
         </span>
         <h1 className="font-display text-[28px] font-semibold leading-tight tracking-tight">{l.titolo}</h1>
         <p className="text-[15px] text-muted">{l.sottotitolo}</p>

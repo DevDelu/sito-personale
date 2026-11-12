@@ -86,11 +86,13 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
   },
   {
     id: "trading",
-    label: "Trading",
+    label: "Scuola mercati",
     icon: ChartCandlestick,
     href: "/trading",
     subsections: [
       { href: "/trading", label: "Corso" },
+      { href: "/trading/glossario", label: "Glossario" },
+      { href: "/trading/ripasso", label: "Ripasso" },
       { href: "/trading/laboratorio", label: "Laboratorio" },
     ],
   },

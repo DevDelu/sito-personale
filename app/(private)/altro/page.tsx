@@ -41,8 +41,8 @@ export default async function AltroPage() {
           <ListRowLink
             href="/trading"
             icon={<ChartCandlestick className="h-5 w-5" strokeWidth={1.75} />}
-            title="Scuola di trading"
-            subtitle="Corso di analisi tecnica"
+            title="Scuola di mercati"
+            subtitle="Corso, glossario, ripasso"
             chevron
           />
           <FeedbackRigaAltro />
