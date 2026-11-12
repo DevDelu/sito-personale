@@ -27,7 +27,7 @@ const API_AUTONOME = [
 
 // GET con effetti o dati troppo sensibili anche per un tester in sola
 // lettura: collegamento Google (OAuth) e lettura delle email.
-const API_VIETATE_AL_TESTER = ["/api/agenda/auth/", "/api/agenda/mail"];
+const API_VIETATE_AL_TESTER = ["/api/agenda/auth/", "/api/agenda/mail", "/api/backup"];
 
 // Voci che finiscono con "/" coprono tutto il sottoalbero, le altre solo la
 // rotta esatta e i suoi figli (/api/agenda/mail non copre /api/agenda/mailx).
