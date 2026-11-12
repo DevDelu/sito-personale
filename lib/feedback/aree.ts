@@ -87,6 +87,14 @@ export const AREE_FEEDBACK = {
   "alimentazione.scanner": "Alimentazione › Scanner codice a barre",
   "alimentazione.modifica-pasto": "Alimentazione › Modifica pasto",
 
+  // Scuola di trading
+  "trading.corso.progressi": "Trading › Corso › Progressi",
+  "trading.corso.lezioni": "Trading › Corso › Elenco lezioni",
+  "trading.lezione.contenuto": "Trading › Lezione › Contenuto",
+  "trading.lezione.quiz": "Trading › Lezione › Verifica",
+  "trading.laboratorio.grafico": "Trading › Laboratorio › Grafico",
+  "trading.laboratorio.esercizi": "Trading › Laboratorio › Esercizi",
+
   // Impostazioni, Altro, shell
   "impostazioni.notifiche": "Impostazioni › Notifiche",
   "impostazioni.vibrazione": "Impostazioni › Vibrazione",

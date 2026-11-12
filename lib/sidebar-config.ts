@@ -1,4 +1,4 @@
-import { Apple, Bell, Calendar, Dumbbell, Layers, TrendingUp, Wallet, type LucideIcon } from "lucide-react";
+import { Apple, Bell, Calendar, ChartCandlestick, Dumbbell, Layers, TrendingUp, Wallet, type LucideIcon } from "lucide-react";
 
 export type SidebarSubsection = { href: string; label: string };
 
@@ -83,6 +83,16 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
     href: "/agenda",
     mobileTab: true,
     subsections: [{ href: "/agenda", label: "Calendario" }],
+  },
+  {
+    id: "trading",
+    label: "Trading",
+    icon: ChartCandlestick,
+    href: "/trading",
+    subsections: [
+      { href: "/trading", label: "Corso" },
+      { href: "/trading/laboratorio", label: "Laboratorio" },
+    ],
   },
   {
     id: "impostazioni",

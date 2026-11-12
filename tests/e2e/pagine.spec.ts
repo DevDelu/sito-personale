@@ -25,6 +25,9 @@ const PAGINE = [
   "/impostazioni",
   "/altro",
   "/feedback",
+  "/trading",
+  "/trading/candele",
+  "/trading/laboratorio",
 ];
 
 // Gli errori di rete si giudicano dalle risposte (che hanno l'URL), non dai
