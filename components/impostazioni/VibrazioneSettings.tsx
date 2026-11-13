@@ -46,7 +46,15 @@ export function VibrazioneSettings() {
       className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-border px-4 text-left active:opacity-70"
     >
       <span className="text-[17px] md:text-sm">Tocco aptico</span>
-      <span className={`text-sm ${attiva ? "text-accent" : "text-muted"}`}>{attiva ? "Attivo" : "Spento"}</span>
+      <span
+        aria-hidden
+        className={`relative inline-flex h-[31px] w-[51px] shrink-0 items-center rounded-full transition-colors duration-200 motion-reduce:transition-none ${attiva ? "bg-accent" : "bg-border"}`}
+      >
+        <span
+          className={`absolute left-[2px] h-[27px] w-[27px] rounded-full bg-white shadow transition-transform duration-200 motion-reduce:transition-none ${attiva ? "translate-x-5" : "translate-x-0"}`}
+        />
+      </span>
+      <span className="sr-only">{attiva ? "Attivo" : "Spento"}</span>
     </button>
   );
 }
