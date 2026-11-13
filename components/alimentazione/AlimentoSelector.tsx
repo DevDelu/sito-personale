@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Alimento } from "@/lib/alimentazione/types";
 import { useAlimentoMutations } from "@/hooks/useAlimentoMutations";
 import { BarcodeScanner } from "./BarcodeScanner";
@@ -33,6 +33,25 @@ export function AlimentoSelector({
   const [mostraScanner, setMostraScanner] = useState(false);
   const [cercaOff, setCercaOff] = useState(false);
   const { creaAlimento, pending } = useAlimentoMutations();
+  const listaId = useId();
+  const contenitoreRef = useRef<HTMLDivElement>(null);
+
+  // La lista si chiude con Esc o toccando fuori (su iPhone resta altrimenti aperta sopra la tastiera).
+  useEffect(() => {
+    if (!mostraLista) return;
+    function fuori(e: PointerEvent) {
+      if (contenitoreRef.current && !contenitoreRef.current.contains(e.target as Node)) setMostraLista(false);
+    }
+    function esc(e: KeyboardEvent) {
+      if (e.key === "Escape") setMostraLista(false);
+    }
+    document.addEventListener("pointerdown", fuori);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("pointerdown", fuori);
+      document.removeEventListener("keydown", esc);
+    };
+  }, [mostraLista]);
 
   const selezionato = alimenti.find((a) => a.id === value) ?? null;
 
@@ -111,7 +130,7 @@ export function AlimentoSelector({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative">
+      <div className="relative" ref={contenitoreRef}>
         <input
           type="text"
           value={mostraLista ? query : (selezionato?.nome ?? query)}
@@ -126,11 +145,11 @@ export function AlimentoSelector({
           role="combobox"
           aria-autocomplete="list"
           aria-expanded={mostraLista}
-          aria-controls="alimento-risultati"
+          aria-controls={mostraLista ? listaId : undefined}
           className="field-input w-full bg-surface"
         />
         {mostraLista && (
-          <div id="alimento-risultati" className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-border bg-surface shadow-lg animate-slide-down">
+          <div id={listaId} className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-border bg-surface shadow-lg animate-slide-down">
             {risultati.map((a) => (
               <button
                 key={a.id}
