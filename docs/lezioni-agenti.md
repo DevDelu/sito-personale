@@ -95,3 +95,9 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
 - `sr-only` (position absolute) dentro un `th`/`td` di una tabella in un contenitore `overflow-x-auto` non posizionato
   allarga la pagina: a 375px `/allenamenti/storico` scorreva in orizzontale (418px, collaudo rosso su #283, 01/11).
   Per un'intestazione vuota usa `aria-label` sul `th`, non un `span.sr-only`.
+- Sandbox degli agenti (13/11): `npx playwright install` è bloccato dal proxy (cdn.playwright.dev); usa il Chromium
+  preinstallato con `executablePath` (`/opt/pw-browsers/chromium-*/chrome-linux64/chrome`). `gh issue list` fallisce
+  (GraphQL non disponibile): usa `gh api repos/DevDelu/sito-personale/...` o gli strumenti GitHub MCP.
+- Prima di lavorare su una proposta guarda il codice: #181 (lista "Altre carte") e #273 (riepilogo dopo l'import spese)
+  risultano già fatte in gran parte (riga-bottone con ruolo, "Importate N spese… righe lasciate fuori"); #192 (html lang)
+  era risolta ed è stata chiusa il 13/11.
