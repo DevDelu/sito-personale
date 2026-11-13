@@ -43,7 +43,7 @@ export function VibrazioneSettings() {
       role="switch"
       aria-checked={attiva}
       onClick={cambia}
-      className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-border px-4 text-left active:opacity-70"
+      className="flex min-h-11 w-full items-center justify-between gap-3 text-left active:opacity-70"
     >
       <span className="text-[17px] md:text-sm">Tocco aptico</span>
       <span
