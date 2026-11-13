@@ -54,7 +54,6 @@ export function VibrazioneSettings() {
           className={`absolute left-[2px] h-[27px] w-[27px] rounded-full bg-white shadow transition-transform duration-200 motion-reduce:transition-none ${attiva ? "translate-x-5" : "translate-x-0"}`}
         />
       </span>
-      <span className="sr-only">{attiva ? "Attivo" : "Spento"}</span>
     </button>
   );
 }
