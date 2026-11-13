@@ -192,7 +192,7 @@ export function PushSettings() {
     return (
       <div className="flex flex-col gap-3">
         <p className="text-[15px] text-muted">Notifiche non ancora configurate sul server.</p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2 md:flex-row md:flex-wrap [&>button]:w-full md:[&>button]:w-auto">
           <button type="button" className="btn-secondary" disabled>
             Attiva notifiche
           </button>
@@ -221,7 +221,7 @@ export function PushSettings() {
       <p className="text-[15px] text-muted">
         {subscribed ? "Notifiche attive su questo dispositivo." : "Notifiche non ancora attivate su questo dispositivo."}
       </p>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2 md:flex-row md:flex-wrap [&>button]:w-full md:[&>button]:w-auto">
         <button type="button" className="btn-primary" disabled={busy || subscribed} onClick={attiva}>
           Attiva notifiche
         </button>
