@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PushSettings } from "@/components/push/PushSettings";
 import { VibrazioneSettings } from "@/components/impostazioni/VibrazioneSettings";
+import { BackupSettings } from "@/components/impostazioni/BackupSettings";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 export const metadata: Metadata = { title: "Impostazioni" };
@@ -33,6 +34,17 @@ export default function ImpostazioniPage() {
           </p>
         </div>
         <VibrazioneSettings />
+      </section>
+
+      <section data-fb-area="impostazioni.backup" className="card flex flex-col gap-4 p-5">
+        <div className="flex flex-col gap-1">
+          <h2 className="font-display text-lg font-medium">Backup</h2>
+          <p className="text-sm text-muted">
+            Una copia JSON dei tuoi dati (spese, investimenti, agenda, alimentazione, allenamenti). Token Google e
+            notifiche push non sono inclusi.
+          </p>
+        </div>
+        <BackupSettings />
       </section>
     </div>
   );
