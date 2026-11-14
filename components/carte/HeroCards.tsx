@@ -1,6 +1,7 @@
 "use client";
 
 import { CardPlaceholder } from "./CardPlaceholder";
+import { useModalitaDiscreta } from "@/hooks/useModalitaDiscreta";
 import { formatCurrency } from "@/lib/carte/format";
 import { ordinePodio, type PosizionePodio } from "@/lib/carte/podio";
 import type { CollectionCard } from "@/lib/carte/types";
@@ -23,6 +24,7 @@ export function HeroCards({
   carte: CollectionCard[];
   onView: (carta: CollectionCard) => void;
 }) {
+  const discreta = useModalitaDiscreta();
   if (carte.length === 0) {
     return (
       <div className="card flex items-center justify-center p-8">
@@ -41,7 +43,7 @@ export function HeroCards({
             <button
               type="button"
               onClick={() => onView(c)}
-              aria-label={`${stile.etichetta}: ${c.name}, ${prezzo !== null ? formatCurrency(prezzo) : "prezzo non disponibile"}`}
+              aria-label={`${stile.etichetta}: ${c.name}, ${prezzo === null ? "prezzo non disponibile" : discreta ? "prezzo nascosto" : formatCurrency(prezzo)}`}
               className="animate-slide-up flex min-w-0 flex-col gap-1.5 rounded-xl p-1 text-left transition-transform active:scale-[0.97] sm:p-1.5 md:hover:-translate-y-0.5"
             >
               <CardPlaceholder

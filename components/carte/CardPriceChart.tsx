@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { useModalitaDiscreta } from "@/hooks/useModalitaDiscreta";
 import { Area, AreaChart, ResponsiveContainer, Tooltip } from "recharts";
 import type { TooltipContentProps } from "recharts";
 import { formatCurrency } from "@/lib/carte/format";
@@ -32,6 +33,7 @@ export function CardPriceChart({ history }: { history: PricePoint[] }) {
     () => window.matchMedia(RIDUCI_MOVIMENTO).matches,
     () => false,
   );
+  const discreta = useModalitaDiscreta();
   if (history.length < 2) {
     return (
       <p className="text-[13px] text-muted md:text-xs">
@@ -50,7 +52,11 @@ export function CardPriceChart({ history }: { history: PricePoint[] }) {
     <div
       className="h-24 w-full"
       role="img"
-      aria-label={`Andamento del prezzo: da ${formatCurrency(primo)} a ${formatCurrency(ultimo)} in ${history.length} rilevamenti`}
+      aria-label={
+        discreta
+          ? `Andamento del prezzo in ${history.length} rilevamenti`
+          : `Andamento del prezzo: da ${formatCurrency(primo)} a ${formatCurrency(ultimo)} in ${history.length} rilevamenti`
+      }
     >
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={history} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
