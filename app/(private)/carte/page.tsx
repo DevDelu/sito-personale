@@ -13,7 +13,7 @@ export default async function CartePage() {
   const { hero, resto, valoreTotale, numeroCarte } = await getCollectionOverview();
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 max-md:pb-16">
       <PageHeader title="Carte" />
 
       <div className="hidden flex-col gap-1 md:flex">
