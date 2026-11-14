@@ -21,6 +21,7 @@ export function MovimentoFormFields({
       <Field label="Titolo">
         <input
           value={form.titolo}
+          autoCapitalize="sentences"
           onChange={(e) => form.setTitolo(e.target.value)}
           required
           className="field-input"
