@@ -42,6 +42,7 @@ export function GestioneFilters({ categorie }: { categorie: Categoria[] }) {
       <div className="flex items-center gap-2 md:hidden">
         <input
           type="text"
+          enterKeyHint="search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cerca per titolo o descrizione..."
@@ -127,6 +128,7 @@ export function GestioneFilters({ categorie }: { categorie: Categoria[] }) {
       <div className="hidden flex-wrap items-center gap-2 md:flex">
         <input
           type="text"
+          enterKeyHint="search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cerca per titolo o descrizione..."

@@ -133,6 +133,7 @@ export function AlimentoSelector({
       <div className="relative" ref={contenitoreRef}>
         <input
           type="text"
+          enterKeyHint="search"
           value={mostraLista ? query : (selezionato?.nome ?? query)}
           onChange={(e) => {
             setQuery(e.target.value);
