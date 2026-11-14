@@ -137,6 +137,7 @@ export function SessionRowNormale({
                 type="number" inputMode="numeric"
                 value={rip}
                 onChange={(e) => setRip(e.target.value)}
+                onFocus={(e) => e.currentTarget.select()}
                 className="field-input w-24"
               />
             </label>
@@ -148,6 +149,7 @@ export function SessionRowNormale({
                   step="0.5"
                   value={peso}
                   onChange={(e) => setPeso(e.target.value)}
+                  onFocus={(e) => e.currentTarget.select()}
                   className="field-input w-24"
                 />
               </label>
