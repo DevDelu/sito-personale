@@ -98,6 +98,12 @@ Supabase vivono in `lib/<dominio>/queries.ts`, mai inline nei componenti.
 
 - Portfolio: animazioni allo scroll solo CSS scroll-driven (nessuna libreria); le sette sfere del
   drago nascoste in home sono un easter egg, restano nel padding in fondo alle sezioni.
+- Mobile: tocco aptico da `lib/haptics.ts` (pressione lunga, serie, pasto; spegnibile da Impostazioni);
+  `PullToRefresh` nel layout privato; `app/(private)/error.tsx` è l'errore dell'area privata. Un nuovo
+  importo o prezzo va nascosto anche nelle etichette `aria-label` in modalità discreta.
+- Pagine pubbliche: niente cookie né `cookies()` (HTML cacheabile dalla CDN): la classifica usa
+  `lib/supabase/anon.ts`, `NEXT_LOCALE` è disattivato. Header in `next.config.ts`: CSP senza `script-src`
+  di proposito (servirebbero nonce), COOP, camera alla stessa origine.
 - Una lettura va fatta con GET: il tester in sola lettura riceve 403 su ogni POST (lo storico prezzi
   delle carte era un POST).
 - Quiz: le domande estratte rispondono `Cache-Control: no-store`; il tempo inviato è normalizzato
