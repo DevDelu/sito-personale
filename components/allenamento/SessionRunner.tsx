@@ -153,12 +153,14 @@ export function SessionRunner({
   righe,
   logEsistenti,
   ultimiValori,
+  massimi,
 }: {
   sessione: Sessione;
   scheda: Scheda;
   righe: SchedaEsercizioConNome[];
   logEsistenti: SessioneLog[];
   ultimiValori: Record<string, SessioneLog | null>;
+  massimi: Record<string, SessioneLog | null>;
 }) {
   const router = useRouter();
   const audio = useSessionAudio();
@@ -315,6 +317,7 @@ export function SessionRunner({
         step={stepCorrente}
         completate={completate}
         ultimiValori={ultimiValori}
+        massimi={massimi}
         pausaGlobale={pausaGlobale}
         tick={audio.tick}
         finish={audio.finish}
@@ -472,6 +475,7 @@ function StepView({
   step,
   completate,
   ultimiValori,
+  massimi,
   pausaGlobale,
   tick,
   finish,
@@ -481,6 +485,7 @@ function StepView({
   step: Step;
   completate: Record<string, number>;
   ultimiValori: Record<string, SessioneLog | null>;
+  massimi: Record<string, SessioneLog | null>;
   pausaGlobale: boolean;
   tick: () => void;
   finish: () => void;
@@ -535,6 +540,7 @@ function StepView({
       row={row}
       numeroSerie={numeroSerie}
       ultimoValore={ultimiValori[row.id] ?? null}
+      massimo={massimi[row.id] ?? null}
       tick={tick}
       finish={finish}
       pausaGlobale={pausaGlobale}
