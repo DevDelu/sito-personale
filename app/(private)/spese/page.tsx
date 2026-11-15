@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getOverviewData, getSpesePerRicorrenti, getTotaliPeriodo } from "@/lib/spese/queries";
 import { trovaRicorrenti } from "@/lib/spese/ricorrenti";
 import { periodoPrecedente } from "@/lib/spese/confronto";
+import { meseScorso } from "@/lib/spese/mese-scorso";
 import { Overview } from "./overview";
 import { Toast } from "@/components/toast";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -35,6 +36,7 @@ function firstOfMonthIso(): string {
 
 function presetRange(preset: string): { from: string; to: string } {
   if (preset === "7") return { from: daysAgoIso(7), to: todayIso() };
+  if (preset === "scorso") return meseScorso(todayIso());
   return { from: firstOfMonthIso(), to: todayIso() };
 }
 

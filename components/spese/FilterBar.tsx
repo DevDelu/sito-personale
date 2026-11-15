@@ -7,6 +7,7 @@ import { Sheet } from "@/components/ui/Sheet";
 const PRESETS = [
   { id: "7", label: "7 giorni" },
   { id: "mese", label: "Mese" },
+  { id: "scorso", label: "Scorso", aria: "Mese scorso" },
 ] as const;
 
 export type Range = { from: string; to: string; preset: string | null };
@@ -28,11 +29,12 @@ export function FilterBar({ range }: { range: Range }) {
           type="button"
           role="tab"
           aria-selected={range.preset === p.id}
+          aria-label={"aria" in p ? p.aria : undefined}
           onClick={() => {
             setShowCustom(false);
             router.push(`/spese?preset=${p.id}`);
           }}
-          className={`flex-1 rounded-[8px] px-3 py-1.5 text-center text-[15px] font-medium transition-all duration-200 ease-out active:scale-[0.97] md:flex-none md:rounded-full md:border md:py-1.5 ${
+          className={`flex-1 rounded-[8px] px-2 py-1.5 text-center text-[15px] font-medium transition-all duration-200 ease-out active:scale-[0.97] md:flex-none md:rounded-full md:border md:py-1.5 ${
             range.preset === p.id
               ? "bg-surface text-foreground shadow-sm md:border-accent md:bg-accent md:text-accent-foreground md:shadow-sm"
               : "text-muted md:border-border md:hover:-translate-y-0.5 md:hover:text-foreground"
@@ -46,7 +48,7 @@ export function FilterBar({ range }: { range: Range }) {
         role="tab"
         aria-selected={range.preset === null}
         onClick={() => setShowCustom(true)}
-        className={`flex-1 rounded-[8px] px-3 py-1.5 text-center text-[15px] font-medium transition-all duration-200 ease-out active:scale-[0.97] md:flex-none md:rounded-full md:border md:py-1.5 ${
+        className={`flex-1 rounded-[8px] px-2 py-1.5 text-center text-[15px] font-medium transition-all duration-200 ease-out active:scale-[0.97] md:flex-none md:rounded-full md:border md:py-1.5 ${
           range.preset === null
             ? "bg-surface text-foreground shadow-sm md:border-accent md:bg-accent md:text-accent-foreground md:shadow-sm"
             : "text-muted md:border-border md:hover:-translate-y-0.5 md:hover:text-foreground"
