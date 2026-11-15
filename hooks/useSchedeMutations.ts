@@ -17,8 +17,17 @@ export function useSchedeMutations() {
   async function run<T>(fn: () => Promise<{ error?: string } & T>) {
     setPending(true);
     setError(null);
-    const res = await fn();
-    setPending(false);
+    let res;
+    try {
+      res = await fn();
+    } catch (e) {
+      // Azione rifiutata o rete assente: senza questo `pending` restava true
+      // e i pulsanti restavano disattivati fino al ricaricamento.
+      setError("Operazione non riuscita. Riprova.");
+      throw e;
+    } finally {
+      setPending(false);
+    }
     if (res?.error) {
       setError(res.error);
       throw new Error(res.error);
