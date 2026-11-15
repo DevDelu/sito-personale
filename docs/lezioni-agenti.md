@@ -98,6 +98,10 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
 - Sandbox degli agenti (13/11): `npx playwright install` è bloccato dal proxy (cdn.playwright.dev); usa il Chromium
   preinstallato con `executablePath` (`/opt/pw-browsers/chromium-*/chrome-linux64/chrome`). `gh issue list` fallisce
   (GraphQL non disponibile): usa `gh api repos/DevDelu/sito-personale/...` o gli strumenti GitHub MCP.
+- Turno del 8-14/11: nessuna PR chiusa senza merge né feedback `ostinato`. Le PR "parte di #N" (es. #331 in tre
+  passi, #312) sono andate bene a pezzi piccoli; chiudi la issue solo nell'ultima con "chiude #N".
+- Dopo un aggiornamento di dipendenze (#326) controlla che `npm audit` e i test passino prima di unire altre
+  PR: l'override di `uuid` per `exceljs` serve a tenerlo pulito.
 - Prima di lavorare su una proposta guarda il codice: #181 (lista "Altre carte") e #273 (riepilogo dopo l'import spese)
   risultano già fatte in gran parte (riga-bottone con ruolo, "Importate N spese… righe lasciate fuori"); #192 (html lang)
   era risolta ed è stata chiusa il 13/11.
