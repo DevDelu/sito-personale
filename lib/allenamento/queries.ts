@@ -1,5 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { migliorSerie } from "./record";
 import type {
   Esercizio,
   ImpegnoFisso,
@@ -156,6 +157,26 @@ export async function getUltimoLogPerSchedaEsercizio(
     peso_effettivo: toNumber(ultimo.peso_effettivo),
     tempo_effettivo_sec: ultimo.tempo_effettivo_sec,
   };
+}
+
+// Serie migliore di sempre per una riga di scheda (sessione corrente esclusa):
+// serve all'avviso "Nuovo record" durante la sessione. Sola lettura.
+export async function getMigliorLogPerSchedaEsercizio(
+  schedaEsercizioId: string,
+  tipo: TipoMetrica,
+  sessioneEsclusa?: string
+): Promise<SessioneLog | null> {
+  const admin = createAdminClient();
+  let query = admin
+    .from("sessioni_log")
+    .select("id, sessione_id, scheda_esercizio_id, serie_effettive, rip_effettive, peso_effettivo, tempo_effettivo_sec")
+    .eq("scheda_esercizio_id", schedaEsercizioId);
+  if (sessioneEsclusa) query = query.neq("sessione_id", sessioneEsclusa);
+
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  const righe = ((data ?? []) as unknown as SessioneLog[]).map((r) => ({ ...r, peso_effettivo: toNumber(r.peso_effettivo) }));
+  return migliorSerie(tipo, righe);
 }
 
 const COLONNE_SESSIONE_ELENCO = "id, data, scheda_id, durata_min, sensazione, note";
