@@ -36,6 +36,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
   const duplicati = righe.filter((r) => r.duplicato).length;
   const doppioniFuori = righe.filter((r, i) => r.duplicato && !selezionate[i]).length;
   const nonImportate = risultato ? Math.max(0, righe.length - risultato.insertedSpese - risultato.insertedDepositi) : 0;
+  const daRivedereImportate = righe.filter((r, i) => selezionate[i] && r.daVerificare).length;
   const daVerificareCount = righe.filter((r) => r.daVerificare).length;
   const numeroSelezionate = selezionate.filter(Boolean).length;
 
@@ -477,6 +478,12 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
             <p className="mt-1 text-muted">
               {nonImportate} {nonImportate === 1 ? "riga lasciata fuori" : "righe lasciate fuori"}
               {doppioniFuori > 0 && <> ({doppioniFuori} già presenti)</>}.
+            </p>
+          )}
+          {daRivedereImportate > 0 && (
+            <p className="mt-1 text-muted">
+              {daRivedereImportate}{" "}
+              {daRivedereImportate === 1 ? "è entrata con una categoria da controllare" : "sono entrate con una categoria da controllare"}.
             </p>
           )}
           <Link href="/spese/gestione" className="btn-secondary mt-3 inline-flex min-h-11 items-center">
