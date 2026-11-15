@@ -7,6 +7,7 @@ import { Sheet } from "@/components/ui/Sheet";
 const PRESETS = [
   { id: "7", label: "7 giorni" },
   { id: "mese", label: "Mese" },
+  { id: "scorso", label: "Mese scorso" },
 ] as const;
 
 export type Range = { from: string; to: string; preset: string | null };
