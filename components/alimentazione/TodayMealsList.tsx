@@ -23,13 +23,13 @@ export function TodayMealsList({ pasti }: { pasti: Pasto[] }) {
     <ul className="card flex flex-col divide-y divide-border">
       {pasti.map((p) => (
         <li key={p.id} data-fb-entita={`pasto:${p.id}`} className="flex items-center justify-between gap-3 px-4 py-3">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[15px] font-medium">{p.alimento_nome}</span>
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="break-words text-[15px] font-medium">{p.alimento_nome}</span>
             <span className="text-[13px] text-muted">
               {LABEL_TIPO[p.tipo_pasto] ?? p.tipo_pasto} · {p.quantita_g}g
             </span>
           </div>
-          <span className="font-figures text-[15px] text-muted">{Math.round(p.kcal)} kcal</span>
+          <span className="shrink-0 whitespace-nowrap font-figures text-[15px] text-muted">{Math.round(p.kcal)} kcal</span>
         </li>
       ))}
     </ul>

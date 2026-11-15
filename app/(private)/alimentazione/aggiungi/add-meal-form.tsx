@@ -121,10 +121,10 @@ export function AddMealForm({
               setTipoPasto(t.value);
               setJollyId("");
             }}
-            className={`min-h-[44px] rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-95 ${
+            className={`min-h-[44px] rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100 ${
               tipoPasto === t.value
                 ? "border-accent bg-accent text-accent-foreground shadow-sm"
-                : "border-border text-muted hover:-translate-y-0.5 hover:text-foreground"
+                : "border-border text-muted hover:-translate-y-0.5 hover:text-foreground motion-reduce:hover:translate-y-0"
             }`}
           >
             {t.label}
@@ -177,7 +177,7 @@ export function AddMealForm({
                   setAlimentoId(f.alimentoId!);
                   setQuantita(String(f.ultimaQuantitaG));
                 }}
-                className={`flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm transition-all duration-200 ease-out active:scale-95 ${
+                className={`flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm transition-all duration-200 ease-out active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100 ${
                   alimentoId === f.alimentoId ? "border-accent bg-accent/10 text-foreground" : "border-border text-muted"
                 }`}
               >
@@ -311,8 +311,8 @@ function TemplatePanel({
           const alimento = alimenti.find((a) => a.id === riga.alimentoId);
           return (
             <div key={riga.alimentoId} className="flex items-center justify-between gap-3 text-sm">
-              <span>{alimento?.nome ?? "Alimento non trovato"}</span>
-              <div className="flex items-center gap-1.5">
+              <span className="min-w-0 break-words">{alimento?.nome ?? "Alimento non trovato"}</span>
+              <div className="flex shrink-0 items-center gap-1.5">
                 <input
                   value={riga.quantita}
                   onChange={(e) => aggiornaQuantita(index, e.target.value)}
