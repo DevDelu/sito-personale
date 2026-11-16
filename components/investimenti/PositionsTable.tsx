@@ -10,6 +10,7 @@ import {
   TIPO_ASSET_LABEL,
 } from "@/lib/investimenti/format";
 import type { Posizione, TransazioneConAsset } from "@/lib/investimenti/types";
+import { VariazioneOggi } from "./VariazioneOggi";
 
 export function PositionsTable({
   posizioni,
@@ -118,6 +119,14 @@ export function PositionsTable({
                     ) : (
                       <div className="flex flex-col">
                         <span>{formatCurrency(p.prezzoAttuale)}</span>
+                        {p.variazioneOggi && (
+                          <VariazioneOggi
+                            importo={p.variazioneOggi.perUnita}
+                            percentuale={p.variazioneOggi.percentuale}
+                            mostraImporto={false}
+                            className="text-xs"
+                          />
+                        )}
                         <span className="text-xs font-sans text-muted">
                           {p.prezzoAttualeFonte === "prezzi_storico" ? "mercato" : "ultima transazione"}
                           {p.prezzoAttualeData &&
@@ -243,6 +252,14 @@ function PositionsCards({
                 <span className="importo text-base font-semibold">
                   {p.valoreAttuale === null ? "n/d" : formatCurrency(p.valoreAttuale)}
                 </span>
+                {p.variazioneOggi && (
+                  <VariazioneOggi
+                    importo={p.variazioneOggi.importo}
+                    percentuale={p.variazioneOggi.percentuale}
+                    mostraImporto={false}
+                    className="text-xs"
+                  />
+                )}
                 <span className="importo text-sm" style={{ color: gainColor }}>
                   {p.plusvalenzaAssoluta === null
                     ? "n/d"
