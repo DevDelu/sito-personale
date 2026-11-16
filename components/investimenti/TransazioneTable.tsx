@@ -184,7 +184,7 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
                     {r.tipo === "buy" ? "Acquisto" : "Vendita"}
                   </td>
                   <td className="px-3 py-2 text-right">{formatQuantita(r.quantita)}</td>
-                  <td className="px-3 py-2 text-right">
+                  <td className="importo px-3 py-2 text-right">
                     {r.prezzo_unitario === null ? "n/d" : formatCurrency(r.prezzo_unitario)}
                   </td>
                   <td className="px-3 py-2">
