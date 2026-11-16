@@ -179,3 +179,15 @@ test("/agenda: le celle del mese sono alte almeno 44px", async ({ page }) => {
   );
   expect(basse, "celle del mese sotto 44px").toEqual([]);
 });
+
+// #321: anche il box del link del giorno (non solo la cella) è alto almeno 44px.
+test("/agenda: i link dei giorni del mese sono alti almeno 44px", async ({ page }) => {
+  await page.goto("/agenda", { waitUntil: "domcontentloaded" });
+  await page.waitForLoadState("networkidle").catch(() => {});
+  const link = page.locator(".agenda-calendar .fc-dayGridMonth-view .fc-daygrid-day-number");
+  if ((await link.count()) === 0) test.skip(true, "vista mese non attiva");
+  const bassi = await link.evaluateAll((els) =>
+    els.map((el) => Math.round(el.getBoundingClientRect().height)).filter((h) => h < 44)
+  );
+  expect(bassi, "link dei giorni sotto 44px").toEqual([]);
+});

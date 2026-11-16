@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   --background: #faf6ee;
   --surface: #fffdf8;
   --surface-hover: #f1ead9;
@@ -67,6 +68,7 @@
 }
 
 [data-theme="dark"] {
+  color-scheme: dark;
   --background: #0b0e14;
   --surface: #141925;
   --surface-hover: #1b222f;
@@ -717,6 +719,9 @@ body {
      l'intestazione della settimana diventa alta almeno 44px. */
   .agenda-calendar .fc-daygrid-day-number {
     position: static;
+    min-height: 44px;
+    min-width: 44px;
+    box-sizing: border-box;
   }
   .agenda-calendar .fc-daygrid-day-number::after {
     content: "";

@@ -10,6 +10,7 @@ import { TransazioneFormModal } from "./TransazioneFormModal";
 import { BulkCostoTipoModal } from "./BulkCostoTipoModal";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import type { Asset, CostoTipo, TransazioneConAsset } from "@/lib/investimenti/types";
+import { mostraToast } from "@/lib/toast/bus";
 
 const COSTO_TIPO_LABEL: Record<CostoTipo, string> = {
   verificato: "Verificato",
@@ -52,6 +53,7 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
     await updateTransazione(editing.id, patch);
     setEditing(null);
     router.refresh();
+    mostraToast({ testo: "Modifiche salvate" });
   }
 
   async function handleDelete() {
@@ -59,6 +61,7 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
     await deleteTransazione(deleting.id);
     setDeleting(null);
     router.refresh();
+    mostraToast({ testo: "Transazione eliminata" });
   }
 
   function toggleRiga(id: string) {
@@ -163,7 +166,7 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
                     <label className="flex items-center justify-center max-md:-m-3 max-md:h-11 max-md:w-11">
                       <input
                         type="checkbox"
-                        aria-label="Seleziona riga"
+                        aria-label={`Seleziona ${r.asset_nome}`}
                         checked={selezionata}
                         onChange={() => toggleRiga(r.id)}
                         className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
@@ -181,7 +184,7 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
                     {r.tipo === "buy" ? "Acquisto" : "Vendita"}
                   </td>
                   <td className="px-3 py-2 text-right">{formatQuantita(r.quantita)}</td>
-                  <td className="px-3 py-2 text-right">
+                  <td className="importo px-3 py-2 text-right">
                     {r.prezzo_unitario === null ? "n/d" : formatCurrency(r.prezzo_unitario)}
                   </td>
                   <td className="px-3 py-2">
@@ -194,13 +197,13 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center justify-end gap-2">
-                      <button type="button" onClick={() => setEditing(r)} aria-label="Modifica" className="btn-icon">
+                      <button type="button" onClick={() => setEditing(r)} aria-label={`Modifica ${r.asset_nome}`} className="btn-icon">
                         <Pencil className="h-4 w-4" />
                       </button>
                       <button
                         type="button"
                         onClick={() => setDeleting(r)}
-                        aria-label="Elimina"
+                        aria-label={`Elimina ${r.asset_nome}`}
                         className="btn-icon hover:!text-spesa"
                       >
                         <Trash2 className="h-4 w-4" />

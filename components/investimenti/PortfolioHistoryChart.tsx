@@ -87,7 +87,7 @@ function HistoryTooltip({ active, payload, label }: Partial<TooltipContentProps<
               <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: p.color }} />
               {p.name}
             </span>
-            <span className="font-figures whitespace-nowrap">{formatCurrency(p.value as number)}</span>
+            <span className="importo font-figures whitespace-nowrap">{formatCurrency(p.value as number)}</span>
           </li>
         ))}
       </ul>

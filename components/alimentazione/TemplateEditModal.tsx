@@ -150,8 +150,8 @@ export function TemplateEditModal({
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium text-muted">Composizione</span>
           {righe.map((riga, index) => (
-            <div key={index} className="flex items-start gap-2">
-              <div className="flex-1">
+            <div key={index} className="flex flex-wrap items-start gap-2 max-md:rounded-xl max-md:border max-md:border-border max-md:p-2 md:flex-nowrap">
+              <div className="w-full flex-1 md:w-auto">
                 <AlimentoSelector
                   alimenti={alimentiList}
                   value={riga.alimentoId}
@@ -163,8 +163,9 @@ export function TemplateEditModal({
                 value={riga.quantita}
                 onChange={(e) => aggiornaRiga(index, { quantita: e.target.value })}
                 placeholder="g"
+                aria-label={`Grammi, voce ${index + 1}`}
                 inputMode="decimal"
-                className="field-input w-20 shrink-0"
+                className="field-input w-24 shrink-0"
               />
               <button
                 type="button"

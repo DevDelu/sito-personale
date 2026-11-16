@@ -60,7 +60,8 @@ Sito personale con area pubblica (portfolio bilingue IT/EN) e area privata a sin
 - **Portfolio pubblico**: homepage e `/progetti` in IT/EN, con metadata tradotti, hreflang e JSON-LD.
   Barra di avanzamento e sezioni animate allo scroll solo con CSS; sette sfere del drago nascoste in home.
 - **Privacy e accessibilità**: modalità discreta che sfoca importi e liste; "riduci movimento"
-  disattiva animazioni e grafici animati; tap target da 44px su telefono in quasi tutti i moduli.
+  disattiva animazioni e grafici animati; tap target da 44px su telefono in quasi tutti i moduli;
+  errore dell'area privata con "Riprova" (`app/(private)/error.tsx`) e 404 col tema del sito.
 - **Alimentazione, Allenamenti, Carte**: scanner barcode in uno Sheet, lista Gestione a righe su
   telefono; countdown di preparazione configurabile con indicatore wake lock; dettaglio e modifica
   carta in Sheet, errori di salvataggio mostrati.
@@ -224,7 +225,18 @@ serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `m
 - **Animazioni allo scroll solo CSS**: niente libreria, resta fluido su mobile e si spegne con
   "riduci movimento".
 - **Storico prezzi carte con GET**: il tester in sola lettura non può fare POST, e una lettura non è una scrittura.
-- **Next.js 16.4.3**: aggiornato per chiudere vulnerabilità note, senza cambi di API.
+- **Next.js 16.4.6**: aggiornato per chiudere vulnerabilità note, senza cambi di API (13/11 insieme a
+  supabase-js, next-intl, resend, tailwind, lucide, playwright; override di `uuid` per `exceljs`).
+- **Header di sicurezza senza `script-src`**: CSP con `object-src`, `base-uri`, `frame-ancestors`,
+  `form-action` in sola segnalazione, più Cross-Origin-Opener-Policy e fotocamera consentita alla stessa
+  origine (scanner barcode). Una `script-src` richiederebbe nonce e renderebbe le pagine dinamiche.
+- **Pagine pubbliche cacheabili dalla CDN**: niente cookie `NEXT_LOCALE` e classifica in home con un client
+  anon senza cookie (`lib/supabase/anon.ts`), così l'HTML non varia per utente.
+- **Tocco aptico e Vibrazione**: `lib/haptics.ts` (anche su iPhone) per pressione lunga sulla tab, serie
+  completata e salvataggio pasto; interruttore in Impostazioni per spegnerlo.
+- **Tira giù per aggiornare**: `components/shell/PullToRefresh.tsx` nel layout privato, solo gesto da telefono.
+- **Spese, riepilogo con confronto**: entrate e uscite messe a confronto col periodo precedente
+  (`lib/spese/confronto.ts`, testato).
 
 ## Cosa manca volutamente in questa fase
 

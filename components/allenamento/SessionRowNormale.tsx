@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useCountdown } from "@/hooks/useCountdown";
+import { tocca } from "@/lib/haptics";
+import { superaRecord } from "@/lib/allenamento/record";
 import { TutorialLink } from "./TutorialLink";
 import type { SchedaEsercizioConNome, SessioneLog } from "@/lib/allenamento/types";
 
@@ -29,6 +31,7 @@ export function SessionRowNormale({
   row,
   numeroSerie,
   ultimoValore,
+  massimo,
   tick,
   finish,
   onSetComplete,
@@ -38,12 +41,14 @@ export function SessionRowNormale({
   row: SchedaEsercizioConNome;
   numeroSerie: number;
   ultimoValore: SessioneLog | null;
+  massimo: SessioneLog | null;
   tick: () => void;
   finish: () => void;
   onSetComplete: (log: SetLog) => void;
   onRestDone: () => void;
   pausaGlobale: boolean;
 }) {
+  const [record, setRecord] = useState<SessioneLog | null>(null);
   const [fase, setFase] = useState<"esecuzione" | "riposo">("esecuzione");
   const [rip, setRip] = useState(String(row.target_rip_max ?? row.target_rip_min ?? ""));
   const [peso, setPeso] = useState(row.target_peso != null ? String(row.target_peso) : "");
@@ -71,6 +76,7 @@ export function SessionRowNormale({
       finish,
       onDone: () => {
         onSetComplete({ tempo_effettivo_sec: targetTempo });
+        if (superaRecord("tempo", { rip_effettive: null, peso_effettivo: null, tempo_effettivo_sec: targetTempo }, massimo)) setRecord(massimo);
         if (riposoSec > 0) setFase("riposo");
         else onRestDone();
       },
@@ -83,10 +89,16 @@ export function SessionRowNormale({
   }, [pausaGlobale, setRiposoInPausa, setEsecuzioneInPausa]);
 
   function completaSerieManuale() {
-    onSetComplete({
+    const nuova = {
       rip_effettive: rip.trim() ? Number(rip) : null,
       peso_effettivo: peso.trim() ? Number(peso) : null,
-    });
+      tempo_effettivo_sec: null,
+    };
+    onSetComplete({ rip_effettive: nuova.rip_effettive, peso_effettivo: nuova.peso_effettivo });
+    if (superaRecord(row.tipo_metrica, nuova, massimo)) {
+      setRecord(massimo);
+      tocca();
+    }
     if (riposoSec > 0) setFase("riposo");
     else onRestDone();
   }
@@ -137,6 +149,7 @@ export function SessionRowNormale({
                 type="number" inputMode="numeric"
                 value={rip}
                 onChange={(e) => setRip(e.target.value)}
+                onFocus={(e) => e.currentTarget.select()}
                 className="field-input w-24"
               />
             </label>
@@ -148,6 +161,7 @@ export function SessionRowNormale({
                   step="0.5"
                   value={peso}
                   onChange={(e) => setPeso(e.target.value)}
+                  onFocus={(e) => e.currentTarget.select()}
                   className="field-input w-24"
                 />
               </label>
@@ -159,6 +173,11 @@ export function SessionRowNormale({
         )
       ) : (
         <div className="flex flex-col items-center gap-2 py-4">
+          {record && massimo && (
+            <p role="status" className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[15px] font-medium text-accent">
+              Nuovo record · prima {formatUltimoValore(row, massimo)}
+            </p>
+          )}
           <span className="text-xs uppercase tracking-wide text-muted">Recupero</span>
           <span className="font-figures text-4xl font-bold tabular-nums">{riposoRimanente}s</span>
           <button type="button" onClick={onRestDone} className="btn-secondary mt-2">

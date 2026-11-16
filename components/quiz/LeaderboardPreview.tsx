@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 import { Leaderboard } from "./Leaderboard";
 
 // Server Component async: query diretta alla view pubblica (client anon,
@@ -6,7 +6,7 @@ import { Leaderboard } from "./Leaderboard";
 // user_id). Il refresh periodico è gestito da `revalidate` sulla pagina
 // homepage, non qui.
 export async function LeaderboardPreview() {
-  const supabase = await createClient();
+  const supabase = createAnonClient();
   const { data } = await supabase
     .from("quiz_leaderboard")
     .select("rank, nickname, score, time_taken_ms")

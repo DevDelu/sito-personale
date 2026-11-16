@@ -8,6 +8,7 @@ import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { ListGroup, ListRowButton } from "@/components/ui/ListGroup";
 import { PastoEditModal } from "./PastoEditModal";
 import type { Pasto } from "@/lib/alimentazione/types";
+import { mostraToast } from "@/lib/toast/bus";
 
 const LABEL_TIPO: Record<string, string> = {
   colazione: "Colazione",
@@ -27,6 +28,7 @@ export function PastoTable({ rows }: { rows: Pasto[] }) {
     await updatePasto(editing.id, patch);
     setEditing(null);
     router.refresh();
+    mostraToast({ testo: "Pasto aggiornato" });
   }
 
   async function handleDelete() {
@@ -34,6 +36,7 @@ export function PastoTable({ rows }: { rows: Pasto[] }) {
     await deletePasto(deleting.id);
     setDeleting(null);
     router.refresh();
+    mostraToast({ testo: "Pasto eliminato" });
   }
 
   if (rows.length === 0) {

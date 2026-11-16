@@ -85,7 +85,7 @@ function CategoryTrendTooltip({ active, payload, label }: TrendTooltipProps) {
               <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: p.color }} />
               <span className="truncate">{p.name}</span>
             </span>
-            <span className="font-figures whitespace-nowrap">{formatCurrency(p.value as number)}</span>
+            <span className="importo font-figures whitespace-nowrap">{formatCurrency(p.value as number)}</span>
           </li>
         ))}
       </ul>
@@ -152,7 +152,7 @@ export function CategorySpendingTrendChart({
                   style={{ backgroundColor: colore, transform: nascosta ? "scale(0.7)" : "scale(1)" }}
                 />
                 {cat.nome}
-                <span className="font-figures text-muted">{formatCurrency(cat.totale)}</span>
+                <span className="importo font-figures text-muted">{formatCurrency(cat.totale)}</span>
               </button>
             );
           })}
