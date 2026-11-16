@@ -13,6 +13,7 @@ import {
   type BulkMovimentoPatch,
 } from "@/hooks/useBulkMovimentoMutations";
 import { ExpenseEditModal } from "./ExpenseEditModal";
+import { mostraToast } from "@/lib/toast/bus";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { ActionBar } from "@/components/ui/ActionBar";
 import { BulkEditModal } from "./BulkEditModal";
@@ -90,6 +91,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
     await updateExpense(editing.tipo, editing.id, patch);
     setEditing(null);
     router.refresh();
+    mostraToast({ testo: "Modifiche salvate" });
   }
 
   async function handleDelete() {
@@ -97,6 +99,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
     await deleteExpense(deleting.tipo, deleting.id);
     setDeleting(null);
     router.refresh();
+    mostraToast({ testo: "Movimento eliminato" });
   }
 
   function toggleRiga(r: Movimento) {
