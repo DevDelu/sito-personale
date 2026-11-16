@@ -10,6 +10,7 @@ import { TransazioneFormModal } from "./TransazioneFormModal";
 import { BulkCostoTipoModal } from "./BulkCostoTipoModal";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import type { Asset, CostoTipo, TransazioneConAsset } from "@/lib/investimenti/types";
+import { mostraToast } from "@/lib/toast/bus";
 
 const COSTO_TIPO_LABEL: Record<CostoTipo, string> = {
   verificato: "Verificato",
@@ -52,6 +53,7 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
     await updateTransazione(editing.id, patch);
     setEditing(null);
     router.refresh();
+    mostraToast({ testo: "Modifiche salvate" });
   }
 
   async function handleDelete() {
@@ -59,6 +61,7 @@ export function TransazioneTable({ rows, assets }: { rows: TransazioneConAsset[]
     await deleteTransazione(deleting.id);
     setDeleting(null);
     router.refresh();
+    mostraToast({ testo: "Transazione eliminata" });
   }
 
   function toggleRiga(id: string) {
