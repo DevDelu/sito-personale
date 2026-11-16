@@ -10,6 +10,7 @@ import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { useCarteMutations } from "@/hooks/useCarteMutations";
 import type { ModificaCartaPatch } from "@/app/(private)/carte/actions";
 import type { CollectionCard } from "@/lib/carte/types";
+import { mostraToast } from "@/lib/toast/bus";
 
 export function CollectionSections({
   hero,
@@ -46,6 +47,7 @@ export function CollectionSections({
     }
     setDeleting(null);
     router.refresh();
+    mostraToast({ testo: "Carta eliminata" });
   }
 
   return (
