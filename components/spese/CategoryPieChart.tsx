@@ -105,7 +105,7 @@ function CategorySummaryTable({
               />
               <span className="truncate">{c.nome}</span>
             </td>
-            <td className="font-figures py-1.5 text-right">{formatCurrency(c.totale)}</td>
+            <td className="importo font-figures py-1.5 text-right">{formatCurrency(c.totale)}</td>
             <td className="font-figures py-1.5 text-right text-muted">
               {totale > 0 ? `${((c.totale / totale) * 100).toFixed(1)}%` : "—"}
             </td>
@@ -253,7 +253,7 @@ export function CategoryPieChart({
               key={etichettaCentro}
               className="animate-pop-in pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-10"
             >
-              <span className="font-figures text-lg font-bold">{formatCurrency(totaleCentro)}</span>
+              <span className="importo font-figures text-lg font-bold">{formatCurrency(totaleCentro)}</span>
               <span className="max-w-[70%] truncate text-xs text-muted">{etichettaCentro}</span>
             </div>
           </>

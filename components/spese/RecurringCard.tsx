@@ -35,7 +35,7 @@ export function RecurringCard({ ricorrenti }: { ricorrenti: Ricorrente[] }) {
       <div className="card flex flex-col gap-0.5 px-4 py-4">
         <h2 className="text-[22px] font-semibold md:text-lg">Ricorrenti</h2>
         <span className="text-[13px] text-muted">Costo stimato su 12 mesi</span>
-        <span className="font-figures text-[32px] font-bold text-spesa md:text-2xl">
+        <span className="importo font-figures text-[32px] font-bold text-spesa md:text-2xl">
           {formatCurrency(totaleAnnuo(ricorrenti))}
         </span>
       </div>
@@ -46,7 +46,7 @@ export function RecurringCard({ ricorrenti }: { ricorrenti: Ricorrente[] }) {
             title={r.titolo}
             subtitle={`Prossimo ${formatData(r.prossimaData)} · ${ETICHETTA_CADENZA[r.cadenza]}${r.importoAumentato ? " · aumentato" : ""}`}
             value={
-              <span className={r.importoAumentato ? "text-spesa" : undefined}>
+              <span className={`importo${r.importoAumentato ? " text-spesa" : ""}`}>
                 {r.importoAumentato ? "▲ " : ""}
                 {formatCurrency(r.importoTipico)}
               </span>

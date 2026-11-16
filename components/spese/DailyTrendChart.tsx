@@ -74,13 +74,13 @@ function DailyHoverTooltip({ active, payload, label }: Partial<TooltipContentPro
       {typeof uscite === "number" && (
         <div className="flex items-center justify-between gap-4">
           <span className="text-spesa">Spese</span>
-          <span className="font-figures">{formatCurrency(uscite)}</span>
+          <span className="importo font-figures">{formatCurrency(uscite)}</span>
         </div>
       )}
       {typeof entrate === "number" && (
         <div className="flex items-center justify-between gap-4">
           <span className="text-entrata">Entrate</span>
-          <span className="font-figures">{formatCurrency(entrate)}</span>
+          <span className="importo font-figures">{formatCurrency(entrate)}</span>
         </div>
       )}
     </div>
