@@ -82,7 +82,7 @@ export function AltreCarteList({
                 </>
               ) : (
                 <span
-                  className="w-20 shrink-0 truncate rounded-full border border-border px-2 py-0.5 text-right text-[12px] font-medium tracking-wide text-muted uppercase"
+                  className="min-w-20 shrink-0 rounded-full border border-border px-2 py-0.5 text-right text-[12px] font-medium tracking-wide whitespace-nowrap text-muted uppercase"
                   title="Prezzo non disponibile"
                 >
                   Prezzo n/d

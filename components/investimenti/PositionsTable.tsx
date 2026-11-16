@@ -110,7 +110,7 @@ export function PositionsTable({
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="importo px-4 py-3">
                     {p.costoMedioCarico === null ? "n/d" : formatCurrency(p.costoMedioCarico)}
                   </td>
                   <td className="px-4 py-3">
@@ -118,7 +118,7 @@ export function PositionsTable({
                       <span className="text-xs text-muted">n/d</span>
                     ) : (
                       <div className="flex flex-col">
-                        <span>{formatCurrency(p.prezzoAttuale)}</span>
+                        <span className="importo">{formatCurrency(p.prezzoAttuale)}</span>
                         {p.variazioneOggi && (
                           <VariazioneOggi
                             importo={p.variazioneOggi.perUnita}
@@ -170,7 +170,7 @@ export function PositionsTable({
                                 {t.tipo === "buy" ? "Acquisto" : "Vendita"}
                               </td>
                               <td className="px-2 py-1.5 text-right">{formatQuantita(t.quantita)}</td>
-                              <td className="px-2 py-1.5 text-right">
+                              <td className="importo px-2 py-1.5 text-right">
                                 {t.prezzo_unitario === null ? "n/d" : formatCurrency(t.prezzo_unitario)}
                               </td>
                               <td className="px-2 py-1.5 font-sans text-muted capitalize">{t.costo_tipo}</td>
@@ -275,14 +275,14 @@ function PositionsCards({
                 <span>
                   Medio carico
                   <br />
-                  <span className="text-foreground">
+                  <span className="importo text-foreground">
                     {p.costoMedioCarico === null ? "n/d" : formatCurrency(p.costoMedioCarico)}
                   </span>
                 </span>
                 <span>
                   Prezzo
                   <br />
-                  <span className="text-foreground">
+                  <span className="importo text-foreground">
                     {p.prezzoAttuale === null ? "n/d" : formatCurrency(p.prezzoAttuale)}
                   </span>
                 </span>
@@ -295,7 +295,7 @@ function PositionsCards({
                     <span className="text-muted">
                       {new Date(`${t.data}T00:00:00Z`).toLocaleDateString("it-IT")} · {t.tipo === "buy" ? "Acquisto" : "Vendita"}
                     </span>
-                    <span>
+                    <span className="importo">
                       {formatQuantita(t.quantita)} × {t.prezzo_unitario === null ? "n/d" : formatCurrency(t.prezzo_unitario)}
                     </span>
                   </li>

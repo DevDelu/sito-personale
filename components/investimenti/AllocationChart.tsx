@@ -127,7 +127,7 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
               textAnchor="middle"
               dominantBaseline="middle"
               fill="currentColor"
-              className="font-figures text-foreground text-base font-bold tracking-tight"
+              className="importo font-figures text-foreground text-base font-bold tracking-tight"
             >
               {formatCurrency(totaleValore)}
             </text>
@@ -156,7 +156,7 @@ export function AllocationChart({ posizioni }: { posizioni: Posizione[] }) {
             />
             <span className="font-medium">{d.nome}</span>
             <span className="font-figures ml-auto text-muted">{d.percentuale.toFixed(1).replace(".", ",")}%</span>
-            <span className="font-figures w-28 text-right">{formatCurrency(d.totale)}</span>
+            <span className="importo font-figures w-28 text-right">{formatCurrency(d.totale)}</span>
           </li>
         ))}
       </ul>
