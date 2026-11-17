@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import type { PesoCorporeo } from "@/lib/alimentazione/types";
+import { mostraToast } from "@/lib/toast/bus";
 
 // Storico completo, non solo l'ultimo valore (richiesto esplicitamente per
-// questa pagina): la lista resta scrollabile invece di comprimere la
-// pagina se il log cresce nel tempo.
+// questa pagina): su desktop la lista resta scrollabile, su telefono scorre con la
+// pagina (niente scroll annidato).
 export function PesoHistory({ righe }: { righe: PesoCorporeo[] }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState<PesoCorporeo | null>(null);
@@ -25,6 +26,7 @@ export function PesoHistory({ righe }: { righe: PesoCorporeo[] }) {
       if (!res.ok) throw new Error(json.error ?? "Errore durante l'eliminazione.");
       setDeleting(null);
       router.refresh();
+      mostraToast({ testo: "Peso eliminato" });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -42,12 +44,12 @@ export function PesoHistory({ righe }: { righe: PesoCorporeo[] }) {
 
   return (
     <>
-      <ul className="card flex max-h-80 flex-col divide-y divide-border overflow-y-auto">
+      <ul className="card flex flex-col divide-y divide-border md:max-h-80 md:overflow-y-auto">
         {righe.map((p) => (
           <li key={p.id} className="flex items-center justify-between gap-3 px-4 py-3">
             <div className="flex flex-col gap-0.5">
-              <span className="font-figures text-sm font-medium">{p.peso_kg} kg</span>
-              <span className="text-xs text-muted">
+              <span className="font-figures text-sm font-medium max-md:text-[17px]">{p.peso_kg} kg</span>
+              <span className="text-xs text-muted max-md:text-[13px]">
                 {p.data}
                 {p.note ? ` · ${p.note}` : ""}
               </span>
