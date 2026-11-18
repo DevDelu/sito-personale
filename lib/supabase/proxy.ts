@@ -13,6 +13,7 @@ const PROTECTED_PREFIXES = [
   "/altro",
   "/feedback",
   "/assistente",
+  "/novita",
 ];
 
 // API che si autenticano da sole e restano fuori dal controllo owner qui
@@ -27,6 +28,8 @@ const API_AUTONOME = [
   "/api/feedback/agente",
   "/api/auth/logout",
   "/api/telegram/webhook",
+  "/api/novita/agente",
+  "/api/resoconti/agente",
 ];
 
 // GET con effetti o dati troppo sensibili anche per un tester in sola

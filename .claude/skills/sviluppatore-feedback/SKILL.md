@@ -97,7 +97,14 @@ Se Lorenzo ti ha indicato feedback precisi, lavora solo quelli.
    Closes #<issue_number>          ← solo se il feedback ha una issue
    Feedback-id: <uuid del feedback>
    Nota per Lorenzo: <una frase senza gergo su cosa è cambiato e dove guardare>
+
+   ## Novità
+   Tipo: <funzione | correzione | tecnico>
+   Titolo: <max 8 parole, senza gergo>
+   <1-3 frasi per Lorenzo: cosa cambia e dove guardare>
    ```
+   La sezione `## Novità` è il testo che Lorenzo legge in Radar → Novità quando la PR va
+   online (formato in `giro-notturno/SKILL.md`, "Regole sempre valide").
    `feedback-pr.yml` porta il feedback a "Da approvare" (in-lavorazione con
    PR); al merge salva la "Nota per Lorenzo"; dopo il deploy di produzione
    `feedback-deploy.yml` lo passa a "Da verificare".

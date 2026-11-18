@@ -59,7 +59,9 @@ un punto è fatto.
 - **Team in turni** (`.claude/skills/giro-notturno/SKILL.md`): tre routine (02:47 principale, 07:47 qualità, 12:47 manutenzione nei feriali) coordinano
   manutenzione PR → feedback → issue → revisione → merge delle PR a rischio basso con rollback →
   tester, designer, prestazioni/sicurezza e scout in parallelo → documentarista la domenica →
-  newsletter con screenshot quando ci sono novità; chiude con il resoconto che arriva per email.
+  chiude con il resoconto pubblicato in Radar → Novità → Resoconti, con una notifica
+  (`scripts/resoconto.mjs`; email con screenshot solo di riserva, se la notifica non parte).
+  Le modifiche online le registra da solo `feedback-deploy.yml` dalla sezione `## Novità` delle PR.
   Agenti in `.claude/agents/`, sviluppo issue in `.claude/skills/sviluppatore-issue/`.
 - Skill esterne (React/Next, Supabase, design) in `.claude/skills/`, vedi `ESTERNE.md`.
 - Nessuna casella spuntabile in questo giro (15/11 riconfermato: i passi aperti restano fuori dal repo): i passi aperti riguardano secret e impostazioni fuori

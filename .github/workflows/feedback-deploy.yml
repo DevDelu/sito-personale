@@ -8,6 +8,12 @@
 # evento si perde, il deploy successivo recupera (il confronto è "PR
 # contenuta nel commit deployato", non "PR di questo deploy").
 #
+# Secondo job (`novita`): le PR mergiate contenute nello stesso deploy
+# diventano voci della sezione Novità di Radar (POST /api/novita/agente, che
+# le spiega a parole semplici e notifica Lorenzo). Idempotente: una PR già
+# registrata viene ignorata, quindi un deploy successivo recupera quelle
+# perse senza doppioni.
+#
 # Secret: RADAR_URL, FEEDBACK_AGENTE_SECRET (o l'alias FEEDBACK_AGENT_SECRET).
 name: feedback-deploy
 
@@ -74,3 +80,66 @@ jobs:
               else passati++;
             }
             core.info(`Deploy ${sha.slice(0, 7)}: ${passati} feedback passati a da-verificare.`);
+
+  novita:
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      (github.event.deployment.environment == 'Production' || github.event.deployment.production_environment)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v9
+        env:
+          RADAR_URL: ${{ secrets.RADAR_URL }}
+          FEEDBACK_AGENTE_SECRET: ${{ secrets.FEEDBACK_AGENTE_SECRET || secrets.FEEDBACK_AGENT_SECRET }}
+        with:
+          script: |
+            const { RADAR_URL, FEEDBACK_AGENTE_SECRET } = process.env;
+            if (!RADAR_URL || !FEEDBACK_AGENTE_SECRET) {
+              core.notice("RADAR_URL o FEEDBACK_AGENTE_SECRET mancanti: novità non registrate.");
+              return;
+            }
+            const sha = context.payload.deployment.sha;
+            // La sezione parte dal 18/11/2026 (scelta di Lorenzo: niente
+            // storico); in più si guardano solo gli ultimi 3 giorni di merge.
+            const DAL = Math.max(Date.parse("2026-11-18T00:00:00Z"), Date.now() - 3 * 86_400_000);
+
+            const { data: chiuse } = await github.rest.pulls.list({
+              ...context.repo,
+              state: "closed",
+              base: "main",
+              sort: "updated",
+              direction: "desc",
+              per_page: 50,
+            });
+            const candidate = chiuse.filter((pr) => pr.merged_at && Date.parse(pr.merged_at) >= DAL && pr.merge_commit_sha);
+
+            const prs = [];
+            for (const pr of candidate) {
+              // Solo PR già dentro il commit deployato: mergiata ≠ online.
+              const { data: cmp } = await github.rest.repos.compareCommitsWithBasehead({
+                ...context.repo,
+                basehead: `${pr.merge_commit_sha}...${sha}`,
+              });
+              if (cmp.status !== "ahead" && cmp.status !== "identical") continue;
+              prs.push({
+                number: pr.number,
+                title: pr.title,
+                body: pr.body ?? "",
+                labels: pr.labels.map((l) => l.name),
+                url: pr.html_url,
+                merged_at: pr.merged_at,
+              });
+            }
+            if (prs.length === 0) {
+              core.info(`Deploy ${sha.slice(0, 7)}: nessuna PR nuova.`);
+              return;
+            }
+
+            const res = await fetch(`${RADAR_URL.replace(/\/$/, "")}/api/novita/agente`, {
+              method: "POST",
+              headers: { Authorization: `Bearer ${FEEDBACK_AGENTE_SECRET}`, "Content-Type": "application/json" },
+              body: JSON.stringify({ deploy_sha: sha, prs }),
+            });
+            if (!res.ok) throw new Error(`Registrazione novità: ${res.status}`);
+            const { registrate, notificato } = await res.json();
+            core.info(`Deploy ${sha.slice(0, 7)}: ${registrate} novità registrate${notificato ? ", Lorenzo notificato" : ""}.`);
