@@ -402,7 +402,36 @@ newsletter (max una al giorno) nei turni principale e qualità, se le variabili 
 design) in `.claude/skills/`, provenienza e licenze in `.claude/skills/ESTERNE.md`: aggiornate solo
 a mano rileggendo il diff, mai scaricate in automatico.
 
+### Assistente Telegram
+
+Bot privato per parlare con Radar da Telegram, a testo o a voce. Webhook unico
+`app/api/telegram/webhook/route.ts`, in `API_AUTONOME`: nessuna sessione Supabase,
+l'autorizzazione è nella route (header `X-Telegram-Bot-Api-Secret-Token` confrontato con
+`TELEGRAM_WEBHOOK_SECRET`, fail-closed, poi `from.id` uguale a `TELEGRAM_OWNER_CHAT_ID`; gli
+estranei non ricevono risposta). Registrazione webhook: `scripts/telegram-setup.mjs`.
+
+- **Voce → testo**: Groq Whisper (`lib/assistente/groq.ts`), vocali fino a 5 minuti. La
+  trascrizione viene sempre rimandata a Lorenzo, così vede cosa ha capito il bot.
+- **LLM con strumenti** (`lib/assistente/strumenti.ts`, loop in `conversa.ts`, max 5 giri): le
+  letture riusano le query dei moduli (`lib/<dominio>/queries.ts`); uno strumento nuovo = una
+  definizione in `DEFINIZIONI` + un `case` in `eseguiStrumento()`.
+- **Nessuna scrittura senza conferma**: `proponi_movimento` crea solo una riga in
+  `telegram_bozze`; spese/depositi si scrivono in `chiudiBozza()` al tap su "Conferma", con
+  UPDATE condizionato su `stato = 'in_attesa'` (doppio tap = una sola riga) e `fonte = 'telegram'`.
+  La categoria deve esistere (`categoriaPerNome()`), altrimenti "Altro": il bot non crea categorie.
+- **Richieste di modifica all'app**: `segnala_modifica` → `inserisciFeedback()` con
+  `origine = 'telegram'`, stesso ciclo notturno dei feedback.
+- **Retry di Telegram**: `telegram_update_visti` scarta gli `update_id` già gestiti; la route
+  risponde sempre 200 (un errore farebbe ripetere l'update all'infinito).
+- **Senza memoria tra messaggi** (v1): ogni messaggio è una richiesta a sé.
+
 ### Decision log (dal README)
+
+- **Assistente Telegram su Groq, non Gemini né Claude API** (nov 2026): Telegram Bot API e
+  Groq free tier costano zero; Groq non addestra sui dati inviati, mentre il free tier Gemini sì
+  (qui passano spese e portafoglio). Claude Pro non include l'API. È l'unica chiamata a un LLM
+  esterno dentro il sito: eccezione voluta alla regola "categorizzazione a regole, niente AI",
+  limitata all'interpretazione delle richieste; il dato entra solo dopo conferma manuale.
 
 - **Overview/Gestione separate in Spese**: Overview è sola lettura (aggregati, grafici);
   Gestione è l'unico posto con CRUD. Evita di mischiare le due responsabilità nello stesso

@@ -16,7 +16,8 @@ const PROTECTED_PREFIXES = [
 
 // API che si autenticano da sole e restano fuori dal controllo owner qui
 // sotto: il quiz è multi-utente per scelta, cron e agenti usano un secret
-// Bearer verificato nella route stessa.
+// Bearer verificato nella route stessa; il webhook Telegram verifica il
+// secret del webhook e l'id Telegram di Lorenzo.
 const API_AUTONOME = [
   "/api/quiz/",
   "/api/cron/",
@@ -24,6 +25,7 @@ const API_AUTONOME = [
   "/api/agenda/note-reminder",
   "/api/feedback/agente",
   "/api/auth/logout",
+  "/api/telegram/webhook",
 ];
 
 // GET con effetti o dati troppo sensibili anche per un tester in sola
