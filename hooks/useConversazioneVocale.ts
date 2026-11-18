@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { OPZIONI_VAD, passoVad, rmsDa, statoIniziale, type StatoVad } from "@/lib/assistente/vad";
 import { frasiPerVoce } from "@/lib/assistente/voce";
+import { contestoAudio, sbloccaAudio } from "@/lib/assistente/audio";
 
 // Motore della conversazione a voce di /assistente, tutto nel browser:
 // microfono → rilevamento del parlato (lib/assistente/vad.ts) → registrazione
@@ -147,9 +148,14 @@ export function useConversazioneVocale({ invia, onErrore }: Opzioni) {
       audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
     });
     streamRef.current = stream;
-    const ctx = audioCtxRef.current ?? new AudioContext();
+    // Contesto condiviso, sbloccato nel tap che ha aperto l'assistente
+    // (lib/assistente/audio.ts): creato qui fuori da un gesto, su iOS
+    // resterebbe sospeso e il microfono sembrerebbe muto.
+    const ctx = audioCtxRef.current ?? contestoAudio() ?? sbloccaAudio() ?? new AudioContext();
     audioCtxRef.current = ctx;
-    if (ctx.state === "suspended") await ctx.resume();
+    // Non si aspetta: fuori da un gesto, su iOS resume() può restare in
+    // sospeso per sempre e bloccherebbe l'avvio.
+    if (ctx.state === "suspended") void ctx.resume().catch(() => {});
     const analyser = ctx.createAnalyser();
     analyser.fftSize = 1024;
     ctx.createMediaStreamSource(stream).connect(analyser);
@@ -300,25 +306,25 @@ export function useConversazioneVocale({ invia, onErrore }: Opzioni) {
 
   // Va chiamata dentro un tap: iOS sblocca microfono, audio e sintesi
   // vocale solo a partire da un gesto dell'utente.
-  const avvia = useCallback(async () => {
-    if (faseRef.current !== "spento") return;
+  const avvia = useCallback(async (): Promise<boolean> => {
+    if (faseRef.current !== "spento") return false;
     cambiaFase("avvio");
     micDuranteRispostaRef.current = !isIos();
-    // Sblocco della sintesi vocale su iOS: una lettura vuota dentro il gesto.
-    const sblocco = new SpeechSynthesisUtterance(" ");
-    sblocco.volume = 0;
-    window.speechSynthesis.speak(sblocco);
+    // Sblocco di audio e sintesi vocale (no-op se già fatto nel tap che ha
+    // aperto lo sheet).
+    sbloccaAudio();
     try {
       await apriMicrofono();
     } catch {
       cambiaFase("spento");
       onErroreRef.current("Serve il permesso del microfono: abilitalo nelle impostazioni del browser.");
-      return;
+      return false;
     }
     ultimoTickRef.current = performance.now();
     timerRef.current = setInterval(tick, TICK_MS);
     avviaRegistrazione();
     cambiaFase("ascolto");
+    return true;
   }, [apriMicrofono, avviaRegistrazione, cambiaFase, tick]);
 
   // Tap sul cerchio mentre Radar parla: basta così, tocca a me.
@@ -347,6 +353,17 @@ export function useConversazioneVocale({ invia, onErrore }: Opzioni) {
     [fermaRegistrazione, gestisciTurno, zittisci]
   );
 
+  // L'assistente parla per primo (es. "Cosa stavi facendo?" dopo un
+  // errore), poi si mette in ascolto.
+  const annuncia = useCallback(
+    (testo: string) => {
+      if (faseRef.current === "spento") return;
+      zittisci();
+      void fermaRegistrazione().then(() => parla(testo));
+    },
+    [fermaRegistrazione, parla, zittisci]
+  );
+
   const cambiaVoce = useCallback(() => {
     voceAttivaRef.current = !voceAttivaRef.current;
     setVoceAttiva(voceAttivaRef.current);
@@ -366,7 +383,8 @@ export function useConversazioneVocale({ invia, onErrore }: Opzioni) {
     return () => {
       document.removeEventListener("visibilitychange", nascosta);
       ferma();
-      audioCtxRef.current?.close().catch(() => {});
+      // Il contesto audio è condiviso (audio.ts) e resta sbloccato per la
+      // prossima apertura: non si chiude.
       audioCtxRef.current = null;
     };
   }, [ferma]);
@@ -378,5 +396,5 @@ export function useConversazioneVocale({ invia, onErrore }: Opzioni) {
     window.speechSynthesis.getVoices();
   }, []);
 
-  return { fase, livello, voceAttiva, supportato, avvia, ferma, interrompi, inviaTesto, cambiaVoce };
+  return { fase, livello, voceAttiva, supportato, avvia, ferma, interrompi, inviaTesto, cambiaVoce, annuncia };
 }

@@ -97,7 +97,7 @@ export const AREE_FEEDBACK = {
   "assistente.conversazione": "Assistente › Conversazione",
   "assistente.controlli": "Assistente › Microfono e controlli",
   "assistente.bozza": "Assistente › Movimento da confermare",
-  "shell.aggiunta-rapida": "Aggiunta rapida",
+  "shell.assistente": "Assistente (pulsante centrale)",
   "comune.conferma-eliminazione": "Conferma eliminazione",
 
   // Feedback
