@@ -91,6 +91,12 @@ export const AREE_FEEDBACK = {
   "impostazioni.notifiche": "Impostazioni › Notifiche",
   "impostazioni.vibrazione": "Impostazioni › Vibrazione",
   "altro.menu": "Altro",
+
+  // Assistente
+  "assistente.pagina": "Assistente",
+  "assistente.conversazione": "Assistente › Conversazione",
+  "assistente.controlli": "Assistente › Microfono e controlli",
+  "assistente.bozza": "Assistente › Movimento da confermare",
   "shell.aggiunta-rapida": "Aggiunta rapida",
   "comune.conferma-eliminazione": "Conferma eliminazione",
 

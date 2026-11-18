@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ExternalLink, Layers, LogOut, Dumbbell, Apple, Bell, Inbox } from "lucide-react";
+import { ExternalLink, Layers, LogOut, Dumbbell, Apple, AudioLines, Bell, Inbox } from "lucide-react";
 import { contaPerTe } from "@/lib/feedback/queries";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PrivacyToggle } from "@/components/privacy-toggle";
@@ -23,6 +23,16 @@ export default async function AltroPage() {
       <PageHeader title="Altro" />
 
       <div data-fb-area="altro.menu" className="flex flex-1 flex-col justify-center gap-6 px-4 py-6">
+        <ListGroup>
+          <ListRowLink
+            href="/assistente"
+            icon={<AudioLines className="h-5 w-5" strokeWidth={1.75} />}
+            title="Assistente"
+            subtitle="Parla con Radar"
+            chevron
+          />
+        </ListGroup>
+
         <ListGroup>
           <ListRowLink href="/carte" icon={<Layers className="h-5 w-5" strokeWidth={1.75} />} title="Carte" chevron />
           <ListRowLink
