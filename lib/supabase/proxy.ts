@@ -23,6 +23,7 @@ const API_AUTONOME = [
   "/api/agenda/cron-sync",
   "/api/agenda/note-reminder",
   "/api/feedback/agente",
+  "/api/auth/logout",
 ];
 
 // GET con effetti o dati troppo sensibili anche per un tester in sola

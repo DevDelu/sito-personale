@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { requireUser } from "@/lib/supabase/dal";
 import { isOwner, isTester } from "@/lib/supabase/owner";
-import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sidebar } from "@/components/sidebar";
 import { TabBar } from "@/components/shell/TabBar";
@@ -29,7 +28,7 @@ export default async function PrivateLayout({
   );
 
   const logoutForm = (
-    <form action={logout}>
+    <form action="/api/auth/logout" method="post">
       <button type="submit" className="btn-secondary !px-3 !py-1.5">
         Esci
       </button>
