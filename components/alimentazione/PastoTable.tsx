@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
 import { usePastoMutations, type PastoPatch } from "@/hooks/usePastoMutations";
@@ -9,6 +9,7 @@ import { ListGroup, ListRowButton } from "@/components/ui/ListGroup";
 import { PastoEditModal } from "./PastoEditModal";
 import type { Pasto } from "@/lib/alimentazione/types";
 import { mostraToast } from "@/lib/toast/bus";
+import { creaAzioniDifferite, RITARDO_ANNULLA_MS } from "@/lib/toast/azione-differita";
 
 const LABEL_TIPO: Record<string, string> = {
   colazione: "Colazione",
@@ -17,8 +18,23 @@ const LABEL_TIPO: Record<string, string> = {
   spuntino: "Spuntino",
 };
 
-export function PastoTable({ rows }: { rows: Pasto[] }) {
+export function PastoTable({ rows: righeServer }: { rows: Pasto[] }) {
   const router = useRouter();
+  // Eliminazione annullabile: la riga sparisce subito, la DELETE parte dopo 5 s.
+  const [nascosti, setNascosti] = useState<Set<string>>(new Set());
+  const rows = useMemo(
+    () => (nascosti.size ? righeServer.filter((p) => !nascosti.has(p.id)) : righeServer),
+    [righeServer, nascosti]
+  );
+  const [differite] = useState(() => creaAzioniDifferite());
+  useEffect(() => {
+    const vaiOra = () => differite.eseguiTutte();
+    window.addEventListener("pagehide", vaiOra);
+    return () => {
+      window.removeEventListener("pagehide", vaiOra);
+      vaiOra();
+    };
+  }, [differite]);
   const { updatePasto, deletePasto, pending, error } = usePastoMutations();
   const [editing, setEditing] = useState<Pasto | null>(null);
   const [deleting, setDeleting] = useState<Pasto | null>(null);
@@ -31,12 +47,39 @@ export function PastoTable({ rows }: { rows: Pasto[] }) {
     mostraToast({ testo: "Pasto aggiornato" });
   }
 
-  async function handleDelete() {
+  function mostraRiga(id: string) {
+    setNascosti((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }
+
+  function handleDelete() {
     if (!deleting) return;
-    await deletePasto(deleting.id);
+    const { id } = deleting;
     setDeleting(null);
-    router.refresh();
-    mostraToast({ testo: "Pasto eliminato" });
+    setNascosti((prev) => new Set(prev).add(id));
+    differite.pianifica(id, async () => {
+      try {
+        await deletePasto(id);
+        router.refresh();
+      } catch {
+        mostraRiga(id);
+        mostraToast({ testo: "Eliminazione non riuscita" });
+      }
+    });
+    mostraToast({
+      testo: "Pasto eliminato",
+      durataMs: RITARDO_ANNULLA_MS,
+      azione: {
+        etichetta: "Annulla",
+        onClick: () => {
+          differite.annulla(id);
+          mostraRiga(id);
+        },
+      },
+    });
   }
 
   if (rows.length === 0) {
