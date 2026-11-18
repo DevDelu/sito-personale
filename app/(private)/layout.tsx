@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { requireUser } from "@/lib/supabase/dal";
-import { isOwner } from "@/lib/supabase/owner";
+import { isOwner, isTester } from "@/lib/supabase/owner";
 import { logout } from "@/app/login/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sidebar } from "@/components/sidebar";
@@ -57,6 +57,12 @@ export default async function PrivateLayout({
           <ThemeToggle />
           {areaPubblicaLink}
         </div>
+        {isTester(user.email) && (
+          <div role="status" className="border-b border-border bg-surface px-4 py-2 text-sm text-muted sm:px-6">
+            Sei collegato come <span className="font-medium text-foreground">{user.email}</span>, l&apos;account tester in
+            sola lettura: puoi guardare ma non caricare o modificare. Esci e rientra con il tuo account.
+          </div>
+        )}
         <main className="app-page-content animate-fade-in flex flex-1 flex-col px-4 pb-[calc(var(--app-tabbar-height)+max(env(safe-area-inset-bottom),20px)+1rem)] sm:px-6 md:pt-6 md:pb-6">
           {children}
         </main>

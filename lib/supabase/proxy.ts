@@ -35,6 +35,16 @@ function inizia(pathname: string, prefissi: string[]) {
   return prefissi.some((p) => (p.endsWith("/") ? pathname.startsWith(p) : pathname === p || pathname.startsWith(`${p}/`)));
 }
 
+// Un "Non autorizzato." secco non diceva perché: la causa tipica è una
+// sessione di un altro account nello stesso browser (il tester degli agenti,
+// che apre le pagine ma non scrive, o un login Google fatto per il quiz che
+// sostituisce la sessione). Il messaggio nomina l'account e dice cosa fare.
+function messaggioAccessoNegato(email: string | null | undefined, tester: boolean): string {
+  if (!email) return "Non autenticato: accedi di nuovo.";
+  if (tester) return `Sei collegato come ${email}, l'account tester in sola lettura: esci e rientra con il tuo account per caricare o modificare dati.`;
+  return `Sei collegato come ${email}, che non è l'account proprietario (succede dopo un login Google per il quiz): esci e rientra con il tuo account.`;
+}
+
 export async function updateSession(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   // Questi header li imposta SOLO questo proxy (sotto, dopo getUser()), e
@@ -109,17 +119,14 @@ export async function updateSession(request: NextRequest) {
     const consentito =
       isOwnerUser || (isTesterUser && lettura && !inizia(pathname, API_VIETATE_AL_TESTER));
     if (!consentito) {
-      return NextResponse.json(
-        { error: user ? "Non autorizzato." : "Non autenticato." },
-        { status: user ? 403 : 401 }
-      );
+      return NextResponse.json({ error: messaggioAccessoNegato(user?.email, isTesterUser) }, { status: user ? 403 : 401 });
     }
   }
 
   // Tester sulle pagine private: può navigare (GET) ma non inviare nulla.
   // Le Server Action sono POST verso la pagina, quindi finiscono qui.
   if (isProtected && isTesterUser && !lettura) {
-    return NextResponse.json({ error: "Utente tester in sola lettura." }, { status: 403 });
+    return NextResponse.json({ error: messaggioAccessoNegato(user?.email, true) }, { status: 403 });
   }
 
   if (isProtected && !isOwnerUser && !isTesterUser) {
