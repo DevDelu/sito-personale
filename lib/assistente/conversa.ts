@@ -2,19 +2,29 @@ import "server-only";
 import { completa, type MessaggioChat } from "./groq";
 import { DEFINIZIONI, eseguiStrumento, type Contesto } from "./strumenti";
 import { giornoSettimana } from "./date";
+import type { Turno } from "./storia";
+
+export type Canale = "telegram" | "voce";
 
 // Massimo giri LLM ↔ strumenti per messaggio: tiene la risposta sotto il
 // timeout della funzione Vercel e i consumi dentro il free tier.
 const MAX_GIRI = 5;
 
-function promptDiSistema(ctx: Contesto): string {
+const STILE: Record<Canale, string> = {
+  telegram:
+    "Rispondi in italiano, in modo diretto e breve: è una chat su telefono. Niente Markdown, niente tabelle; elenchi semplici con trattini se servono.",
+  voce:
+    "Stai parlando a voce: la risposta viene letta ad alta voce. Frasi brevi e naturali, massimo tre o quattro, come in una telefonata. Niente elenchi, simboli, emoji o Markdown. Importi arrotondati e detti come si direbbero (\"circa trecentoventi euro\"). Se l'elenco sarebbe lungo, riassumi i punti principali e offri di approfondire.",
+};
+
+function promptDiSistema(ctx: Contesto, canale: Canale): string {
   const spese = ctx.categorie.filter((c) => c.tipo === "spesa").map((c) => c.nome);
   const entrate = ctx.categorie.filter((c) => c.tipo === "entrata").map((c) => c.nome);
   return [
     "Sei l'assistente personale di Lorenzo dentro Radar, la sua app privata (spese, investimenti, alimentazione).",
-    "Rispondi in italiano, in modo diretto e breve: è una chat su telefono. Niente Markdown, niente tabelle; elenchi semplici con trattini se servono.",
+    STILE[canale],
     `Oggi è ${giornoSettimana(ctx.oggi)} ${ctx.oggi} (fuso Europe/Rome). Converti tu le date relative ("ieri", "sabato scorso", "questo mese").`,
-    "Quando Lorenzo dice di aver speso o incassato qualcosa, chiama proponi_movimento (una volta per movimento). Non dire che è salvato: comparirà un bottone di conferma.",
+    "Quando Lorenzo dice di aver speso o incassato qualcosa, chiama proponi_movimento (una volta per movimento). Non dire che è salvato: comparirà un bottone di conferma, oppure Lorenzo può dire \"conferma\" e allora usi gestisci_bozze_in_attesa.",
     `Categorie spesa: ${spese.join(", ") || "nessuna"}. Categorie entrata: ${entrate.join(", ") || "nessuna"}. Scegli la più adatta tra queste; se nessuna va bene ometti la categoria.`,
     "Per domande sui suoi dati usa SEMPRE gli strumenti: non inventare cifre. Se i dati non bastano dillo.",
     "Puoi dare consigli e analisi (andamento spese, portafoglio, alimentazione), ma non sei un consulente finanziario autorizzato: niente ordini di comprare/vendere, ragiona su dati e rischi.",
@@ -22,9 +32,17 @@ function promptDiSistema(ctx: Contesto): string {
   ].join("\n");
 }
 
-export async function conversa(testoUtente: string, ctx: Contesto): Promise<string> {
+// `storia`: scambi precedenti della stessa conversazione (solo testo), per
+// le domande che si appoggiano a quelle prima ("e il mese prima?").
+export async function conversa(
+  testoUtente: string,
+  storia: Turno[],
+  ctx: Contesto,
+  canale: Canale
+): Promise<string> {
   const messaggi: MessaggioChat[] = [
-    { role: "system", content: promptDiSistema(ctx) },
+    { role: "system", content: promptDiSistema(ctx, canale) },
+    ...storia,
     { role: "user", content: testoUtente },
   ];
 

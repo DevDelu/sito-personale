@@ -3,6 +3,7 @@ import { inviaMessaggio, modificaMessaggio, rispondiBottone, scaricaFile, staScr
 import { trascrivi, LimiteGroq } from "@/lib/assistente/groq";
 import { conversa } from "@/lib/assistente/conversa";
 import { chiudiBozza, segnaUpdate } from "@/lib/assistente/bozze";
+import { leggiStoriaTelegram, salvaScambioTelegram, svuotaStoriaTelegram } from "@/lib/assistente/storia-db";
 import { oggiRoma } from "@/lib/assistente/date";
 import { getCategorie } from "@/lib/spese/queries";
 import type { Contesto } from "@/lib/assistente/strumenti";
@@ -41,7 +42,8 @@ const AIUTO = [
   "- \"quante calorie ho mangiato oggi?\"",
   "- \"vorrei il grafico delle spese anche per settimana\" (diventa un feedback per gli agenti)",
   "",
-  "Le spese le salvo solo dopo il tuo tap su Conferma.",
+  "Le spese le salvo solo dopo il tuo tap su Conferma (o se mi scrivi \"conferma\").",
+  "Ricordo la conversazione per 30 minuti; /nuova per ricominciare da zero.",
 ].join("\n");
 
 export async function POST(request: Request) {
@@ -92,6 +94,12 @@ async function gestisciMessaggio(msg: Messaggio) {
     return;
   }
 
+  if (msg.text?.startsWith("/nuova")) {
+    await svuotaStoriaTelegram();
+    await inviaMessaggio(chatId, "Ok, ricominciamo da zero.");
+    return;
+  }
+
   await staScrivendo(chatId);
   let richiesta = msg.text?.trim() ?? "";
   const audio = msg.voice ?? msg.audio;
@@ -113,9 +121,11 @@ async function gestisciMessaggio(msg: Messaggio) {
     return;
   }
 
-  const ctx: Contesto = { oggi: oggiRoma(), categorie: await getCategorie(), bozze: [] };
-  const risposta = await conversa(richiesta, ctx);
+  const [categorie, storia] = await Promise.all([getCategorie(), leggiStoriaTelegram()]);
+  const ctx: Contesto = { oggi: oggiRoma(), categorie, bozze: [], bozzeChiuse: [] };
+  const risposta = await conversa(richiesta, storia, ctx, "telegram");
   await inviaMessaggio(chatId, risposta);
+  await salvaScambioTelegram(richiesta, risposta).catch((e) => console.error("[telegram] storia", e));
   for (const b of ctx.bozze) {
     await inviaMessaggio(chatId, b.riepilogo, [
       [

@@ -6,6 +6,7 @@ import { getPastiByData, getRiepilogoTdee } from "@/lib/alimentazione/queries";
 import { inserisciFeedback } from "@/lib/feedback/queries";
 import { FEEDBACK_TIPI, type FeedbackTipo } from "@/lib/feedback/types";
 import { categoriaPerNome } from "./categorie";
+import { chiudiBozza } from "./bozze";
 import { dataValida, formattaEuro } from "./date";
 import type { DefinizioneStrumento } from "./groq";
 
@@ -20,7 +21,13 @@ export type Contesto = {
   oggi: string;
   categorie: Categoria[];
   bozze: { id: string; riepilogo: string }[];
+  // Bozze chiuse a voce in questo messaggio: la UI aggiorna le card.
+  bozzeChiuse: { id: string; stato: "confermata" | "annullata" }[];
 };
+
+// Finestra in cui "conferma" a voce vale per le bozze ancora aperte: oltre,
+// una bozza dimenticata non si conferma per sbaglio giorni dopo.
+const FINESTRA_CONFERMA_MIN = 30;
 
 type Args = Record<string, unknown>;
 
@@ -44,6 +51,19 @@ export const DEFINIZIONI: DefinizioneStrumento[] = [
           descrizione: { type: "string" },
         },
         required: ["tipo", "titolo", "importo"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "gestisci_bozze_in_attesa",
+      description:
+        "Conferma o annulla i movimenti proposti negli ultimi minuti e non ancora confermati. Usala SOLO se Lorenzo lo chiede esplicitamente (\"sì, conferma\", \"salvale\", \"annulla\").",
+      parameters: {
+        type: "object",
+        properties: { azione: { type: "string", enum: ["conferma", "annulla"] } },
+        required: ["azione"],
       },
     },
   },
@@ -124,7 +144,7 @@ async function proponiMovimento(args: Args, ctx: Contesto) {
   const categoria = categoriaPerNome(testo(args.categoria) || undefined, ctx.categorie, tipo);
   const admin = createAdminClient();
   const { data: riga, error } = await admin
-    .from("telegram_bozze")
+    .from("assistente_bozze")
     .insert({
       tipo,
       titolo,
@@ -142,6 +162,30 @@ async function proponiMovimento(args: Args, ctx: Contesto) {
     `📅 ${data}  🏷️ ${categoria.nome}${categoria.riconosciuta ? "" : " (categoria da verificare)"}`;
   ctx.bozze.push({ id: riga.id, riepilogo });
   return { bozza_creata: true, riepilogo, nota: "Lorenzo vedrà i bottoni Conferma/Annulla: non chiedere altra conferma." };
+}
+
+async function gestisciBozze(args: Args, ctx: Contesto) {
+  const azione = args.azione === "annulla" ? "annulla" : args.azione === "conferma" ? "conferma" : null;
+  if (!azione) return { errore: "Azione non valida." };
+  const admin = createAdminClient();
+  const da = new Date(Date.now() - FINESTRA_CONFERMA_MIN * 60_000).toISOString();
+  const { data, error } = await admin
+    .from("assistente_bozze")
+    .select("id, titolo, importo")
+    .eq("stato", "in_attesa")
+    .gte("created_at", da)
+    .order("created_at");
+  if (error) throw new Error(error.message);
+  if (!data?.length) return { nessuna_bozza_in_attesa: true };
+  const fatte: string[] = [];
+  for (const b of data) {
+    const esito = await chiudiBozza(b.id, azione);
+    if (esito.ok) {
+      fatte.push(`${b.titolo} ${formattaEuro(Number(b.importo))}`);
+      ctx.bozzeChiuse.push({ id: b.id, stato: esito.stato });
+    }
+  }
+  return { azione, movimenti: fatte };
 }
 
 async function riepilogoMovimenti(args: Args, ctx: Contesto) {
@@ -262,6 +306,8 @@ export async function eseguiStrumento(nome: string, argomenti: string, ctx: Cont
   switch (nome) {
     case "proponi_movimento":
       return proponiMovimento(args, ctx);
+    case "gestisci_bozze_in_attesa":
+      return gestisciBozze(args, ctx);
     case "riepilogo_movimenti":
       return riepilogoMovimenti(args, ctx);
     case "cerca_movimenti":

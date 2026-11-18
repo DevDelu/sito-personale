@@ -42,6 +42,7 @@ await chiama("setWebhook", {
 await chiama("setMyCommands", {
   commands: [
     { command: "aiuto", description: "Cosa posso fare" },
+    { command: "nuova", description: "Nuova conversazione (dimentica il contesto)" },
   ],
 });
 const info = await chiama("getWebhookInfo", {});

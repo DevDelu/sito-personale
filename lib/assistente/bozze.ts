@@ -12,7 +12,7 @@ export type EsitoBozza =
 export async function chiudiBozza(id: string, azione: "conferma" | "annulla"): Promise<EsitoBozza> {
   const admin = createAdminClient();
   const { data: bozza, error } = await admin
-    .from("telegram_bozze")
+    .from("assistente_bozze")
     .update({ stato: azione === "conferma" ? "confermata" : "annullata" })
     .eq("id", id)
     .eq("stato", "in_attesa")
@@ -31,16 +31,16 @@ export async function chiudiBozza(id: string, azione: "conferma" | "annulla"): P
       descrizione: bozza.descrizione,
       categoria_id: bozza.categoria_id,
       data: bozza.data,
-      fonte: "telegram",
+      fonte: "assistente",
     })
     .select("id")
     .single();
   if (errIns) {
     // Rimette la bozza in attesa: Lorenzo può ritoccare Conferma.
-    await admin.from("telegram_bozze").update({ stato: "in_attesa" }).eq("id", id);
+    await admin.from("assistente_bozze").update({ stato: "in_attesa" }).eq("id", id);
     throw new Error(errIns.message);
   }
-  await admin.from("telegram_bozze").update({ movimento_id: mov.id }).eq("id", id);
+  await admin.from("assistente_bozze").update({ movimento_id: mov.id }).eq("id", id);
   revalidatePath("/spese");
   return { ok: true, stato: "confermata", titolo: bozza.titolo };
 }
