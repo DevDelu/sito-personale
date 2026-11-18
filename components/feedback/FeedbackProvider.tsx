@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { CheckCircle2, MessageCircle } from "lucide-react";
 import { Toast } from "@/components/toast";
 import { FeedbackSheet, type BozzaFeedback } from "@/components/feedback/FeedbackSheet";
-import { FeedbackPulsante } from "@/components/feedback/FeedbackAccessi";
+import { apriAssistente } from "@/lib/assistente/bus";
 import { segnaNonRisolto, segnaVerificato } from "@/app/(private)/feedback/actions";
 import {
   accodaFeedback,
@@ -382,7 +382,11 @@ export function FeedbackProvider({ owner }: { owner: boolean }) {
     const stato = leggiLocale<StatoSuggerimento>(CHIAVE_SUGGERIMENTO, STATO_SUGGERIMENTO_INIZIALE);
     scriviLocale(CHIAVE_SUGGERIMENTO, dopoAccettato(stato));
     suggerimentoRef.current = null;
-    apriFeedback({ origine: "suggerimento", tipo: "problema", attrito: evento, pagina: evento.pagina });
+    setSuggerimento(null);
+    // Il feedback dopo un errore si dà a voce (scelta di Lorenzo, nov 2026):
+    // l'assistente si apre sulla pagina, chiede cosa è successo e lo registra
+    // con l'errore allegato. Il tap sblocca l'audio su iOS (assistente/bus.ts).
+    apriAssistente({ pagina: evento.pagina, attrito: evento });
   }
 
   // --- Ciclo di verifica (solo owner: il tester non può rispondere) -------
@@ -468,12 +472,8 @@ export function FeedbackProvider({ owner }: { owner: boolean }) {
 
   // Il pulsante sparisce mentre lo sheet, la barra "Tocca l'elemento" o un
   // avviso in basso sono visibili, e durante la sessione di allenamento.
-  const mostraPulsante = !apertura && !suggerimento && !verifica && !inSessioneAllenamento(pathname);
-
   return (
     <>
-      {mostraPulsante && <FeedbackPulsante />}
-
       {apertura && !puntando && (
         <FeedbackSheet
           bozza={bozza}

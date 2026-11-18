@@ -5,6 +5,7 @@ import { LimiteGroq, trascrivi } from "@/lib/assistente/groq";
 import { validaStoria } from "@/lib/assistente/storia";
 import type { Contesto } from "@/lib/assistente/strumenti";
 import { trascrizioneValida } from "@/lib/assistente/voce";
+import { attritoValido, paginaValida } from "@/lib/assistente/pagina";
 import { getCategorie } from "@/lib/spese/queries";
 
 // Un turno della conversazione a voce (/assistente): audio registrato dal
@@ -12,6 +13,15 @@ import { getCategorie } from "@/lib/spese/queries";
 // La storia vive nel browser: nessuna tabella, sparisce chiudendo la pagina.
 
 export const maxDuration = 60;
+
+function messaggioErrore(e: unknown): string {
+  const m = e instanceof Error ? e.message : String(e);
+  if (/GROQ_API_KEY/.test(m)) return "Manca la chiave GROQ_API_KEY su Vercel (poi serve un Redeploy).";
+  if (/assistente_bozze|assistente_storia|relation .* does not exist/i.test(m)) {
+    return "Manca la migration 035 su Supabase (supabase/035_assistente.sql).";
+  }
+  return m.slice(0, 300) || "Errore sconosciuto.";
+}
 
 // Le funzioni Vercel accettano corpi fino a ~4,5 MB; il client chiude la
 // registrazione a 60 s, che in Opus/AAC sta ben sotto.
@@ -47,7 +57,21 @@ export async function POST(request: Request) {
     }
     if (!richiesta) return Response.json({ vuoto: true });
 
-    const ctx: Contesto = { oggi: oggiRoma(), categorie: await getCategorie(), bozze: [], bozzeChiuse: [] };
+    let attrito;
+    try {
+      attrito = attritoValido(JSON.parse(String(form.get("attrito") ?? "null")));
+    } catch {
+      attrito = undefined;
+    }
+    const ctx: Contesto = {
+      oggi: oggiRoma(),
+      categorie: await getCategorie(),
+      bozze: [],
+      bozzeChiuse: [],
+      canale: "voce",
+      pagina: paginaValida(form.get("pagina")),
+      attrito,
+    };
     const risposta = await conversa(richiesta, storia, ctx, "voce");
     return Response.json({ trascrizione, richiesta, risposta, bozze: ctx.bozze, bozzeChiuse: ctx.bozzeChiuse });
   } catch (e) {
@@ -55,6 +79,8 @@ export async function POST(request: Request) {
       return Response.json({ error: "Limite gratuito raggiunto per ora: riprova tra qualche minuto." }, { status: 429 });
     }
     console.error("[assistente] parla", e);
-    return Response.json({ error: "Qualcosa è andato storto." }, { status: 500 });
+    // Route solo owner: il motivo vero aiuta Lorenzo (e chi lo aiuta) a
+    // capire cosa sistemare, invece di un generico "qualcosa è andato storto".
+    return Response.json({ error: messaggioErrore(e) }, { status: 500 });
   }
 }

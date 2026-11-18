@@ -5,6 +5,7 @@ import { Check, Keyboard, Mic, MicOff, RotateCcw, Send, Volume2, VolumeX, X } fr
 import { useConversazioneVocale, type FaseVoce, type RispostaTurno } from "@/hooks/useConversazioneVocale";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { MAX_TURNI, type Turno } from "@/lib/assistente/storia";
+import type { AttritoEvento } from "@/lib/feedback/types";
 
 type StatoBozza = "in_attesa" | "confermata" | "annullata" | "invio";
 type Bozza = { id: string; riepilogo: string; stato: StatoBozza };
@@ -28,7 +29,22 @@ const ETICHETTE: Record<FaseVoce, string> = {
 
 let prossimoId = 1;
 
-export function ParlaConRadar() {
+type Props = {
+  // Pagina da cui è stato aperto l'assistente (pulsante centrale): va con
+  // ogni turno, così un feedback detto a voce sa a quale pagina si riferisce.
+  pagina?: string;
+  // Errore che ha fatto comparire l'invito "Qualcosa non va?": l'assistente
+  // apre chiedendo cosa è successo.
+  attrito?: AttritoEvento;
+  // Dentro lo sheet si mette in ascolto da solo (il tap sul pulsante che
+  // l'ha aperto ha già sbloccato l'audio).
+  avvioAutomatico?: boolean;
+  inSheet?: boolean;
+};
+
+const DOMANDA_ATTRITO = "Ho visto che qualcosa non è andato. Cosa stavi facendo? Raccontamelo e lo passo al team.";
+
+export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inSheet = false }: Props = {}) {
   const [messaggi, setMessaggi] = useState<Messaggio[]>([]);
   const [errore, setErrore] = useState<string | null>(null);
   const [tastiera, setTastiera] = useState(false);
@@ -60,6 +76,8 @@ export function ParlaConRadar() {
         aggiungi({ ruolo: "user", testo: dati.testo });
       }
       form.append("storia", JSON.stringify(storiaRef.current));
+      if (pagina) form.append("pagina", pagina);
+      if (attrito) form.append("attrito", JSON.stringify(attrito));
 
       const res = await fetch("/api/assistente/parla", { method: "POST", body: form });
       const json = (await res.json().catch(() => ({}))) as Partial<RispostaTurno> & { error?: string; vuoto?: boolean };
@@ -81,7 +99,7 @@ export function ParlaConRadar() {
       ].slice(-MAX_TURNI);
       return r;
     },
-    [aggiungi, aggiornaBozze]
+    [aggiungi, aggiornaBozze, pagina, attrito]
   );
 
   const voce = useConversazioneVocale({ invia, onErrore: setErrore });
@@ -91,6 +109,23 @@ export function ParlaConRadar() {
   useEffect(() => {
     fondoRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messaggi, voce.fase]);
+
+  // Avvio automatico (sheet): una volta sola, anche col doppio effetto di
+  // React in sviluppo.
+  const avviatoRef = useRef(false);
+  const { avvia, annuncia } = voce;
+  useEffect(() => {
+    if (!avvioAutomatico || avviatoRef.current) return;
+    avviatoRef.current = true;
+    async function parti() {
+      const ok = await avvia();
+      if (!attrito) return;
+      aggiungi({ ruolo: "assistant", testo: DOMANDA_ATTRITO });
+      storiaRef.current = [{ role: "assistant", content: DOMANDA_ATTRITO }];
+      if (ok) annuncia(DOMANDA_ATTRITO);
+    }
+    void parti();
+  }, [avvioAutomatico, attrito, avvia, annuncia, aggiungi]);
 
   async function gestisciBozza(id: string, azione: "conferma" | "annulla") {
     aggiornaBozze(new Map([[id, "invio"]]));
@@ -130,8 +165,21 @@ export function ParlaConRadar() {
   const scala = 1 + (voce.fase === "ascolto" || voce.fase === "registro" ? voce.livello * 0.35 : 0);
 
   return (
-    <div className="flex min-h-[calc(100dvh-12rem)] flex-1 flex-col md:min-h-[70vh]">
-      <div data-fb-area="assistente.conversazione" className="flex flex-1 flex-col gap-3 pb-4">
+    <div
+      className={
+        inSheet
+          ? "flex h-[min(78dvh,680px)] flex-col"
+          : "flex min-h-[calc(100dvh-12rem)] flex-1 flex-col md:min-h-[70vh]"
+      }
+    >
+      <div
+        data-fb-area="assistente.conversazione"
+        className={`flex flex-1 flex-col gap-3 pb-4 ${inSheet ? "min-h-0 overflow-y-auto overscroll-contain px-4 pt-2" : ""}`}
+        // Nello sheet il pannello si chiude trascinandolo in giù: scorrendo la
+        // conversazione non deve partire il trascinamento (si chiude dal
+        // grabber, dai controlli o col tocco fuori).
+        onPointerDown={inSheet ? (e) => e.stopPropagation() : undefined}
+      >
         {messaggi.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 py-6 text-center">
             <p className="max-w-xs text-sm text-muted">
@@ -214,9 +262,14 @@ export function ParlaConRadar() {
 
       <div
         data-fb-area="assistente.controlli"
-        // Sopra la tab bar su mobile (stesso calcolo di ActionBar), in linea su desktop.
-        style={{ bottom: "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom))" }}
-        className="sticky z-20 -mx-4 flex flex-col items-center gap-3 border-t border-[var(--app-hairline)] bg-background/95 px-4 pb-3 pt-4 backdrop-blur md:static md:mx-0 md:rounded-2xl md:border"
+        // Pagina: sopra la tab bar su mobile (stesso calcolo di ActionBar), in
+        // linea su desktop. Sheet: in fondo al pannello, che copre la tab bar.
+        style={inSheet ? undefined : { bottom: "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom))" }}
+        className={
+          inSheet
+            ? "flex shrink-0 flex-col items-center gap-3 border-t border-[var(--app-hairline)] px-4 pb-3 pt-4"
+            : "sticky z-20 -mx-4 flex flex-col items-center gap-3 border-t border-[var(--app-hairline)] bg-background/95 px-4 pb-3 pt-4 backdrop-blur md:static md:mx-0 md:rounded-2xl md:border"
+        }
       >
         {errore ? (
           <p role="alert" className="text-center text-sm text-spesa">

@@ -6,7 +6,7 @@ import { join } from "node:path";
 // Regola di CLAUDE.md: nessun testo sotto i 12px nell'area privata, tranne le
 // etichette della tab bar. Le eccezioni sono elencate qui, esplicite.
 const ECCEZIONI = new Set([
-  "components/shell/QuickAddButton.tsx", // etichetta della tab bar
+  "components/shell/ParlaButton.tsx", // etichetta della tab bar
   "components/shell/TabBar.tsx", // etichette della tab bar (11px)
   "components/sidebar.tsx", // solo desktop
   "components/feedback/FeedbackAccessi.tsx", // solo desktop (tasto F)
