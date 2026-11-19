@@ -192,3 +192,17 @@ test("/agenda: i link dei giorni del mese sono alti almeno 44px", async ({ page 
   );
   expect(bassi, "link dei giorni sotto 44px").toEqual([]);
 });
+
+// Regressione #391: i chip della legenda "Andamento per categoria" in Spese
+// devono essere alti almeno 44px su telefono.
+test("/spese: i chip della legenda per categoria sono alti almeno 44px su telefono", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/spese", { waitUntil: "domcontentloaded" });
+  await page.waitForLoadState("networkidle").catch(() => {});
+  const chip = page.locator('[data-fb-area="spese.overview.categorie-trend"] button[aria-pressed]');
+  const n = await chip.count();
+  for (let i = 0; i < n; i++) {
+    const box = await chip.nth(i).boundingBox();
+    expect(box?.height ?? 0, "altezza chip").toBeGreaterThanOrEqual(43.5);
+  }
+});
