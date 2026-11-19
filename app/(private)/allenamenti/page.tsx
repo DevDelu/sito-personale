@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Play } from "lucide-react";
+import { oggiItaliaISO } from "@/lib/cron/data-italia";
 import { getSchedeConMeta, getSessioni } from "@/lib/allenamento/queries";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
@@ -31,11 +32,9 @@ function formatData(iso: string): string {
 export default async function AllenamentoPage() {
   const [schede, sessioni] = await Promise.all([getSchedeConMeta(), getSessioni()]);
 
-  const oggi = new Date();
-  const sessioniMese = sessioni.filter((s) => {
-    const d = new Date(`${s.data}T00:00:00Z`);
-    return d.getUTCFullYear() === oggi.getUTCFullYear() && d.getUTCMonth() === oggi.getUTCMonth();
-  });
+  // Mese corrente nel fuso Europe/Rome: in UTC la notte del 1 del mese contava ancora il mese scorso.
+  const meseCorrente = oggiItaliaISO().slice(0, 7);
+  const sessioniMese = sessioni.filter((s) => s.data.slice(0, 7) === meseCorrente);
   const ultimaSessione = sessioni[0] ?? null;
   const nomeSchedaUltima = ultimaSessione
     ? (schede.find((s) => s.id === ultimaSessione.scheda_id)?.nome ?? "Scheda eliminata")
