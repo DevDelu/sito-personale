@@ -147,14 +147,18 @@ export function AlimentoSelector({
           aria-autocomplete="list"
           aria-expanded={mostraLista}
           aria-controls={mostraLista ? listaId : undefined}
+          aria-haspopup="listbox"
           className="field-input w-full bg-surface"
         />
         {mostraLista && (
-          <div id={listaId} className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-border bg-surface shadow-lg animate-slide-down">
+          <div className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-border bg-surface shadow-lg animate-slide-down">
+            <div id={listaId} role="listbox" aria-label="Alimenti trovati">
             {risultati.map((a) => (
               <button
                 key={a.id}
                 type="button"
+                role="option"
+                aria-selected={a.id === value}
                 onClick={() => selezionaAlimento(a)}
                 className="flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-surface-hover"
               >
@@ -162,6 +166,7 @@ export function AlimentoSelector({
                 <span className="font-figures text-[13px] text-muted">{a.kcal_100g} kcal/100g</span>
               </button>
             ))}
+            </div>
             <button
               type="button"
               onClick={apriCreazione}
