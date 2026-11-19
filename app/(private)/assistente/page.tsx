@@ -14,7 +14,6 @@ export default function AssistentePage() {
         <h1 className="font-display text-2xl font-semibold tracking-tight">Assistente</h1>
         <p className="text-sm text-muted">Parla con Radar: spese, numeri, idee per l&apos;app.</p>
       </div>
-      <h1 className="sr-only md:hidden">Assistente</h1>
       <div data-fb-area="assistente.pagina" className="contents">
         <ParlaConRadar />
       </div>
