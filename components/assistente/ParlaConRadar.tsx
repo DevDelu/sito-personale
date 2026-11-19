@@ -103,6 +103,17 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
 
   const voce = useConversazioneVocale({ invia, onErrore: setErrore });
   const attiva = voce.fase !== "spento";
+  // iOS non riduce dvh quando si apre la tastiera: nello sheet l'altezza segue
+  // il viewport visibile, così la barra di scrittura resta sopra la tastiera.
+  const [altezzaVisibile, setAltezzaVisibile] = useState<number | null>(null);
+  useEffect(() => {
+    const vv = typeof window !== "undefined" ? window.visualViewport : null;
+    if (!inSheet || !vv) return;
+    const aggiorna = () => setAltezzaVisibile(Math.round(vv.height));
+    aggiorna();
+    vv.addEventListener("resize", aggiorna);
+    return () => vv.removeEventListener("resize", aggiorna);
+  }, [inSheet]);
   useWakeLock(attiva);
 
   useEffect(() => {
@@ -165,6 +176,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
 
   return (
     <div
+      style={inSheet && altezzaVisibile ? { maxHeight: altezzaVisibile - 16 } : undefined}
       className={
         inSheet
           ? "flex h-[min(78dvh,680px)] flex-col"
@@ -189,7 +201,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
                 <button
                   key={es}
                   type="button"
-                  className="rounded-full border border-border px-3 py-1.5 text-[13px] text-muted active:bg-surface-hover"
+                  className="min-h-11 rounded-full border border-border px-4 text-[13px] text-muted active:bg-surface-hover"
                   onClick={() => void voce.inviaTesto(es)}
                 >
                   {es}
@@ -286,14 +298,14 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
             // Scrivere e parlare insieme non ha senso: toccando la barra il
             // microfono si chiude (su iOS la tastiera si apre dal tocco).
             onFocus={() => {
-              if (attiva) voce.ferma();
+              if (voce.fase === "ascolto" || voce.fase === "registro") voce.ferma();
             }}
             placeholder="Scrivi a Radar…"
             enterKeyHint="send"
             className="min-h-11 flex-1 rounded-full border border-border bg-surface px-4 text-[16px] outline-none focus:border-accent"
             aria-label="Messaggio"
           />
-          <button type="submit" className="btn-primary !px-3" aria-label="Invia" disabled={!bozza.trim()}>
+          <button type="submit" className="btn-primary min-w-11 !px-3" aria-label="Invia" disabled={!bozza.trim()}>
             <Send className="h-4 w-4" />
           </button>
         </form>
