@@ -216,7 +216,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
                 <p
                   className={
                     m.ruolo === "user"
-                      ? "max-w-[85%] rounded-2xl rounded-br-md bg-accent/15 px-3.5 py-2 text-[15px]"
+                      ? "importo max-w-[85%] rounded-2xl rounded-br-md bg-accent/15 px-3.5 py-2 text-[15px]"
                       : "importo max-w-[90%] whitespace-pre-line rounded-2xl rounded-bl-md bg-surface px-3.5 py-2 text-[15px] shadow-sm"
                   }
                 >
@@ -260,10 +260,11 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
               </li>
             ))}
             {voce.fase === "penso" ? (
-              <li className="flex items-center gap-1.5 px-1 text-muted" aria-label="Sto pensando">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-muted" />
-                <span className="h-2 w-2 animate-pulse rounded-full bg-muted [animation-delay:150ms]" />
-                <span className="h-2 w-2 animate-pulse rounded-full bg-muted [animation-delay:300ms]" />
+              <li className="flex items-center gap-1.5 px-1 text-muted">
+                <span className="sr-only">Sto pensando</span>
+                <span aria-hidden className="h-2 w-2 animate-pulse rounded-full bg-muted" />
+                <span aria-hidden className="h-2 w-2 animate-pulse rounded-full bg-muted [animation-delay:150ms]" />
+                <span aria-hidden className="h-2 w-2 animate-pulse rounded-full bg-muted [animation-delay:300ms]" />
               </li>
             ) : null}
           </ul>
