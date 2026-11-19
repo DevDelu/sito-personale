@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, Keyboard, Mic, MicOff, RotateCcw, Send, Volume2, VolumeX, X } from "lucide-react";
+import { Check, Mic, MicOff, RotateCcw, Send, Volume2, VolumeX, X } from "lucide-react";
 import { useConversazioneVocale, type FaseVoce, type RispostaTurno } from "@/hooks/useConversazioneVocale";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { MAX_TURNI, type Turno } from "@/lib/assistente/storia";
@@ -47,7 +47,6 @@ const DOMANDA_ATTRITO = "Ho visto che qualcosa non è andato. Cosa stavi facendo
 export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inSheet = false }: Props = {}) {
   const [messaggi, setMessaggi] = useState<Messaggio[]>([]);
   const [errore, setErrore] = useState<string | null>(null);
-  const [tastiera, setTastiera] = useState(false);
   const [bozza, setBozza] = useState("");
   const storiaRef = useRef<Turno[]>([]);
   const fondoRef = useRef<HTMLDivElement>(null);
@@ -104,6 +103,17 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
 
   const voce = useConversazioneVocale({ invia, onErrore: setErrore });
   const attiva = voce.fase !== "spento";
+  // iOS non riduce dvh quando si apre la tastiera: nello sheet l'altezza segue
+  // il viewport visibile, così la barra di scrittura resta sopra la tastiera.
+  const [altezzaVisibile, setAltezzaVisibile] = useState<number | null>(null);
+  useEffect(() => {
+    const vv = typeof window !== "undefined" ? window.visualViewport : null;
+    if (!inSheet || !vv) return;
+    const aggiorna = () => setAltezzaVisibile(Math.round(vv.height));
+    aggiorna();
+    vv.addEventListener("resize", aggiorna);
+    return () => vv.removeEventListener("resize", aggiorna);
+  }, [inSheet]);
   useWakeLock(attiva);
 
   useEffect(() => {
@@ -166,6 +176,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
 
   return (
     <div
+      style={inSheet && altezzaVisibile ? { maxHeight: altezzaVisibile - 16 } : undefined}
       className={
         inSheet
           ? "flex h-[min(78dvh,680px)] flex-col"
@@ -190,7 +201,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
                 <button
                   key={es}
                   type="button"
-                  className="rounded-full border border-border px-3 py-1.5 text-[13px] text-muted active:bg-surface-hover"
+                  className="min-h-11 rounded-full border border-border px-4 text-[13px] text-muted active:bg-surface-hover"
                   onClick={() => void voce.inviaTesto(es)}
                 >
                   {es}
@@ -280,23 +291,27 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
           <p className="text-center text-sm text-muted">Questo browser non supporta la voce: puoi scrivere.</p>
         ) : null}
 
-        {tastiera || !voce.supportato ? (
-          <form onSubmit={inviaScritto} className="flex w-full items-center gap-2">
-            <input
-              value={bozza}
-              onChange={(e) => setBozza(e.target.value)}
-              placeholder="Scrivi a Radar…"
-              enterKeyHint="send"
-              className="min-h-11 flex-1 rounded-full border border-border bg-surface px-4 text-[16px] outline-none focus:border-accent"
-              aria-label="Messaggio"
-            />
-            <button type="submit" className="btn-primary !px-3" aria-label="Invia" disabled={!bozza.trim()}>
-              <Send className="h-4 w-4" />
-            </button>
-          </form>
-        ) : null}
+        <form onSubmit={inviaScritto} className="flex w-full items-center gap-2">
+          <input
+            value={bozza}
+            onChange={(e) => setBozza(e.target.value)}
+            // Scrivere e parlare insieme non ha senso: toccando la barra il
+            // microfono si chiude (su iOS la tastiera si apre dal tocco).
+            onFocus={() => {
+              if (voce.fase === "ascolto" || voce.fase === "registro") voce.ferma();
+            }}
+            placeholder="Scrivi a Radar…"
+            enterKeyHint="send"
+            className="min-h-11 flex-1 rounded-full border border-border bg-surface px-4 text-[16px] outline-none focus:border-accent"
+            aria-label="Messaggio"
+          />
+          <button type="submit" className="btn-primary min-w-11 !px-3" aria-label="Invia" disabled={!bozza.trim()}>
+            <Send className="h-4 w-4" />
+          </button>
+        </form>
 
-        <div className="flex w-full items-center justify-between">
+        {/* Tre colonne: il cerchio resta fermo qualunque pulsante compaia ai lati. */}
+        <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center">
           <div className="flex gap-1">
             <button
               type="button"
@@ -306,15 +321,6 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
               aria-pressed={voce.voceAttiva}
             >
               {voce.voceAttiva ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-            </button>
-            <button
-              type="button"
-              className="btn-icon"
-              onClick={() => setTastiera((t) => !t)}
-              aria-label="Scrivi invece di parlare"
-              aria-pressed={tastiera}
-            >
-              <Keyboard className="h-5 w-5" />
             </button>
           </div>
 
@@ -343,7 +349,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
             <span />
           )}
 
-          <div className="flex gap-1">
+          <div className="flex justify-end gap-1">
             {attiva ? (
               <button type="button" className="btn-icon" onClick={voce.ferma} aria-label="Chiudi il microfono">
                 <MicOff className="h-5 w-5" />

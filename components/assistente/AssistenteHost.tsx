@@ -19,7 +19,7 @@ export function AssistenteHost() {
 
   if (!apertura) return null;
   return (
-    <Sheet onClose={() => setApertura(null)} area="shell.assistente" className="!p-0">
+    <Sheet onClose={() => setApertura(null)} area="shell.assistente" posizione="alto" className="!p-0">
       <h2 className="sr-only">Assistente</h2>
       <ParlaConRadar
         key={apertura.chiave}
