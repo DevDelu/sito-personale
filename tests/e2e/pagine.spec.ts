@@ -25,6 +25,7 @@ const PAGINE = [
   "/impostazioni",
   "/altro",
   "/feedback",
+  "/assistente",
 ];
 
 // Gli errori di rete si giudicano dalle risposte (che hanno l'URL), non dai
@@ -60,8 +61,8 @@ for (const percorso of PAGINE) {
 
     // Barra superiore (PageHeader) e tab bar presenti.
     await expect(page.locator(".app-page-header").first(), "PageHeader").toBeVisible();
-    // Ogni pagina ha un titolo (h1) per i lettori di schermo.
-    expect(await page.getByRole("heading", { level: 1 }).count(), "titolo h1").toBeGreaterThan(0);
+    // Ogni pagina ha esattamente un titolo (h1) visibile ai lettori di schermo.
+    expect(await page.getByRole("heading", { level: 1 }).count(), "un solo titolo h1").toBe(1);
     const tabBar = page.getByRole("navigation", { name: "Navigazione principale" });
     await expect(tabBar, "tab bar").toBeVisible();
 
@@ -190,4 +191,18 @@ test("/agenda: i link dei giorni del mese sono alti almeno 44px", async ({ page 
     els.map((el) => Math.round(el.getBoundingClientRect().height)).filter((h) => h < 44)
   );
   expect(bassi, "link dei giorni sotto 44px").toEqual([]);
+});
+
+// Regressione #391: i chip della legenda "Andamento per categoria" in Spese
+// devono essere alti almeno 44px su telefono.
+test("/spese: i chip della legenda per categoria sono alti almeno 44px su telefono", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/spese", { waitUntil: "domcontentloaded" });
+  await page.waitForLoadState("networkidle").catch(() => {});
+  const chip = page.locator('[data-fb-area="spese.overview.categorie-trend"] button[aria-pressed]');
+  const n = await chip.count();
+  for (let i = 0; i < n; i++) {
+    const box = await chip.nth(i).boundingBox();
+    expect(box?.height ?? 0, "altezza chip").toBeGreaterThanOrEqual(43.5);
+  }
 });

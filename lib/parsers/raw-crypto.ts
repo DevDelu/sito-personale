@@ -1,5 +1,7 @@
 import type { ImportRowError } from "@/lib/parsers/import-excel";
 
+export type FonteGrezza = "crypto" | "intesa" | "traderepublic";
+
 export type RawTransaction = {
   data: string; // YYYY-MM-DD
   importo: number; // sempre positivo
@@ -7,7 +9,8 @@ export type RawTransaction = {
   descrizioneGrezza: string; // per il motore di regole
   dettagliGrezzi: string; // testo esteso se disponibile (Intesa "Dettagli"), altrimenti = descrizioneGrezza
   categoriaBanca: string | null;
-  fonte: "crypto" | "intesa";
+  fonte: FonteGrezza;
+  tipoBanca?: string | null; // tipo operazione dichiarato dalla banca (Trade Republic: "Commercio", "Bonifico", ...)
 };
 
 const COLONNE_CRYPTO = [

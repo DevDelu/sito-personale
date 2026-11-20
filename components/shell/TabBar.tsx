@@ -9,11 +9,11 @@ import { interceptSessionNav } from "@/lib/allenamento/session-guard";
 import { apriFeedback, focusCampoFeedback, leggiLocale, scriviLocale } from "@/lib/feedback/bus";
 import { inSessioneAllenamento } from "@/lib/feedback/regole-suggerimento";
 import { usePressioneLunga } from "@/hooks/usePressioneLunga";
-import { QuickAddButton } from "./QuickAddButton";
+import { ParlaButton } from "./ParlaButton";
 
 // Sezioni con slot dedicato (vedi lib/sidebar-config.ts), più "Altro" come
 // ultimo slot fisso per tutto il resto (Carte, Allenamento, Impostazioni...).
-// Divise a metà attorno al pulsante centrale "+" (QuickAddButton).
+// Divise a metà attorno al pulsante centrale "Parla" (ParlaButton, assistente a voce).
 const TAB_SECTIONS = SIDEBAR_SECTIONS.filter((s) => s.mobileTab);
 const META = Math.ceil(TAB_SECTIONS.length / 2);
 const PRIMA_META = TAB_SECTIONS.slice(0, META);
@@ -145,7 +145,7 @@ export function TabBar() {
           onPressioneLunga={feedbackDaTab}
         />
       ))}
-      <QuickAddButton />
+      <ParlaButton />
       {SECONDA_META.map((s) => (
         <TabLink
           key={s.id}

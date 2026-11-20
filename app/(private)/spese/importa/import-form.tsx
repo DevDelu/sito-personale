@@ -32,6 +32,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
 
   const [cryptoFile, setCryptoFile] = useState<File | null>(null);
   const [intesaFile, setIntesaFile] = useState<File | null>(null);
+  const [tradeRepublicFile, setTradeRepublicFile] = useState<File | null>(null);
 
   const duplicati = righe.filter((r) => r.duplicato).length;
   const doppioniFuori = righe.filter((r, i) => r.duplicato && !selezionate[i]).length;
@@ -55,6 +56,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
     resetPreview();
     setCryptoFile(null);
     setIntesaFile(null);
+    setTradeRepublicFile(null);
   }
 
   async function handleFileChangeExcel(e: React.ChangeEvent<HTMLInputElement>) {
@@ -90,7 +92,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
   }
 
   async function handleAnalizzaGrezzi() {
-    if (!cryptoFile && !intesaFile) return;
+    if (!cryptoFile && !intesaFile && !tradeRepublicFile) return;
 
     setStato("parsing");
     resetPreview();
@@ -99,6 +101,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
       const body = new FormData();
       if (cryptoFile) body.append("crypto", cryptoFile);
       if (intesaFile) body.append("intesa", intesaFile);
+      if (tradeRepublicFile) body.append("traderepublic", tradeRepublicFile);
       const res = await fetch("/api/spese/importa/grezzo", { method: "POST", body });
       const json = await res.json();
 
@@ -166,7 +169,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
               modalita === m ? "bg-accent text-accent-foreground" : "text-muted hover:text-foreground"
             }`}
           >
-            {m === "excel" ? "Excel pronto" : "CSV grezzi Crypto + Intesa"}
+            {m === "excel" ? "Excel pronto" : "File grezzi delle banche"}
           </button>
         ))}
       </div>
@@ -211,15 +214,25 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
                 className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground transition-all duration-150 file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-foreground file:transition-opacity hover:file:opacity-90 md:w-fit"
               />
             </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-muted">Trade Republic (estratto conto .pdf)</label>
+              <input
+                type="file"
+                accept=".pdf,application/pdf"
+                onChange={(e) => setTradeRepublicFile(e.target.files?.[0] ?? null)}
+                disabled={stato === "parsing" || stato === "importing"}
+                className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground transition-all duration-150 file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-foreground file:transition-opacity hover:file:opacity-90 md:w-fit"
+              />
+            </div>
           </div>
           <p className="text-xs text-muted">
-            Almeno uno dei due file è obbligatorio. Categorizzazione automatica in locale, nessuna
-            chiamata esterna.
+            Basta un file qualsiasi. Categorizzazione automatica in locale, nessuna chiamata
+            esterna. Giroconti tra i tuoi conti e acquisti di ETF finiscono nei movimenti esclusi.
           </p>
           <button
             type="button"
             onClick={handleAnalizzaGrezzi}
-            disabled={(!cryptoFile && !intesaFile) || stato === "parsing" || stato === "importing"}
+            disabled={(!cryptoFile && !intesaFile && !tradeRepublicFile) || stato === "parsing" || stato === "importing"}
             className="btn-primary w-full self-stretch md:w-fit md:self-start"
           >
             {stato === "parsing" ? "Analisi in corso..." : "Analizza file"}

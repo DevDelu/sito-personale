@@ -92,7 +92,13 @@ export const AREE_FEEDBACK = {
   "impostazioni.vibrazione": "Impostazioni › Vibrazione",
   "impostazioni.backup": "Impostazioni › Backup",
   "altro.menu": "Altro",
-  "shell.aggiunta-rapida": "Aggiunta rapida",
+
+  // Assistente
+  "assistente.pagina": "Assistente",
+  "assistente.conversazione": "Assistente › Conversazione",
+  "assistente.controlli": "Assistente › Microfono e controlli",
+  "assistente.bozza": "Assistente › Movimento da confermare",
+  "shell.assistente": "Assistente (pulsante centrale)",
   "comune.conferma-eliminazione": "Conferma eliminazione",
 
   // Feedback
