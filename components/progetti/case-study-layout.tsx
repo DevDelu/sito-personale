@@ -55,7 +55,7 @@ export function CaseStudyLayout({
         {project.cover ? (
           <RevealItem className="mt-8">
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md bg-surface-hover">
-              <Image src={project.cover} alt={project.title} fill sizes="100vw" className="object-cover" />
+              <Image src={project.cover} alt={project.title} fill sizes="100vw" className="object-cover" unoptimized={project.cover.endsWith(".svg")} />
             </div>
           </RevealItem>
         ) : null}

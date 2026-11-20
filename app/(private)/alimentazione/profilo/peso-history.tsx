@@ -10,6 +10,15 @@ import { mostraToast } from "@/lib/toast/bus";
 // Storico completo, non solo l'ultimo valore (richiesto esplicitamente per
 // questa pagina): su desktop la lista resta scrollabile, su telefono scorre con la
 // pagina (niente scroll annidato).
+function formatData(iso: string): string {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("it-IT", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 export function PesoHistory({ righe }: { righe: PesoCorporeo[] }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState<PesoCorporeo | null>(null);
@@ -50,7 +59,7 @@ export function PesoHistory({ righe }: { righe: PesoCorporeo[] }) {
             <div className="flex flex-col gap-0.5">
               <span className="font-figures text-sm font-medium max-md:text-[17px]">{p.peso_kg} kg</span>
               <span className="text-xs text-muted max-md:text-[13px]">
-                {p.data}
+                {formatData(p.data)}
                 {p.note ? ` · ${p.note}` : ""}
               </span>
             </div>
@@ -72,7 +81,7 @@ export function PesoHistory({ righe }: { righe: PesoCorporeo[] }) {
       )}
       {deleting && (
         <DeleteConfirmDialog
-          titolo={`${deleting.peso_kg} kg (${deleting.data})`}
+          titolo={`${deleting.peso_kg} kg (${formatData(deleting.data)})`}
           pending={pending}
           onConfirm={handleDelete}
           onCancel={() => setDeleting(null)}

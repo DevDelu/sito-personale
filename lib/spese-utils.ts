@@ -38,6 +38,7 @@ export function categorieOrdinatePerTotale(righe: ConCategoriaEImporto[]): Categ
 const FONTE_LABEL: Record<string, string> = {
   crypto: "Crypto.com",
   intesa: "Intesa Sanpaolo",
+  traderepublic: "Trade Republic",
   manuale: "Manuale",
 };
 

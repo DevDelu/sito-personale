@@ -1,7 +1,7 @@
 export const FEEDBACK_TIPI = ["problema", "complicato", "idea"] as const;
 export type FeedbackTipo = (typeof FEEDBACK_TIPI)[number];
 
-export const FEEDBACK_ORIGINI = ["tab", "suggerimento", "altro", "desktop", "pulsante"] as const;
+export const FEEDBACK_ORIGINI = ["tab", "suggerimento", "altro", "desktop", "pulsante", "telegram"] as const;
 export type FeedbackOrigine = (typeof FEEDBACK_ORIGINI)[number];
 
 // Stati e transizioni: lib/feedback/stati.ts.
