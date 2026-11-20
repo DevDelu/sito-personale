@@ -338,7 +338,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
               >
                 <span
                   aria-hidden
-                  className="absolute inset-0 rounded-full bg-accent/30 transition-transform duration-75"
+                  className={`absolute inset-0 rounded-full transition-transform duration-75 ${attiva ? "bg-spesa/30" : "bg-accent/30"}`}
                   style={{ transform: `scale(${scala * 1.25})` }}
                 />
                 {attiva ? (
