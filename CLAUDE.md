@@ -35,6 +35,11 @@ Authentication > Users (nessun flusso di registrazione pubblico), copia `.env.ex
 `.env.local` e compila le variabili (vedi i commenti in `.env.example` per cosa serve ognuna:
 Supabase, `OWNER_EMAIL`, `CRON_SECRET`, Resend per le email, Turnstile anti-bot).
 
+**Migration con tabelle nuove (da 036 in poi)**: Supabase non espone più in automatico le tabelle nuove ai
+ruoli API (changelog 45329), quindi la migration deve includere `grant select, insert, update, delete on
+<tabella> to service_role;` (e `authenticated` solo se il client la legge). Senza, errore 42501 anche con RLS
+giusta. `lib/supabase/migration-grant.test.ts` lo verifica in `npm test`.
+
 ## Architettura
 
 ### Routing: `proxy.ts`, non `middleware.ts`
