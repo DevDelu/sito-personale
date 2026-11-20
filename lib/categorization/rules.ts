@@ -66,6 +66,35 @@ function estraiNominativoStipendio(raw: RawTransaction): string | null {
   return null;
 }
 
+// Trade Republic scrive i bonifici in inglese con il nome in ordine
+// "COGNOME NOME" ("Incoming transfer from DE LUCA LORENZO (IBAN)"): il
+// confronto col proprio nome avviene per parole, indipendente dall'ordine.
+const TR_BONIFICO_RE = /^(incoming|outgoing) transfer (?:from|for|to)\s+(.+?)(?:\s*\(([A-Z]{2}\d{2}[A-Z0-9]+)\))?$/i;
+
+function nominativoBonificoTradeRepublic(raw: RawTransaction): string | null {
+  if (raw.fonte !== "traderepublic") return null;
+  const m = raw.descrizioneGrezza.trim().match(TR_BONIFICO_RE);
+  return m ? m[2].trim() : null;
+}
+
+function isNomeProprio(nome: string): boolean {
+  const parole = new Set(nome.toLowerCase().split(/\s+/));
+  return PROPRIO_NOMINATIVO.toLowerCase().split(/\s+/).every((p) => parole.has(p));
+}
+
+function isBonificoTradeRepublicVersoSeStesso(raw: RawTransaction): boolean {
+  const nome = nominativoBonificoTradeRepublic(raw);
+  return nome !== null && isNomeProprio(nome);
+}
+
+// Ordini, piani di accumulo, saveback e round-up: denaro spostato verso o
+// dagli investimenti, non spesa né entrata reale.
+function isInvestimentoTradeRepublic(raw: RawTransaction): boolean {
+  if (raw.fonte !== "traderepublic") return false;
+  if ((raw.tipoBanca ?? "").toLowerCase() === "commercio") return true;
+  return /savings plan execution|buy trade|sell trade|saveback|round ?up/i.test(raw.descrizioneGrezza);
+}
+
 export const REGOLE: CategorizationRule[] = [
   {
     id: "crypto-deposit-withdrawal",
@@ -85,10 +114,24 @@ export const REGOLE: CategorizationRule[] = [
     titolo: () => "",
   },
   {
+    id: "traderepublic-bonifico-self",
+    descrizione: "Bonifico Trade Republic da/verso un mio altro conto (giroconto).",
+    match: isBonificoTradeRepublicVersoSeStesso,
+    escludi: true,
+    titolo: () => "",
+  },
+  {
+    id: "traderepublic-investimento",
+    descrizione: "Ordini, piani di accumulo, saveback e round-up Trade Republic: movimenti verso gli investimenti.",
+    match: isInvestimentoTradeRepublic,
+    escludi: true,
+    titolo: () => "",
+  },
+  {
     id: "ristoranti-merchant",
-    descrizione: "Merchant di ristorazione riconosciuti (Pellegrini, Bkno, McDonald's).",
+    descrizione: "Merchant di ristorazione riconosciuti (Pellegrini, Bkno, McDonald's, Popeyes).",
     match: (raw) =>
-      raw.tipo === "spesa" && contiene(raw, "Pellegrini Spa", "Bkno Spa", "Mc Donald's", "McDonald's"),
+      raw.tipo === "spesa" && contiene(raw, "Pellegrini Spa", "Bkno Spa", "Mc Donald's", "McDonald's", "MCD ", "Popeyes"),
     categoria: "Ristoranti",
     titolo: (raw) => raw.descrizioneGrezza.trim(),
   },
@@ -132,6 +175,14 @@ export const REGOLE: CategorizationRule[] = [
     categoria: "Bonifici",
     titolo: (raw) => raw.descrizioneGrezza.trim(),
     estraiNominativo: estraiNominativoBonifico,
+  },
+  {
+    id: "traderepublic-bonifici",
+    descrizione: "Bonifici Trade Republic non verso/da sé stesso: nominativo dal testo.",
+    match: (raw) => nominativoBonificoTradeRepublic(raw) !== null && !isBonificoTradeRepublicVersoSeStesso(raw),
+    categoria: "Bonifici",
+    titolo: (raw) => `${raw.tipo === "spesa" ? "Bonifico a" : "Bonifico da"} ${nominativoBonificoTradeRepublic(raw)}`,
+    estraiNominativo: nominativoBonificoTradeRepublic,
   },
   {
     id: "stipendio",
