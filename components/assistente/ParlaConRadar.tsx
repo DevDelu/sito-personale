@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, Mic, MicOff, RotateCcw, Send, Volume2, VolumeX, X } from "lucide-react";
+import { Check, Mic, RotateCcw, Send, Square, Volume2, VolumeX, X } from "lucide-react";
 import { useConversazioneVocale, type FaseVoce, type RispostaTurno } from "@/hooks/useConversazioneVocale";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { MAX_TURNI, type Turno } from "@/lib/assistente/storia";
@@ -21,9 +21,9 @@ const ESEMPI = [
 const ETICHETTE: Record<FaseVoce, string> = {
   spento: "Tocca per parlare",
   avvio: "Apro il microfono…",
-  ascolto: "Ti ascolto",
-  registro: "Ti ascolto…",
-  penso: "Ci penso…",
+  ascolto: "Ti ascolto · tocca per fermare",
+  registro: "Ti ascolto… · tocca per fermare",
+  penso: "Ci penso… · tocca per fermare",
   parlo: "Tocca per interrompere",
 };
 
@@ -155,6 +155,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
   function tapCerchio() {
     if (voce.fase === "spento") void voce.avvia();
     else if (voce.fase === "parlo") voce.interrompi();
+    else voce.ferma();
   }
 
   function nuovaConversazione() {
@@ -332,7 +333,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
                 onClick={tapCerchio}
                 aria-label={ETICHETTE[voce.fase]}
                 className={`relative flex h-20 w-20 items-center justify-center rounded-full text-accent-foreground shadow-lg transition-colors ${
-                  attiva ? "bg-accent" : "bg-accent/85"
+                  attiva ? "bg-spesa" : "bg-accent/85"
                 } ${voce.fase === "penso" ? "animate-pulse" : ""}`}
               >
                 <span
@@ -340,9 +341,13 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
                   className="absolute inset-0 rounded-full bg-accent/30 transition-transform duration-75"
                   style={{ transform: `scale(${scala * 1.25})` }}
                 />
-                <Mic className="relative h-8 w-8" strokeWidth={2} />
+                {attiva ? (
+                  <Square className="relative h-7 w-7 fill-current" strokeWidth={2} />
+                ) : (
+                  <Mic className="relative h-8 w-8" strokeWidth={2} />
+                )}
               </button>
-              <span className="text-xs text-muted" aria-live="polite">
+              <span className="text-center text-xs text-muted" aria-live="polite">
                 {ETICHETTE[voce.fase]}
               </span>
             </div>
@@ -351,11 +356,6 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
           )}
 
           <div className="flex justify-end gap-1">
-            {attiva ? (
-              <button type="button" className="btn-icon" onClick={voce.ferma} aria-label="Chiudi il microfono">
-                <MicOff className="h-5 w-5" />
-              </button>
-            ) : null}
             <button
               type="button"
               className="btn-icon"
