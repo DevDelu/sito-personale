@@ -34,7 +34,11 @@ export default async function LezionePage({ params }: { params: Promise<{ slug: 
         <span className="text-[13px] font-medium uppercase tracking-wide text-accent">
           Lezione {numero} di {LEZIONI.length} · {modulo(l.modulo).titolo} · {l.minuti} min
         </span>
-        <h1 className="font-display text-[28px] font-semibold leading-tight tracking-tight">{l.titolo}</h1>
+        {/* Su telefono l'h1 è quello del PageHeader: qui lo stesso titolo in grande, senza secondo h1 */}
+        <p aria-hidden className="font-display text-[28px] font-semibold leading-tight tracking-tight md:hidden">
+          {l.titolo}
+        </p>
+        <h1 className="hidden font-display text-[28px] font-semibold leading-tight tracking-tight md:block">{l.titolo}</h1>
         <p className="text-[15px] text-muted">{l.sottotitolo}</p>
       </header>
 
