@@ -154,8 +154,10 @@ export function ImportForm() {
                       className="border-b border-border transition-colors duration-150 last:border-0 hover:bg-surface-hover"
                     >
                       <td className="px-3 py-2">
+                        <label className="flex items-center justify-center max-md:-m-3 max-md:h-11 max-md:w-11">
                         <input
                           type="checkbox"
+                          aria-label={`Importa ${r.asset_nome}`}
                           checked={selezionate[i] ?? false}
                           onChange={(e) =>
                             setSelezionate((prev) => {
@@ -164,8 +166,9 @@ export function ImportForm() {
                               return next;
                             })
                           }
-                          className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90"
+                          className="h-4 w-4 rounded border-border accent-[var(--accent)] transition-transform active:scale-90 max-md:h-5 max-md:w-5"
                         />
+                        </label>
                       </td>
                       <td className="px-3 py-2 whitespace-nowrap text-muted">
                         {new Date(`${r.data}T00:00:00Z`).toLocaleDateString("it-IT")}

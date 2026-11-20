@@ -4,6 +4,7 @@ import {
   getScheda,
   getSchedaEsercizi,
   getSessione,
+  getMigliorLogPerSchedaEsercizio,
   getUltimoLogPerSchedaEsercizio,
 } from "@/lib/allenamento/queries";
 import { SessionRunner } from "@/components/allenamento/SessionRunner";
@@ -30,6 +31,9 @@ export default async function SessionePage({ params }: { params: Promise<{ id: s
   const ultimiValoriEntries = await Promise.all(
     righeNormali.map(async (r) => [r.id, await getUltimoLogPerSchedaEsercizio(r.id, id)] as const)
   );
+  const massimiEntries = await Promise.all(
+    righeNormali.map(async (r) => [r.id, await getMigliorLogPerSchedaEsercizio(r.id, r.tipo_metrica, id)] as const)
+  );
 
   return (
     <div data-fb-area="allenamenti.sessione.runner" className="contents">
@@ -39,6 +43,7 @@ export default async function SessionePage({ params }: { params: Promise<{ id: s
         righe={righe}
         logEsistenti={logEsistenti}
         ultimiValori={Object.fromEntries(ultimiValoriEntries)}
+        massimi={Object.fromEntries(massimiEntries)}
       />
     </div>
   );

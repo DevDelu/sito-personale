@@ -6,10 +6,10 @@ import {
   type AttritoEvento,
   type FeedbackContesto,
   type FeedbackPayload,
-} from "./types";
-import { paginaTemplate } from "./pagina";
-import { isAreaFeedback } from "./aree";
-import { validaEntita, validaPunto } from "./punto";
+} from "./types.ts";
+import { paginaTemplate } from "./pagina.ts";
+import { isAreaFeedback } from "./aree.ts";
+import { validaEntita, validaPunto } from "./punto.ts";
 
 // Il body arriva dal client (anche da una coda offline vecchia di giorni):
 // si tiene solo ciò che lo schema prevede, con limiti di lunghezza, e il

@@ -8,6 +8,7 @@ import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { ListGroup, ListRowButton } from "@/components/ui/ListGroup";
 import { PastoEditModal } from "./PastoEditModal";
 import type { Pasto } from "@/lib/alimentazione/types";
+import { mostraToast } from "@/lib/toast/bus";
 
 const LABEL_TIPO: Record<string, string> = {
   colazione: "Colazione",
@@ -27,6 +28,7 @@ export function PastoTable({ rows }: { rows: Pasto[] }) {
     await updatePasto(editing.id, patch);
     setEditing(null);
     router.refresh();
+    mostraToast({ testo: "Pasto aggiornato" });
   }
 
   async function handleDelete() {
@@ -34,6 +36,7 @@ export function PastoTable({ rows }: { rows: Pasto[] }) {
     await deletePasto(deleting.id);
     setDeleting(null);
     router.refresh();
+    mostraToast({ testo: "Pasto eliminato" });
   }
 
   if (rows.length === 0) {
@@ -95,7 +98,7 @@ export function PastoTable({ rows }: { rows: Pasto[] }) {
                     <button
                       type="button"
                       onClick={() => setEditing(p)}
-                      aria-label="Modifica pasto"
+                      aria-label={`Modifica ${p.alimento_nome}`}
                       className="btn-icon"
                     >
                       <Pencil className="h-4 w-4" />
@@ -103,7 +106,7 @@ export function PastoTable({ rows }: { rows: Pasto[] }) {
                     <button
                       type="button"
                       onClick={() => setDeleting(p)}
-                      aria-label="Elimina pasto"
+                      aria-label={`Elimina ${p.alimento_nome}`}
                       className="btn-icon"
                     >
                       <Trash2 className="h-4 w-4" />

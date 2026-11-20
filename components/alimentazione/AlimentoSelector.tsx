@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Alimento } from "@/lib/alimentazione/types";
 import { useAlimentoMutations } from "@/hooks/useAlimentoMutations";
 import { BarcodeScanner } from "./BarcodeScanner";
@@ -33,6 +33,25 @@ export function AlimentoSelector({
   const [mostraScanner, setMostraScanner] = useState(false);
   const [cercaOff, setCercaOff] = useState(false);
   const { creaAlimento, pending } = useAlimentoMutations();
+  const listaId = useId();
+  const contenitoreRef = useRef<HTMLDivElement>(null);
+
+  // La lista si chiude con Esc o toccando fuori (su iPhone resta altrimenti aperta sopra la tastiera).
+  useEffect(() => {
+    if (!mostraLista) return;
+    function fuori(e: PointerEvent) {
+      if (contenitoreRef.current && !contenitoreRef.current.contains(e.target as Node)) setMostraLista(false);
+    }
+    function esc(e: KeyboardEvent) {
+      if (e.key === "Escape") setMostraLista(false);
+    }
+    document.addEventListener("pointerdown", fuori);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("pointerdown", fuori);
+      document.removeEventListener("keydown", esc);
+    };
+  }, [mostraLista]);
 
   const selezionato = alimenti.find((a) => a.id === value) ?? null;
 
@@ -111,9 +130,10 @@ export function AlimentoSelector({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative">
+      <div className="relative" ref={contenitoreRef}>
         <input
           type="text"
+          enterKeyHint="search"
           value={mostraLista ? query : (selezionato?.nome ?? query)}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -126,15 +146,19 @@ export function AlimentoSelector({
           role="combobox"
           aria-autocomplete="list"
           aria-expanded={mostraLista}
-          aria-controls="alimento-risultati"
+          aria-controls={mostraLista ? listaId : undefined}
+          aria-haspopup="listbox"
           className="field-input w-full bg-surface"
         />
         {mostraLista && (
-          <div id="alimento-risultati" className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-border bg-surface shadow-lg animate-slide-down">
+          <div className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-border bg-surface shadow-lg animate-slide-down">
+            <div id={listaId} role="listbox" aria-label="Alimenti trovati">
             {risultati.map((a) => (
               <button
                 key={a.id}
                 type="button"
+                role="option"
+                aria-selected={a.id === value}
                 onClick={() => selezionaAlimento(a)}
                 className="flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-surface-hover"
               >
@@ -142,6 +166,7 @@ export function AlimentoSelector({
                 <span className="font-figures text-[13px] text-muted">{a.kcal_100g} kcal/100g</span>
               </button>
             ))}
+            </div>
             <button
               type="button"
               onClick={apriCreazione}
@@ -173,7 +198,7 @@ export function AlimentoSelector({
             aria-label="Nome alimento"
             className="field-input"
           />
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
             <FieldMini label="Kcal/100g">
               <input
                 value={kcal}
@@ -204,7 +229,7 @@ export function AlimentoSelector({
               value={grassi}
               onChange={(e) => setGrassi(e.target.value)}
               inputMode="decimal"
-              className="field-input w-32"
+              className="field-input w-full md:w-32"
             />
           </FieldMini>
           {formError && (

@@ -47,7 +47,7 @@ export function Pagination({
       </label>
 
       {totalPages > 1 && (
-        <div className="flex items-center gap-3">
+        <div className="flex w-full flex-wrap items-center justify-between gap-3 md:w-auto md:justify-start">
           <button type="button" onClick={() => goTo(page - 1)} disabled={page <= 1} className="btn-secondary">
             ← Precedente
           </button>

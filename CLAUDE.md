@@ -98,6 +98,12 @@ Supabase vivono in `lib/<dominio>/queries.ts`, mai inline nei componenti.
 
 - Portfolio: animazioni allo scroll solo CSS scroll-driven (nessuna libreria); le sette sfere del
   drago nascoste in home sono un easter egg, restano nel padding in fondo alle sezioni.
+- Mobile: tocco aptico da `lib/haptics.ts` (pressione lunga, serie, pasto; spegnibile da Impostazioni);
+  `PullToRefresh` nel layout privato; `app/(private)/error.tsx` è l'errore dell'area privata. Un nuovo
+  importo o prezzo va nascosto anche nelle etichette `aria-label` in modalità discreta.
+- Pagine pubbliche: niente cookie né `cookies()` (HTML cacheabile dalla CDN): la classifica usa
+  `lib/supabase/anon.ts`, `NEXT_LOCALE` è disattivato. Header in `next.config.ts`: CSP senza `script-src`
+  di proposito (servirebbero nonce), COOP, camera alla stessa origine.
 - Una lettura va fatta con GET: il tester in sola lettura riceve 403 su ogni POST (lo storico prezzi
   delle carte era un POST).
 - Quiz: le domande estratte rispondono `Cache-Control: no-store`; il tempo inviato è normalizzato
@@ -212,7 +218,8 @@ layout desktop dell'area privata non cambiano.
 - **Font di sistema** (`-apple-system, "SF Pro Text", system-ui`) sostituisce
   Fraunces/Space Grotesk/JetBrains Mono solo dentro `.app-shell`: scelta voluta per il
   feeling nativo, non estenderla al sito pubblico o al desktop.
-- **Tab bar mobile** (`components/shell/TabBar.tsx`, `md:hidden`): 5 slot, definiti da
+- **Tab bar mobile** (`components/shell/TabBar.tsx`, `md:hidden`): al centro il pulsante "Parla"
+  (`ParlaButton`, assistente a voce; ha sostituito "Aggiungi"), attorno 5 slot, definiti da
   `mobileTab: true` su `lib/sidebar-config.ts` (fonte unica con la sidebar desktop — cambiare
   quali moduli hanno lo slot è una riga). Rispetta `interceptSessionNav` (nav guard
   allenamento) e si nasconde su `/allenamenti/sessione/*`. Le sezioni senza slot dedicato
@@ -245,12 +252,13 @@ tutti verso lo stesso sheet (`components/feedback/FeedbackSheet.tsx`, ospitato d
   nel timer. Un suggerimento di scoperta compare una sola volta (flag in localStorage).
 - **Suggerimento dopo un attrito** ("Qualcosa non va? Dimmelo", sopra la tab bar, 4 s): oggi
   scatta su `errore_api` (risposte 5xx da `/api/*`, via `fetch` osservata) ed `errore_js`; gli
-  altri tipi arriveranno col tracciamento d'uso. Regole anti-invadenza pure e testate in
+  altri tipi arriveranno col tracciamento d'uso. Il tap apre l'**assistente a voce** (non lo sheet
+  scritto), che chiede cosa è successo e registra il feedback con l'errore allegato. Regole anti-invadenza pure e testate in
   `lib/feedback/regole-suggerimento.ts`.
-- **Pulsante su ogni pagina** (`FeedbackPulsante`, montato da `FeedbackProvider`, origine `pulsante`,
-  migration 032): il feedback prende come riferimento la pagina in cui è toccato. Mobile in basso a
-  sinistra sopra la tab bar (i FAB delle pagine stanno a destra), desktop in basso a destra; nascosto
-  con sheet/avvisi aperti e in `/allenamenti/sessione/*`.
+- **A voce, dall'assistente** (canale principale, scelta di Lorenzo nov 2026): il pulsante centrale
+  "Parla" della tab bar apre l'assistente sopra la pagina corrente; quello che Lorenzo segnala diventa un
+  feedback con quella pagina come `route` (origine `pulsante`; `suggerimento` se nasce da un errore).
+  Vedi "Assistente". Il vecchio pulsante flottante in basso a sinistra (`FeedbackPulsante`) è stato tolto.
 - **Riserva**: riga in `/altro` (allega l'ultima pagina visitata prima di Altro), voce "Feedback"
   in fondo alla sidebar desktop, scorciatoia `F` senza campi a fuoco.
 
@@ -396,7 +404,70 @@ newsletter (max una al giorno) nei turni principale e qualità, se le variabili 
 design) in `.claude/skills/`, provenienza e licenze in `.claude/skills/ESTERNE.md`: aggiornate solo
 a mano rileggendo il diff, mai scaricate in automatico.
 
+### Assistente (Telegram + voce)
+
+Due ingressi sullo stesso cervello (`lib/assistente/`): il bot Telegram privato e la pagina
+`/assistente` per parlare a voce in tempo reale. Groq free tier per trascrizione (Whisper) e LLM.
+
+**Cervello comune**
+- **LLM con strumenti** (`strumenti.ts`, loop in `conversa.ts`, max 5 giri, stile diverso per
+  `canale` telegram/voce): le letture riusano le query dei moduli (`lib/<dominio>/queries.ts`);
+  uno strumento nuovo = una definizione in `DEFINIZIONI` + un `case` in `eseguiStrumento()`.
+- **Nessuna scrittura senza conferma**: `proponi_movimento` crea solo una riga in
+  `assistente_bozze`; spese/depositi si scrivono in `chiudiBozza()` (bottone, card o "conferma"
+  detto a voce → `gestisci_bozze_in_attesa`, solo bozze degli ultimi 30 minuti), con UPDATE
+  condizionato su `stato = 'in_attesa'` (doppio tap = una sola riga) e `fonte = 'assistente'`.
+  La categoria deve esistere (`categoriaPerNome()`), altrimenti "Altro": niente categorie nuove.
+- **Richieste di modifica all'app**: `segnala_modifica` → `inserisciFeedback()` con
+  `origine = 'telegram'`, stesso ciclo notturno dei feedback.
+- **Memoria breve**: ultimi `MAX_TURNI` scambi di solo testo (`storia.ts`). Telegram la salva in
+  `assistente_storia` (scade dopo 30 minuti di pausa, `/nuova` la svuota); la pagina voce la tiene
+  nel browser e la manda a ogni turno (validata da `validaStoria()`).
+
+**Telegram** — webhook `app/api/telegram/webhook/route.ts`, in `API_AUTONOME`: nessuna sessione
+Supabase, l'autorizzazione è nella route (header `X-Telegram-Bot-Api-Secret-Token` confrontato
+con `TELEGRAM_WEBHOOK_SECRET`, fail-closed, poi `from.id` uguale a `TELEGRAM_OWNER_CHAT_ID`; gli
+estranei non ricevono risposta). `telegram_update_visti` scarta i retry di Telegram; la route
+risponde sempre 200. Registrazione webhook: `scripts/telegram-setup.mjs`.
+
+**Ovunque nell'area privata**: `AssistenteHost` (layout privato) apre `ParlaConRadar` in uno `Sheet`
+quando qualcuno chiama `apriAssistente()` (`lib/assistente/bus.ts`): il pulsante centrale "Parla" della
+tab bar e l'invito "Qualcosa non va? Dimmelo". Si mette subito in ascolto e manda a ogni turno la pagina
+di partenza (e l'eventuale errore, validati da `paginaValida()`/`attritoValido()` in
+`lib/assistente/pagina.ts`), che finiscono nel feedback e nel prompt. **Gotcha iOS**: `apriAssistente()`
+va chiamata dentro un onClick, perché `sbloccaAudio()` (`lib/assistente/audio.ts`) deve creare/riprendere
+l'`AudioContext` condiviso e sbloccare la sintesi vocale nel gesto; aperto da un effetto, il microfono
+sentirebbe solo silenzio.
+
+**Voce** (`/assistente`, `hooks/useConversazioneVocale.ts`, `components/assistente/`) — tutto nel
+browser tranne trascrizione e LLM: microfono → VAD a energia (`vad.ts`, puro e testato: soglia
+adattiva al rumore, calibrazione iniziale) → `MediaRecorder` della frase → `POST
+/api/assistente/parla` → risposta letta con `speechSynthesis` (voce di sistema, una frase alla
+volta, `frasiPerVoce()`) → di nuovo in ascolto. Gotcha:
+- serve `microphone=(self)` nel `Permissions-Policy` di `next.config.ts`;
+- l'avvio va fatto dentro un tap (iOS sblocca microfono e sintesi vocale solo da un gesto);
+- su iPhone il microfono si chiude mentre Radar parla (con il microfono aperto iOS manda l'audio
+  nella capsula auricolare): lì si interrompe toccando il cerchio; altrove anche parlando, con
+  soglia ×3 contro l'eco;
+- Whisper "sente" frasi nel silenzio ("Sottotitoli creati dalla comunità Amara.org"):
+  `trascrizioneValida()` le scarta lato server;
+- le API (`/api/assistente/*`) accettano solo l'owner (`rifiutaSeNonOwner()`), mai il tester;
+- gli errori mostrano il motivo vero (`ErroreGroq`, chiave mancante, migration mancante): pagina e bot
+  sono solo di Lorenzo. Modello di default `openai/gpt-oss-120b` con `reasoning_effort: "low"`: il primo
+  default (`llama-3.3-70b-versatile`) era nelle deprecazioni di Groq e in produzione dava sempre errore.
+  Prima di cambiare modello controllare console.groq.com/docs/deprecations.
+
 ### Decision log (dal README)
+
+- **Assistente su Groq, non Gemini né Claude API** (nov 2026): Telegram Bot API e Groq free tier
+  costano zero; Groq non addestra sui dati inviati, mentre il free tier Gemini sì (qui passano
+  spese e portafoglio). Claude Pro non include l'API. È l'unica chiamata a un LLM esterno dentro
+  il sito: eccezione voluta alla regola "categorizzazione a regole, niente AI", limitata
+  all'interpretazione delle richieste; il dato entra solo dopo conferma manuale.
+- **Voce a turni con sintesi di sistema, non speech-to-speech** (nov 2026): i modelli audio
+  nativi (Gemini Live) suonano più naturali ma oggi sono a pagamento (~0,02 $/min); la versione
+  a turni costa zero. Se in futuro serve, si sostituisce solo il motore in
+  `useConversazioneVocale`, strumenti e bozze restano gli stessi.
 
 - **Overview/Gestione separate in Spese**: Overview è sola lettura (aggregati, grafici);
   Gestione è l'unico posto con CRUD. Evita di mischiare le due responsabilità nello stesso

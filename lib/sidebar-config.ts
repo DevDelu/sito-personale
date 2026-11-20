@@ -1,4 +1,4 @@
-import { Apple, Bell, Calendar, ChartCandlestick, Dumbbell, Layers, TrendingUp, Wallet, type LucideIcon } from "lucide-react";
+import { Apple, AudioLines, Bell, Calendar, ChartCandlestick, Dumbbell, Layers, TrendingUp, Wallet, type LucideIcon } from "lucide-react";
 
 export type SidebarSubsection = { href: string; label: string };
 
@@ -95,6 +95,12 @@ export const SIDEBAR_SECTIONS: SidebarSection[] = [
       { href: "/trading/ripasso", label: "Ripasso" },
       { href: "/trading/laboratorio", label: "Laboratorio" },
     ],
+  },
+  {
+    id: "assistente",
+    label: "Assistente",
+    icon: AudioLines,
+    href: "/assistente",
   },
   {
     id: "impostazioni",

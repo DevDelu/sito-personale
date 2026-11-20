@@ -85,7 +85,7 @@ function CategoryTrendTooltip({ active, payload, label }: TrendTooltipProps) {
               <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: p.color }} />
               <span className="truncate">{p.name}</span>
             </span>
-            <span className="font-figures whitespace-nowrap">{formatCurrency(p.value as number)}</span>
+            <span className="importo font-figures whitespace-nowrap">{formatCurrency(p.value as number)}</span>
           </li>
         ))}
       </ul>
@@ -142,7 +142,7 @@ export function CategorySpendingTrendChart({
                 type="button"
                 onClick={() => toggleCategoria(cat.nome)}
                 aria-pressed={!nascosta}
-                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm active:scale-95 ${
+                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs max-md:min-h-11 font-medium transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm active:scale-95 ${
                   nascosta ? "opacity-40" : ""
                 }`}
                 style={{ borderColor: colore }}
@@ -152,7 +152,7 @@ export function CategorySpendingTrendChart({
                   style={{ backgroundColor: colore, transform: nascosta ? "scale(0.7)" : "scale(1)" }}
                 />
                 {cat.nome}
-                <span className="font-figures text-muted">{formatCurrency(cat.totale)}</span>
+                <span className="importo font-figures text-muted">{formatCurrency(cat.totale)}</span>
               </button>
             );
           })}

@@ -17,6 +17,7 @@ const UNLOCALIZED_PREFIXES = [
   "/altro",
   "/feedback",
   "/trading",
+  "/assistente",
 ];
 // Login e recupero password vivono fuori da app/[locale]/: senza queste voci
 // next-intl le prende per pagine pubbliche e risponde 404 (link "Password
