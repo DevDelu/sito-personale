@@ -39,3 +39,7 @@ create table resoconti (
 
 create index resoconti_created_idx on resoconti (created_at desc);
 alter table resoconti enable row level security;
+
+-- Accesso ai ruoli API (Supabase non espone più in automatico le tabelle nuove)
+grant select, insert, update, delete on novita to service_role;
+grant select, insert, update, delete on resoconti to service_role;

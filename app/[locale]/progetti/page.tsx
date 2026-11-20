@@ -29,6 +29,7 @@ export default async function ProgettiPage({
   const t = await getTranslations("Progetti");
   const tCaseStudy = await getTranslations("CaseStudy");
   const tCategory = await getTranslations("ProjectCategory");
+  const tDiario = await getTranslations("Diario");
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6 py-16">
@@ -44,6 +45,14 @@ export default async function ProgettiPage({
         <RevealItem className="mt-4">
           <h1 className="font-sans text-2xl font-bold tracking-tight">{t("title")}</h1>
           <p className="mt-2 text-sm text-muted">{t("description")}</p>
+        </RevealItem>
+        <RevealItem className="mt-8">
+          <Link
+            href="/progetti/diario"
+            className="inline-flex min-h-11 items-center font-mono text-sm text-accent transition-colors hover:text-foreground"
+          >
+            {tDiario("cta")} → <span className="ml-2 text-muted">{tDiario("ctaHint")}</span>
+          </Link>
         </RevealItem>
         <RevealItem className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(260px,340px))] gap-6">
           {projects.map((project) => (

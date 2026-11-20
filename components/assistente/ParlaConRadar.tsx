@@ -277,7 +277,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
         data-fb-area="assistente.controlli"
         // Pagina: sopra la tab bar su mobile (stesso calcolo di ActionBar), in
         // linea su desktop. Sheet: in fondo al pannello, che copre la tab bar.
-        style={inSheet ? undefined : { bottom: "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom))" }}
+        style={inSheet ? undefined : { bottom: "calc(var(--app-tabbar-height) + max(env(safe-area-inset-bottom), 20px))" }}
         className={
           inSheet
             ? "flex shrink-0 flex-col items-center gap-3 border-t border-[var(--app-hairline)] px-4 pb-3 pt-4"

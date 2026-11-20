@@ -1,10 +1,12 @@
 import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import { getPortfolioHistoryByAsset, getPosizioniCorrenti, getTransazioni } from "@/lib/investimenti/queries";
+import { variazioneTotale } from "@/lib/investimenti/variazione-giorno";
 import { SummaryCards } from "@/components/investimenti/SummaryCards";
 import { PositionsTable } from "@/components/investimenti/PositionsTable";
 import { AggiornaPrezzi } from "@/components/investimenti/AggiornaPrezzi";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { PrivacyToggle } from "@/components/privacy-toggle";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
 
@@ -41,9 +43,11 @@ export default async function InvestimentiPage({
   const plusvalenzaPercentuale =
     plusvalenzaAssoluta !== null && costoNotoTotale > 0 ? (plusvalenzaAssoluta / costoNotoTotale) * 100 : null;
 
+  const oggi = variazioneTotale(posizioni.map((p) => ({ variazione: p.variazioneOggi, valoreAttuale: p.valoreAttuale })));
+
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Investimenti" />
+      <PageHeader title="Investimenti" action={<PrivacyToggle />} />
       <SegmentedControl items={INVESTIMENTI_SEGMENTI} />
 
       <div className="hidden flex-col gap-1 md:flex">
@@ -61,6 +65,7 @@ export default async function InvestimentiPage({
           valoreAttuale={valoreAttuale}
           plusvalenzaAssoluta={plusvalenzaAssoluta}
           plusvalenzaPercentuale={plusvalenzaPercentuale}
+          oggi={oggi}
         />
       </div>
 

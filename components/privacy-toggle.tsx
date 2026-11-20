@@ -39,9 +39,9 @@ export function PrivacyToggle() {
       role="switch"
       aria-checked={attiva}
       aria-label="Nascondi importi"
-      className={`flex h-[44px] w-[44px] items-center justify-center rounded-full border text-foreground active:scale-90 ${attiva ? "border-accent bg-accent/15" : "border-border"}`}
+      className={`flex h-[44px] w-[44px] items-center justify-center rounded-full border text-foreground active:scale-90 md:h-9 md:w-9 ${attiva ? "border-accent bg-accent/15" : "border-border"}`}
     >
-      {attiva ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+      {attiva ? <EyeOff className="h-5 w-5 md:h-4 md:w-4" /> : <Eye className="h-5 w-5 md:h-4 md:w-4" />}
     </button>
   );
 }

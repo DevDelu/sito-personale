@@ -3,6 +3,7 @@ import { ExternalLink } from "lucide-react";
 import { requireUser } from "@/lib/supabase/dal";
 import { isOwner, isTester } from "@/lib/supabase/owner";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { PrivacyToggle } from "@/components/privacy-toggle";
 import { Sidebar } from "@/components/sidebar";
 import { TabBar } from "@/components/shell/TabBar";
 import { RefreshAlRitorno } from "@/components/shell/RefreshAlRitorno";
@@ -54,6 +55,7 @@ export default async function PrivateLayout({
       <Sidebar logoutSlot={logoutForm} />
       <div className="flex flex-1 flex-col">
         <div className="sticky top-0 z-20 hidden items-center justify-end gap-2 border-b border-border bg-surface/80 px-4 py-3 backdrop-blur-md sm:px-6 md:flex">
+          <PrivacyToggle />
           <ThemeToggle />
           {areaPubblicaLink}
         </div>

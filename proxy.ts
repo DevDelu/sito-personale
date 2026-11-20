@@ -16,6 +16,7 @@ const UNLOCALIZED_PREFIXES = [
   "/impostazioni",
   "/altro",
   "/feedback",
+  "/trading",
   "/assistente",
   "/novita",
 ];

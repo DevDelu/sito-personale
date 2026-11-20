@@ -2,7 +2,8 @@
 // chiama mostraToast(), il ToastHost montato nel layout privato lo mostra.
 // Stesso pattern di lib/feedback/bus.ts.
 
-export type ToastDati = { testo: string };
+export type ToastAzione = { etichetta: string; onClick: () => void };
+export type ToastDati = { testo: string; azione?: ToastAzione; durataMs?: number };
 export type ToastAttivo = ToastDati & { id: number };
 
 type Ascoltatore = (t: ToastAttivo) => void;
@@ -18,7 +19,7 @@ export function mostraToast(dati: ToastDati): boolean {
   const testo = dati.testo.trim();
   if (!testo || !ascoltatore) return false;
   contatore += 1;
-  ascoltatore({ testo, id: contatore });
+  ascoltatore({ ...dati, testo, id: contatore });
   return true;
 }
 

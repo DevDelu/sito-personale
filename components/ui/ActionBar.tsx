@@ -7,7 +7,7 @@ export function ActionBar({ children }: { children: React.ReactNode }) {
   return (
     <div
       className="app-scroll fixed inset-x-0 z-30 flex items-center justify-center gap-2 border-t border-border bg-surface/95 px-4 py-2.5 backdrop-blur-md md:hidden"
-      style={{ bottom: "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom))" }}
+      style={{ bottom: "calc(var(--app-tabbar-height) + max(env(safe-area-inset-bottom), 20px))" }}
     >
       {children}
     </div>

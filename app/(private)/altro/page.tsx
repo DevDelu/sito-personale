@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ExternalLink, Layers, LogOut, Dumbbell, Apple, AudioLines, Bell, Inbox, Sparkles } from "lucide-react";
+import { ExternalLink, Layers, LogOut, Dumbbell, Apple, AudioLines, Bell, Inbox, Sparkles, ChartCandlestick } from "lucide-react";
 import { contaPerTe } from "@/lib/feedback/queries";
 import { contaNovitaRecenti } from "@/lib/novita/queries";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -60,6 +60,13 @@ export default async function AltroPage() {
             href="/alimentazione"
             icon={<Apple className="h-5 w-5" strokeWidth={1.75} />}
             title="Alimentazione"
+            chevron
+          />
+          <ListRowLink
+            href="/trading"
+            icon={<ChartCandlestick className="h-5 w-5" strokeWidth={1.75} />}
+            title="Scuola di mercati"
+            subtitle="Corso, glossario, ripasso"
             chevron
           />
           <FeedbackRigaAltro />

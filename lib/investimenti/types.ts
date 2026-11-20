@@ -53,4 +53,6 @@ export type Posizione = {
   // restano sempre calcolati solo sulle transazioni note.
   quantitaValore: number;
   datiIncompleti: boolean;
+  // Variazione rispetto all'ultima chiusura, solo se il prezzo è di oggi.
+  variazioneOggi: import("./variazione-giorno").VariazioneGiorno | null;
 };

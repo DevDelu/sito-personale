@@ -54,6 +54,16 @@
     "title": "Projects",
     "description": "A selection of case studies: thesis, personal projects and work."
   },
+  "Diario": {
+    "title": "Build log",
+    "description": "The latest changes to Radar, the site you are looking at: every entry is a change that actually shipped.",
+    "intro": "Radar grows every day, with the help of a team of AI agents. Below are the latest changes that shipped, grouped by week, each linking to the change on GitHub.",
+    "week": "Week of {data}",
+    "empty": "The log is not reachable right now. Please try again shortly.",
+    "noteLang": "Change titles are written in Italian.",
+    "cta": "Build log",
+    "ctaHint": "The latest changes to Radar, week by week."
+  },
   "CaseStudy": {
     "backLink": "Home",
     "share": "Share",

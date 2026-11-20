@@ -174,7 +174,7 @@ export function PushSettings() {
     }
   }
 
-  if (stato === "loading") return <p role="status" className="text-sm text-muted">Controllo delle notifiche…</p>;
+  if (stato === "loading") return <p role="status" className="text-[15px] text-muted md:text-sm">Controllo delle notifiche…</p>;
 
   if (stato === "non_supportato") {
     return <p className="text-[15px] text-muted">Le notifiche push non sono supportate da questo browser.</p>;
