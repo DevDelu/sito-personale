@@ -6,6 +6,7 @@ import { meseScorso } from "@/lib/spese/mese-scorso";
 import { Overview } from "./overview";
 import { Toast } from "@/components/toast";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { PrivacyToggle } from "@/components/privacy-toggle";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
 
@@ -65,7 +66,7 @@ export default async function SpesePage({
     <div className="flex flex-col gap-6">
       {added && <Toast message="Movimento aggiunto" />}
 
-      <PageHeader title="Spese" />
+      <PageHeader title="Spese" action={<PrivacyToggle />} />
       <SegmentedControl items={SPESE_SEGMENTI} />
 
       <div className="hidden flex-col gap-1 md:flex">
