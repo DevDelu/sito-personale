@@ -42,6 +42,14 @@ async function headers() {
       headers: [{ key: "Cache-Control", value: CACHE_ASSET_PUBBLICI }],
     },
     {
+      source: "/splash/:path*",
+      headers: [{ key: "Cache-Control", value: CACHE_ASSET_PUBBLICI }],
+    },
+    {
+      source: "/cv-:lingua.pdf",
+      headers: [{ key: "Cache-Control", value: CACHE_ASSET_PUBBLICI }],
+    },
+    {
       // Il service worker non va mai servito da cache: un browser che tiene
       // /sw.js vecchio (il default statico di Vercel/Next per i file in
       // public/ non è "no-store") ritarda di ore l'arrivo di fix come questo
