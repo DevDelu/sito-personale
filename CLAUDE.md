@@ -108,6 +108,7 @@ Supabase vivono in `lib/<dominio>/queries.ts`, mai inline nei componenti.
   delle carte era un POST).
 - Quiz: le domande estratte rispondono `Cache-Control: no-store`; il tempo inviato è normalizzato
   prima di entrare in classifica.
+- `/oggi` (da `/altro`): vista di sola lettura con eventi di oggi, kcal, impegno di allenamento e spesa del giorno; ogni sezione usa `Promise.allSettled`, se una query fallisce mostra "non disponibile". Rotta non localizzata come le altre (`proxy.ts` + `lib/supabase/proxy.ts`).
 - Allenamenti: il countdown di preparazione è configurabile e c'è un indicatore wake lock; gli elenchi
   non scaricano `scheda_snapshot`. Alimentazione: scanner barcode dentro uno `Sheet`.
 
