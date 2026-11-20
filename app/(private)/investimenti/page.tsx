@@ -5,6 +5,7 @@ import { SummaryCards } from "@/components/investimenti/SummaryCards";
 import { PositionsTable } from "@/components/investimenti/PositionsTable";
 import { AggiornaPrezzi } from "@/components/investimenti/AggiornaPrezzi";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { PrivacyToggle } from "@/components/privacy-toggle";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
 
@@ -43,7 +44,7 @@ export default async function InvestimentiPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Investimenti" />
+      <PageHeader title="Investimenti" action={<PrivacyToggle />} />
       <SegmentedControl items={INVESTIMENTI_SEGMENTI} />
 
       <div className="hidden flex-col gap-1 md:flex">
