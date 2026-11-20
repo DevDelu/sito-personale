@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { oggiItaliaISO } from "@/lib/cron/data-italia";
 import { getAlimenti, getPasti, getPastiTraDate } from "@/lib/alimentazione/queries";
 import { getTemplatePasti } from "@/lib/alimentazione/template";
 import { AddMealForm } from "./add-meal-form";
@@ -7,8 +8,10 @@ import { PageHeader } from "@/components/ui/PageHeader";
 export const metadata: Metadata = { title: "Alimentazione · Aggiungi pasto" };
 
 export default async function AggiungiPastoPage() {
-  const adesso = new Date();
-  const oggi = adesso.toISOString().slice(0, 10);
+  // Fuso Europe/Rome come nel resto del modulo: in UTC tra mezzanotte e le 1-2
+  // italiane "oggi" era ieri e gli alimenti usati di recente slittavano.
+  const oggi = oggiItaliaISO();
+  const adesso = new Date(`${oggi}T00:00:00Z`);
   adesso.setUTCDate(adesso.getUTCDate() - 30);
   const da = adesso.toISOString().slice(0, 10);
   const [alimenti, { rows: recenti }, pastiMese, templates] = await Promise.all([

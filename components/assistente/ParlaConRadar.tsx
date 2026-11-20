@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, Keyboard, Mic, MicOff, RotateCcw, Send, Volume2, VolumeX, X } from "lucide-react";
+import { Check, Mic, RotateCcw, Send, Square, Volume2, VolumeX, X } from "lucide-react";
 import { useConversazioneVocale, type FaseVoce, type RispostaTurno } from "@/hooks/useConversazioneVocale";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { MAX_TURNI, type Turno } from "@/lib/assistente/storia";
@@ -21,9 +21,9 @@ const ESEMPI = [
 const ETICHETTE: Record<FaseVoce, string> = {
   spento: "Tocca per parlare",
   avvio: "Apro il microfono…",
-  ascolto: "Ti ascolto",
-  registro: "Ti ascolto…",
-  penso: "Ci penso…",
+  ascolto: "Ti ascolto · tocca per fermare",
+  registro: "Ti ascolto… · tocca per fermare",
+  penso: "Ci penso… · tocca per fermare",
   parlo: "Tocca per interrompere",
 };
 
@@ -47,7 +47,6 @@ const DOMANDA_ATTRITO = "Ho visto che qualcosa non è andato. Cosa stavi facendo
 export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inSheet = false }: Props = {}) {
   const [messaggi, setMessaggi] = useState<Messaggio[]>([]);
   const [errore, setErrore] = useState<string | null>(null);
-  const [tastiera, setTastiera] = useState(false);
   const [bozza, setBozza] = useState("");
   const storiaRef = useRef<Turno[]>([]);
   const fondoRef = useRef<HTMLDivElement>(null);
@@ -104,6 +103,17 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
 
   const voce = useConversazioneVocale({ invia, onErrore: setErrore });
   const attiva = voce.fase !== "spento";
+  // iOS non riduce dvh quando si apre la tastiera: nello sheet l'altezza segue
+  // il viewport visibile, così la barra di scrittura resta sopra la tastiera.
+  const [altezzaVisibile, setAltezzaVisibile] = useState<number | null>(null);
+  useEffect(() => {
+    const vv = typeof window !== "undefined" ? window.visualViewport : null;
+    if (!inSheet || !vv) return;
+    const aggiorna = () => setAltezzaVisibile(Math.round(vv.height));
+    aggiorna();
+    vv.addEventListener("resize", aggiorna);
+    return () => vv.removeEventListener("resize", aggiorna);
+  }, [inSheet]);
   useWakeLock(attiva);
 
   useEffect(() => {
@@ -145,6 +155,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
   function tapCerchio() {
     if (voce.fase === "spento") void voce.avvia();
     else if (voce.fase === "parlo") voce.interrompi();
+    else voce.ferma();
   }
 
   function nuovaConversazione() {
@@ -166,6 +177,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
 
   return (
     <div
+      style={inSheet && altezzaVisibile ? { maxHeight: altezzaVisibile - 16 } : undefined}
       className={
         inSheet
           ? "flex h-[min(78dvh,680px)] flex-col"
@@ -190,7 +202,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
                 <button
                   key={es}
                   type="button"
-                  className="rounded-full border border-border px-3 py-1.5 text-[13px] text-muted active:bg-surface-hover"
+                  className="min-h-11 rounded-full border border-border px-4 text-[13px] text-muted active:bg-surface-hover"
                   onClick={() => void voce.inviaTesto(es)}
                 >
                   {es}
@@ -205,7 +217,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
                 <p
                   className={
                     m.ruolo === "user"
-                      ? "max-w-[85%] rounded-2xl rounded-br-md bg-accent/15 px-3.5 py-2 text-[15px]"
+                      ? "importo max-w-[85%] rounded-2xl rounded-br-md bg-accent/15 px-3.5 py-2 text-[15px]"
                       : "importo max-w-[90%] whitespace-pre-line rounded-2xl rounded-bl-md bg-surface px-3.5 py-2 text-[15px] shadow-sm"
                   }
                 >
@@ -249,10 +261,11 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
               </li>
             ))}
             {voce.fase === "penso" ? (
-              <li className="flex items-center gap-1.5 px-1 text-muted" aria-label="Sto pensando">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-muted" />
-                <span className="h-2 w-2 animate-pulse rounded-full bg-muted [animation-delay:150ms]" />
-                <span className="h-2 w-2 animate-pulse rounded-full bg-muted [animation-delay:300ms]" />
+              <li className="flex items-center gap-1.5 px-1 text-muted">
+                <span className="sr-only">Sto pensando</span>
+                <span aria-hidden className="h-2 w-2 animate-pulse rounded-full bg-muted" />
+                <span aria-hidden className="h-2 w-2 animate-pulse rounded-full bg-muted [animation-delay:150ms]" />
+                <span aria-hidden className="h-2 w-2 animate-pulse rounded-full bg-muted [animation-delay:300ms]" />
               </li>
             ) : null}
           </ul>
@@ -280,23 +293,27 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
           <p className="text-center text-sm text-muted">Questo browser non supporta la voce: puoi scrivere.</p>
         ) : null}
 
-        {tastiera || !voce.supportato ? (
-          <form onSubmit={inviaScritto} className="flex w-full items-center gap-2">
-            <input
-              value={bozza}
-              onChange={(e) => setBozza(e.target.value)}
-              placeholder="Scrivi a Radar…"
-              enterKeyHint="send"
-              className="min-h-11 flex-1 rounded-full border border-border bg-surface px-4 text-[16px] outline-none focus:border-accent"
-              aria-label="Messaggio"
-            />
-            <button type="submit" className="btn-primary !px-3" aria-label="Invia" disabled={!bozza.trim()}>
-              <Send className="h-4 w-4" />
-            </button>
-          </form>
-        ) : null}
+        <form onSubmit={inviaScritto} className="flex w-full items-center gap-2">
+          <input
+            value={bozza}
+            onChange={(e) => setBozza(e.target.value)}
+            // Scrivere e parlare insieme non ha senso: toccando la barra il
+            // microfono si chiude (su iOS la tastiera si apre dal tocco).
+            onFocus={() => {
+              if (voce.fase === "ascolto" || voce.fase === "registro") voce.ferma();
+            }}
+            placeholder="Scrivi a Radar…"
+            enterKeyHint="send"
+            className="min-h-11 flex-1 rounded-full border border-border bg-surface px-4 text-[16px] outline-none focus:border-accent"
+            aria-label="Messaggio"
+          />
+          <button type="submit" className="btn-primary min-w-11 !px-3" aria-label="Invia" disabled={!bozza.trim()}>
+            <Send className="h-4 w-4" />
+          </button>
+        </form>
 
-        <div className="flex w-full items-center justify-between">
+        {/* Tre colonne: il cerchio resta fermo qualunque pulsante compaia ai lati. */}
+        <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center">
           <div className="flex gap-1">
             <button
               type="button"
@@ -307,15 +324,6 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
             >
               {voce.voceAttiva ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
             </button>
-            <button
-              type="button"
-              className="btn-icon"
-              onClick={() => setTastiera((t) => !t)}
-              aria-label="Scrivi invece di parlare"
-              aria-pressed={tastiera}
-            >
-              <Keyboard className="h-5 w-5" />
-            </button>
           </div>
 
           {voce.supportato ? (
@@ -325,17 +333,21 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
                 onClick={tapCerchio}
                 aria-label={ETICHETTE[voce.fase]}
                 className={`relative flex h-20 w-20 items-center justify-center rounded-full text-accent-foreground shadow-lg transition-colors ${
-                  attiva ? "bg-accent" : "bg-accent/85"
+                  attiva ? "bg-spesa" : "bg-accent/85"
                 } ${voce.fase === "penso" ? "animate-pulse" : ""}`}
               >
                 <span
                   aria-hidden
-                  className="absolute inset-0 rounded-full bg-accent/30 transition-transform duration-75"
+                  className={`absolute inset-0 rounded-full transition-transform duration-75 ${attiva ? "bg-spesa/30" : "bg-accent/30"}`}
                   style={{ transform: `scale(${scala * 1.25})` }}
                 />
-                <Mic className="relative h-8 w-8" strokeWidth={2} />
+                {attiva ? (
+                  <Square className="relative h-7 w-7 fill-current" strokeWidth={2} />
+                ) : (
+                  <Mic className="relative h-8 w-8" strokeWidth={2} />
+                )}
               </button>
-              <span className="text-xs text-muted" aria-live="polite">
+              <span className="text-center text-xs text-muted" aria-live="polite">
                 {ETICHETTE[voce.fase]}
               </span>
             </div>
@@ -343,12 +355,7 @@ export function ParlaConRadar({ pagina, attrito, avvioAutomatico = false, inShee
             <span />
           )}
 
-          <div className="flex gap-1">
-            {attiva ? (
-              <button type="button" className="btn-icon" onClick={voce.ferma} aria-label="Chiudi il microfono">
-                <MicOff className="h-5 w-5" />
-              </button>
-            ) : null}
+          <div className="flex justify-end gap-1">
             <button
               type="button"
               className="btn-icon"
