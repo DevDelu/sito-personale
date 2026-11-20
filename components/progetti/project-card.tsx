@@ -23,6 +23,7 @@ export function ProjectCard({
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-hover">
           <Image
             src={project.cover}
+            unoptimized={project.cover.endsWith(".svg")}
             alt={project.title}
             fill
             sizes="(min-width: 768px) 33vw, 100vw"

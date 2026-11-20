@@ -98,12 +98,12 @@ export function EventoFormModal({
           />
         </Field>
 
-        <label className="flex items-center gap-2 text-sm font-medium text-muted">
+        <label className="flex items-center gap-2 text-sm font-medium text-muted max-md:min-h-11">
           <input
             type="checkbox"
             checked={tuttoIlGiorno}
             onChange={(e) => setTuttoIlGiorno(e.target.checked)}
-            className="h-4 w-4 rounded border-border accent-[var(--accent)]"
+            className="h-4 w-4 max-md:h-5 max-md:w-5 rounded border-border accent-[var(--accent)]"
           />
           Tutto il giorno
         </label>

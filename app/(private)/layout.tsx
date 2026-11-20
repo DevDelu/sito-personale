@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { requireUser } from "@/lib/supabase/dal";
-import { isOwner } from "@/lib/supabase/owner";
-import { logout } from "@/app/login/actions";
+import { isOwner, isTester } from "@/lib/supabase/owner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sidebar } from "@/components/sidebar";
 import { TabBar } from "@/components/shell/TabBar";
@@ -10,6 +9,7 @@ import { RefreshAlRitorno } from "@/components/shell/RefreshAlRitorno";
 import { PullToRefresh } from "@/components/shell/PullToRefresh";
 import { ToastHost } from "@/components/ui/ToastHost";
 import { FeedbackProvider } from "@/components/feedback/FeedbackProvider";
+import { AssistenteHost } from "@/components/assistente/AssistenteHost";
 import { appViewport } from "@/lib/app-viewport";
 
 export const viewport = appViewport;
@@ -29,7 +29,7 @@ export default async function PrivateLayout({
   );
 
   const logoutForm = (
-    <form action={logout}>
+    <form action="/api/auth/logout" method="post">
       <button type="submit" className="btn-secondary !px-3 !py-1.5">
         Esci
       </button>
@@ -57,6 +57,12 @@ export default async function PrivateLayout({
           <ThemeToggle />
           {areaPubblicaLink}
         </div>
+        {isTester(user.email) && (
+          <div role="status" className="border-b border-border bg-surface px-4 py-2 text-sm text-muted sm:px-6">
+            Sei collegato come <span className="font-medium text-foreground">{user.email}</span>, l&apos;account tester in
+            sola lettura: puoi guardare ma non caricare o modificare. Esci e rientra con il tuo account.
+          </div>
+        )}
         <main className="app-page-content animate-fade-in flex flex-1 flex-col px-4 pb-[calc(var(--app-tabbar-height)+max(env(safe-area-inset-bottom),20px)+1rem)] sm:px-6 md:pt-6 md:pb-6">
           {children}
         </main>
@@ -66,6 +72,7 @@ export default async function PrivateLayout({
       <PullToRefresh />
       <ToastHost />
       <FeedbackProvider owner={isOwner(user.email)} />
+      <AssistenteHost />
     </div>
   );
 }

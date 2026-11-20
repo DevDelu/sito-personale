@@ -55,22 +55,3 @@ export function FeedbackLinkSidebar() {
     </Link>
   );
 }
-
-// Pulsante flottante su OGNI pagina privata (prima c'era solo in Spese):
-// il feedback prende come riferimento la pagina in cui viene toccato
-// (route, url, area e scroll catturati da FeedbackProvider all'apertura).
-// Mobile: in basso a SINISTRA sopra la tab bar, così non si sovrappone ai
-// FAB delle pagine (es. "+" in Carte, a destra); z-20, sotto l'ActionBar
-// della selezione multipla. Desktop: in basso a destra.
-export function FeedbackPulsante() {
-  return (
-    <button
-      type="button"
-      onClick={() => apriFeedback({ origine: "pulsante" })}
-      aria-label="Lascia un feedback su questa pagina"
-      className="app-static fixed bottom-[calc(var(--app-tabbar-height)+max(env(safe-area-inset-bottom),20px)+1rem)] left-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface text-muted shadow-md transition-transform duration-150 ease-out active:scale-90 md:right-6 md:bottom-6 md:left-auto"
-    >
-      <MessageSquare className="h-5 w-5" strokeWidth={1.75} />
-    </button>
-  );
-}

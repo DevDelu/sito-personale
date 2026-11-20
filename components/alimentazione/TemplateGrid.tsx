@@ -4,6 +4,8 @@ import { Fragment, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTemplateMutations } from "@/hooks/useTemplateMutations";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
+import { ListGroup, ListRowButton } from "@/components/ui/ListGroup";
+import { mostraToast } from "@/lib/toast/bus";
 import { TemplateEditModal, type TemplateSavePayload } from "./TemplateEditModal";
 import type { Alimento, TemplatePasto, TipoPasto } from "@/lib/alimentazione/types";
 
@@ -62,6 +64,7 @@ export function TemplateGrid({ templates, alimenti }: { templates: TemplatePasto
     }
     setEditing(null);
     router.refresh();
+    mostraToast({ testo: "Template salvato" });
   }
 
   async function handleDelete() {
@@ -70,13 +73,38 @@ export function TemplateGrid({ templates, alimenti }: { templates: TemplatePasto
     setDeleting(null);
     setEditing(null);
     router.refresh();
+    mostraToast({ testo: "Template eliminato" });
+  }
+
+  function composizioneTesto(t: TemplatePasto): string {
+    if (t.composizione.length === 0) return "Nessuna composizione fissa";
+    return t.composizione.map((c) => `${alimentiById.get(c.alimento_id)?.nome ?? "?"} ${c.quantita_g}g`).join(" · ");
   }
 
   const cellaInModifica = templateInModifica();
 
   return (
     <>
-      <div className="overflow-x-auto">
+      <div className="flex flex-col gap-5 md:hidden">
+        {GIORNI.map((g) => (
+          <ListGroup key={g.value} title={g.label}>
+            {TIPI.map((tipo) => {
+              const template = templateFor(g.value, tipo.value);
+              return (
+                <ListRowButton
+                  key={tipo.value}
+                  title={template ? `${tipo.label} · ${template.nome}` : tipo.label}
+                  subtitle={template ? composizioneTesto(template) : "+ Aggiungi"}
+                  chevron
+                  onClick={() => setEditing({ giorno: g.value, tipoPasto: tipo.value })}
+                />
+              );
+            })}
+          </ListGroup>
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto md:block">
         <div className="grid min-w-[900px] grid-cols-[120px_repeat(7,1fr)] gap-2">
           <div />
           {GIORNI.map((g) => (
@@ -135,7 +163,7 @@ export function TemplateGrid({ templates, alimenti }: { templates: TemplatePasto
           <button
             type="button"
             onClick={() => setEditing({ giorno: null, tipoPasto: "pranzo" })}
-            className="btn-secondary !px-3 !py-1.5 text-xs"
+            className="btn-secondary !px-3 !py-1.5 text-xs max-md:text-[15px]"
           >
             + Nuovo jolly
           </button>
@@ -148,9 +176,9 @@ export function TemplateGrid({ templates, alimenti }: { templates: TemplatePasto
                 key={t.id}
                 type="button"
                 onClick={() => setEditing({ giorno: null, tipoPasto: t.tipo_pasto, jollyId: t.id })}
-                className="card card-hover flex flex-col gap-1 p-2.5 text-left text-xs"
+                className="card card-hover flex min-h-11 flex-col gap-1 p-2.5 text-left text-xs max-md:text-[13px]"
               >
-                <span className="text-sm font-medium leading-snug">{t.nome}</span>
+                <span className="text-sm font-medium leading-snug max-md:text-[17px]">{t.nome}</span>
                 <span className="text-muted">
                   {TIPI.find((tp) => tp.value === t.tipo_pasto)?.label} ·{" "}
                   {t.composizione.length > 0
