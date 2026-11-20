@@ -34,7 +34,7 @@ export default async function LezionePage({ params }: { params: Promise<{ slug: 
         <span className="text-[13px] font-medium uppercase tracking-wide text-accent">
           Lezione {numero} di {LEZIONI.length} · {modulo(l.modulo).titolo} · {l.minuti} min
         </span>
-        <h1 className="font-display text-[28px] font-semibold leading-tight tracking-tight">{l.titolo}</h1>
+        <h2 className="font-display text-[28px] font-semibold leading-tight tracking-tight">{l.titolo}</h2>
         <p className="text-[15px] text-muted">{l.sottotitolo}</p>
       </header>
 
