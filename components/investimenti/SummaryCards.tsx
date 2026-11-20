@@ -1,22 +1,30 @@
 import { formatCurrency, formatPercent } from "@/lib/investimenti/format";
+import { VariazioneOggi } from "./VariazioneOggi";
 
 export function SummaryCards({
   totaleInvestito,
   valoreAttuale,
   plusvalenzaAssoluta,
   plusvalenzaPercentuale,
+  oggi = null,
 }: {
   totaleInvestito: number;
   valoreAttuale: number;
   plusvalenzaAssoluta: number | null;
   plusvalenzaPercentuale: number | null;
+  oggi?: { importo: number; percentuale: number | null } | null;
 }) {
   const gainColorVar = plusvalenzaAssoluta === null ? "--muted" : plusvalenzaAssoluta >= 0 ? "--entrata" : "--spesa";
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <Card label="Totale investito" value={formatCurrency(totaleInvestito)} colorVar="--invest-stock" />
-      <Card label="Valore attuale" value={formatCurrency(valoreAttuale)} colorVar="--accent" />
+      <Card
+        label="Valore attuale"
+        value={formatCurrency(valoreAttuale)}
+        colorVar="--accent"
+        extra={oggi ? <VariazioneOggi importo={oggi.importo} percentuale={oggi.percentuale} className="text-sm" /> : null}
+      />
       <Card
         label="Plus/minusvalenza"
         value={
@@ -30,7 +38,17 @@ export function SummaryCards({
   );
 }
 
-function Card({ label, value, colorVar }: { label: string; value: string; colorVar: string }) {
+function Card({
+  label,
+  value,
+  colorVar,
+  extra = null,
+}: {
+  label: string;
+  value: string;
+  colorVar: string;
+  extra?: React.ReactNode;
+}) {
   return (
     <div
       className="card card-hover animate-slide-up flex flex-col gap-1 border-l-4 px-4 py-3"
@@ -40,6 +58,7 @@ function Card({ label, value, colorVar }: { label: string; value: string; colorV
       <span className="importo font-figures text-2xl font-semibold" style={{ color: `var(${colorVar})` }}>
         {value}
       </span>
+      {extra}
     </div>
   );
 }

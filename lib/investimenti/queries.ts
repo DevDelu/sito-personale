@@ -1,6 +1,8 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { calcolaFifo } from "./fifo";
+import { oggiItaliaISO } from "@/lib/cron/data-italia";
+import { variazioneGiorno } from "./variazione-giorno";
 import type { Asset, Posizione, Transazione, TransazioneConAsset } from "./types";
 
 function toNumber(v: unknown): number {
@@ -80,11 +82,15 @@ export async function getPosizioniCorrenti(): Promise<Posizione[]> {
   if (prezziRes.error) throw new Error(prezziRes.error.message);
 
   const ultimoPrezzo = new Map<string, { prezzo: number; data: string }>();
+  const penultimoPrezzo = new Map<string, { prezzo: number; data: string }>();
   for (const p of prezziRes.data ?? []) {
     if (!ultimoPrezzo.has(p.asset_id)) {
       ultimoPrezzo.set(p.asset_id, { prezzo: toNumber(p.prezzo), data: p.data });
+    } else if (!penultimoPrezzo.has(p.asset_id) && p.data < (ultimoPrezzo.get(p.asset_id) as { data: string }).data) {
+      penultimoPrezzo.set(p.asset_id, { prezzo: toNumber(p.prezzo), data: p.data });
     }
   }
+  const oggi = oggiItaliaISO();
 
   const transazioniPerAsset = new Map<string, Transazione[]>();
   for (const row of transazioniRes.data ?? []) {
@@ -162,6 +168,10 @@ export async function getPosizioniCorrenti(): Promise<Posizione[]> {
       hasSconosciuto: fifo.hasSconosciuto,
       quantitaValore,
       datiIncompleti,
+      variazioneOggi:
+        prezzoAttualeFonte === "prezzi_storico"
+          ? variazioneGiorno(storico, penultimoPrezzo.get(asset.id), quantitaValore, oggi)
+          : null,
     });
   }
 
