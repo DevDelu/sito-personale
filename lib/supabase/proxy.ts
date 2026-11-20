@@ -12,6 +12,7 @@ const PROTECTED_PREFIXES = [
   "/impostazioni",
   "/altro",
   "/feedback",
+  "/trading",
   "/assistente",
 ];
 

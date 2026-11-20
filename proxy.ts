@@ -16,6 +16,7 @@ const UNLOCALIZED_PREFIXES = [
   "/impostazioni",
   "/altro",
   "/feedback",
+  "/trading",
   "/assistente",
 ];
 // Login e recupero password vivono fuori da app/[locale]/: senza queste voci
