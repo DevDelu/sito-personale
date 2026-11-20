@@ -93,6 +93,7 @@ export function useConversazioneVocale({ invia, onErrore }: Opzioni) {
   const vadRef = useRef<StatoVad>(statoIniziale());
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const ultimoTickRef = useRef(0);
+  const ultimoRiprovaCtxRef = useRef(0);
   const turnoVoceRef = useRef(0); // invalida gli onend di letture interrotte
   const mimeRef = useRef(scegliMime());
   const micDuranteRispostaRef = useRef(true);
@@ -153,9 +154,13 @@ export function useConversazioneVocale({ invia, onErrore }: Opzioni) {
     // resterebbe sospeso e il microfono sembrerebbe muto.
     const ctx = audioCtxRef.current ?? contestoAudio() ?? sbloccaAudio() ?? new AudioContext();
     audioCtxRef.current = ctx;
-    // Non si aspetta: fuori da un gesto, su iOS resume() può restare in
-    // sospeso per sempre e bloccherebbe l'avvio.
-    if (ctx.state === "suspended") void ctx.resume().catch(() => {});
+    // Al primo uso il prompt del permesso lascia il contesto sospeso: ora che
+    // la cattura è concessa si riprova a riattivarlo. Attesa breve: fuori da
+    // un gesto, su iOS resume() può restare in sospeso e bloccherebbe l'avvio
+    // (se resta sospeso ci riprova il ciclo di ascolto, vedi tick()).
+    if (ctx.state === "suspended") {
+      await Promise.race([ctx.resume().catch(() => {}), new Promise((r) => setTimeout(r, 400))]);
+    }
     const analyser = ctx.createAnalyser();
     analyser.fftSize = 1024;
     ctx.createMediaStreamSource(stream).connect(analyser);
@@ -268,6 +273,13 @@ export function useConversazioneVocale({ invia, onErrore }: Opzioni) {
     if (!analyser || !buffer || (f !== "ascolto" && f !== "registro" && f !== "parlo")) {
       setLivello(0);
       return;
+    }
+    // Contesto ancora sospeso (tipico del primo uso, dopo il permesso): il
+    // microfono sembra muto. Si riprova a riattivarlo ogni secondo.
+    const ctx = audioCtxRef.current;
+    if (ctx && ctx.state !== "running" && ora - ultimoRiprovaCtxRef.current > 1000) {
+      ultimoRiprovaCtxRef.current = ora;
+      void ctx.resume().catch(() => {});
     }
     analyser.getFloatTimeDomainData(buffer);
     const rms = rmsDa(buffer);
