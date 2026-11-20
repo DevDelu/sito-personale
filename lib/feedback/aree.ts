@@ -93,6 +93,10 @@ export const AREE_FEEDBACK = {
   "altro.menu": "Altro",
 
   // Assistente
+  "novita.modifiche": "Novità › Modifiche online",
+  "novita.resoconti": "Novità › Resoconti del team",
+  "novita.resoconto": "Novità › Resoconto",
+
   "assistente.pagina": "Assistente",
   "assistente.conversazione": "Assistente › Conversazione",
   "assistente.controlli": "Assistente › Microfono e controlli",

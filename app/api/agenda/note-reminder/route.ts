@@ -38,8 +38,10 @@ function spostaGiorno(data: string, giorni: number): string {
 // supporta timezone, quindi con l'ora legale l'orario reale scala di 1h,
 // stesso limite già accettato per gli altri cron di questo progetto).
 // Manda una push con il riepilogo di oggi (eventi + cenno alla nota) se c'è
-// almeno una delle due cose, e un'email SOLO se esiste una nota non vuota per
-// la data odierna; entrambe solo se il promemoria è attivo (interruttore in
+// almeno una delle due cose. L'email con la nota è solo una riserva: parte se
+// c'è una nota non vuota E la push non è arrivata (notifiche non attive sul
+// telefono, VAPID mancanti...). Lorenzo ha scelto le notifiche al posto delle
+// email (nov 2026). Tutto solo se il promemoria è attivo (interruttore in
 // agenda_impostazioni, gestito dalla pagina Agenda).
 export async function GET(request: Request) {
   const rifiutata = rifiutaSeNonCron(request);
@@ -70,6 +72,9 @@ export async function GET(request: Request) {
 
   if (!nota || !haNota) {
     return NextResponse.json({ ok: true, inviata: false, push: pushInviata, motivo: "nessuna nota per oggi" });
+  }
+  if (pushInviata) {
+    return NextResponse.json({ ok: true, inviata: false, push: true, motivo: "notificata via push" });
   }
 
   const apiKey = process.env.RESEND_API_KEY;

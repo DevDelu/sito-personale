@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { ExternalLink, Layers, LogOut, Dumbbell, Apple, AudioLines, Bell, Inbox } from "lucide-react";
+import { ExternalLink, Layers, LogOut, Dumbbell, Apple, AudioLines, Bell, Inbox, Sparkles } from "lucide-react";
 import { contaPerTe } from "@/lib/feedback/queries";
+import { contaNovitaRecenti } from "@/lib/novita/queries";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PrivacyToggle } from "@/components/privacy-toggle";
 import { ListGroup, ListRow, ListRowLink } from "@/components/ui/ListGroup";
@@ -16,7 +17,10 @@ export default async function AltroPage() {
   // Contatore dei feedback che aspettano Lorenzo (domanda, PR da approvare,
   // verifica) a destra della riga "I miei feedback"; 0 se la migration 033
   // non è ancora applicata.
-  const perTe = await contaPerTe().catch(() => 0);
+  const [perTe, novitaSettimana] = await Promise.all([
+    contaPerTe().catch(() => 0),
+    contaNovitaRecenti().catch(() => 0),
+  ]);
 
   return (
     <div className="flex flex-1 flex-col md:hidden">
@@ -29,6 +33,17 @@ export default async function AltroPage() {
             icon={<AudioLines className="h-5 w-5" strokeWidth={1.75} />}
             title="Assistente"
             subtitle="Parla con Radar"
+            chevron
+          />
+          <ListRowLink
+            href="/novita"
+            icon={<Sparkles className="h-5 w-5" strokeWidth={1.75} />}
+            title="Novità"
+            subtitle={
+              novitaSettimana > 0
+                ? `${novitaSettimana} novità questa settimana`
+                : "Modifiche online e resoconti"
+            }
             chevron
           />
         </ListGroup>

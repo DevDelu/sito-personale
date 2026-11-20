@@ -40,7 +40,14 @@ React/Next.js, `supabase` per query/auth/RLS, `web-design-guidelines` per l'inte
 
    Closes #<N>
    Nota per Lorenzo: <una frase senza gergo su cosa è cambiato e dove guardare>
+
+   ## Novità
+   Tipo: <funzione | correzione | tecnico>
+   Titolo: <max 8 parole, senza gergo>
+   <1-3 frasi per Lorenzo: cosa cambia e dove guardare>
    ```
+   La sezione `## Novità` è il testo che Lorenzo legge in Radar → Novità quando la PR va
+   online (formato in `giro-notturno/SKILL.md`, "Regole sempre valide").
    Repo **pubblico**: niente dati personali. Controlla il corpo con
    `node .github/scripts/privacy.mjs <file>`.
 7. Torna a `main` pulito prima della issue successiva. Una PR per issue.

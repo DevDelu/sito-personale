@@ -392,8 +392,10 @@ delle PR aperte, feedback (`sviluppatore-feedback`), issue (`sviluppatore-issue`
 `rischio-basso`) le mergia il giro dopo revisione e check verdi, una alla volta, con controllo del
 deploy di produzione e **rollback automatico** (PR "Revert #N") se qualcosa si rompe; quelle a
 rischio alto (migration, auth, proxy, workflow, calcoli su importi...) restano a Lorenzo.
-Newsletter con screenshot via `scripts/screenshot.mjs` + `scripts/newsletter.mjs` (Resend; le
-immagini mostrano dati reali: solo nella scratchpad e nell'email privata, mai nel repo). Lezioni
+Resoconto di fine turno in Radar con notifica (`scripts/resoconto.mjs`, vedi "Novità e
+resoconti" sotto); email con screenshot (`scripts/screenshot.mjs` + `scripts/newsletter.mjs`) solo di
+riserva se la notifica non parte (le immagini mostrano dati reali: solo nella scratchpad e nell'email
+privata, mai nel repo). **Ogni PR ha una sezione `## Novità`** (formato in `giro-notturno/SKILL.md`). Lezioni
 dagli errori in `docs/lezioni-agenti.md`.
 
 Regole per gli agenti: **costo zero** (solo abbonamento Claude Pro; mai chiavi API, crediti extra o
@@ -456,6 +458,32 @@ volta, `frasiPerVoce()`) → di nuovo in ascolto. Gotcha:
   sono solo di Lorenzo. Modello di default `openai/gpt-oss-120b` con `reasoning_effort: "low"`: il primo
   default (`llama-3.3-70b-versatile`) era nelle deprecazioni di Groq e in produzione dava sempre errore.
   Prima di cambiare modello controllare console.groq.com/docs/deprecations.
+
+### Novità e resoconti (notifiche al posto delle email)
+
+Lorenzo ha scelto (nov 2026) di ricevere tutto come **notifica dall'app** e di leggerlo dentro Radar;
+le email restano solo come riserva quando la notifica non parte (push non attive, VAPID mancanti).
+
+- **Sezione Novità** (`/novita`, da Altro e sidebar): ogni PR andata in produzione, spiegata semplice.
+  Il job `novita` di `.github/workflows/feedback-deploy.yml` (deploy di produzione riuscito) manda a
+  `POST /api/novita/agente` le PR mergiate contenute nel deploy; `novitaDaPr()`
+  (`lib/novita/testo-pr.ts`, testata) prende tipo/titolo/spiegazione dalla sezione `## Novità` del
+  corpo PR, in mancanza dalla riga `Nota per Lorenzo:` o dal titolo ripulito; i "Revert" diventano
+  `annullata`. Tabella `novita` (migration 036), idempotente su `pr_number`; parte dal 18/11/2026,
+  senza storico (scelta di Lorenzo). In pagina: prima ciò che cambia per lui (nuovo, sistemato,
+  annullato), poi i lavori tecnici, ognuno con la sua spiegazione.
+- **Resoconti** (`/novita/resoconti`): fine turno degli agenti, `scripts/resoconto.mjs` →
+  `POST /api/resoconti/agente` (tabella `resoconti`). Markdown semplice reso da `leggiMarkdown()`
+  (`lib/novita/markdown.ts`): niente HTML né MDX, link solo http(s) o interni.
+- Le due route sono in `API_AUTONOME` con lo stesso secret di `/api/feedback/agente`
+  (`rifiutaSeNonAgente()`, `lib/agenti/secret.ts`, fail-closed).
+- **Notifiche**: novità online (solo se almeno una non è tecnica, tag `novita`), resoconto (tag
+  `resoconto`, apre il resoconto), domanda di un agente e modifiche da verificare
+  (`notificaPerCambio()` in `lib/feedback/testo-notifiche.ts`, chiamata da `cambiaStato()`, mai per le
+  azioni di Lorenzo, un tag per tipo così si sostituiscono invece di accumularsi). Tutte via
+  `sendPushToOwner()`.
+- **Email rimaste**: nota agenda solo se la push non arriva; avvisi tecnici (token Google scaduto,
+  login sospetto) e messaggi dal form contatti del portfolio invariati.
 
 ### Decision log (dal README)
 

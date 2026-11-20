@@ -11,6 +11,8 @@ import type {
   FeedbackRow,
   FeedbackStato,
 } from "./types";
+import { notificaPerCambio } from "./testo-notifiche";
+import { sendPushToOwner } from "@/lib/push/send";
 
 export { isTabellaMancante } from "@/lib/push/queries";
 
@@ -152,7 +154,23 @@ export async function cambiaStato(
       testo: extra.testo ?? null,
     });
   }
+  if (daCambiare.length > 0) await notificaCosaDaFare(a, autore);
   return { ok: true, aggiornati: daCambiare.length, invariati: righe.length - daCambiare.length };
+}
+
+// Notifica sul telefono quando qualcosa aspetta Lorenzo (domanda di un
+// agente, modifica da verificare). Best-effort: una notifica mancata non
+// deve far fallire il cambio di stato.
+async function notificaCosaDaFare(stato: FeedbackStato, autore: EventoAutore) {
+  if (stato !== "serve-info" && stato !== "da-verificare") return;
+  try {
+    const admin = createAdminClient();
+    const { count } = await admin.from("feedback").select("id", { count: "exact", head: true }).eq("stato", stato);
+    const testo = notificaPerCambio(stato, autore, count ?? 0);
+    if (testo) await sendPushToOwner(testo);
+  } catch (e) {
+    console.error("[feedback] notifica", stato, (e as Error).message);
+  }
 }
 
 // Nota-fix dell'agente (una frase per Lorenzo) o altro evento senza cambio
