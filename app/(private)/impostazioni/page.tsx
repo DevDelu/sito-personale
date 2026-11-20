@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PushSettings } from "@/components/push/PushSettings";
 import { VibrazioneSettings } from "@/components/impostazioni/VibrazioneSettings";
+import { BackupSettings } from "@/components/impostazioni/BackupSettings";
 import { ListGroup } from "@/components/ui/ListGroup";
 import { PageHeader } from "@/components/ui/PageHeader";
 
@@ -35,6 +36,18 @@ export default function ImpostazioniPage() {
         </ListGroup>
         <p className="-mt-4 px-1 text-[13px] text-muted md:text-sm">
           Un tocco leggero quando completi una serie o apri il feedback con la pressione lunga.
+        </p>
+      </div>
+
+      <div data-fb-area="impostazioni.backup" className="contents">
+        <ListGroup title="Backup">
+          <div className="py-3 pr-4">
+            <BackupSettings />
+          </div>
+        </ListGroup>
+        <p className="-mt-4 px-1 text-[13px] text-muted md:text-sm">
+          Una copia JSON dei tuoi dati (spese, investimenti, agenda, alimentazione, allenamenti). Token Google e
+          notifiche push non sono inclusi.
         </p>
       </div>
     </div>
