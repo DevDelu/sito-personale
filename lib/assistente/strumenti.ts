@@ -10,6 +10,7 @@ import { routeModello } from "./pagina";
 import { chiudiBozza } from "./bozze";
 import { dataValida, formattaEuro } from "./date";
 import type { DefinizioneStrumento } from "./groq";
+import { opzionaliNullabili } from "./schema-strumenti";
 
 // Strumenti che l'LLM può chiamare. Regola: le letture vanno dirette su
 // Supabase riusando le query dei moduli; l'unica scrittura sui dati
@@ -40,7 +41,7 @@ type Args = Record<string, unknown>;
 
 const testo = (v: unknown, max = 200) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
-export const DEFINIZIONI: DefinizioneStrumento[] = [
+export const DEFINIZIONI: DefinizioneStrumento[] = opzionaliNullabili([
   {
     type: "function",
     function: {
@@ -137,7 +138,7 @@ export const DEFINIZIONI: DefinizioneStrumento[] = [
       },
     },
   },
-];
+]);
 
 async function proponiMovimento(args: Args, ctx: Contesto) {
   const tipo = args.tipo === "entrata" ? "entrata" : "spesa";
