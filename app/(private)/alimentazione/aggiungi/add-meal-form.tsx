@@ -257,13 +257,19 @@ export function AddMealForm({
         <p className="text-[13px] text-muted">Scegli un alimento dall&apos;elenco per poter aggiungere il pasto.</p>
       )}
 
-      <div className="flex gap-3">
+      {/* Su telefono la barra resta in vista sopra la tab bar, con le kcal dell'anteprima */}
+      <div
+        className="sticky z-20 -mx-4 flex items-center gap-3 border-t border-border bg-surface/95 px-4 py-2.5 backdrop-blur-md max-md:bottom-[calc(var(--app-tabbar-height)+env(safe-area-inset-bottom))] md:static md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none"
+      >
         <button type="submit" disabled={pending || !alimentoId} className="btn-primary min-h-[44px]">
           {pending ? "Salvataggio..." : "Aggiungi"}
         </button>
         <button type="button" onClick={() => router.back()} className="btn-secondary min-h-[44px]">
           Annulla
         </button>
+        {preview && (
+          <span className="ml-auto text-[15px] font-medium tabular-nums md:hidden">{preview.kcal} kcal</span>
+        )}
       </div>
       </form>
     </div>
