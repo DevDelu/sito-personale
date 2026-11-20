@@ -54,6 +54,16 @@
     "title": "Progetti",
     "description": "Una selezione di case study: tesi, progetti personali e lavoro."
   },
+  "Diario": {
+    "title": "Diario di bordo",
+    "description": "Le ultime modifiche a Radar, il sito che stai guardando: ogni voce è una modifica davvero pubblicata.",
+    "intro": "Radar cresce ogni giorno, anche con l'aiuto di un team di agenti AI. Qui sotto trovi le ultime modifiche pubblicate, raggruppate per settimana, con il link alla modifica su GitHub.",
+    "week": "Settimana del {data}",
+    "empty": "Il diario non è raggiungibile in questo momento. Riprova tra poco.",
+    "noteLang": "I titoli delle modifiche sono in italiano.",
+    "cta": "Diario di bordo",
+    "ctaHint": "Le ultime modifiche a Radar, settimana per settimana."
+  },
   "CaseStudy": {
     "backLink": "Home",
     "share": "Condividi",

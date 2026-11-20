@@ -57,6 +57,8 @@ test("vociSitemap: home e progetti in IT ed EN con alternative, niente rotte pri
     "https://a.example/en",
     "https://a.example/progetti",
     "https://a.example/en/progetti",
+    "https://a.example/progetti/diario",
+    "https://a.example/en/progetti/diario",
     "https://a.example/progetti/radar",
     "https://a.example/en/progetti/radar",
   ]);
