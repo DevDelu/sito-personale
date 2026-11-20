@@ -151,7 +151,7 @@ export function AlimentoSelector({
           className="field-input w-full bg-surface"
         />
         {mostraLista && (
-          <div className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-border bg-surface shadow-lg animate-slide-down">
+          <div className="relative z-10 mt-1 max-h-[32dvh] w-full md:absolute md:max-h-56 overflow-y-auto rounded-xl border border-border bg-surface shadow-lg animate-slide-down">
             <div id={listaId} role="listbox" aria-label="Alimenti trovati">
             {risultati.map((a) => (
               <button
