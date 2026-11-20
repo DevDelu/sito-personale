@@ -93,6 +93,14 @@ ne hanno bisogno e scrivilo in cima al resoconto.
 ### 1. Manutenzione delle PR aperte
 CI rossa → sistemala; conflitti → rebase e push; commenti di Lorenzo → applicali.
 
+**Limite di PR aperte (spazio Vercel)**: ogni PR aperta ha una anteprima, e le anteprime riempiono
+il "Functions Storage" del piano Hobby (10 GB, superato a nov 2026). Conta le PR aperte dopo la
+manutenzione: se sono **8 o più**, non aprire PR nuove (né di iniziativa né da issue): lavora solo
+su quelle esistenti, chiudi le tue PR superate o doppie (con un commento che dice perché) e scrivi
+in cima al resoconto "Limite PR raggiunto". I feedback di Lorenzo (fase 2) hanno la precedenza e
+possono superare il limite. Per ogni PR mergiata o chiusa dal giro, il branch non va lasciato
+aperto: se la PR non ha cancellato il branch, scrivilo nel resoconto.
+
 ### 2. Feedback di Lorenzo
 Con `RADAR_URL` e `FEEDBACK_AGENTE_SECRET`: `sviluppatore-feedback`. Senza: salta e scrivilo
 in cima al resoconto.
@@ -163,6 +171,9 @@ del tag); la domenica sempre, con il riepilogo della settimana.
    le variabili in "Serve te".
 
 ## Regole sempre valide
+- **Poche PR, poco spazio**: una PR per cambiamento, niente PR piccole che si possono unire a
+  una già aperta sullo stesso file, niente branch di prova. Le anteprime Vercel pesano (vedi
+  limite in fase 1).
 - **Costo zero**: si usa solo l'abbonamento Claude Pro di Lorenzo. Mai chiavi API Anthropic o di
   altri modelli, mai crediti extra, mai servizi o piani a pagamento (Vercel, Supabase, Resend,
   GitHub restano sui piani gratuiti). Se una soluzione richiede di pagare, è solo una proposta nel
