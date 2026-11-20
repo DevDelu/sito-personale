@@ -141,7 +141,7 @@ export function PastoTable({ rows: righeServer }: { rows: Pasto[] }) {
                     <button
                       type="button"
                       onClick={() => setEditing(p)}
-                      aria-label="Modifica pasto"
+                      aria-label={`Modifica ${p.alimento_nome}`}
                       className="btn-icon"
                     >
                       <Pencil className="h-4 w-4" />
@@ -149,7 +149,7 @@ export function PastoTable({ rows: righeServer }: { rows: Pasto[] }) {
                     <button
                       type="button"
                       onClick={() => setDeleting(p)}
-                      aria-label="Elimina pasto"
+                      aria-label={`Elimina ${p.alimento_nome}`}
                       className="btn-icon"
                     >
                       <Trash2 className="h-4 w-4" />

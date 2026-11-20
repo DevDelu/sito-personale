@@ -67,3 +67,46 @@ test("lo stipendio ha categoria Stipendio e importo/data restano quelli della ri
   assert.equal(r.categorizzate[0].importo, 1500);
   assert.equal(r.categorizzate[0].data, "2026-01-10");
 });
+
+test("Trade Republic: il bonifico da un mio conto è un giroconto, anche con il nome in ordine COGNOME NOME", () => {
+  const nomeInvertito = PROPRIO_NOMINATIVO.split(" ").reverse().join(" ").toUpperCase();
+  const r = applicaCategorizzazione([
+    raw({
+      fonte: "traderepublic",
+      tipo: "entrata",
+      tipoBanca: "Bonifico",
+      descrizioneGrezza: `Incoming transfer from ${nomeInvertito} (IT00X0000000000000000000000)`,
+    }),
+  ]);
+  assert.equal(r.categorizzate.length, 0);
+  assert.equal(r.escluse[0].motivoRegolaId, "traderepublic-bonifico-self");
+});
+
+test("Trade Republic: piani di accumulo e ordini sono esclusi come investimenti", () => {
+  const r = applicaCategorizzazione([
+    raw({ fonte: "traderepublic", tipoBanca: "Commercio", descrizioneGrezza: "Savings plan execution IE0000000000" }),
+  ]);
+  assert.equal(r.categorizzate.length, 0);
+  assert.equal(r.escluse[0].motivoRegolaId, "traderepublic-investimento");
+});
+
+test("Trade Republic: un bonifico da terzi va in Bonifici con il nominativo", () => {
+  const r = applicaCategorizzazione([
+    raw({
+      fonte: "traderepublic",
+      tipo: "entrata",
+      tipoBanca: "Bonifico",
+      descrizioneGrezza: "Incoming transfer from MARIO ROSSI (IT00X0000000000000000000000)",
+    }),
+  ]);
+  assert.equal(r.categorizzate[0].categoria, "Bonifici");
+  assert.equal(r.categorizzate[0].nominativo, "MARIO ROSSI");
+  assert.equal(r.categorizzate[0].titolo, "Bonifico da MARIO ROSSI");
+});
+
+test("Trade Republic: le spese con carta passano dalle regole comuni (PayPal)", () => {
+  const r = applicaCategorizzazione([
+    raw({ fonte: "traderepublic", tipoBanca: "Transazione con carta", descrizioneGrezza: "PAYPAL *ESEMPIO" }),
+  ]);
+  assert.equal(r.categorizzate[0].categoria, "PayPal");
+});

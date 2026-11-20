@@ -1,4 +1,5 @@
 import ExcelJS from "exceljs";
+import type { FonteGrezza } from "@/lib/parsers/raw-crypto";
 
 export type ImportRow = {
   tipo: "spesa" | "entrata";
@@ -9,7 +10,7 @@ export type ImportRow = {
   descrizione: string | null;
   nominativo: string | null;
   dettaglio: string | null;
-  fonte: "crypto" | "intesa";
+  fonte: FonteGrezza;
 };
 
 export type ImportRowError = { riga: number; messaggio: string };
@@ -40,7 +41,7 @@ const CATEGORIE_SPESA = new Set([
   "Altro",
 ]);
 const CATEGORIE_ENTRATA = new Set(["Stipendio", "Rimborso", "Vinted", "Bonifici", "Altro"]);
-const FONTI_AMMESSE = new Set(["crypto", "intesa"]);
+const FONTI_AMMESSE = new Set<string>(["crypto", "intesa", "traderepublic"]);
 
 function cellText(value: ExcelJS.CellValue): string {
   if (value === null || value === undefined) return "";
@@ -152,10 +153,10 @@ export async function parseImportExcel(buffer: ArrayBuffer): Promise<ImportResul
     }
 
     if (!FONTI_AMMESSE.has(fonteRaw)) {
-      errori.push({ riga: r, messaggio: `fonte non valida: "${fonteRaw}" (atteso "crypto" o "intesa").` });
+      errori.push({ riga: r, messaggio: `fonte non valida: "${fonteRaw}" (atteso "crypto", "intesa" o "traderepublic").` });
       continue;
     }
-    const fonte = fonteRaw as "crypto" | "intesa";
+    const fonte = fonteRaw as FonteGrezza;
 
     righeValide.push({
       tipo,
