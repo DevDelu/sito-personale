@@ -13,9 +13,9 @@ import type { SessioneElenco } from "@/lib/allenamento/types";
 const SENSAZIONE_LABEL = ["😞", "🙁", "😐", "🙂", "💪"];
 const SENSAZIONE_TESTO = ["Pessima", "Scarsa", "Normale", "Buona", "Ottima"];
 
-function formatData(iso: string): string {
+function formatData(iso: string, conGiorno = true): string {
   return new Date(`${iso}T00:00:00Z`).toLocaleDateString("it-IT", {
-    weekday: "short",
+    ...(conGiorno ? { weekday: "short" as const } : {}),
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -149,11 +149,11 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: SessioneElenco[] 
                     />
                   </label>
                 </th>
-                <th className="px-4 py-2 font-medium">Data</th>
-                <th className="px-4 py-2 font-medium">Durata</th>
-                <th className="px-4 py-2 font-medium">Sensazione</th>
+                <th className="px-2 md:px-4 py-2 font-medium">Data</th>
+                <th className="px-2 md:px-4 py-2 font-medium">Durata</th>
+                <th className="px-2 md:px-4 py-2 font-medium">Sensazione</th>
                 <th className="hidden px-4 py-2 font-medium md:table-cell">Note</th>
-                <th aria-label="Azioni" className="px-4 py-2 font-medium" />
+                <th aria-label="Azioni" className="px-2 md:px-4 py-2 font-medium" />
               </tr>
             </thead>
             <tbody>
@@ -178,18 +178,19 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: SessioneElenco[] 
                         />
                       </label>
                     </td>
-                    <td className="px-4 py-2 whitespace-nowrap capitalize">
+                    <td className="px-2 py-2 whitespace-nowrap capitalize md:px-4">
                       <Link
                         href={`/allenamenti/storico/${s.id}`}
                         className="inline-flex min-h-11 items-center hover:text-accent hover:underline md:min-h-0"
                       >
-                        {formatData(s.data)}
+                        <span className="md:hidden">{formatData(s.data, false)}</span>
+                        <span className="hidden md:inline">{formatData(s.data)}</span>
                       </Link>
                     </td>
-                    <td className="font-figures px-4 py-2 whitespace-nowrap">
+                    <td className="font-figures px-2 py-2 whitespace-nowrap md:px-4">
                       {s.durata_min != null ? `${s.durata_min} min` : "—"}
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-2 py-2 md:px-4">
                       {s.sensazione != null ? (
                         <span role="img" aria-label={`Sensazione: ${SENSAZIONE_TESTO[s.sensazione - 1]}`}>
                           {SENSAZIONE_LABEL[s.sensazione - 1]}
@@ -199,7 +200,7 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: SessioneElenco[] 
                       )}
                     </td>
                     <td className="hidden max-w-xs truncate px-4 py-2 text-muted md:table-cell">{s.note ?? "—"}</td>
-                    <td className="px-4 py-2">
+                    <td className="px-2 py-2 md:px-4">
                       <button
                         type="button"
                         onClick={() => setEliminando(s)}

@@ -1,6 +1,6 @@
 import type { ImportRow } from "@/lib/parsers/import-excel";
 import type { RawTransaction } from "@/lib/parsers/raw-crypto";
-import { REGOLE } from "@/lib/categorization/rules";
+import { REGOLE } from "./rules.ts";
 
 export type CategorizedRow = ImportRow & { daVerificare: boolean; categoriaSuggerita: string | null };
 export type ExclusedRow = { raw: RawTransaction; motivoRegolaId: string };

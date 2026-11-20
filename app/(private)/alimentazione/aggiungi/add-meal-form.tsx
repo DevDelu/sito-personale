@@ -253,6 +253,10 @@ export function AddMealForm({
         </p>
       )}
 
+      {!alimentoId && (
+        <p className="text-[13px] text-muted">Scegli un alimento dall&apos;elenco per poter aggiungere il pasto.</p>
+      )}
+
       <div className="flex gap-3">
         <button type="submit" disabled={pending || !alimentoId} className="btn-primary min-h-[44px]">
           {pending ? "Salvataggio..." : "Aggiungi"}
