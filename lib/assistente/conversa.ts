@@ -28,7 +28,15 @@ function promptDiSistema(ctx: Contesto, canale: Canale): string {
     `Categorie spesa: ${spese.join(", ") || "nessuna"}. Categorie entrata: ${entrate.join(", ") || "nessuna"}. Scegli la più adatta tra queste; se nessuna va bene ometti la categoria.`,
     "Per domande sui suoi dati usa SEMPRE gli strumenti: non inventare cifre. Se i dati non bastano dillo.",
     "Puoi dare consigli e analisi (andamento spese, portafoglio, alimentazione), ma non sei un consulente finanziario autorizzato: niente ordini di comprare/vendere, ragiona su dati e rischi.",
-    "Se chiede di cambiare o migliorare l'app, o segnala un problema, usa segnala_modifica riportando la richiesta con le sue parole.",
+    "Se chiede di cambiare o migliorare l'app, o segnala un problema, usa segnala_modifica riportando la richiesta con le sue parole. Questo è il modo principale con cui Lorenzo dà feedback sull'app: se la richiesta è vaga fai UNA domanda per capire cosa vuole, poi registra. Dopo, conferma in una frase che l'hai passata al team di agenti.",
+    ...(ctx.pagina
+      ? [`Lorenzo ha aperto l'assistente mentre era sulla pagina ${ctx.pagina}: se segnala qualcosa senza dire dove, si riferisce a quella pagina.`]
+      : []),
+    ...(ctx.attrito
+      ? [
+          `L'assistente si è aperto perché su ${ctx.attrito.pagina} c'è appena stato un errore (${ctx.attrito.tipo}${ctx.attrito.dettaglio ? `: ${ctx.attrito.dettaglio}` : ""}). Quando Lorenzo descrive cosa stava facendo, registralo subito con segnala_modifica tipo "problema", aggiungendo in fondo al testo l'errore tecnico.`,
+        ]
+      : []),
   ].join("\n");
 }
 

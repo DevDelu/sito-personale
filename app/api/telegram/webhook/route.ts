@@ -69,7 +69,7 @@ export async function POST(request: Request) {
       const testo =
         e instanceof LimiteGroq
           ? "Ho raggiunto il limite gratuito di Groq per ora: riprova tra qualche minuto."
-          : "Qualcosa è andato storto. Riprova tra poco.";
+          : `Qualcosa è andato storto: ${(e instanceof Error ? e.message : String(e)).slice(0, 300)}`;
       await inviaMessaggio(chatId, testo).catch(() => undefined);
     }
   }
@@ -122,7 +122,7 @@ async function gestisciMessaggio(msg: Messaggio) {
   }
 
   const [categorie, storia] = await Promise.all([getCategorie(), leggiStoriaTelegram()]);
-  const ctx: Contesto = { oggi: oggiRoma(), categorie, bozze: [], bozzeChiuse: [] };
+  const ctx: Contesto = { oggi: oggiRoma(), categorie, bozze: [], bozzeChiuse: [], canale: "telegram" };
   const risposta = await conversa(richiesta, storia, ctx, "telegram");
   await inviaMessaggio(chatId, risposta);
   await salvaScambioTelegram(richiesta, risposta).catch((e) => console.error("[telegram] storia", e));

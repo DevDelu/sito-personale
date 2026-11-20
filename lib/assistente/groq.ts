@@ -6,7 +6,11 @@ import "server-only";
 // Il modello è configurabile da env perché il catalogo Groq cambia nel tempo.
 
 const BASE = "https://api.groq.com/openai/v1";
-const MODELLO_CHAT_DEFAULT = "llama-3.3-70b-versatile";
+// llama-3.3-70b-versatile (il default della prima versione) è nella lista
+// delle deprecazioni di Groq: in produzione l'assistente rispondeva sempre
+// "Qualcosa è andato storto". gpt-oss-120b è tra i modelli di produzione e
+// supporta gli strumenti.
+const MODELLO_CHAT_DEFAULT = "openai/gpt-oss-120b";
 const MODELLO_VOCE_DEFAULT = "whisper-large-v3-turbo";
 
 function chiave(): string {
@@ -26,7 +30,8 @@ export async function trascrivi(audio: Blob, nomeFile = "vocale.ogg"): Promise<s
     headers: { authorization: `Bearer ${chiave()}` },
     body: form,
   });
-  if (!res.ok) throw new Error(`Groq trascrizione: ${res.status} ${await res.text()}`);
+  if (res.status === 429) throw new LimiteGroq();
+  if (!res.ok) throw new ErroreGroq("trascrizione", res.status, await res.text());
   const json = (await res.json()) as { text?: string };
   return (json.text ?? "").trim();
 }
@@ -51,23 +56,49 @@ export async function completa(
   messaggi: MessaggioChat[],
   strumenti: DefinizioneStrumento[]
 ): Promise<{ content: string | null; tool_calls?: ChiamataStrumento[] }> {
+  const modello = process.env.GROQ_MODELLO_CHAT || MODELLO_CHAT_DEFAULT;
+  const ragionatore = modello.startsWith("openai/gpt-oss");
   const res = await fetch(`${BASE}/chat/completions`, {
     method: "POST",
     headers: { authorization: `Bearer ${chiave()}`, "content-type": "application/json" },
     body: JSON.stringify({
-      model: process.env.GROQ_MODELLO_CHAT || MODELLO_CHAT_DEFAULT,
+      model: modello,
       messages: messaggi,
       tools: strumenti,
       tool_choice: "auto",
       temperature: 0.2,
+      // gpt-oss ragiona prima di rispondere: "low" tiene bassa la latenza
+      // (conta nella conversazione a voce) e il ragionamento non serve al client.
+      ...(ragionatore ? { reasoning_effort: "low", include_reasoning: false } : {}),
     }),
   });
   if (res.status === 429) throw new LimiteGroq();
-  if (!res.ok) throw new Error(`Groq chat: ${res.status} ${await res.text()}`);
+  if (!res.ok) throw new ErroreGroq("chat", res.status, await res.text());
   const json = (await res.json()) as {
     choices: { message: { content: string | null; tool_calls?: ChiamataStrumento[] } }[];
   };
   return json.choices[0]?.message ?? { content: null };
+}
+
+// Errore di Groq con un messaggio leggibile per Lorenzo (la pagina e il bot
+// sono solo suoi): dice cosa non va invece di "Qualcosa è andato storto".
+export class ErroreGroq extends Error {
+  constructor(fase: "chat" | "trascrizione", status: number, corpo: string) {
+    let dettaglio = "";
+    try {
+      dettaglio = (JSON.parse(corpo) as { error?: { message?: string } }).error?.message ?? "";
+    } catch {
+      dettaglio = corpo.slice(0, 200);
+    }
+    const cosa = fase === "chat" ? "il modello" : "la trascrizione";
+    const motivo =
+      status === 401
+        ? "la chiave GROQ_API_KEY non è valida"
+        : status === 404 || /decommission|deprecat|does not exist|not found/i.test(dettaglio)
+          ? "il modello non esiste più: cambia GROQ_MODELLO_CHAT/GROQ_MODELLO_VOCE"
+          : `errore ${status}`;
+    super(`Groq: ${cosa} non risponde (${motivo})${dettaglio ? ` — ${dettaglio.slice(0, 160)}` : ""}`);
+  }
 }
 
 export class LimiteGroq extends Error {

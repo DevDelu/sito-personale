@@ -4,11 +4,13 @@ import { getTotaliPeriodo } from "@/lib/spese/queries";
 import { getPosizioniCorrenti } from "@/lib/investimenti/queries";
 import { getPastiByData, getRiepilogoTdee } from "@/lib/alimentazione/queries";
 import { inserisciFeedback } from "@/lib/feedback/queries";
-import { FEEDBACK_TIPI, type FeedbackTipo } from "@/lib/feedback/types";
+import { FEEDBACK_TIPI, type AttritoEvento, type FeedbackTipo } from "@/lib/feedback/types";
 import { categoriaPerNome } from "./categorie";
+import { routeModello } from "./pagina";
 import { chiudiBozza } from "./bozze";
 import { dataValida, formattaEuro } from "./date";
 import type { DefinizioneStrumento } from "./groq";
+import { opzionaliNullabili } from "./schema-strumenti";
 
 // Strumenti che l'LLM può chiamare. Regola: le letture vanno dirette su
 // Supabase riusando le query dei moduli; l'unica scrittura sui dati
@@ -23,6 +25,12 @@ export type Contesto = {
   bozze: { id: string; riepilogo: string }[];
   // Bozze chiuse a voce in questo messaggio: la UI aggiorna le card.
   bozzeChiuse: { id: string; stato: "confermata" | "annullata" }[];
+  canale?: "telegram" | "voce";
+  // Pagina da cui Lorenzo ha aperto l'assistente (solo voce): i feedback
+  // senza un "dove" esplicito si riferiscono a quella.
+  pagina?: string;
+  // Errore che ha fatto comparire "Qualcosa non va? Dimmelo".
+  attrito?: AttritoEvento;
 };
 
 // Finestra in cui "conferma" a voce vale per le bozze ancora aperte: oltre,
@@ -33,7 +41,7 @@ type Args = Record<string, unknown>;
 
 const testo = (v: unknown, max = 200) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
-export const DEFINIZIONI: DefinizioneStrumento[] = [
+export const DEFINIZIONI: DefinizioneStrumento[] = opzionaliNullabili([
   {
     type: "function",
     function: {
@@ -130,7 +138,7 @@ export const DEFINIZIONI: DefinizioneStrumento[] = [
       },
     },
   },
-];
+]);
 
 async function proponiMovimento(args: Args, ctx: Contesto) {
   const tipo = args.tipo === "entrata" ? "entrata" : "spesa";
@@ -275,23 +283,27 @@ async function alimentazioneGiorno(args: Args, ctx: Contesto) {
   };
 }
 
-async function segnalaModifica(args: Args) {
+async function segnalaModifica(args: Args, ctx: Contesto) {
   const tipo = (FEEDBACK_TIPI as readonly string[]).includes(String(args.tipo)) ? (args.tipo as FeedbackTipo) : "idea";
   const corpo = testo(args.testo, 5000);
   if (!corpo) return { errore: "Testo vuoto." };
-  const pagina = testo(args.pagina, 100);
+  // Pagina: quella detta da Lorenzo, altrimenti quella da cui ha aperto
+  // l'assistente, altrimenti nessuna (bot Telegram).
+  const detta = testo(args.pagina, 100);
+  const pagina = detta.startsWith("/") ? detta : (ctx.pagina ?? "");
   const esito = await inserisciFeedback({
-    route: pagina.startsWith("/") ? pagina : "/telegram",
-    url: null,
+    route: pagina ? routeModello(pagina) : "/telegram",
+    url: pagina || null,
     area: null,
     entita: null,
     punto: null,
     tipo,
     testo: corpo,
-    origine: "telegram",
-    // Metadati tecnici obbligatori nel tipo: qui non c'è una pagina aperta,
-    // il bot si usa da telefono.
-    contesto: { query_chiavi: [], viewport: "mobile", tema: "scuro" },
+    // Origini già ammesse dal vincolo in DB: telegram per il bot, per la voce
+    // "suggerimento" se nasce da un errore, altrimenti "pulsante" (aperta dal
+    // pulsante centrale sulla pagina, come il vecchio pulsante feedback).
+    origine: ctx.canale === "voce" ? (ctx.attrito ? "suggerimento" : "pulsante") : "telegram",
+    contesto: { query_chiavi: [], viewport: "mobile", tema: "scuro", attrito: ctx.attrito ?? null },
   });
   return esito.ok ? { registrato: true } : { errore: esito.motivo };
 }
@@ -317,7 +329,7 @@ export async function eseguiStrumento(nome: string, argomenti: string, ctx: Cont
     case "alimentazione_giorno":
       return alimentazioneGiorno(args, ctx);
     case "segnala_modifica":
-      return segnalaModifica(args);
+      return segnalaModifica(args, ctx);
     default:
       return { errore: `Strumento sconosciuto: ${nome}` };
   }

@@ -218,7 +218,8 @@ layout desktop dell'area privata non cambiano.
 - **Font di sistema** (`-apple-system, "SF Pro Text", system-ui`) sostituisce
   Fraunces/Space Grotesk/JetBrains Mono solo dentro `.app-shell`: scelta voluta per il
   feeling nativo, non estenderla al sito pubblico o al desktop.
-- **Tab bar mobile** (`components/shell/TabBar.tsx`, `md:hidden`): 5 slot, definiti da
+- **Tab bar mobile** (`components/shell/TabBar.tsx`, `md:hidden`): al centro il pulsante "Parla"
+  (`ParlaButton`, assistente a voce; ha sostituito "Aggiungi"), attorno 5 slot, definiti da
   `mobileTab: true` su `lib/sidebar-config.ts` (fonte unica con la sidebar desktop — cambiare
   quali moduli hanno lo slot è una riga). Rispetta `interceptSessionNav` (nav guard
   allenamento) e si nasconde su `/allenamenti/sessione/*`. Le sezioni senza slot dedicato
@@ -251,12 +252,13 @@ tutti verso lo stesso sheet (`components/feedback/FeedbackSheet.tsx`, ospitato d
   nel timer. Un suggerimento di scoperta compare una sola volta (flag in localStorage).
 - **Suggerimento dopo un attrito** ("Qualcosa non va? Dimmelo", sopra la tab bar, 4 s): oggi
   scatta su `errore_api` (risposte 5xx da `/api/*`, via `fetch` osservata) ed `errore_js`; gli
-  altri tipi arriveranno col tracciamento d'uso. Regole anti-invadenza pure e testate in
+  altri tipi arriveranno col tracciamento d'uso. Il tap apre l'**assistente a voce** (non lo sheet
+  scritto), che chiede cosa è successo e registra il feedback con l'errore allegato. Regole anti-invadenza pure e testate in
   `lib/feedback/regole-suggerimento.ts`.
-- **Pulsante su ogni pagina** (`FeedbackPulsante`, montato da `FeedbackProvider`, origine `pulsante`,
-  migration 032): il feedback prende come riferimento la pagina in cui è toccato. Mobile in basso a
-  sinistra sopra la tab bar (i FAB delle pagine stanno a destra), desktop in basso a destra; nascosto
-  con sheet/avvisi aperti e in `/allenamenti/sessione/*`.
+- **A voce, dall'assistente** (canale principale, scelta di Lorenzo nov 2026): il pulsante centrale
+  "Parla" della tab bar apre l'assistente sopra la pagina corrente; quello che Lorenzo segnala diventa un
+  feedback con quella pagina come `route` (origine `pulsante`; `suggerimento` se nasce da un errore).
+  Vedi "Assistente". Il vecchio pulsante flottante in basso a sinistra (`FeedbackPulsante`) è stato tolto.
 - **Riserva**: riga in `/altro` (allega l'ultima pagina visitata prima di Altro), voce "Feedback"
   in fondo alla sidebar desktop, scorciatoia `F` senza campi a fuoco.
 
@@ -430,6 +432,15 @@ con `TELEGRAM_WEBHOOK_SECRET`, fail-closed, poi `from.id` uguale a `TELEGRAM_OWN
 estranei non ricevono risposta). `telegram_update_visti` scarta i retry di Telegram; la route
 risponde sempre 200. Registrazione webhook: `scripts/telegram-setup.mjs`.
 
+**Ovunque nell'area privata**: `AssistenteHost` (layout privato) apre `ParlaConRadar` in uno `Sheet`
+quando qualcuno chiama `apriAssistente()` (`lib/assistente/bus.ts`): il pulsante centrale "Parla" della
+tab bar e l'invito "Qualcosa non va? Dimmelo". Si mette subito in ascolto e manda a ogni turno la pagina
+di partenza (e l'eventuale errore, validati da `paginaValida()`/`attritoValido()` in
+`lib/assistente/pagina.ts`), che finiscono nel feedback e nel prompt. **Gotcha iOS**: `apriAssistente()`
+va chiamata dentro un onClick, perché `sbloccaAudio()` (`lib/assistente/audio.ts`) deve creare/riprendere
+l'`AudioContext` condiviso e sbloccare la sintesi vocale nel gesto; aperto da un effetto, il microfono
+sentirebbe solo silenzio.
+
 **Voce** (`/assistente`, `hooks/useConversazioneVocale.ts`, `components/assistente/`) — tutto nel
 browser tranne trascrizione e LLM: microfono → VAD a energia (`vad.ts`, puro e testato: soglia
 adattiva al rumore, calibrazione iniziale) → `MediaRecorder` della frase → `POST
@@ -442,7 +453,11 @@ volta, `frasiPerVoce()`) → di nuovo in ascolto. Gotcha:
   soglia ×3 contro l'eco;
 - Whisper "sente" frasi nel silenzio ("Sottotitoli creati dalla comunità Amara.org"):
   `trascrizioneValida()` le scarta lato server;
-- le API (`/api/assistente/*`) accettano solo l'owner (`rifiutaSeNonOwner()`), mai il tester.
+- le API (`/api/assistente/*`) accettano solo l'owner (`rifiutaSeNonOwner()`), mai il tester;
+- gli errori mostrano il motivo vero (`ErroreGroq`, chiave mancante, migration mancante): pagina e bot
+  sono solo di Lorenzo. Modello di default `openai/gpt-oss-120b` con `reasoning_effort: "low"`: il primo
+  default (`llama-3.3-70b-versatile`) era nelle deprecazioni di Groq e in produzione dava sempre errore.
+  Prima di cambiare modello controllare console.groq.com/docs/deprecations.
 
 ### Novità e resoconti (notifiche al posto delle email)
 

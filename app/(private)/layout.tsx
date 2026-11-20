@@ -9,6 +9,7 @@ import { RefreshAlRitorno } from "@/components/shell/RefreshAlRitorno";
 import { PullToRefresh } from "@/components/shell/PullToRefresh";
 import { ToastHost } from "@/components/ui/ToastHost";
 import { FeedbackProvider } from "@/components/feedback/FeedbackProvider";
+import { AssistenteHost } from "@/components/assistente/AssistenteHost";
 import { appViewport } from "@/lib/app-viewport";
 
 export const viewport = appViewport;
@@ -71,6 +72,7 @@ export default async function PrivateLayout({
       <PullToRefresh />
       <ToastHost />
       <FeedbackProvider owner={isOwner(user.email)} />
+      <AssistenteHost />
     </div>
   );
 }
