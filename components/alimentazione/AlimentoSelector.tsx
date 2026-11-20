@@ -198,7 +198,7 @@ export function AlimentoSelector({
             aria-label="Nome alimento"
             className="field-input"
           />
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
             <FieldMini label="Kcal/100g">
               <input
                 value={kcal}
@@ -229,7 +229,7 @@ export function AlimentoSelector({
               value={grassi}
               onChange={(e) => setGrassi(e.target.value)}
               inputMode="decimal"
-              className="field-input w-32"
+              className="field-input w-full md:w-32"
             />
           </FieldMini>
           {formError && (
