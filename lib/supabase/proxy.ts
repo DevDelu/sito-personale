@@ -14,6 +14,7 @@ const PROTECTED_PREFIXES = [
   "/feedback",
   "/trading",
   "/assistente",
+  "/oggi",
 ];
 
 // API che si autenticano da sole e restano fuori dal controllo owner qui
