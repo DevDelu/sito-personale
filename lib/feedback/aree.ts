@@ -104,6 +104,7 @@ export const AREE_FEEDBACK = {
   "altro.menu": "Altro",
   "oggi.agenda": "Oggi › Agenda",
   "oggi.pasti": "Oggi › Alimentazione",
+  "oggi.allenamento": "Oggi › Allenamento",
   "oggi.spese": "Oggi › Spese",
 
   // Assistente

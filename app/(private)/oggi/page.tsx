@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, Apple, Wallet } from "lucide-react";
+import { CalendarDays, Apple, Wallet, Dumbbell } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ListGroup, ListRow, ListRowLink } from "@/components/ui/ListGroup";
 import { oggiItaliaISO } from "@/lib/cron/data-italia";
@@ -7,6 +7,7 @@ import { getEventiRange } from "@/lib/agenda/queries";
 import { eventiDiOggi } from "@/lib/agenda/digest";
 import { getPastiByData, getRiepilogoTdee, sommaMacro } from "@/lib/alimentazione/queries";
 import { getTotaliPeriodo } from "@/lib/spese/queries";
+import { getImpegniFissi, getSessioni } from "@/lib/allenamento/queries";
 
 // "Cosa c'è oggi?" in sola lettura: agenda, kcal e spesa del giorno. Ogni
 // riga rimanda al modulo; una sezione che non si carica mostra un testo
@@ -28,17 +29,27 @@ const euro = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR"
 
 export default async function OggiPage() {
   const oggi = oggiItaliaISO();
-  const [eventiRes, pastiRes, tdeeRes, speseRes] = await Promise.allSettled([
+  // 0 = lunedì .. 6 = domenica, come giorno_settimana degli impegni fissi
+  const giornoSettimana = (new Date(`${oggi}T12:00:00Z`).getUTCDay() + 6) % 7;
+  const [eventiRes, pastiRes, tdeeRes, speseRes, impegniRes, sessioniRes] = await Promise.allSettled([
     getEventiRange(giornoPiu(oggi, -1), giornoPiu(oggi, 2)),
     getPastiByData(oggi),
     getRiepilogoTdee(),
     getTotaliPeriodo(oggi, oggi),
+    getImpegniFissi(),
+    getSessioni(),
   ]);
 
   const eventi = eventiRes.status === "fulfilled" ? eventiDiOggi(eventiRes.value, oggi) : null;
   const kcal = pastiRes.status === "fulfilled" ? Math.round(sommaMacro(pastiRes.value).kcal) : null;
   const target = tdeeRes.status === "fulfilled" && tdeeRes.value.ok ? tdeeRes.value.targetKcal : null;
   const uscite = speseRes.status === "fulfilled" ? speseRes.value.uscite : null;
+
+  const impegniOggi =
+    impegniRes.status === "fulfilled"
+      ? impegniRes.value.filter((i) => i.attivo && i.giorno_settimana === giornoSettimana)
+      : null;
+  const sessioneFatta = sessioniRes.status === "fulfilled" ? sessioniRes.value.some((x) => x.data === oggi) : false;
 
   const dataLunga = new Intl.DateTimeFormat("it-IT", {
     timeZone: "Europe/Rome",
@@ -96,6 +107,32 @@ export default async function OggiPage() {
             subtitle={target !== null && kcal !== null ? `Obiettivo ${target} kcal` : "Imposta il profilo per vedere l'obiettivo"}
             chevron
           />
+        </ListGroup>
+      </section>
+
+      <section data-fb-area="oggi.allenamento">
+        <ListGroup title="Allenamento">
+          {impegniOggi === null ? (
+            <ListRow icon={<Dumbbell className="h-5 w-5" strokeWidth={1.75} />} title="Allenamento non disponibile" subtitle="Riprova tra poco" />
+          ) : impegniOggi.length === 0 ? (
+            <ListRowLink
+              href="/allenamenti"
+              icon={<Dumbbell className="h-5 w-5" strokeWidth={1.75} />}
+              title={sessioneFatta ? "Sessione di oggi registrata" : "Nessun impegno fisso oggi"}
+              chevron
+            />
+          ) : (
+            impegniOggi.map((i) => (
+              <ListRowLink
+                key={i.id}
+                href="/allenamenti"
+                icon={<Dumbbell className="h-5 w-5" strokeWidth={1.75} />}
+                title={i.titolo}
+                subtitle={sessioneFatta ? "Sessione di oggi registrata" : (i.orario ?? undefined)}
+                chevron
+              />
+            ))
+          )}
         </ListGroup>
       </section>
 

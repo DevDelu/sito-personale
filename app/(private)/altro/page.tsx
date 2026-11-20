@@ -38,7 +38,7 @@ export default async function AltroPage() {
             href="/oggi"
             icon={<Sun className="h-5 w-5" strokeWidth={1.75} />}
             title="Oggi"
-            subtitle="Agenda, kcal e spesa del giorno"
+            subtitle="Agenda, kcal, allenamento e spesa"
             chevron
           />
           <ListRowLink href="/carte" icon={<Layers className="h-5 w-5" strokeWidth={1.75} />} title="Carte" chevron />
