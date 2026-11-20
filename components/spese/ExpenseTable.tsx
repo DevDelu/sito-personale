@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
 import { CategoryBadge } from "@/components/category-badge";
@@ -14,6 +14,7 @@ import {
 } from "@/hooks/useBulkMovimentoMutations";
 import { ExpenseEditModal } from "./ExpenseEditModal";
 import { mostraToast } from "@/lib/toast/bus";
+import { creaAzioniDifferite, RITARDO_ANNULLA_MS } from "@/lib/toast/azione-differita";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { ActionBar } from "@/components/ui/ActionBar";
 import { BulkEditModal } from "./BulkEditModal";
@@ -45,8 +46,30 @@ function raggruppaPerGiorno(rows: Movimento[]): { giorno: string; righe: Movimen
   return gruppi;
 }
 
-export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie: Categoria[] }) {
+export function ExpenseTable({
+  rows: righeServer,
+  categorie,
+}: {
+  rows: Movimento[];
+  categorie: Categoria[];
+}) {
   const router = useRouter();
+  // Eliminazione annullabile: la riga sparisce subito, la cancellazione vera
+  // parte dopo 5 s se non si tocca "Annulla".
+  const [nascosti, setNascosti] = useState<Set<string>>(new Set());
+  const rows = useMemo(
+    () => (nascosti.size ? righeServer.filter((r) => !nascosti.has(rowKey(r))) : righeServer),
+    [righeServer, nascosti]
+  );
+  const [differite] = useState(() => creaAzioniDifferite());
+  useEffect(() => {
+    const vaiOra = () => differite.eseguiTutte();
+    window.addEventListener("pagehide", vaiOra);
+    return () => {
+      window.removeEventListener("pagehide", vaiOra);
+      vaiOra();
+    };
+  }, [differite]);
   const { updateExpense, deleteExpense, pending, error } = useExpenseMutations();
   const bulk = useBulkMovimentoMutations();
   const [editing, setEditing] = useState<Movimento | null>(null);
@@ -56,7 +79,7 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
   const [prevCategorie, setPrevCategorie] = useState(categorie);
   const [selezionati, setSelezionati] = useState<Set<string>>(new Set());
   const [modalitaSelezione, setModalitaSelezione] = useState(false);
-  const [prevRows, setPrevRows] = useState(rows);
+  const [prevRows, setPrevRows] = useState(righeServer);
   const [modificaBulk, setModificaBulk] = useState(false);
   const [eliminaBulk, setEliminaBulk] = useState(false);
 
@@ -72,8 +95,8 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
 
   // Cambio pagina/filtro in Gestione = nuove `rows`: la selezione precedente
   // non ha più senso (righe non più visibili), quindi si azzera.
-  if (rows !== prevRows) {
-    setPrevRows(rows);
+  if (righeServer !== prevRows) {
+    setPrevRows(righeServer);
     setSelezionati(new Set());
     if (modalitaSelezione) setModalitaSelezione(false);
   }
@@ -94,12 +117,40 @@ export function ExpenseTable({ rows, categorie }: { rows: Movimento[]; categorie
     mostraToast({ testo: "Modifiche salvate" });
   }
 
-  async function handleDelete() {
+  function mostraRiga(chiave: string) {
+    setNascosti((prev) => {
+      const next = new Set(prev);
+      next.delete(chiave);
+      return next;
+    });
+  }
+
+  function handleDelete() {
     if (!deleting) return;
-    await deleteExpense(deleting.tipo, deleting.id);
+    const { tipo, id } = deleting;
+    const chiave = rowKey(deleting);
     setDeleting(null);
-    router.refresh();
-    mostraToast({ testo: "Movimento eliminato" });
+    setNascosti((prev) => new Set(prev).add(chiave));
+    differite.pianifica(chiave, async () => {
+      try {
+        await deleteExpense(tipo, id);
+        router.refresh();
+      } catch {
+        mostraRiga(chiave);
+        mostraToast({ testo: "Eliminazione non riuscita" });
+      }
+    });
+    mostraToast({
+      testo: "Movimento eliminato",
+      durataMs: RITARDO_ANNULLA_MS,
+      azione: {
+        etichetta: "Annulla",
+        onClick: () => {
+          differite.annulla(chiave);
+          mostraRiga(chiave);
+        },
+      },
+    });
   }
 
   function toggleRiga(r: Movimento) {

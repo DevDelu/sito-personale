@@ -17,7 +17,7 @@ export function ToastHost() {
 
   useEffect(() => {
     if (!toast) return;
-    const t = window.setTimeout(() => setToast(null), DURATA_TOAST_MS);
+    const t = window.setTimeout(() => setToast(null), toast.durataMs ?? DURATA_TOAST_MS);
     return () => window.clearTimeout(t);
   }, [toast]);
 
@@ -34,6 +34,18 @@ export function ToastHost() {
         >
           <Check className="h-4 w-4 shrink-0 text-accent" aria-hidden />
           <span>{toast.testo}</span>
+          {toast.azione && (
+            <button
+              type="button"
+              onClick={() => {
+                toast.azione?.onClick();
+                setToast(null);
+              }}
+              className="pointer-events-auto -mr-2 ml-1 inline-flex min-h-11 items-center rounded-full px-3 text-[15px] font-semibold text-accent"
+            >
+              {toast.azione.etichetta}
+            </button>
+          )}
         </div>
       )}
     </div>
