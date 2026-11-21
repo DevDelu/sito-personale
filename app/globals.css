@@ -804,8 +804,6 @@ p {
   }
   .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-more-link {
     pointer-events: auto;
-  }
-  .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-more-link {
     font-size: 0.75rem;
   }
 }
