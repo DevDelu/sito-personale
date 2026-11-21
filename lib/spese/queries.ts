@@ -2,6 +2,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Categoria, Deposito, Movimento, Spesa } from "@/lib/types";
 import { aggiungiMesi, type SpesaGrezza } from "./ricorrenti";
+import { FONTI_NON_IMPORT } from "./ultimo-import";
 
 export async function getCategorie(): Promise<Categoria[]> {
   const admin = createAdminClient();
@@ -140,4 +141,18 @@ export async function getMovimenti(
     rows: (data ?? []).map((r) => ({ ...r, importo: Number(r.importo) })),
     total: count ?? 0,
   };
+}
+
+// Data di inserimento (created_at) della spesa importata più di recente, o
+// null se non ce ne sono. Esclude le spese scritte a mano o dall'assistente.
+export async function getUltimoInserimentoImport(): Promise<string | null> {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("spese")
+    .select("created_at")
+    .not("fonte", "in", `(${FONTI_NON_IMPORT.join(",")})`)
+    .order("created_at", { ascending: false })
+    .limit(1);
+  if (error) throw new Error(error.message);
+  return data?.[0]?.created_at ?? null;
 }

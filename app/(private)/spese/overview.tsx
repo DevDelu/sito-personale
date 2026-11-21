@@ -5,6 +5,8 @@ import dynamic from "next/dynamic";
 import { SummaryCards } from "@/components/spese/SummaryCards";
 import { FilterBar, type Range } from "@/components/spese/FilterBar";
 import { RecurringCard } from "@/components/spese/RecurringCard";
+import Link from "next/link";
+import { caricamentoInRitardo, etichettaUltimoCaricamento } from "@/lib/spese/ultimo-import";
 import type { Ricorrente } from "@/lib/spese/ricorrenti";
 import type { Categoria, Deposito, Spesa } from "@/lib/types";
 
@@ -34,6 +36,7 @@ export function Overview({
   ricorrenti,
   range,
   precedente,
+  giorniDaCaricamento,
 }: {
   spese: Spesa[];
   categorie: Categoria[];
@@ -41,6 +44,7 @@ export function Overview({
   ricorrenti: Ricorrente[];
   range: Range;
   precedente: { entrate: number; uscite: number } | null;
+  giorniDaCaricamento: number | null;
 }) {
   const [categorieList, setCategorieList] = useState(categorie);
   const [prevCategorie, setPrevCategorie] = useState(categorie);
@@ -69,6 +73,18 @@ export function Overview({
     <div className="flex flex-col gap-8">
       <div data-fb-area="spese.overview.filtri" className="contents">
         <FilterBar range={range} />
+        {giorniDaCaricamento !== null ? (
+          caricamentoInRitardo(giorniDaCaricamento) ? (
+            <Link
+              href="/spese/importa"
+              className="-mt-5 flex min-h-11 items-center text-[13px] font-medium text-accent"
+            >
+              {etichettaUltimoCaricamento(giorniDaCaricamento)} · carica ora
+            </Link>
+          ) : (
+            <p className="-mt-5 text-[13px] text-muted">{etichettaUltimoCaricamento(giorniDaCaricamento)}</p>
+          )
+        ) : null}
       </div>
 
       <div data-fb-area="spese.overview.riepilogo" className="contents">

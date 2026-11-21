@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getOverviewData, getSpesePerRicorrenti, getTotaliPeriodo } from "@/lib/spese/queries";
+import { getOverviewData, getSpesePerRicorrenti, getTotaliPeriodo, getUltimoInserimentoImport } from "@/lib/spese/queries";
+import { giorniDalCaricamento } from "@/lib/spese/ultimo-import";
 import { trovaRicorrenti } from "@/lib/spese/ricorrenti";
 import { periodoPrecedente } from "@/lib/spese/confronto";
 import { meseScorso } from "@/lib/spese/mese-scorso";
@@ -54,12 +55,15 @@ export default async function SpesePage({
       : { ...presetRange(preset ?? DEFAULT_PRESET), preset: preset ?? DEFAULT_PRESET };
 
   const prec = periodoPrecedente(range.from, range.to);
-  const [{ spese, categorie, depositi }, spesePerRicorrenti, totaliPrec] = await Promise.all([
+  const [{ spese, categorie, depositi }, spesePerRicorrenti, totaliPrec, ultimoImport] = await Promise.all([
     getOverviewData(range.from, range.to),
     getSpesePerRicorrenti(todayIso()),
     // Un errore nel confronto non deve rompere la pagina: la riga semplicemente non compare.
     prec ? getTotaliPeriodo(prec.from, prec.to).catch(() => null) : Promise.resolve(null),
+    // Idem: senza la data la riga "Ultimo caricamento" non compare.
+    getUltimoInserimentoImport().catch(() => null),
   ]);
+  const giorniDaCaricamento = ultimoImport ? giorniDalCaricamento(ultimoImport) : null;
   const ricorrenti = trovaRicorrenti(spesePerRicorrenti, todayIso());
 
   return (
@@ -74,7 +78,7 @@ export default async function SpesePage({
         <p className="text-sm text-muted">Panoramica di entrate, uscite e categorie di spesa.</p>
       </div>
 
-      <Overview spese={spese} categorie={categorie} depositi={depositi} ricorrenti={ricorrenti} range={range} precedente={totaliPrec} />
+      <Overview spese={spese} categorie={categorie} depositi={depositi} ricorrenti={ricorrenti} range={range} precedente={totaliPrec} giorniDaCaricamento={giorniDaCaricamento} />
     </div>
   );
 }
