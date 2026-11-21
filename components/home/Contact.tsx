@@ -22,6 +22,13 @@ export function Contact() {
         <RevealItem className="max-w-2xl">
           <SectionHeading>{t("title")}</SectionHeading>
           <p className="mt-2 text-sm text-muted">{t("subtitle")}</p>
+          <a
+            href="/contatto.vcf"
+            download="lorenzo-de-luca.vcf"
+            className="mt-4 inline-flex min-h-[44px] items-center text-sm font-medium text-accent underline-offset-4 hover:underline"
+          >
+            {t("saveContact")}
+          </a>
         </RevealItem>
 
         <RevealItem className="mt-8">
