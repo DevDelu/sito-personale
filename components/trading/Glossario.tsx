@@ -66,7 +66,7 @@ export function Glossario() {
             <dd className="text-[15px] leading-relaxed text-foreground/90">{v.definizione}</dd>
             {v.lezione && (
               <dd>
-                <Link href={`/trading/${v.lezione}`} className="inline-flex min-h-9 items-center text-[13px] font-medium text-accent">
+                <Link href={`/trading/${v.lezione}`} className="inline-flex min-h-9 items-center max-md:min-h-11 text-[13px] font-medium text-accent">
                   Vai alla lezione →
                 </Link>
               </dd>
