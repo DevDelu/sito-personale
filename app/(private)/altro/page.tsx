@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ExternalLink, Layers, LogOut, Dumbbell, Apple, AudioLines, Bell, Inbox, ChartCandlestick } from "lucide-react";
+import { ExternalLink, Layers, LogOut, Dumbbell, Apple, AudioLines, Bell, Inbox, ChartCandlestick, Sun } from "lucide-react";
 import { contaPerTe } from "@/lib/feedback/queries";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PrivacyToggle } from "@/components/privacy-toggle";
@@ -34,6 +34,13 @@ export default async function AltroPage() {
         </ListGroup>
 
         <ListGroup>
+          <ListRowLink
+            href="/oggi"
+            icon={<Sun className="h-5 w-5" strokeWidth={1.75} />}
+            title="Oggi"
+            subtitle="Agenda, kcal, allenamento e spesa"
+            chevron
+          />
           <ListRowLink href="/carte" icon={<Layers className="h-5 w-5" strokeWidth={1.75} />} title="Carte" chevron />
           <ListRowLink
             href="/allenamenti"

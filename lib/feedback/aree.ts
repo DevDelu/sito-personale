@@ -102,6 +102,10 @@ export const AREE_FEEDBACK = {
   "impostazioni.vibrazione": "Impostazioni › Vibrazione",
   "impostazioni.backup": "Impostazioni › Backup",
   "altro.menu": "Altro",
+  "oggi.agenda": "Oggi › Agenda",
+  "oggi.pasti": "Oggi › Alimentazione",
+  "oggi.allenamento": "Oggi › Allenamento",
+  "oggi.spese": "Oggi › Spese",
 
   // Assistente
   "assistente.pagina": "Assistente",
