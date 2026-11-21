@@ -1,10 +1,10 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import Script from "next/script";
 import { useLocale, useTranslations } from "next-intl";
 import { sendContactMessage, type ContactState } from "@/app/[locale]/contact-actions";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
+import { TurnstileLazy } from "@/components/home/turnstile-lazy";
 import { SectionHeading } from "@/components/home/section-heading";
 
 const inputClass =
@@ -62,12 +62,7 @@ export function Contact() {
                 <textarea id="message" name="message" required rows={5} className={`${inputClass} resize-none`} />
               </div>
 
-              <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
-              <div
-                className="cf-turnstile"
-                data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-                data-theme="auto"
-              />
+              <TurnstileLazy siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
 
               {state?.error && (
                 <p className="animate-slide-down text-sm text-stamp" role="alert">
