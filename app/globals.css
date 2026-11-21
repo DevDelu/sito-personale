@@ -796,6 +796,15 @@ p {
   .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-block-event .fc-event-main {
     display: none;
   }
+  /* Pallini e barrette sono indicatori, non bersagli: a 6-9px un tocco li
+     mancava o apriva l'evento sbagliato. Il tocco passa alla cella (>= 44px) e
+     il dettaglio, con la modifica, sta nel pannello del giorno. */
+  .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-event-harness {
+    pointer-events: none;
+  }
+  .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-more-link {
+    pointer-events: auto;
+  }
   .agenda-calendar .fc-dayGridMonth-view .fc-daygrid-more-link {
     font-size: 0.75rem;
   }
