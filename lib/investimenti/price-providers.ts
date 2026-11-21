@@ -47,6 +47,29 @@ export async function fetchCoinGeckoPrice(id: string, vsCurrency = "eur"): Promi
   return { prezzo, data: new Date().toISOString().slice(0, 10) };
 }
 
+// Una sola richiesta per tutte le cripto: con N chiamate separate il limite di
+// CoinGecko free (429) scatta molto prima. Restituisce solo gli id con un
+// prezzo valido; se la richiesta fallisce del tutto lancia.
+export async function fetchCoinGeckoPrices(ids: string[], vsCurrency = "eur"): Promise<Map<string, PriceQuote>> {
+  const uniche = [...new Set(ids)];
+  const out = new Map<string, PriceQuote>();
+  if (uniche.length === 0) return out;
+  const res = await fetchConRetry(() =>
+    fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${uniche.map(encodeURIComponent).join(",")}&vs_currencies=${vsCurrency}`,
+      { headers: headerCoinGecko() }
+    )
+  );
+  if (!res.ok) throw new Error(`CoinGecko: HTTP ${res.status}`);
+  const json = await res.json();
+  const data = new Date().toISOString().slice(0, 10);
+  for (const id of uniche) {
+    const prezzo = json?.[id]?.[vsCurrency];
+    if (typeof prezzo === "number") out.set(id, { prezzo, data });
+  }
+  return out;
+}
+
 // Backfill una tantum (non nel cron giornaliero): storico giornaliero da
 // `fromDate` a oggi. Stesso endpoint chart non ufficiale di fetchYahooPrice,
 // con period1/period2 invece di range.
