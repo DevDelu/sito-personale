@@ -185,9 +185,10 @@ stesso principio già usato da `sendPushToOwner()`.
   loggate oggi con il target TDEE (`getRiepilogoTdee()`): push solo se lo scarto supera il 20%
   del target (costante `SOGLIA_SCOSTAMENTO_PERCENTUALE` in cima al file, non env). Zero pasti
   loggati oggi → nessun push (già coperto dai due promemoria pasto sopra, evita doppioni).
-- `/api/cron/spese/promemoria-csv` — `0 16 * * 0`, domenica (≈18:00 Italia). Promemoria "alla
-  cieca" per l'upload CSV: nessun controllo se questa settimana è già stata caricata (il flusso
-  di import non ha un modo affidabile per saperlo, vedi decision log nel README).
+- `/api/cron/spese/promemoria-csv` — `0 16 * * 0`, domenica (≈18:00 Italia). Promemoria per
+  l'upload CSV: non parte se l'ultimo import (`spese.created_at` con fonte diversa da `manuale` e
+  `assistente`) è di 3 giorni o meno, `lib/spese/ultimo-import.ts`; se la lettura fallisce parte
+  comunque. Lo stesso dato alimenta la riga "Ultimo caricamento" nella panoramica Spese.
 - **Alert push login sospetto** (`app/login/actions.ts`, `inviaAvvisoTentativiSospetti`): non è
   un cron. Quando scatta il rate-limit del login, subito dopo l'email via Resend già esistente
   parte anche `sendPushToOwner()` con lo stesso IP nel corpo. Stessa finestra/deduplica

@@ -178,13 +178,10 @@ serve solo internamente a distinguere l'origine del dato (`crypto`, `intesa`, `m
   → Condividi → Aggiungi a Home, richiede 16.4+), non dal sito visitato nel browser. Vedi
   CLAUDE.md, sezione "PWA e notifiche push", per i dettagli implementativi.
 
-- **Promemoria spese CSV "alla cieca" (nessun controllo se la settimana è già stata caricata)**:
-  il flusso di import (manuale o via `/api/spese/importa/grezzo`) non ha un modo semplice e
-  affidabile per sapere se "questa settimana" è già stata coperta — servirebbe una logica ad
-  hoc solo per questo controllo. Il cron settimanale invia sempre il promemoria, stesso giorno
-  ogni settimana: falso positivo occasionale (promemoria anche se già fatto) preferito a
-  costruire un controllo di stato fragile. Renderlo condizionale (es. sull'ultima transazione
-  importata) resta backlog, non implementato.
+- **Promemoria spese CSV condizionale (21/11/26)**: il cron della domenica non invia il push se l'ultimo
+  import è di 3 giorni o meno, misurato su `created_at` delle spese con fonte diversa da `manuale` e
+  `assistente`. Un solo dato (`getUltimoInserimentoImport()`) alimenta anche la riga "Ultimo caricamento"
+  in Spese. Se la lettura fallisce, il promemoria parte comunque: meglio uno in più che nessuno.
 - **Nessun promemoria push per la colazione**: spesso saltata volontariamente (es. digiuno
   intermittente), a differenza di pranzo e cena che restano promemoria utili. Solo un'assunzione
   di Lorenzo, non un vincolo tecnico — si aggiunge come gli altri due se in futuro serve.

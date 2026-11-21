@@ -13,7 +13,7 @@ convenzioni per gli agenti in `CLAUDE.md`, passi manuali aperti in `docs/agenti-
 - Fatto: Overview, Gestione, import Excel con dedup, nuovo movimento, colori categoria, modulo
   modello della UI mobile, promemoria settimanale import (push).
 - Fatto (11/11): riepilogo con confronto sul periodo precedente.
-- Prossimo: promemoria condizionale all'ultimo import (backlog).
+- Fatto (21/11): promemoria condizionale all'ultimo import e riga "Ultimo caricamento" nella panoramica.
 
 ## Investimenti, Carte, Agenda, Allenamenti
 - Fatto: moduli operativi con aggiornamento prezzi (cron + on demand), sync Google Calendar,
