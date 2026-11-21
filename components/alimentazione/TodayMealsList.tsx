@@ -1,4 +1,5 @@
 import type { Pasto } from "@/lib/alimentazione/types";
+import { ListGroup, ListRow } from "@/components/ui/ListGroup";
 
 const LABEL_TIPO: Record<string, string> = {
   colazione: "Colazione",
@@ -20,18 +21,16 @@ export function TodayMealsList({ pasti }: { pasti: Pasto[] }) {
   }
 
   return (
-    <ul className="card flex flex-col divide-y divide-border">
+    <ListGroup>
       {pasti.map((p) => (
-        <li key={p.id} data-fb-entita={`pasto:${p.id}`} className="flex items-center justify-between gap-3 px-4 py-3">
-          <div className="flex min-w-0 flex-col gap-0.5">
-            <span className="break-words text-[15px] font-medium">{p.alimento_nome}</span>
-            <span className="text-[13px] text-muted">
-              {LABEL_TIPO[p.tipo_pasto] ?? p.tipo_pasto} · {p.quantita_g}g
-            </span>
-          </div>
-          <span className="shrink-0 whitespace-nowrap font-figures text-[15px] text-muted">{Math.round(p.kcal)} kcal</span>
-        </li>
+        <div key={p.id} data-fb-entita={`pasto:${p.id}`}>
+          <ListRow
+            title={p.alimento_nome}
+            subtitle={`${LABEL_TIPO[p.tipo_pasto] ?? p.tipo_pasto} · ${p.quantita_g}g`}
+            value={`${Math.round(p.kcal)} kcal`}
+          />
+        </div>
       ))}
-    </ul>
+    </ListGroup>
   );
 }
