@@ -150,7 +150,7 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: SessioneElenco[] 
                   </label>
                 </th>
                 <th className="px-2 md:px-4 py-2 font-medium">Data</th>
-                <th className="px-2 md:px-4 py-2 font-medium">Durata</th>
+                <th className="hidden px-4 py-2 font-medium md:table-cell">Durata</th>
                 <th className="px-2 md:px-4 py-2 font-medium">Sensazione</th>
                 <th className="hidden px-4 py-2 font-medium md:table-cell">Note</th>
                 <th aria-label="Azioni" className="px-2 md:px-4 py-2 font-medium" />
@@ -186,8 +186,11 @@ export function SessionsHistoryTable({ sessioni }: { sessioni: SessioneElenco[] 
                         <span className="md:hidden">{formatData(s.data, false)}</span>
                         <span className="hidden md:inline">{formatData(s.data)}</span>
                       </Link>
+                      {s.durata_min != null && (
+                        <span className="font-figures block text-[13px] normal-case text-muted md:hidden">{s.durata_min} min</span>
+                      )}
                     </td>
-                    <td className="font-figures px-2 py-2 whitespace-nowrap md:px-4">
+                    <td className="font-figures hidden px-4 py-2 whitespace-nowrap md:table-cell">
                       {s.durata_min != null ? `${s.durata_min} min` : "—"}
                     </td>
                     <td className="px-2 py-2 md:px-4">
