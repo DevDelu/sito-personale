@@ -36,7 +36,7 @@
     "next-mdx-remote": "^6.0.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "recharts": "^3.10.1",
+    "recharts": "^3.11.0",
     "resend": "^6.39.0",
     "unpdf": "^1.9.1",
     "web-push": "^3.6.7"
