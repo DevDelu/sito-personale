@@ -38,3 +38,9 @@ test("la panoramica Spese legge spese ed entrate a pagine, con ordine univoco", 
   assert.equal(overview.match(/\.order\("id"/g)?.length, 2);
   assert.equal(overview.match(/\.range\(da, a\)/g)?.length, 2);
 });
+
+test("il controllo doppioni dell'import legge a pagine, con ordine univoco", () => {
+  const dedup = readFileSync(new URL("./dedup.ts", import.meta.url), "utf8");
+  assert.match(dedup, /leggiAPagine/);
+  assert.match(dedup, /\.order\("id"[^\n]*\n\s*\.range\(da, a\)/);
+});
