@@ -70,8 +70,8 @@ export async function runGoogleSync(): Promise<SyncResult> {
         .select("id, sync_status")
         .eq("google_event_id", ev.google_event_id)
         .maybeSingle();
-      // Se la lettura fallisce non si sa se l'evento esiste: inserirlo
-      // rischierebbe un doppione.
+      // Se la lettura fallisce non si sa se l'evento esiste (né se ha
+      // modifiche in attesa di invio): meglio riprovare al giro dopo.
       verificaScrittura(lettura);
       const locale = lettura.data;
 
