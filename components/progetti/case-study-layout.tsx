@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import type { CSSProperties } from "react";
+import { isValidElement, type CSSProperties, type ReactNode } from "react";
 import type { Project } from "@/types/project";
 import { getAccentColors } from "@/lib/progetti-theme";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
@@ -9,7 +9,15 @@ import { MdxH2, MdxImg, MdxP, MdxUl } from "@/components/progetti/mdx-elements";
 import { Link } from "@/i18n/navigation";
 import { ShareButton } from "@/components/progetti/share-button";
 
-const mdxComponents = { h2: MdxH2, p: MdxP, ul: MdxUl, img: MdxImg };
+// Il markdown avvolge in un paragrafo anche un'immagine da sola, ma MdxImg
+// rende un <figure>: dentro un <p> è HTML non valido, il browser lo spezza e
+// React va in errore di idratazione (#418). In quel caso niente paragrafo.
+function MdxParagrafo({ children }: { children?: ReactNode }) {
+  if (isValidElement(children) && children.type === MdxImg) return children;
+  return <MdxP>{children}</MdxP>;
+}
+
+const mdxComponents = { h2: MdxH2, p: MdxParagrafo, ul: MdxUl, img: MdxImg };
 
 export function CaseStudyLayout({
   project,
