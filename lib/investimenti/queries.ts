@@ -1,12 +1,27 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { calcolaFifo } from "./fifo";
+import { tutteLeRighe } from "./tutte-le-righe";
 import { oggiItaliaISO } from "@/lib/cron/data-italia";
 import { variazioneGiorno } from "./variazione-giorno";
 import type { Asset, Posizione, Transazione, TransazioneConAsset } from "./types";
 
 function toNumber(v: unknown): number {
   return v === null || v === undefined ? 0 : Number(v);
+}
+
+// Tutto lo storico prezzi: cresce di una riga per asset al giorno, quindi
+// supera presto le 1000 righe di una singola richiesta. (data, asset_id) è
+// univoco: le pagine non si sovrappongono.
+function leggiPrezzi(admin: ReturnType<typeof createAdminClient>, crescente: boolean) {
+  return tutteLeRighe((da, a) =>
+    admin
+      .from("prezzi_storico")
+      .select("asset_id, data, prezzo")
+      .order("data", { ascending: crescente })
+      .order("asset_id", { ascending: true })
+      .range(da, a)
+  );
 }
 
 function mapAsset(row: Record<string, unknown>): Asset {
@@ -68,22 +83,18 @@ export async function getTransazioni(): Promise<TransazioneConAsset[]> {
 // in UI come "non aggiornato" invece di un valore di mercato reale.
 export async function getPosizioniCorrenti(): Promise<Posizione[]> {
   const admin = createAdminClient();
-  const [assetsRes, transazioniRes, prezziRes] = await Promise.all([
+  const [assetsRes, transazioniRes, prezzi] = await Promise.all([
     admin.from("assets").select("*").order("nome"),
     admin.from("transazioni").select("*"),
-    admin
-      .from("prezzi_storico")
-      .select("asset_id, data, prezzo")
-      .order("data", { ascending: false }),
+    leggiPrezzi(admin, false),
   ]);
 
   if (assetsRes.error) throw new Error(assetsRes.error.message);
   if (transazioniRes.error) throw new Error(transazioniRes.error.message);
-  if (prezziRes.error) throw new Error(prezziRes.error.message);
 
   const ultimoPrezzo = new Map<string, { prezzo: number; data: string }>();
   const penultimoPrezzo = new Map<string, { prezzo: number; data: string }>();
-  for (const p of prezziRes.data ?? []) {
+  for (const p of prezzi) {
     if (!ultimoPrezzo.has(p.asset_id)) {
       ultimoPrezzo.set(p.asset_id, { prezzo: toNumber(p.prezzo), data: p.data });
     } else if (!penultimoPrezzo.has(p.asset_id) && p.data < (ultimoPrezzo.get(p.asset_id) as { data: string }).data) {
@@ -233,14 +244,13 @@ export async function getPortfolioHistoryByAsset(
   to?: string
 ): Promise<{ punti: PuntoPortafoglio[]; gruppi: GruppoStorico[] }> {
   const admin = createAdminClient();
-  const [assetsRes, transazioniRes, prezziRes] = await Promise.all([
+  const [assetsRes, transazioniRes, prezzi] = await Promise.all([
     admin.from("assets").select("*").order("nome"),
     admin.from("transazioni").select("*").order("data", { ascending: true }),
-    admin.from("prezzi_storico").select("asset_id, data, prezzo").order("data", { ascending: true }),
+    leggiPrezzi(admin, true),
   ]);
   if (assetsRes.error) throw new Error(assetsRes.error.message);
   if (transazioniRes.error) throw new Error(transazioniRes.error.message);
-  if (prezziRes.error) throw new Error(prezziRes.error.message);
 
   const assets = (assetsRes.data ?? []).map(mapAsset);
   const transazioni = (transazioniRes.data ?? []).map(mapTransazione);
@@ -267,7 +277,7 @@ export async function getPortfolioHistoryByAsset(
   }
 
   const prezziPerAsset = new Map<string, { data: string; prezzo: number }[]>();
-  for (const p of prezziRes.data ?? []) {
+  for (const p of prezzi) {
     const list = prezziPerAsset.get(p.asset_id as string) ?? [];
     list.push({ data: p.data as string, prezzo: toNumber(p.prezzo) });
     prezziPerAsset.set(p.asset_id as string, list);
