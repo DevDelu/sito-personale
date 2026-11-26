@@ -1,11 +1,22 @@
 import { ImageResponse } from "next/og";
-import { getProjectBySlug } from "@/lib/projects";
+import { routing } from "@/i18n/routing";
+import { getProjectBySlug, getProjects } from "@/lib/projects";
 
 // Anteprima social del singolo progetto (LinkedIn, WhatsApp...): titolo, sottotitolo
 // e tag dal content layer, stessa grafica della home. Nessun font o risorsa remota.
 export const alt = "Lorenzo De Luca";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+// Disegnata una volta in build per ogni progetto e lingua, vedi
+// app/[locale]/opengraph-image.tsx.
+export const dynamic = "force-static";
+// Indirizzi non elencati (slug inventati): 404, niente disegno al volo.
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return routing.locales.flatMap((locale) => getProjects(locale).map(({ slug }) => ({ locale, slug })));
+}
 
 export default async function ProjectOpengraphImage({
   params,
