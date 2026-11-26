@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getTranslations } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 
 // Anteprima per la condivisione del link (LinkedIn, WhatsApp, Slack...).
 // Nessun font né risorsa remota: ImageResponse usa il font incluso in Next,
@@ -15,6 +16,16 @@ const STELLE = [
   { left: 105, top: 215 },
   { left: 215, top: 215 },
 ];
+
+// Disegnata una volta in build (una per lingua) e poi servita come file:
+// senza, ogni visita di un social o di un bot la ridisegnava in una funzione.
+export const dynamic = "force-static";
+// Indirizzi non elencati (slug inventati): 404, niente disegno al volo.
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
 
 export default async function OpengraphImage({
   params,
