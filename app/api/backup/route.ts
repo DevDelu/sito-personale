@@ -26,6 +26,10 @@ export async function GET() {
         const { data, error } = await admin
           .from(tabella)
           .select("*")
+          // Senza un ordine il database non garantisce che le pagine siano
+          // disgiunte: righe doppie o mancanti. Ogni tabella del backup ha
+          // `id` come chiave primaria.
+          .order("id", { ascending: true })
           .range(da, da + PAGINA - 1);
         if (error) return { tabella, righe: null, errore: error.message };
         righe.push(...(data ?? []));
