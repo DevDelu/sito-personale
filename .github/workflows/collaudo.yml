@@ -11,11 +11,10 @@
 # Repo PUBBLICO e dati reali: niente screenshot, video, trace né report
 # caricati come artifact (vedi playwright.config.ts).
 #
-# Si esegue sempre il codice dei test di `main`, anche sulle anteprime: i
-# secret del tester non passano mai a codice non ancora mergiato.
+# Si esegue sempre il codice dei test di `main`.
 #
 # Secret: TESTER_EMAIL, TESTER_PASSWORD, SUPABASE_URL, SUPABASE_ANON_KEY,
-# RADAR_URL; facoltativo VERCEL_BYPASS_SECRET se le anteprime sono protette.
+# RADAR_URL; facoltativo VERCEL_BYPASS_SECRET se il deploy è protetto.
 name: collaudo
 
 on:
@@ -25,9 +24,10 @@ on:
   workflow_dispatch:
 
 concurrency:
-  # Le anteprime (job saltato) stanno in un gruppo a parte: non devono
-  # annullare il collaudo di produzione in corso.
-  group: collaudo-${{ github.event_name == 'deployment_status' && github.event.deployment.environment || github.event_name }}
+  # La concorrenza vale prima dell'`if` del job: anteprime e stati diversi da
+  # success (job saltato, es. una build fallita) stanno in gruppi a parte e
+  # non annullano il collaudo di produzione in corso.
+  group: collaudo-${{ github.event_name == 'deployment_status' && format('{0}-{1}', github.event.deployment.environment, github.event.deployment_status.state) || github.event_name }}
   cancel-in-progress: true
 
 permissions:

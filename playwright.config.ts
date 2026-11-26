@@ -3,7 +3,7 @@ import { STORAGE_STATE } from "./tests/e2e/login-tester";
 
 // Collaudatore (tests/e2e/): controlli strutturali deterministici sull'area
 // privata vista da un iPhone, con l'utente tester in sola lettura. Gira sul
-// sito vero (produzione di notte, anteprima Vercel a ogni PR) quindi
+// sito vero (produzione, a ogni deploy e di notte) quindi
 // vede dati reali: niente screenshot, video o trace, perché i report delle
 // Actions di un repo pubblico sono leggibili da chiunque.
 const bypass = process.env.VERCEL_BYPASS_SECRET;
