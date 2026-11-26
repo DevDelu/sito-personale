@@ -1,7 +1,10 @@
 # Collaudatore: suite Playwright deterministica (tests/e2e/) sul sito vero,
 # con l'utente tester in sola lettura su un iPhone simulato. Non usa Claude.
-# - a ogni deploy Vercel riuscito (anteprima di una PR o produzione): il
-#   risultato compare come check sul commit/PR;
+# - a ogni deploy di PRODUZIONE riuscito: il risultato compare come check sul
+#   commit. Le anteprime delle PR non si collaudano più: ogni giro sono
+#   migliaia di richieste al sito, e con una anteprima per ogni push hanno
+#   contribuito a superare i limiti del piano gratuito Vercel (sito sospeso
+#   il 21/11/2026). Se più merge si susseguono, resta solo l'ultimo giro;
 # - ogni notte sulla produzione, prima degli altri agenti: se qualcosa non
 #   va apre/aggiorna la issue `dal-collaudo`, e la chiude quando torna verde.
 #
@@ -22,7 +25,9 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: collaudo-${{ github.event.deployment.id || github.event_name }}
+  # Le anteprime (job saltato) stanno in un gruppo a parte: non devono
+  # annullare il collaudo di produzione in corso.
+  group: collaudo-${{ github.event_name == 'deployment_status' && github.event.deployment.environment || github.event_name }}
   cancel-in-progress: true
 
 permissions:
@@ -31,7 +36,7 @@ permissions:
 
 jobs:
   collaudo:
-    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
+    if: github.event_name != 'deployment_status' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

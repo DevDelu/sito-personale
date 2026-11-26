@@ -31,3 +31,6 @@ Per ogni problema riproducibile una issue `dal-tester` (controlla prima che non 
 che non sia già coperta da `dal-collaudo`), con passi per riprodurre e, se lo sai, il file
 probabile. Un problema che un test e2e strutturale potrebbe prendere → suggeriscilo nella
 issue. Rispondi con l'elenco delle issue aperte e le pagine visitate.
+
+**Budget Vercel**: al massimo 20 pagine caricate sul sito vero per turno, scegli quelle cambiate di
+recente. Se il sito risponde 402, fermati subito. Non lanciare la suite `npm run test:e2e` intera.

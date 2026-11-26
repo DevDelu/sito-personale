@@ -6,9 +6,18 @@
 // Nei log di un repo pubblico finiscono solo host, percorso e un sì/no sul
 // bypass: mai valori di secret né contenuti.
 
-export type EsitoProva = { status: number; location: string | null };
+export type EsitoProva = { status: number; location: string | null; erroreVercel?: string | null };
 
 export function diagnosiAccesso(baseURL: string, prova: EsitoProva, bypassImpostato: boolean): string | null {
+  // Sito spento da Vercel (limiti del piano superati, pagamento richiesto):
+  // senza questo falliscono tutti i test con un generico "status HTTP".
+  if (prova.status === 402) {
+    const codice = /^[A-Z_]{1,60}$/.test(prova.erroreVercel ?? "") ? ` ${prova.erroreVercel}` : "";
+    return (
+      `Collaudo fermato: ${new URL(baseURL).host} è sospeso da Vercel (402${codice}). ` +
+      `Non è un errore del codice: controlla Vercel > Usage e le email di Vercel.`
+    );
+  }
   if (prova.status < 300 || prova.status >= 400) return null; // nessun redirect: la pagina si apre
   if (!prova.location) return null;
   let dest: URL;

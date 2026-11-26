@@ -56,7 +56,7 @@ Sito personale con area pubblica (portfolio bilingue IT/EN) e area privata a sin
   rischio basso sono mergiate con rollback automatico. Dettagli per gli agenti in `CLAUDE.md` e
   `.claude/skills/giro-notturno/SKILL.md`; lezioni in `docs/lezioni-agenti.md`.
 - **Collaudatore e2e**: `npm run test:e2e` (Playwright, utente tester in sola lettura), a ogni
-  deploy e ogni notte. Vedi `tests/e2e/README.md`.
+  deploy di produzione e ogni notte (non sulle anteprime, limiti Vercel). Vedi `tests/e2e/README.md`.
 - **Portfolio pubblico**: homepage e `/progetti` in IT/EN, con metadata tradotti, hreflang e JSON-LD.
   Barra di avanzamento e sezioni animate allo scroll solo con CSS; sette sfere del drago nascoste in home.
 - **Privacy e accessibilità**: modalità discreta che sfoca importi e liste; "riduci movimento"

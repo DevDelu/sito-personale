@@ -8,7 +8,10 @@ Per ogni pagina privata: si apre senza rimandare al login, PageHeader e tab bar 
 nessuno scroll orizzontale, tap target della tab bar ≥ 44px, nessun testo sotto i 12px, nessun
 errore JS/console, nessun 404/5xx. Più il flusso feedback (pressione lunga → sheet → Annulla).
 
-In CI: `.github/workflows/collaudo.yml` (a ogni deploy Vercel e ogni notte).
+In CI: `.github/workflows/collaudo.yml` (a ogni deploy di produzione e ogni notte; le anteprime no).
+Ogni giro consuma i limiti del piano gratuito Vercel (sito sospeso il 21/11/2026): in locale usa
+`-g` o un solo file, e non aggiungere test che ricaricano una pagina già visitata (il controllo a
+375px restringe la stessa pagina). Se il sito risponde 402 il giro si ferma subito.
 
 In locale:
 

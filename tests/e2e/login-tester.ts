@@ -51,7 +51,12 @@ export default async function loginTester(config: FullConfig) {
         ...(bypass ? { "x-vercel-protection-bypass": bypass } : {}),
       },
     });
-    const motivo = diagnosiAccesso(baseURL, { status: risposta.status, location: risposta.headers.get("location") }, !!bypass);
+    const prova = {
+      status: risposta.status,
+      location: risposta.headers.get("location"),
+      erroreVercel: risposta.headers.get("x-vercel-error"),
+    };
+    const motivo = diagnosiAccesso(baseURL, prova, !!bypass);
     if (motivo) throw new Error(motivo);
   } catch (e) {
     if (e instanceof Error && e.message.startsWith("Collaudo fermato")) throw e;

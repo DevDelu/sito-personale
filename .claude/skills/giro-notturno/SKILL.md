@@ -69,6 +69,23 @@ ne hanno bisogno e scrivilo in cima al resoconto.
   (proposte `pronta`, issue appena aperte dagli agenti). Massimo PR nuove per turno: 5 principale, 3 qualità, 2 manutenzione.
 - Le fasi sono in ordine di valore: se il tempo finisce si perdono le ultime.
 
+## Budget Vercel (piano gratuito)
+
+Il 21/11/2026 Vercel ha sospeso il sito: superate le 4 ore di CPU delle funzioni, oltre al limite
+di richieste CDN (1 milione) e di spazio delle funzioni. La causa più probabile sono i controlli
+automatici sul sito vero (circa 500 giri di collaudo tra il 26/10 e il 21/11). Ogni visita degli
+agenti conta come quella di un utente. Quindi:
+- se il sito risponde 402 (`x-vercel-error`), è sospeso: niente merge, tester, collaudo,
+  Lighthouse, screenshot o newsletter; scrivilo in cima al resoconto;
+- **al massimo 3 merge in produzione al giorno**, sommando tutti i turni (ogni merge è una build
+  più un collaudo): contali con `git log --since=midnight origin/main`. Fa eccezione il rollback.
+  Le PR pronte oltre il limite aspettano il giorno dopo;
+- il collaudo completo lo lancia il workflow: **mai `npm run test:e2e` intero a mano** contro
+  produzione o anteprime (per un dubbio preciso, un solo file o `-g`);
+- `tester-esploratore`: al massimo 20 pagine caricate per turno; Lighthouse sul sito vero solo
+  sulle pagine pubbliche, una volta a settimana; screenshot solo per la newsletter;
+- dove basta, prova in locale (`next build && next start`) invece che sul sito vero.
+
 ## Fasi
 
 ### 0. Preparazione
@@ -119,11 +136,12 @@ dati. Altrimenti è **basso**. Scrivi il rischio come etichetta della PR (`risch
 
 ### 5. Merge in produzione (solo rischio basso) e rollback
 Una PR alla volta, solo se: rischio basso, revisore ok, tutti i check verdi (CI `controlli`,
-anteprima Vercel riuscita, `collaudo` sull'anteprima se presente), nessun conflitto.
+anteprima Vercel riuscita), nessun conflitto, e ancora spazio nei 3 merge del giorno.
 1. `gh api -X PUT repos/DevDelu/sito-personale/pulls/<N>/merge -f merge_method=squash`.
 2. Aspetta il deploy di produzione del nuovo commit di `main` (check-run/deployment Vercel
-   riuscito, max 10 minuti) e controlla: home e pagine toccate rispondono 200; con le
-   variabili del tester anche `npm run test:e2e` contro `RADAR_URL`.
+   riuscito, max 10 minuti) e controlla: home e pagine toccate rispondono 200; poi aspetta
+   il check `collaudo` di quel commit (parte da solo, solo in produzione: non rilanciare
+   la suite a mano).
 3. Se il deploy fallisce o il controllo è rosso: **rollback subito**. Branch
    `revert/<N>` da `main`, `git revert <sha del merge>`, PR "Revert #<N>", mergiala appena la
    CI è verde, poi riapri la issue/feedback con il motivo. Annota la lezione in
