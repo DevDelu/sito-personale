@@ -21,9 +21,12 @@ export async function generateMetadata({
 }
 
 // Il teaser del quiz (top 5 in classifica) è una query diretta a Supabase in
-// un Server Component: revalidate qui, a livello di route segment, tiene la
-// classifica ragionevolmente fresca senza farla ricalcolare a ogni request.
-export const revalidate = 60;
+// un Server Component. Quando un punteggio entra in classifica la home viene
+// rigenerata subito (revalidatePath in app/api/quiz/submit); il revalidate qui
+// è solo la rete di sicurezza. Ogni rigenerazione consuma CPU delle funzioni
+// (piano gratuito Vercel): con 60 secondi potevano essere fino a 1440 al
+// giorno per lingua, con 900 al massimo 96.
+export const revalidate = 900;
 
 export default async function HomePage({
   params,

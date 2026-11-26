@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -104,6 +105,9 @@ export async function POST(request: Request) {
           { onConflict: "user_id" }
         );
         saved = !upsertError;
+        // La classifica è cambiata: la home (IT ed EN) va rigenerata alla
+        // prossima visita, senza aspettare il revalidate periodico.
+        if (saved) revalidatePath("/[locale]", "page");
       } else {
         saved = true;
       }
