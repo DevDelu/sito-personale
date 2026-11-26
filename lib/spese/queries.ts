@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { Categoria, Deposito, Movimento, Spesa } from "@/lib/types";
 import { aggiungiMesi, type SpesaGrezza } from "./ricorrenti";
 import { FONTI_NON_IMPORT } from "./ultimo-import";
+import { leggiAPagine } from "./pagine";
 
 export async function getCategorie(): Promise<Categoria[]> {
   const admin = createAdminClient();
@@ -27,30 +28,28 @@ export async function getOverviewData(
 }> {
   const admin = createAdminClient();
 
-  const [speseRes, categorieRes, depositiRes] = await Promise.all([
+  // A pagine: su un periodo lungo oltre 1000 righe i totali sarebbero parziali.
+  // `id` rende univoco l'ordinamento tra movimenti dello stesso giorno.
+  const righeDi = (vista: "spese_con_categoria" | "depositi_con_categoria") =>
     admin
-      .from("spese_con_categoria")
+      .from(vista)
       .select("*")
       .gte("data", from)
       .lte("data", to)
-      .order("data", { ascending: false }),
+      .order("data", { ascending: false });
+
+  const [spese, categorieRes, depositi] = await Promise.all([
+    leggiAPagine((da, a) => righeDi("spese_con_categoria").order("id", { ascending: true }).range(da, a)),
     admin.from("categorie").select("id, nome, colore, tipo").order("nome"),
-    admin
-      .from("depositi_con_categoria")
-      .select("*")
-      .gte("data", from)
-      .lte("data", to)
-      .order("data", { ascending: false }),
+    leggiAPagine((da, a) => righeDi("depositi_con_categoria").order("id", { ascending: true }).range(da, a)),
   ]);
 
-  if (speseRes.error) throw new Error(speseRes.error.message);
   if (categorieRes.error) throw new Error(categorieRes.error.message);
-  if (depositiRes.error) throw new Error(depositiRes.error.message);
 
   return {
-    spese: (speseRes.data ?? []).map((r) => ({ ...r, importo: Number(r.importo) })),
+    spese: spese.map((r) => ({ ...r, importo: Number(r.importo) })),
     categorie: categorieRes.data ?? [],
-    depositi: (depositiRes.data ?? []).map((r) => ({ ...r, importo: Number(r.importo) })),
+    depositi: depositi.map((r) => ({ ...r, importo: Number(r.importo) })),
   };
 }
 
