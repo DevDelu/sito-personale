@@ -17,7 +17,7 @@ export function RecoverForm() {
         <p className="text-sm text-muted">
           Se l&apos;indirizzo è registrato riceverai a breve un&apos;email con il link per reimpostare la password.
         </p>
-        <Link href="/login" className="text-sm text-muted hover:text-fg">
+        <Link href="/login" className="inline-flex min-h-11 items-center justify-center text-sm text-muted hover:text-fg md:min-h-0">
           Torna al login
         </Link>
       </div>
@@ -50,7 +50,7 @@ export function RecoverForm() {
         {pending ? "Invio in corso..." : "Invia link di recupero"}
       </button>
 
-      <Link href="/login" className="self-center text-sm text-muted hover:text-fg">
+      <Link href="/login" className="inline-flex min-h-11 items-center self-center text-sm text-muted hover:text-fg md:min-h-0">
         Torna al login
       </Link>
     </form>

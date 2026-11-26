@@ -34,7 +34,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
           autoComplete="current-password"
           className="field-input bg-surface"
         />
-        <Link href="/login/recupera-password" className="self-end text-sm text-muted hover:text-fg">
+        <Link href="/login/recupera-password" className="inline-flex min-h-11 items-center self-end text-sm text-muted hover:text-fg md:min-h-0">
           Password dimenticata?
         </Link>
       </div>
