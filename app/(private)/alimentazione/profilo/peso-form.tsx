@@ -2,8 +2,9 @@
 
 import { useActionState } from "react";
 import { aggiungiPeso, type RegistraPesoState } from "../actions";
+import { oggiItaliaISO } from "@/lib/cron/data-italia";
 
-const oggi = () => new Date().toISOString().slice(0, 10);
+const oggi = () => oggiItaliaISO();
 
 export function PesoForm() {
   const [state, formAction, pending] = useActionState<RegistraPesoState, FormData>(aggiungiPeso, undefined);

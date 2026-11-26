@@ -5,6 +5,7 @@ import type { EventoPatch } from "@/app/(private)/agenda/actions";
 import { PALETTE_COLORI_EVENTO } from "@/lib/agenda/colori";
 import type { CategoriaEvento, Evento } from "@/lib/agenda/types";
 import { ModalDialog } from "@/components/ui/ModalDialog";
+import { oggiItaliaISO } from "@/lib/cron/data-italia";
 
 const CATEGORIE: { value: CategoriaEvento; label: string }[] = [
   { value: "ferie", label: "Ferie" },
@@ -46,7 +47,7 @@ export function EventoFormModal({
   const [colore, setColore] = useState<string | null>(evento?.colore ?? null);
   const [tuttoIlGiorno, setTuttoIlGiorno] = useState(evento?.tutto_il_giorno ?? false);
 
-  const dataDefault = dataIniziale?.data ?? new Date().toISOString().slice(0, 10);
+  const dataDefault = dataIniziale?.data ?? oggiItaliaISO();
   const [dataInizio, setDataInizio] = useState(evento ? toLocalInputValue(evento.data_inizio) : `${dataDefault}T09:00`);
   const [dataFine, setDataFine] = useState(evento ? toLocalInputValue(evento.data_fine) : `${dataDefault}T10:00`);
   const [erroreForm, setErroreForm] = useState<string | null>(null);

@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { aggiungiMovimento, type AggiungiMovimentoState } from "../actions";
 import { CategoriaPickerSheet } from "@/components/spese/CategoriaPickerSheet";
 import type { Categoria } from "@/lib/types";
+import { oggiItaliaISO } from "@/lib/cron/data-italia";
 
-const oggi = () => new Date().toISOString().slice(0, 10);
+const oggi = () => oggiItaliaISO();
 
 export function AddTransactionForm({
   categorie,

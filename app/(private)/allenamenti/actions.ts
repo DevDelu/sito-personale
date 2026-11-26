@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireWriter } from "@/lib/supabase/dal";
 import { getSchedaEsercizi } from "@/lib/allenamento/queries";
 import type { TipoMetrica, TipoRiga } from "@/lib/allenamento/types";
+import { oggiItaliaISO } from "@/lib/cron/data-italia";
 
 export type AllenamentoActionResult = { error?: string };
 
@@ -59,7 +60,7 @@ export async function creaSessione(schedaId: string): Promise<{ id: string } | {
   if (righe.length === 0) return { error: "Questa scheda non ha ancora esercizi: aggiungine almeno uno." };
 
   const admin = createAdminClient();
-  const oggi = new Date().toISOString().slice(0, 10);
+  const oggi = oggiItaliaISO();
   const { data, error } = await admin
     .from("sessioni")
     .insert({ data: oggi, scheda_id: schedaId, scheda_snapshot: righe })

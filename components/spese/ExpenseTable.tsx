@@ -19,14 +19,15 @@ import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 import { ActionBar } from "@/components/ui/ActionBar";
 import { BulkEditModal } from "./BulkEditModal";
 import type { Categoria, Movimento } from "@/lib/types";
+import { giorniPrimaISO, oggiItaliaISO } from "@/lib/cron/data-italia";
 
 function rowKey(r: Movimento): string {
   return `${r.tipo}-${r.id}`;
 }
 
 function giornoLabel(iso: string): string {
-  const oggi = new Date().toISOString().slice(0, 10);
-  const ieri = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const oggi = oggiItaliaISO();
+  const ieri = giorniPrimaISO(oggi, 1);
   if (iso === oggi) return "Oggi";
   if (iso === ieri) return "Ieri";
   return new Date(`${iso}T00:00:00Z`).toLocaleDateString("it-IT", {
