@@ -38,3 +38,12 @@ for (const [percorso, lingua] of [["/", "it"], ["/en", "en"]] as const) {
     await expect(page.locator("html")).toHaveAttribute("lang", lingua);
   });
 }
+
+// Un'immagine del markdown finiva dentro un <p>: errore di idratazione React.
+test("/progetti/piattaforma-aperitivi: nessun errore JavaScript", async ({ page }) => {
+  const errori: string[] = [];
+  page.on("pageerror", (e) => errori.push(e.message.slice(0, 200)));
+  await page.goto("/progetti/piattaforma-aperitivi", { waitUntil: "networkidle" });
+  await expect(page.locator("main figure img").first()).toBeAttached();
+  expect(errori).toEqual([]);
+});
