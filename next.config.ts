@@ -63,6 +63,11 @@ async function headers() {
 const nextConfig: NextConfig = {
   // Non dichiarare il framework/versione a ogni risposta (X-Powered-By).
   poweredByHeader: false,
+  // Spazio Vercel: le pagine con opengraph-image si portavano dietro tre copie di sharp
+  // (~47 MB per funzione, oltre metà del peso del deploy). next/og lo usa solo se c'è,
+  // altrimenti disegna con resvg (già incluso in Next); next/image su Vercel è ottimizzato
+  // dalla piattaforma, non dalle funzioni. In self-hosting (next start) sharp resta installato.
+  outputFileTracingExcludes: { "/**": ["node_modules/sharp/**/*", "node_modules/@img/**/*"] },
   headers,
   images: {
     remotePatterns: supabaseHostname
