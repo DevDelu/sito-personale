@@ -24,7 +24,8 @@ npm run test:e2e    # collaudatore Playwright sul sito vero col tester in sola l
 
 Gli unit test importano con estensione `.ts` (serve a Node), da qui `allowImportingTsExtensions` in
 `tsconfig.json`. Il collaudatore (`tests/e2e/`, `.github/workflows/collaudo.yml`) gira a ogni deploy
-Vercel e ogni notte; entra come tester con `signInWithPassword` via `@supabase/ssr` (niente form di
+di produzione e ogni notte (non sulle anteprime: limiti del piano gratuito Vercel, vedi "Budget
+Vercel" in `giro-notturno/SKILL.md`); entra come tester con `signInWithPassword` via `@supabase/ssr` (niente form di
 login, che ha Turnstile). Vede dati reali in un repo pubblico: **mai** screenshot/video/trace o
 report caricati come artifact, e asserzioni solo strutturali. Pagina privata nuova → aggiungila a
 `PAGINE` in `tests/e2e/pagine.spec.ts`; bug corretto → test che fallisce prima e passa dopo.

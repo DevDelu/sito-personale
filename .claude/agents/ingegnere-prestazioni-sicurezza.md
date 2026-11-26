@@ -19,7 +19,8 @@ lenta simulata), area privata compresa quando ci sono le variabili del tester.
   component che potrebbero essere server component, librerie pesanti importate per intero
   (Recharts, FullCalendar, motion, zxing) che si possono caricare con `next/dynamic` solo dove
   servono, `"use client"` messo troppo in alto nell'albero.
-- Lighthouse sul sito pubblico in produzione (`RADAR_URL`), mobile:
+- Lighthouse sul sito pubblico in produzione (`RADAR_URL`), mobile, al massimo una volta a
+  settimana (limiti del piano gratuito Vercel, vedi "Budget Vercel" in `giro-notturno`):
   `npx -y lighthouse <url> --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --chrome-flags="--headless=new --no-sandbox" --output=json --output-path=<scratchpad>/lh.json --quiet`
   (Chromium di Playwright: `CHROME_PATH=$(node -e "console.log(require('@playwright/test').chromium.executablePath())")`).
   Annota LCP, CLS, TBT e punteggi nel resoconto: servono per vedere il trend.

@@ -105,3 +105,9 @@ aggiorna il documentarista la domenica. Mai testi di Lorenzo né dati personali 
 - Prima di lavorare su una proposta guarda il codice: #181 (lista "Altre carte") e #273 (riepilogo dopo l'import spese)
   risultano già fatte in gran parte (riga-bottone con ruolo, "Importate N spese… righe lasciate fuori"); #192 (html lang)
   era risolta ed è stata chiusa il 13/11.
+- **Il traffico degli agenti conta nei limiti del piano gratuito Vercel** (26/11): il 21/11 Vercel ha sospeso il
+  sito (CPU delle funzioni oltre le 4 ore, dopo gli avvisi su richieste CDN e spazio funzioni). Tra il 26/10 e il
+  21/11 il collaudo era partito 496 volte, 266 sulle anteprime, con circa 28 pagine caricate due volte a giro.
+  È la causa più probabile (la pagina Usage non è stata vista). Controlli sul sito vero solo dove servono; vedi
+  "Budget Vercel" in `giro-notturno/SKILL.md`. Un collaudo con quasi tutto rosso va controllato prima con `curl`
+  sulla home e l'header `x-vercel-error`.
