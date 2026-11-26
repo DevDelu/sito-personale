@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getOverviewData, getSpesePerRicorrenti, getTotaliPeriodo, getUltimoInserimentoImport } from "@/lib/spese/queries";
 import { giorniDalCaricamento } from "@/lib/spese/ultimo-import";
+import { giorniPrimaISO, oggiItaliaISO } from "@/lib/cron/data-italia";
 import { trovaRicorrenti } from "@/lib/spese/ricorrenti";
 import { periodoPrecedente } from "@/lib/spese/confronto";
 import { meseScorso } from "@/lib/spese/mese-scorso";
@@ -23,23 +24,10 @@ export const metadata: Metadata = { title: "Spese" };
 
 const DEFAULT_PRESET = "mese";
 
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function daysAgoIso(days: number): string {
-  return new Date(Date.now() - (days - 1) * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-}
-
-function firstOfMonthIso(): string {
-  const d = new Date();
-  return new Date(Date.UTC(d.getFullYear(), d.getMonth(), 1)).toISOString().slice(0, 10);
-}
-
-function presetRange(preset: string): { from: string; to: string } {
-  if (preset === "7") return { from: daysAgoIso(7), to: todayIso() };
-  if (preset === "scorso") return meseScorso(todayIso());
-  return { from: firstOfMonthIso(), to: todayIso() };
+function presetRange(preset: string, oggi: string): { from: string; to: string } {
+  if (preset === "7") return { from: giorniPrimaISO(oggi, 6), to: oggi };
+  if (preset === "scorso") return meseScorso(oggi);
+  return { from: `${oggi.slice(0, 7)}-01`, to: oggi };
 }
 
 export default async function SpesePage({
@@ -49,22 +37,25 @@ export default async function SpesePage({
 }) {
   const { added, preset, from, to } = await searchParams;
 
+  // Fuso Europe/Rome: il server è in UTC e dopo mezzanotte italiana "oggi" era
+  // ancora ieri (il primo del mese, il mese precedente).
+  const oggi = oggiItaliaISO();
   const range =
     from && to
       ? { from, to, preset: null }
-      : { ...presetRange(preset ?? DEFAULT_PRESET), preset: preset ?? DEFAULT_PRESET };
+      : { ...presetRange(preset ?? DEFAULT_PRESET, oggi), preset: preset ?? DEFAULT_PRESET };
 
   const prec = periodoPrecedente(range.from, range.to);
   const [{ spese, categorie, depositi }, spesePerRicorrenti, totaliPrec, ultimoImport] = await Promise.all([
     getOverviewData(range.from, range.to),
-    getSpesePerRicorrenti(todayIso()),
+    getSpesePerRicorrenti(oggi),
     // Un errore nel confronto non deve rompere la pagina: la riga semplicemente non compare.
     prec ? getTotaliPeriodo(prec.from, prec.to).catch(() => null) : Promise.resolve(null),
     // Idem: senza la data la riga "Ultimo caricamento" non compare.
     getUltimoInserimentoImport().catch(() => null),
   ]);
   const giorniDaCaricamento = ultimoImport ? giorniDalCaricamento(ultimoImport) : null;
-  const ricorrenti = trovaRicorrenti(spesePerRicorrenti, todayIso());
+  const ricorrenti = trovaRicorrenti(spesePerRicorrenti, oggi);
 
   return (
     <div className="flex flex-col gap-6">

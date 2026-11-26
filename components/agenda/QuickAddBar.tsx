@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import { useAgendaMutations } from "@/hooks/useAgendaMutations";
 import { EventoFormModal } from "./EventoFormModal";
 import type { EventoPatch } from "@/app/(private)/agenda/actions";
+import { oggiItaliaISO } from "@/lib/cron/data-italia";
 
 // Il supporto chrono-node all'italiano è solo parziale (pieno per
 // fi/fr/ja/nl/ru/uk/vi, parziale per it/de/es/pt/sv/zh): se il parsing
@@ -95,7 +96,7 @@ export function QuickAddBar() {
       {formAperto && (
         <EventoFormModal
           evento={null}
-          dataIniziale={{ data: new Date().toISOString().slice(0, 10), titoloIniziale: bozzaTitolo }}
+          dataIniziale={{ data: oggiItaliaISO(), titoloIniziale: bozzaTitolo }}
           pending={pending}
           error={error}
           onSave={handleSalvaForm}

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { oggiItaliaISO, settimanaCorrenteItalia } from "./data-italia.ts";
+import { giorniPrimaISO, oggiItaliaISO, settimanaCorrenteItalia } from "./data-italia.ts";
 
 test("oggi in Italia: dopo mezzanotte italiana UTC è ancora il giorno prima", () => {
   // 22:30 UTC del 28/10 = 23:30 CET → ancora 28
@@ -40,4 +40,16 @@ test("settimana: attraversa il cambio d'anno", () => {
     inizio: "2026-12-28",
     fine: "2027-01-03",
   });
+});
+
+test("giorniPrimaISO attraversa mesi, anni e cambio d'ora", () => {
+  assert.equal(giorniPrimaISO("2027-01-01", 1), "2026-12-31");
+  assert.equal(giorniPrimaISO("2026-03-30", 1), "2026-03-29");
+  assert.equal(giorniPrimaISO("2026-10-26", 1), "2026-10-25");
+  assert.equal(giorniPrimaISO("2026-12-04", 6), "2026-11-28");
+});
+
+test("appena dopo la mezzanotte italiana oggi è già il giorno nuovo", () => {
+  assert.equal(oggiItaliaISO(new Date("2026-11-30T23:30:00Z")), "2026-12-01");
+  assert.equal(oggiItaliaISO(new Date("2026-06-30T22:30:00Z")), "2026-07-01");
 });

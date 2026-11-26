@@ -31,3 +31,11 @@ export function settimanaCorrenteItalia(date: Date = new Date()): { inizio: stri
 
   return { inizio: lunedi.toISOString().slice(0, 10), fine: domenica.toISOString().slice(0, 10) };
 }
+
+// La data `giorni` giorni prima di una "YYYY-MM-DD": pura aritmetica di
+// calendario, quindi il cambio d'ora non la sposta.
+export function giorniPrimaISO(iso: string, giorni: number): string {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - giorni);
+  return d.toISOString().slice(0, 10);
+}
