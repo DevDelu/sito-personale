@@ -89,7 +89,8 @@ export function SyncStatusBadge({ integrazione }: { integrazione: IntegrazioneGo
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <div className="flex items-center gap-1.5 text-xs">
+      {/* Su telefono sta nella barra del titolo (48px): resta solo il pulsante. */}
+      <div className="hidden items-center gap-1.5 text-xs md:flex">
         {stato === "scaduto" ? (
           <>
             <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-spesa" />
@@ -102,7 +103,11 @@ export function SyncStatusBadge({ integrazione }: { integrazione: IntegrazioneGo
           </>
         )}
       </div>
-      <Link href="/api/agenda/auth/google" className="btn-secondary flex items-center gap-1.5 !px-2.5 !py-1 text-xs">
+      <Link
+        href="/api/agenda/auth/google"
+        aria-label={stato === "scaduto" ? "Riconnetti Google: collegamento scaduto" : "Connetti Google"}
+        className="btn-secondary flex min-h-11 items-center gap-1.5 !px-2.5 !py-1 text-xs md:min-h-0"
+      >
         <Link2 className="h-3 w-3" />
         {stato === "scaduto" ? "Riconnetti" : "Connetti"}
       </Link>

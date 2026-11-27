@@ -79,7 +79,7 @@ export function QuickAddBar() {
           value={testo}
           onChange={(e) => setTesto(e.target.value)}
           placeholder='Aggiungi al volo: "domani alle 15 dal dentista"'
-          className="field-input flex-1"
+          className="field-input min-w-0 flex-1"
         />
         <button
           type="submit"
