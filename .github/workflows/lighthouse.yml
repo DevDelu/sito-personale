@@ -1,0 +1,30 @@
+# Velocità delle pagine pubbliche (portfolio) in profilo mobile con Lighthouse CI.
+# Solo segnalazione: le soglie in lighthouserc.json sono "warn" e il job non
+# fallisce; la tabella finisce nel riepilogo del job. Gira ogni lunedì e a
+# richiesta. Nessun report/screenshot caricato come artifact (repo pubblico).
+name: lighthouse
+
+on:
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Lighthouse CI (solo segnalazione)
+        run: npx --yes @lhci/cli@0.14.0 autorun || true
+
+      - name: Riepilogo
+        run: node scripts/lighthouse-riepilogo.mjs >> "$GITHUB_STEP_SUMMARY"
