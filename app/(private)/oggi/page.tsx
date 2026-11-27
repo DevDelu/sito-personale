@@ -153,7 +153,13 @@ export default async function OggiPage() {
                 href="/allenamenti"
                 icon={<Dumbbell className="h-5 w-5" strokeWidth={1.75} />}
                 title={i.titolo}
-                subtitle={sessioneFatta ? "Sessione di oggi registrata" : (notaSessioni ?? i.orario ?? undefined)}
+                // La sessione non dice a quale impegno si riferisce: con più
+                // impegni resta l'orario di ciascuno.
+                subtitle={
+                  [i.orario, sessioneFatta ? (impegniOggi.length === 1 ? "Sessione di oggi registrata" : "Oggi hai registrato una sessione") : notaSessioni]
+                    .filter(Boolean)
+                    .join(" · ") || undefined
+                }
                 chevron
               />
             ))
