@@ -7,6 +7,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { siteUrl } from "@/lib/site-url";
 import { sendPushToOwner } from "@/lib/push/send";
+import { percorsoInterno } from "@/lib/url/percorso-interno";
 
 export type LoginState = { error?: string } | undefined;
 
@@ -78,7 +79,7 @@ export async function login(
     return { error: "Email o password non corrette." };
   }
 
-  redirect(redirectTo.startsWith("/") ? redirectTo : "/spese");
+  redirect(percorsoInterno(redirectTo, "/spese"));
 }
 
 export type RequestResetState = { error?: string; sent?: boolean } | undefined;
