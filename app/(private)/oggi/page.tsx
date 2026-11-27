@@ -40,6 +40,11 @@ export default async function OggiPage() {
     getSessioni(),
   ]);
 
+  // La pagina resta in piedi anche se una lettura fallisce, ma il motivo va nei log.
+  for (const r of [eventiRes, pastiRes, tdeeRes, speseRes, impegniRes, sessioniRes]) {
+    if (r.status === "rejected") console.error("[oggi] lettura fallita:", r.reason);
+  }
+
   const eventi = eventiRes.status === "fulfilled" ? eventiDiOggi(eventiRes.value, oggi) : null;
   const kcal = pastiRes.status === "fulfilled" ? Math.round(sommaMacro(pastiRes.value).kcal) : null;
   const target = tdeeRes.status === "fulfilled" && tdeeRes.value.ok ? tdeeRes.value.targetKcal : null;
@@ -56,9 +61,13 @@ export default async function OggiPage() {
 
   const impegniOggi =
     impegniRes.status === "fulfilled"
-      ? impegniRes.value.filter((i) => i.attivo && i.giorno_settimana === giornoSettimana)
+      ? impegniRes.value
+          .filter((i) => i.attivo && i.giorno_settimana === giornoSettimana)
+          .sort((a, b) => (a.orario ?? "").localeCompare(b.orario ?? ""))
       : null;
   const sessioneFatta = sessioniRes.status === "fulfilled" ? sessioniRes.value.some((x) => x.data === oggi) : false;
+  // Senza le sessioni non sappiamo se è stata fatta: lo diciamo.
+  const notaSessioni = sessioniRes.status === "rejected" ? "Sessioni non disponibili" : undefined;
 
   const dataLunga = new Intl.DateTimeFormat("it-IT", {
     timeZone: "Europe/Rome",
@@ -134,6 +143,7 @@ export default async function OggiPage() {
               href="/allenamenti"
               icon={<Dumbbell className="h-5 w-5" strokeWidth={1.75} />}
               title={sessioneFatta ? "Sessione di oggi registrata" : "Nessun impegno fisso oggi"}
+              subtitle={notaSessioni}
               chevron
             />
           ) : (
@@ -143,7 +153,7 @@ export default async function OggiPage() {
                 href="/allenamenti"
                 icon={<Dumbbell className="h-5 w-5" strokeWidth={1.75} />}
                 title={i.titolo}
-                subtitle={sessioneFatta ? "Sessione di oggi registrata" : (i.orario ?? undefined)}
+                subtitle={sessioneFatta ? "Sessione di oggi registrata" : (notaSessioni ?? i.orario ?? undefined)}
                 chevron
               />
             ))
