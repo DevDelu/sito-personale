@@ -59,3 +59,14 @@ test("giornata intera prima degli altri, e fine inclusiva", () => {
 test("eventi di altri giorni esclusi", () => {
   assert.equal(componiPushAgenda([ev({ data_inizio: "2026-10-28T09:00:00+01:00", data_fine: "2026-10-28T10:00:00+01:00" })], "2026-10-27", false), null);
 });
+
+test("evento che finisce a mezzanotte in punto: non è un impegno del giorno dopo", () => {
+  const cena = ev({ data_inizio: "2026-10-26T22:00:00+01:00", data_fine: "2026-10-27T00:00:00+01:00" });
+  assert.equal(eventiDiOggi([cena], "2026-10-27").length, 0);
+  assert.equal(eventiDiOggi([cena], "2026-10-26").length, 1);
+});
+
+test("evento senza durata a mezzanotte: resta nel suo giorno", () => {
+  const istante = ev({ data_inizio: "2026-10-27T00:00:00+01:00", data_fine: "2026-10-27T00:00:00+01:00" });
+  assert.equal(eventiDiOggi([istante], "2026-10-27").length, 1);
+});

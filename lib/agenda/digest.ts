@@ -21,13 +21,20 @@ function oraRoma(iso: string): string {
   );
 }
 
+// La fine di un orario è esclusa: chi finisce a mezzanotte in punto non occupa
+// il giorno dopo. Un evento senza durata resta nel giorno in cui inizia.
+function giornoFineConOrario(e: Evento): string {
+  const fine = Math.max(Date.parse(e.data_inizio), Date.parse(e.data_fine) - 1);
+  return dataRoma(new Date(fine).toISOString());
+}
+
 // Stessa regola di prossimi.ts: gli eventi "tutto il giorno" hanno data_fine
 // inclusiva; quelli con orario si leggono nel fuso di Roma.
 export function eventiDiOggi(eventi: Evento[], oggi: string): Evento[] {
   return eventi
     .filter((e) => {
       const inizio = e.tutto_il_giorno ? e.data_inizio.slice(0, 10) : dataRoma(e.data_inizio);
-      const fine = e.tutto_il_giorno ? e.data_fine.slice(0, 10) : dataRoma(e.data_fine);
+      const fine = e.tutto_il_giorno ? e.data_fine.slice(0, 10) : giornoFineConOrario(e);
       return inizio <= oggi && fine >= oggi;
     })
     .sort((a, b) =>
