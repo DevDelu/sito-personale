@@ -46,7 +46,7 @@ export function RecoverForm() {
         </p>
       )}
 
-      <button type="submit" disabled={pending} className="btn-primary mt-2 min-h-11 w-full md:min-h-0">
+      <button type="submit" disabled={pending} className="btn-primary mt-2 w-full">
         {pending ? "Invio in corso..." : "Invia link di recupero"}
       </button>
 
