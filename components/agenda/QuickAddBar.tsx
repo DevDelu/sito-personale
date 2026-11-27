@@ -76,10 +76,11 @@ export function QuickAddBar() {
     <div className="flex flex-col gap-1">
       <form onSubmit={handleSubmit} className="flex items-center gap-2">
         <input
+          aria-label="Aggiungi un evento al volo"
           value={testo}
           onChange={(e) => setTesto(e.target.value)}
           placeholder='Aggiungi al volo: "domani alle 15 dal dentista"'
-          className="field-input flex-1"
+          className="field-input min-w-0 flex-1"
         />
         <button
           type="submit"
