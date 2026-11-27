@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { MoreHorizontal, type LucideIcon } from "lucide-react";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
 import { interceptSessionNav } from "@/lib/allenamento/session-guard";
-import { ascoltaAvvisoInBasso, avvisoInBasso } from "@/lib/feedback/avviso-in-basso";
+import { avvisoFeedback, toastAperto } from "@/lib/feedback/avviso-in-basso";
 import { apriFeedback, focusCampoFeedback, leggiLocale, scriviLocale } from "@/lib/feedback/bus";
 import { inSessioneAllenamento } from "@/lib/feedback/regole-suggerimento";
 import { usePressioneLunga } from "@/hooks/usePressioneLunga";
@@ -78,8 +78,9 @@ export function TabBar() {
   const [frecciaScoperta, setFrecciaScoperta] = useState<number | null>(null);
   const inSessione = inSessioneAllenamento(pathname);
   // Un avviso più importante nella stessa posizione ha la precedenza.
-  const occupato = useSyncExternalStore(ascoltaAvvisoInBasso, avvisoInBasso, () => false);
-  const scopertaVisibile = frecciaScoperta !== null && !occupato;
+  const conFeedback = useSyncExternalStore(avvisoFeedback.ascolta, avvisoFeedback.leggi, () => false);
+  const conToast = useSyncExternalStore(toastAperto.ascolta, toastAperto.leggi, () => false);
+  const scopertaVisibile = frecciaScoperta !== null && !conFeedback && !conToast;
 
   useEffect(() => {
     if (inSessione || leggiLocale(CHIAVE_SCOPERTA, false)) return;
