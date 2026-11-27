@@ -24,17 +24,13 @@ export async function aggiornaPrezzi(): Promise<EsitoAggiornamentoPrezzi> {
   const aggiornati: EsitoAggiornamentoPrezzi["aggiornati"] = [];
   const errori: EsitoAggiornamentoPrezzi["errori"] = [];
 
-  // Tutte le cripto in una sola richiesta (vedi fetchCoinGeckoPrices).
+  // Tutte le cripto in una sola richiesta (vedi fetchCoinGeckoPrices). Non si
+  // attende qui: se CoinGecko è lento, i prezzi Yahoo si salvano lo stesso.
   const idsCripto = (assets ?? []).flatMap((a) => (a.coingecko_id ? [a.coingecko_id as string] : []));
-  let prezziCripto: Awaited<ReturnType<typeof fetchCoinGeckoPrices>> | null = null;
-  let erroreCripto = "";
-  if (idsCripto.length > 0) {
-    try {
-      prezziCripto = await fetchCoinGeckoPrices(idsCripto);
-    } catch (e) {
-      erroreCripto = (e as Error).message;
-    }
-  }
+  const richiestaCripto = fetchCoinGeckoPrices(idsCripto).then(
+    (prezzi) => ({ prezzi, errore: null }),
+    (e: Error) => ({ prezzi: null, errore: e.message })
+  );
 
   await Promise.all(
     (assets ?? []).map(async (asset) => {
@@ -45,8 +41,9 @@ export async function aggiornaPrezzi(): Promise<EsitoAggiornamentoPrezzi> {
         if (asset.coingecko_id) {
           // Se CoinGecko non risponde non si ripiega su un'altra fonte (valuta diversa = prezzo sbagliato):
           // resta l'ultimo prezzo salvato e l'errore viene segnalato.
-          if (!prezziCripto) throw new Error(erroreCripto);
-          quote = prezziCripto.get(asset.coingecko_id) ?? null;
+          const { prezzi, errore } = await richiestaCripto;
+          if (!prezzi) throw new Error(`${errore} per ${asset.coingecko_id}`);
+          quote = prezzi.get(asset.coingecko_id) ?? null;
           if (!quote) throw new Error(`CoinGecko: risposta senza prezzo valido per ${asset.coingecko_id}`);
           fonte = "coingecko";
         } else if (asset.price_symbol) {
