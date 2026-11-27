@@ -4,15 +4,18 @@ import { useActionState } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import { login, type LoginState } from "./actions";
+import { inviaSenzaSvuotare } from "@/hooks/inviaSenzaSvuotare";
+import { useResetAntispam } from "@/hooks/useResetAntispam";
 
 export function LoginForm({ redirectTo }: { redirectTo: string }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(
     login,
     undefined
   );
+  const antispam = useResetAntispam(state);
 
   return (
-    <form action={action} className="flex w-full max-w-sm animate-slide-up flex-col gap-4">
+    <form action={action} onSubmit={inviaSenzaSvuotare(action)} className="flex w-full max-w-sm animate-slide-up flex-col gap-4">
       <input type="hidden" name="redirect" value={redirectTo} />
 
       <div className="flex flex-col gap-1.5">
@@ -41,6 +44,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
 
       <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
       <div
+        ref={antispam}
         className="cf-turnstile"
         data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
         data-theme="auto"

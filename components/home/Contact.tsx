@@ -6,6 +6,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { sendContactMessage, type ContactState } from "@/app/[locale]/contact-actions";
 import { RevealGroup, RevealItem } from "@/components/progetti/reveal";
 import { SectionHeading } from "@/components/home/section-heading";
+import { inviaSenzaSvuotare } from "@/hooks/inviaSenzaSvuotare";
+import { useResetAntispam } from "@/hooks/useResetAntispam";
 
 const inputClass =
   "w-full min-h-[44px] border-0 border-b border-border bg-transparent px-0 py-2 text-base text-foreground outline-none transition-colors placeholder:text-muted/60 focus:border-accent";
@@ -14,6 +16,7 @@ export function Contact() {
   const t = useTranslations("Contact");
   const locale = useLocale();
   const [state, action, pending] = useActionState<ContactState, FormData>(sendContactMessage, undefined);
+  const antispam = useResetAntispam(state);
   const [renderedAt] = useState(() => Date.now());
 
   return (
@@ -30,7 +33,7 @@ export function Contact() {
               {t("success")}
             </p>
           ) : (
-            <form action={action} className="relative flex flex-col gap-5">
+            <form action={action} onSubmit={inviaSenzaSvuotare(action)} className="relative flex flex-col gap-5">
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="ts" value={renderedAt} />
 
@@ -64,6 +67,7 @@ export function Contact() {
 
               <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
               <div
+                ref={antispam}
                 className="cf-turnstile"
                 data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
                 data-theme="auto"
