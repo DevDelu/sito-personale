@@ -8,7 +8,8 @@
       "numberOfRuns": 1,
       "settings": {
         "formFactor": "mobile",
-        "chromeFlags": "--no-sandbox --headless=new"
+        "chromeFlags": "--no-sandbox --headless=new",
+        "extraHeaders": { "Accept-Language": "it-IT,it;q=0.9" }
       }
     },
     "assert": {
