@@ -7,6 +7,7 @@ import { CheckCircle2, MessageCircle } from "lucide-react";
 import { Toast } from "@/components/toast";
 import { FeedbackSheet, type BozzaFeedback } from "@/components/feedback/FeedbackSheet";
 import { apriAssistente } from "@/lib/assistente/bus";
+import { impostaAvvisoInBasso } from "@/lib/feedback/avviso-in-basso";
 import { segnaNonRisolto, segnaVerificato } from "@/app/(private)/feedback/actions";
 import {
   accodaFeedback,
@@ -123,13 +124,22 @@ export function FeedbackProvider({ owner }: { owner: boolean }) {
   const [ricevuto, setRicevuto] = useState<{ n: number; messaggio: string }>({ n: 0, messaggio: "" });
   const [daVerificare, setDaVerificare] = useState<FeedbackDaVerificare[] | null>(null);
   const [verifica, setVerifica] = useState<FeedbackDaVerificare | null>(null);
+  const verificaRef = useRef<FeedbackDaVerificare | null>(null);
   const attriti = useRef<AttritoEvento[]>([]);
   const svuotando = useRef(false);
 
   useEffect(() => {
     aperturaRef.current = apertura;
     suggerimentoRef.current = suggerimento;
-  }, [apertura, suggerimento]);
+    verificaRef.current = verifica;
+  }, [apertura, suggerimento, verifica]);
+
+  // Un solo avviso alla volta sopra la tab bar: verifica o errore coprono il
+  // suggerimento di scoperta di TabBar.
+  useEffect(() => {
+    impostaAvvisoInBasso(suggerimento !== null || verifica !== null);
+    return () => impostaAvvisoInBasso(false);
+  }, [suggerimento, verifica]);
 
   // "Ultima pagina prima di Altro": il feedback aperto da /altro allega
   // quella, non /altro stesso.
@@ -193,7 +203,9 @@ export function FeedbackProvider({ owner }: { owner: boolean }) {
     const evento: AttritoEvento = { tipo, pagina, at: new Date().toISOString(), dettaglio: dettaglio?.slice(0, 200) };
     attriti.current = [...attriti.current, evento].slice(-ATTRITI_MAX);
 
-    if (aperturaRef.current || suggerimentoRef.current) return;
+    // Con l'avviso di verifica aperto il suggerimento resterebbe nascosto sotto
+    // la card e verrebbe contato come ignorato.
+    if (aperturaRef.current || suggerimentoRef.current || verificaRef.current) return;
     const stato = leggiLocale<StatoSuggerimento>(CHIAVE_SUGGERIMENTO, STATO_SUGGERIMENTO_INIZIALE);
     const oggi = oggiLocale();
     const mostra = puoMostrareSuggerimento(stato, {

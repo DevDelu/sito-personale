@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MoreHorizontal, type LucideIcon } from "lucide-react";
 import { SIDEBAR_SECTIONS } from "@/lib/sidebar-config";
 import { interceptSessionNav } from "@/lib/allenamento/session-guard";
+import { ascoltaAvvisoInBasso, avvisoInBasso } from "@/lib/feedback/avviso-in-basso";
 import { apriFeedback, focusCampoFeedback, leggiLocale, scriviLocale } from "@/lib/feedback/bus";
 import { inSessioneAllenamento } from "@/lib/feedback/regole-suggerimento";
 import { usePressioneLunga } from "@/hooks/usePressioneLunga";
@@ -76,6 +77,9 @@ export function TabBar() {
   // l'utente cambia pagina prima dei 5 secondi.
   const [frecciaScoperta, setFrecciaScoperta] = useState<number | null>(null);
   const inSessione = inSessioneAllenamento(pathname);
+  // Un avviso più importante nella stessa posizione ha la precedenza.
+  const occupato = useSyncExternalStore(ascoltaAvvisoInBasso, avvisoInBasso, () => false);
+  const scopertaVisibile = frecciaScoperta !== null && !occupato;
 
   useEffect(() => {
     if (inSessione || leggiLocale(CHIAVE_SCOPERTA, false)) return;
@@ -95,11 +99,11 @@ export function TabBar() {
   // margine): sulle tab ai bordi resta spostata, la freccia no.
   useLayoutEffect(() => {
     const el = bolla.current;
-    if (frecciaScoperta === null || !el) return;
+    if (frecciaScoperta === null || !scopertaVisibile || !el) return;
     const w = el.offsetWidth;
     const left = Math.min(Math.max(frecciaScoperta - w / 2, 16), window.innerWidth - 16 - w);
     el.style.left = `${left}px`;
-  }, [frecciaScoperta]);
+  }, [frecciaScoperta, scopertaVisibile]);
 
   // Nascosta durante una sessione di allenamento attiva (/allenamenti/sessione/*):
   // più spazio al runner, meno tentazione di uscire a metà sessione.
@@ -119,7 +123,7 @@ export function TabBar() {
       className="app-scroll app-static fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-surface-hover pb-[max(env(safe-area-inset-bottom),20px)] shadow-[0_-2px_8px_rgba(0,0,0,0.15)] md:hidden"
       style={{ height: "calc(var(--app-tabbar-height) + max(env(safe-area-inset-bottom), 20px))" }}
     >
-      {frecciaScoperta !== null && (
+      {scopertaVisibile && (
         <>
           <span
             ref={bolla}
