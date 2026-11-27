@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { decryptToken, encryptToken } from "@/lib/agenda/crypto";
+import { tokenDaSalvare, verificaScrittura } from "@/lib/agenda/sync-token";
 import {
   GoogleReauthRequiredError,
   pullGoogleEvents,
@@ -52,6 +53,7 @@ export async function runGoogleSync(): Promise<SyncResult> {
 
   // --- Pull ---
   let pull = await pullGoogleEvents(accessToken, integrazione.calendar_sync_token);
+  const syncCompleta = !integrazione.calendar_sync_token || Boolean(pull.fullResyncRichiesto);
   if (pull.fullResyncRichiesto) {
     pull = await pullGoogleEvents(accessToken, null);
   }
@@ -60,15 +62,19 @@ export async function runGoogleSync(): Promise<SyncResult> {
   for (const ev of pull.eventi) {
     try {
       if (ev.cancellato) {
-        await admin.from("eventi").delete().eq("google_event_id", ev.google_event_id);
+        verificaScrittura(await admin.from("eventi").delete().eq("google_event_id", ev.google_event_id));
         continue;
       }
 
-      const { data: locale } = await admin
+      const lettura = await admin
         .from("eventi")
         .select("id, sync_status")
         .eq("google_event_id", ev.google_event_id)
         .maybeSingle();
+      // Se la lettura fallisce non si sa se l'evento esiste (né se ha
+      // modifiche in attesa di invio): meglio riprovare al giro dopo.
+      verificaScrittura(lettura);
+      const locale = lettura.data;
 
       // Conflict resolution last-write-wins: una riga locale ancora da
       // pushare (pending_push) rappresenta una modifica più recente non
@@ -89,9 +95,9 @@ export async function runGoogleSync(): Promise<SyncResult> {
       };
 
       if (locale) {
-        await admin.from("eventi").update(riga).eq("id", locale.id);
+        verificaScrittura(await admin.from("eventi").update(riga).eq("id", locale.id));
       } else {
-        await admin.from("eventi").insert(riga);
+        verificaScrittura(await admin.from("eventi").insert(riga));
       }
     } catch (e) {
       pullErrori.push((e as Error).message);
@@ -120,7 +126,9 @@ export async function runGoogleSync(): Promise<SyncResult> {
         },
         accessToken
       );
-      await admin.from("eventi").update({ google_event_id: googleId, sync_status: "synced" }).eq("id", evento.id);
+      verificaScrittura(
+        await admin.from("eventi").update({ google_event_id: googleId, sync_status: "synced" }).eq("id", evento.id)
+      );
     } catch (e) {
       pushErrori.push((e as Error).message);
     }
@@ -130,7 +138,12 @@ export async function runGoogleSync(): Promise<SyncResult> {
     .from("integrazione_google")
     .update({
       ultimo_sync: new Date().toISOString(),
-      calendar_sync_token: pull.nextSyncToken ?? integrazione.calendar_sync_token,
+      calendar_sync_token: tokenDaSalvare(
+        pullErrori.length,
+        pull.nextSyncToken,
+        integrazione.calendar_sync_token,
+        syncCompleta
+      ),
       access_token_enc: encryptToken(accessToken),
     })
     .eq("id", integrazione.id);
