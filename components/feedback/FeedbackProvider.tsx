@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { flushSync } from "react-dom";
 import { usePathname } from "next/navigation";
 import { CheckCircle2, MessageCircle } from "lucide-react";
 import { Toast } from "@/components/toast";
 import { FeedbackSheet, type BozzaFeedback } from "@/components/feedback/FeedbackSheet";
 import { apriAssistente } from "@/lib/assistente/bus";
+import { avvisoFeedback, toastAperto } from "@/lib/feedback/avviso-in-basso";
 import { segnaNonRisolto, segnaVerificato } from "@/app/(private)/feedback/actions";
 import {
   accodaFeedback,
@@ -110,6 +111,7 @@ function etichettaPunto(p: PuntoCatturato | null): string | null {
 export function FeedbackProvider({ owner }: { owner: boolean }) {
   const pathname = usePathname();
   const pathnameRef = useRef(pathname);
+  const conToast = useSyncExternalStore(toastAperto.ascolta, toastAperto.leggi, () => false);
   const [apertura, setApertura] = useState<AperturaFeedback | null>(null);
   const aperturaRef = useRef<AperturaFeedback | null>(null);
   const [contesto, setContesto] = useState<ContestoCatturato | null>(null);
@@ -123,13 +125,22 @@ export function FeedbackProvider({ owner }: { owner: boolean }) {
   const [ricevuto, setRicevuto] = useState<{ n: number; messaggio: string }>({ n: 0, messaggio: "" });
   const [daVerificare, setDaVerificare] = useState<FeedbackDaVerificare[] | null>(null);
   const [verifica, setVerifica] = useState<FeedbackDaVerificare | null>(null);
+  const verificaRef = useRef<FeedbackDaVerificare | null>(null);
   const attriti = useRef<AttritoEvento[]>([]);
   const svuotando = useRef(false);
 
   useEffect(() => {
     aperturaRef.current = apertura;
     suggerimentoRef.current = suggerimento;
-  }, [apertura, suggerimento]);
+    verificaRef.current = verifica;
+  }, [apertura, suggerimento, verifica]);
+
+  // Un solo avviso alla volta sopra la tab bar: verifica o errore coprono il
+  // suggerimento di scoperta di TabBar.
+  useEffect(() => {
+    avvisoFeedback.imposta(suggerimento !== null || verifica !== null);
+    return () => avvisoFeedback.imposta(false);
+  }, [suggerimento, verifica]);
 
   // "Ultima pagina prima di Altro": il feedback aperto da /altro allega
   // quella, non /altro stesso.
@@ -193,7 +204,9 @@ export function FeedbackProvider({ owner }: { owner: boolean }) {
     const evento: AttritoEvento = { tipo, pagina, at: new Date().toISOString(), dettaglio: dettaglio?.slice(0, 200) };
     attriti.current = [...attriti.current, evento].slice(-ATTRITI_MAX);
 
-    if (aperturaRef.current || suggerimentoRef.current) return;
+    // Con l'avviso di verifica aperto il suggerimento resterebbe nascosto sotto
+    // la card e verrebbe contato come ignorato.
+    if (aperturaRef.current || suggerimentoRef.current || verificaRef.current) return;
     const stato = leggiLocale<StatoSuggerimento>(CHIAVE_SUGGERIMENTO, STATO_SUGGERIMENTO_INIZIALE);
     const oggi = oggiLocale();
     const mostra = puoMostrareSuggerimento(stato, {
@@ -467,8 +480,12 @@ export function FeedbackProvider({ owner }: { owner: boolean }) {
     if (!esito.ok) setRicevuto((r) => ({ n: r.n + 1, messaggio: esito.errore }));
   }
 
-  const inBasso =
-    "pointer-events-none fixed inset-x-0 bottom-[calc(var(--app-tabbar-height)+max(env(safe-area-inset-bottom),20px)+0.75rem)] z-40 flex justify-center px-4 md:bottom-6";
+  // Con una conferma aperta (ToastHost, stessa posizione) l'avviso sale sopra.
+  const inBasso = `pointer-events-none fixed inset-x-0 z-40 flex justify-center px-4 ${
+    conToast
+      ? "bottom-[calc(var(--app-tabbar-height)+max(env(safe-area-inset-bottom),20px)+5.25rem)] md:bottom-24"
+      : "bottom-[calc(var(--app-tabbar-height)+max(env(safe-area-inset-bottom),20px)+0.75rem)] md:bottom-6"
+  }`;
 
   // Il pulsante sparisce mentre lo sheet, la barra "Tocca l'elemento" o un
   // avviso in basso sono visibili, e durante la sessione di allenamento.

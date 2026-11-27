@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
+import { toastAperto } from "@/lib/feedback/avviso-in-basso";
 import { DURATA_TOAST_MS, registraToast, type ToastAttivo } from "@/lib/toast/bus";
 
 // Conferma breve sopra la tab bar (mobile) o in basso al centro (desktop).
@@ -14,6 +15,12 @@ export function ToastHost() {
     registraToast(setToast);
     return () => registraToast(null);
   }, []);
+
+  // Gli altri avvisi nella stessa posizione si spostano finché è aperto.
+  useEffect(() => {
+    toastAperto.imposta(toast !== null);
+    return () => toastAperto.imposta(false);
+  }, [toast]);
 
   useEffect(() => {
     if (!toast) return;
