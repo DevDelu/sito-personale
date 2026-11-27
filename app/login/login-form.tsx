@@ -52,7 +52,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
         </p>
       )}
 
-      <button type="submit" disabled={pending} className="btn-primary mt-2 w-full">
+      <button type="submit" disabled={pending} className="btn-primary mt-2 min-h-11 w-full md:min-h-0">
         {pending ? "Accesso in corso..." : "Accedi"}
       </button>
     </form>

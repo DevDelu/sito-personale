@@ -29,3 +29,16 @@ for (const [percorso, nome] of [
     expect(Math.round(box?.height ?? 0)).toBeGreaterThanOrEqual(44);
   });
 }
+
+// Anche i pulsanti di invio, su telefono, erano alti 36px.
+for (const [percorso, nome] of [
+  ["/login", "Accedi"],
+  ["/login/recupera-password", "Invia link di recupero"],
+] as const) {
+  test(`${percorso}: il pulsante "${nome}" è alto almeno 44px`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(percorso);
+    const box = await page.getByRole("button", { name: nome, exact: true }).boundingBox();
+    expect(Math.round(box?.height ?? 0)).toBeGreaterThanOrEqual(44);
+  });
+}
