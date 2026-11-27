@@ -1,0 +1,2 @@
+# Il formato vCard richiede righe che finiscono con CRLF (RFC 6350): git non deve convertirle.
+*.vcf -text

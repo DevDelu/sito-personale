@@ -46,6 +46,7 @@
     "nameLabel": "Nome",
     "emailLabel": "Email",
     "messageLabel": "Messaggio",
+    "saveContact": "Salva nei contatti",
     "send": "Invia messaggio",
     "sending": "Invio in corso...",
     "success": "Messaggio inviato, grazie! Ti risponderò il prima possibile."
