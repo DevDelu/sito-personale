@@ -19,3 +19,8 @@ test("un errore nella risposta di supabase-js diventa un'eccezione", () => {
   assert.throws(() => verificaScrittura({ error: { message: "scrittura rifiutata" } }), /scrittura rifiutata/);
   assert.doesNotThrow(() => verificaScrittura({ error: null }));
 });
+
+test("sync completa: si avanza anche con errori, senza tornare al token scaduto", () => {
+  assert.equal(tokenDaSalvare(1, "nuovo", "scaduto", true), "nuovo");
+  assert.equal(tokenDaSalvare(1, null, "scaduto", true), null);
+});

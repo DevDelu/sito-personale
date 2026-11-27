@@ -53,6 +53,7 @@ export async function runGoogleSync(): Promise<SyncResult> {
 
   // --- Pull ---
   let pull = await pullGoogleEvents(accessToken, integrazione.calendar_sync_token);
+  const syncCompleta = !integrazione.calendar_sync_token || Boolean(pull.fullResyncRichiesto);
   if (pull.fullResyncRichiesto) {
     pull = await pullGoogleEvents(accessToken, null);
   }
@@ -137,7 +138,12 @@ export async function runGoogleSync(): Promise<SyncResult> {
     .from("integrazione_google")
     .update({
       ultimo_sync: new Date().toISOString(),
-      calendar_sync_token: tokenDaSalvare(pullErrori.length, pull.nextSyncToken, integrazione.calendar_sync_token),
+      calendar_sync_token: tokenDaSalvare(
+        pullErrori.length,
+        pull.nextSyncToken,
+        integrazione.calendar_sync_token,
+        syncCompleta
+      ),
       access_token_enc: encryptToken(accessToken),
     })
     .eq("id", integrazione.id);
