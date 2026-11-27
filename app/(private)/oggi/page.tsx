@@ -43,6 +43,15 @@ export default async function OggiPage() {
   const eventi = eventiRes.status === "fulfilled" ? eventiDiOggi(eventiRes.value, oggi) : null;
   const kcal = pastiRes.status === "fulfilled" ? Math.round(sommaMacro(pastiRes.value).kcal) : null;
   const target = tdeeRes.status === "fulfilled" && tdeeRes.value.ok ? tdeeRes.value.targetKcal : null;
+  // Il profilo da completare e un errore di lettura sono due cose diverse.
+  const sottotitoloKcal =
+    kcal === null || tdeeRes.status === "rejected"
+      ? "Riprova tra poco"
+      : target !== null
+        ? `Obiettivo ${target} kcal`
+        : tdeeRes.value.ok === false && tdeeRes.value.motivo === "peso_mancante"
+          ? "Registra il peso per vedere l'obiettivo"
+          : "Imposta il profilo per vedere l'obiettivo";
   const uscite = speseRes.status === "fulfilled" ? speseRes.value.uscite : null;
 
   const impegniOggi =
@@ -85,15 +94,21 @@ export default async function OggiPage() {
                 href="/agenda"
                 icon={<CalendarDays className="h-5 w-5" strokeWidth={1.75} />}
                 title={e.titolo}
-                subtitle={e.tutto_il_giorno ? "Tutto il giorno" : `Alle ${oraRoma(e.data_inizio)}`}
+                subtitle={
+                  e.tutto_il_giorno
+                    ? "Tutto il giorno"
+                    : oggiItaliaISO(new Date(e.data_inizio)) < oggi
+                      ? "In corso da un giorno precedente"
+                      : `Alle ${oraRoma(e.data_inizio)}`
+                }
                 chevron
               />
             ))
           )}
         </ListGroup>
         {eventi && eventi.length > 5 && (
-          <Link href="/agenda" className="px-1 text-[15px] text-accent">
-            e altri {eventi.length - 5} eventi
+          <Link href="/agenda" className="inline-flex min-h-11 items-center self-start px-1 text-[15px] text-accent">
+            {eventi.length === 6 ? "e un altro evento" : `e altri ${eventi.length - 5} eventi`}
           </Link>
         )}
       </section>
@@ -104,7 +119,7 @@ export default async function OggiPage() {
             href="/alimentazione"
             icon={<Apple className="h-5 w-5" strokeWidth={1.75} />}
             title={kcal === null ? "Pasti non disponibili" : `${kcal} kcal oggi`}
-            subtitle={target !== null && kcal !== null ? `Obiettivo ${target} kcal` : "Imposta il profilo per vedere l'obiettivo"}
+            subtitle={sottotitoloKcal}
             chevron
           />
         </ListGroup>
