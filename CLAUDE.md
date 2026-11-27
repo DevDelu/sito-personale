@@ -76,6 +76,9 @@ Tienilo a mente prima di toccare routing/auth: cercare `middleware.ts` o la funz
   `/api/feedback/agente` con secret Bearer verificato nella route). Una route nuova è quindi
   protetta di default; se deve essere pubblica o a secret va aggiunta ad `API_AUTONOME`. Prima
   molte route controllavano solo `getUser()`, cioè qualunque sessione (anche un giocatore del quiz).
+- **Identità solo dalla sessione**: `getUser()` verifica sempre la sessione con Supabase Auth (una volta
+  per render, `cache()`), mai da header della richiesta. API e prefissi privati hanno anche una voce
+  `"/<prefisso>/:path*"` nel matcher di `proxy.ts`: un prefisso nuovo va aggiunto pure lì.
 - **Tester in sola lettura** (`isTester()`, env `TESTER_EMAIL`): l'utente degli agenti notturni.
   Apre tutte le pagine private (`requireUser()` lo accetta) e fa GET sulle API, ma il proxy rifiuta
   ogni sua richiesta non GET/HEAD (Server Action comprese) e le rotte in `API_VIETATE_AL_TESTER`

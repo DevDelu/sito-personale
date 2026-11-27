@@ -1,29 +1,19 @@
 import "server-only";
+import { cache } from "react";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { isOwner, isTester } from "@/lib/supabase/owner";
 
-// lib/supabase/proxy.ts (middleware) chiama già supabase.auth.getUser() ad
-// ogni richiesta protetta e propaga l'esito via header di richiesta: qui ci
-// si fida di quell'header invece di rifare la stessa chiamata di rete a
-// Supabase Auth, che prima raddoppiava la latenza di ogni navigazione
-// nell'area privata (una volta nel middleware, una volta nel layout/route).
-// Il fallback di rete resta per le rotte non coperte dal matcher del
-// middleware (vedi proxy.ts in root).
-export async function getUser() {
-  const headerList = await headers();
-  const verifiedId = headerList.get("x-verified-user-id");
-  if (verifiedId) {
-    return { id: verifiedId, email: headerList.get("x-verified-user-email") || null };
-  }
-
+// L'identità si legge solo dalla sessione, verificata con Supabase Auth: mai
+// da header o altri dati della richiesta. cache() evita di rifare la chiamata
+// più volte nello stesso render (layout, pagina, query).
+export const getUser = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   return user;
-}
+});
 
 // L'area privata è a singolo utente (Lorenzo). Il quiz pubblico in homepage
 // introduce un secondo modo di autenticarsi (Google OAuth via Supabase Auth,

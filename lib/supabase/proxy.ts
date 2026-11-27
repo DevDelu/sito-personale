@@ -51,14 +51,7 @@ function messaggioAccessoNegato(email: string | null | undefined, tester: boolea
 }
 
 export async function updateSession(request: NextRequest) {
-  const requestHeaders = new Headers(request.headers);
-  // Questi header li imposta SOLO questo proxy (sotto, dopo getUser()), e
-  // dal.ts li considera già verificati: vanno scartati se arrivano dal
-  // client, altrimenti bastava inviarli a mano con l'email dell'owner per
-  // superare getUser()/isOwner() su qualunque route /api/*.
-  requestHeaders.delete("x-verified-user-id");
-  requestHeaders.delete("x-verified-user-email");
-  let supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } });
+  let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -72,7 +65,7 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
-          supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } });
+          supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           );
@@ -86,22 +79,6 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  // Propaga l'esito di questa verifica (già fatta via rete qui sopra) ai
-  // Server Component/Route Handler/Server Action a valle tramite header di
-  // richiesta: lib/supabase/dal.ts la legge invece di richiamare
-  // supabase.auth.getUser() una seconda volta per la stessa richiesta, che
-  // raddoppiava il round-trip verso Supabase Auth su ogni navigazione
-  // nell'area privata. La response viene ricostruita per includere gli
-  // header aggiornati, riapplicando gli eventuali cookie di refresh sessione
-  // impostati sopra da setAll().
-  if (user) {
-    requestHeaders.set("x-verified-user-id", user.id);
-    requestHeaders.set("x-verified-user-email", user.email ?? "");
-  }
-  const responseWithHeaders = NextResponse.next({ request: { headers: requestHeaders } });
-  supabaseResponse.cookies.getAll().forEach((cookie) => responseWithHeaders.cookies.set(cookie));
-  supabaseResponse = responseWithHeaders;
 
   const { pathname } = request.nextUrl;
   const isProtected = PROTECTED_PREFIXES.some(

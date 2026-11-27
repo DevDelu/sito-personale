@@ -44,5 +44,20 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|pdf)$).*)",
+    // API e area privata passano sempre dal proxy, qualunque sia la fine del
+    // percorso. Ogni prefisso privato nuovo va aggiunto anche qui (lo verifica
+    // lib/supabase/proxy-matcher.test.ts).
+    "/api/:path*",
+    "/spese/:path*",
+    "/investimenti/:path*",
+    "/carte/:path*",
+    "/allenamenti/:path*",
+    "/agenda/:path*",
+    "/alimentazione/:path*",
+    "/impostazioni/:path*",
+    "/altro/:path*",
+    "/feedback/:path*",
+    "/trading/:path*",
+    "/assistente/:path*",
   ],
 };
