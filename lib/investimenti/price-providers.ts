@@ -1,5 +1,6 @@
 import "server-only";
 import { fetchConRetry } from "@/lib/investimenti/retry";
+import { leggiPrezziCoinGecko, urlPrezziCoinGecko } from "@/lib/investimenti/coingecko";
 
 // Chiave "demo" gratuita di CoinGecko (facoltativa): alza il limite di richieste.
 function headerCoinGecko(): HeadersInit {
@@ -30,21 +31,15 @@ export async function fetchYahooPrice(symbol: string): Promise<PriceQuote> {
   return { prezzo, data: new Date(timestamp * 1000).toISOString().slice(0, 10) };
 }
 
-export async function fetchCoinGeckoPrice(id: string, vsCurrency = "eur"): Promise<PriceQuote> {
-  const res = await fetchConRetry(() =>
-    fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${encodeURIComponent(id)}&vs_currencies=${vsCurrency}`, {
-      headers: headerCoinGecko(),
-    })
-  );
-  if (!res.ok) throw new Error(`CoinGecko: HTTP ${res.status} per ${id}`);
-
-  const json = await res.json();
-  const prezzo = json?.[id]?.[vsCurrency];
-  if (typeof prezzo !== "number") {
-    throw new Error(`CoinGecko: risposta senza prezzo valido per ${id}`);
-  }
-
-  return { prezzo, data: new Date().toISOString().slice(0, 10) };
+// Una sola richiesta per tutte le cripto: con N chiamate separate il limite di
+// CoinGecko free (429) scatta molto prima. Restituisce solo gli id con un
+// prezzo valido; se la richiesta fallisce del tutto lancia.
+export async function fetchCoinGeckoPrices(ids: string[], vsCurrency = "eur"): Promise<Map<string, PriceQuote>> {
+  const uniche = [...new Set(ids)];
+  if (uniche.length === 0) return new Map();
+  const res = await fetchConRetry(() => fetch(urlPrezziCoinGecko(uniche, vsCurrency), { headers: headerCoinGecko() }));
+  if (!res.ok) throw new Error(`CoinGecko: HTTP ${res.status}`);
+  return leggiPrezziCoinGecko(await res.json(), uniche, vsCurrency, new Date().toISOString().slice(0, 10));
 }
 
 // Backfill una tantum (non nel cron giornaliero): storico giornaliero da
