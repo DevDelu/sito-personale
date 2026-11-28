@@ -2,17 +2,15 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import Script from "next/script";
 import { login, type LoginState } from "./actions";
 import { inviaSenzaSvuotare } from "@/hooks/inviaSenzaSvuotare";
-import { useResetAntispam } from "@/hooks/useResetAntispam";
+import { WidgetAntispam } from "@/components/antispam/WidgetAntispam";
 
 export function LoginForm({ redirectTo }: { redirectTo: string }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(
     login,
     undefined
   );
-  const antispam = useResetAntispam(state);
 
   return (
     <form action={action} onSubmit={inviaSenzaSvuotare(action)} className="flex w-full max-w-sm animate-slide-up flex-col gap-4">
@@ -42,13 +40,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
         </Link>
       </div>
 
-      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
-      <div
-        ref={antispam}
-        className="cf-turnstile"
-        data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-        data-theme="auto"
-      />
+      <WidgetAntispam siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} esito={state} />
 
       {state?.error && (
         <p className="animate-slide-down text-sm text-spesa" role="alert">

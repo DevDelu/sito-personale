@@ -2,17 +2,15 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import Script from "next/script";
 import { requestPasswordReset, type RequestResetState } from "../actions";
 import { inviaSenzaSvuotare } from "@/hooks/inviaSenzaSvuotare";
-import { useResetAntispam } from "@/hooks/useResetAntispam";
+import { WidgetAntispam } from "@/components/antispam/WidgetAntispam";
 
 export function RecoverForm() {
   const [state, action, pending] = useActionState<RequestResetState, FormData>(
     requestPasswordReset,
     undefined
   );
-  const antispam = useResetAntispam(state);
 
   if (state?.sent) {
     return (
@@ -36,13 +34,7 @@ export function RecoverForm() {
         <input id="email" name="email" type="email" required autoComplete="email" className="field-input bg-surface" />
       </div>
 
-      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
-      <div
-        ref={antispam}
-        className="cf-turnstile"
-        data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-        data-theme="auto"
-      />
+      <WidgetAntispam siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} esito={state} />
 
       {state?.error && (
         <p className="animate-slide-down text-sm text-spesa" role="alert">
