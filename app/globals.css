@@ -178,13 +178,17 @@
   --font-display: var(--font-fraunces);
   --font-mono: var(--font-jetbrains-mono);
 
-  /* Animazioni condivise (genera automaticamente le utility animate-*) */
-  --animate-fade-in: fade-in 0.25s ease-out both;
-  --animate-scale-in: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
-  --animate-slide-up: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
-  --animate-slide-down: slide-down 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
-  --animate-pop-in: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  --animate-count-up: count-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* Animazioni condivise (genera automaticamente le utility animate-*).
+     Sono tutte d'ingresso e finiscono nello stato naturale: fill-mode
+     `backwards`, mai `both`. Con `both` opacità e transform restavano
+     applicati e intrappolavano i fogli aperti lì dentro (stacking context):
+     la tab bar copriva Salva ed Elimina. */
+  --animate-fade-in: fade-in 0.25s ease-out backwards;
+  --animate-scale-in: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  --animate-slide-up: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  --animate-slide-down: slide-down 0.2s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  --animate-pop-in: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  --animate-count-up: count-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
   --animate-twinkle: twinkle 1.8s ease-in-out infinite;
 }
 

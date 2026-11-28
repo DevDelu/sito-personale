@@ -54,7 +54,9 @@ export default async function PrivateLayout({
     <div className="app-shell flex min-h-[100dvh] flex-1 flex-col md:flex-row">
       <Sidebar logoutSlot={logoutForm} />
       <div className="flex flex-1 flex-col">
-        <div className="sticky top-0 z-20 hidden items-center justify-end gap-2 border-b border-border bg-surface/80 px-4 py-3 backdrop-blur-md sm:px-6 md:flex">
+        {/* z-30: senza stacking context su <main>, a pari z-20 le barre dei form
+            (flex item, z-index valido anche con md:static) le passavano sopra. */}
+        <div className="sticky top-0 z-30 hidden items-center justify-end gap-2 border-b border-border bg-surface/80 px-4 py-3 backdrop-blur-md sm:px-6 md:flex">
           <PrivacyToggle />
           <ThemeToggle />
           {areaPubblicaLink}
