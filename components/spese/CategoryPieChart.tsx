@@ -107,7 +107,7 @@ function CategorySummaryTable({
             </td>
             <td className="importo font-figures py-1.5 text-right">{formatCurrency(c.totale)}</td>
             <td className="font-figures py-1.5 text-right text-muted">
-              {totale > 0 ? `${((c.totale / totale) * 100).toFixed(1)}%` : "—"}
+              {totale > 0 ? `${((c.totale / totale) * 100).toFixed(1).replace(".", ",")}%` : "—"}
             </td>
           </tr>
         ))}

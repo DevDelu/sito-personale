@@ -221,7 +221,7 @@ export function GraficoTrading({
         <span>C {formatta(c.close)}</span>
         <span className={variazione >= 0 ? "text-entrata" : "text-spesa"}>
           {variazione >= 0 ? "+" : ""}
-          {variazione.toFixed(2)}%
+          {variazione.toFixed(2).replace(".", ",")}%
         </span>
         {on("rsi") && ind.rsi[iInfo] !== null && <span>RSI {ind.rsi[iInfo]!.toFixed(0)}</span>}
       </div>
