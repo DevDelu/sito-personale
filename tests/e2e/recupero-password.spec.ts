@@ -34,3 +34,23 @@ test("dal link 'Password dimenticata?' il controllo anti-spam compare", async ({
   await page.waitForURL("**/login/recupera-password");
   await expect(page.getByTestId("antispam-finto")).toHaveCount(1);
 });
+
+test("il controllo anti-spam compare anche cambiando modulo prima che lo script arrivi", async ({ page }) => {
+  let consegna = () => {};
+  const attesa = new Promise<void>((risolvi) => (consegna = risolvi));
+  await page.route("https://challenges.cloudflare.com/**", async (rotta) => {
+    await attesa;
+    await rotta.fulfill({
+      contentType: "application/javascript",
+      body: 'window.turnstile={render:(el)=>{const s=document.createElement("span");s.dataset.testid="antispam-finto";s.textContent="ok";el.append(s);return "w"},reset(){},remove(){}};',
+    });
+  });
+  const richiesta = page.waitForRequest("https://challenges.cloudflare.com/**");
+  await page.goto("/login", { waitUntil: "domcontentloaded" });
+  await richiesta;
+  await page.getByRole("link", { name: "Password dimenticata?" }).click();
+  await page.waitForURL("**/login/recupera-password", { waitUntil: "commit" });
+  await expect(page.getByRole("button", { name: /invia/i })).toBeVisible();
+  consegna();
+  await expect(page.getByTestId("antispam-finto")).toHaveCount(1);
+});

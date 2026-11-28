@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Script from "next/script";
 
 declare global {
@@ -36,10 +36,21 @@ export function WidgetAntispam({
   const contenitore = useRef<HTMLDivElement>(null);
   const widget = useRef<string | null>(null);
 
-  // onReady parte quando lo script è pronto e poi a ogni nuovo montaggio.
-  const disegna = useCallback(() => {
-    if (!siteKey || widget.current || !contenitore.current || !window.turnstile) return;
-    widget.current = window.turnstile.render(contenitore.current, { sitekey: siteKey, theme: "auto" }) ?? null;
+  // Si aspetta window.turnstile invece di affidarsi a onReady di next/script:
+  // se il modulo si monta mentre lo script è ancora in arrivo (link toccato
+  // subito, rete lenta) onReady non viene mai chiamato e il riquadro manca.
+  useEffect(() => {
+    if (!siteKey) return;
+    const disegna = () => {
+      if (!window.turnstile || !contenitore.current) return false;
+      widget.current ??= window.turnstile.render(contenitore.current, { sitekey: siteKey, theme: "auto" }) ?? null;
+      return true;
+    };
+    if (disegna()) return;
+    const attesa = setInterval(() => {
+      if (disegna()) clearInterval(attesa);
+    }, 200);
+    return () => clearInterval(attesa);
   }, [siteKey]);
 
   useEffect(
@@ -56,7 +67,7 @@ export function WidgetAntispam({
 
   return (
     <>
-      <Script src={SCRIPT_TURNSTILE} strategy={strategy} onReady={disegna} />
+      <Script src={SCRIPT_TURNSTILE} strategy={strategy} />
       <div ref={contenitore} className="min-h-[65px]" />
     </>
   );
