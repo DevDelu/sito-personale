@@ -33,3 +33,6 @@ export type LeaderboardRow = {
   score: number;
   time_taken_ms: number;
 };
+
+// Domande di una partita: ne escono tante e il punteggio si calcola solo su altrettante risposte.
+export const DOMANDE_PER_PARTITA = 5;

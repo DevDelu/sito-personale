@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import type { QuizQuestionPublic } from "@/lib/quiz/types";
-
-const DOMANDE_PER_PARTITA = 5;
+import { DOMANDE_PER_PARTITA, type QuizQuestionPublic } from "@/lib/quiz/types";
 
 // Service role key: unico modo di leggere quiz_questions (RLS blocca
 // anon/authenticated). correct_index ed explain non escono mai da qui: il
