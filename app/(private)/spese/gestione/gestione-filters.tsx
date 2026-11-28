@@ -46,6 +46,7 @@ export function GestioneFilters({ categorie }: { categorie: Categoria[] }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cerca per titolo o descrizione..."
+          aria-label="Cerca per titolo o descrizione"
           className="field-input flex-1 bg-surface"
         />
         <button
@@ -132,6 +133,7 @@ export function GestioneFilters({ categorie }: { categorie: Categoria[] }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Cerca per titolo o descrizione..."
+          aria-label="Cerca per titolo o descrizione"
           className="field-input w-full bg-surface px-3 py-1.5 text-sm sm:w-56"
         />
         <select

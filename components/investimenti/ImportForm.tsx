@@ -84,6 +84,7 @@ export function ImportForm() {
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium text-muted">File Excel (.xlsx)</label>
         <input
+          aria-label="File Excel (.xlsx)"
           type="file"
           accept=".xlsx"
           onChange={handleFileChange}

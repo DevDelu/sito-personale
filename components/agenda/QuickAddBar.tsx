@@ -79,6 +79,7 @@ export function QuickAddBar() {
           value={testo}
           onChange={(e) => setTesto(e.target.value)}
           placeholder='Aggiungi al volo: "domani alle 15 dal dentista"'
+          aria-label="Aggiungi un evento al volo"
           className="field-input flex-1"
         />
         <button
