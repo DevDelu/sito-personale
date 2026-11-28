@@ -2,7 +2,7 @@ export { formatCurrency } from "@/lib/spese-utils";
 
 export function formatPercent(n: number): string {
   const sign = n > 0 ? "+" : "";
-  return `${sign}${n.toFixed(2)}%`;
+  return `${sign}${n.toFixed(2).replace(".", ",")}%`;
 }
 
 export function formatQuantita(n: number): string {
