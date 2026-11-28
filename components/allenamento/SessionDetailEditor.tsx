@@ -159,7 +159,7 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
               className="field-input"
             />
           </label>
-          <div className="flex flex-col gap-1.5 sm:col-span-2">
+          <div className="col-span-2 flex flex-col gap-1.5">
             <span className="text-sm font-medium text-muted">Sensazione</span>
             <div className="flex gap-1.5">
               {[1, 2, 3, 4, 5].map((v) => (
@@ -167,6 +167,8 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
                   key={v}
                   type="button"
                   onClick={() => setSensazione(sensazione === v ? null : v)}
+                  aria-label={`Sensazione ${v} su 5`}
+                  aria-pressed={sensazione === v}
                   className={`h-11 w-11 rounded-full md:h-8 md:w-8 border text-sm font-medium transition-all duration-200 ${
                     sensazione === v
                       ? "border-accent bg-accent text-accent-foreground"
@@ -197,8 +199,8 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
           <div key={blocco} className="card flex flex-col gap-3 p-4">
             <span className="font-display text-sm font-semibold">{blocco}</span>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
+              <table className="w-full text-sm max-md:block">
+                <thead className="max-md:hidden">
                   <tr className="border-b border-border text-left text-xs text-muted">
                     <th className="py-2 pr-3 font-medium">Esercizio</th>
                     <th className="py-2 pr-3 font-medium">Serie</th>
@@ -208,45 +210,56 @@ export function SessionDetailEditor({ sessione, log }: { sessione: Sessione; log
                     <th aria-label="Azioni" className="py-2 pr-3 font-medium" />
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="max-md:block">
                   {righe.map((r) => (
-                    <tr key={r.id} className="border-b border-border last:border-0">
-                      <td className="py-2 pr-3 whitespace-nowrap">{r.esercizio_nome}</td>
-                      <td className="py-2 pr-3">
+                    <tr
+                      key={r.id}
+                      className="border-b border-border last:border-0 max-md:grid max-md:grid-cols-2 max-md:gap-x-3 max-md:gap-y-2 max-md:py-3"
+                    >
+                      <td className="py-2 pr-3 whitespace-nowrap max-md:col-span-2 max-md:p-0 max-md:text-[15px] max-md:font-semibold max-md:whitespace-normal">{r.esercizio_nome}</td>
+                      <td className="py-2 pr-3 max-md:p-0">
+                        <span aria-hidden className="mb-1 block text-[13px] text-muted md:hidden">Serie</span>
                         <input
                           type="number" inputMode="numeric"
                           value={form[r.id].serie}
                           onChange={(e) => setForm((f) => ({ ...f, [r.id]: { ...f[r.id], serie: e.target.value } }))}
-                          className="field-input w-16 !py-1"
+                          aria-label={`Serie, ${r.esercizio_nome}`}
+                          className="field-input w-16 !py-1 max-md:w-full"
                         />
                       </td>
-                      <td className="py-2 pr-3">
+                      <td className="py-2 pr-3 max-md:p-0">
+                        <span aria-hidden className="mb-1 block text-[13px] text-muted md:hidden">Ripetizioni</span>
                         <input
                           type="number" inputMode="numeric"
                           value={form[r.id].rip}
                           onChange={(e) => setForm((f) => ({ ...f, [r.id]: { ...f[r.id], rip: e.target.value } }))}
-                          className="field-input w-16 !py-1"
+                          aria-label={`Ripetizioni, ${r.esercizio_nome}`}
+                          className="field-input w-16 !py-1 max-md:w-full"
                         />
                       </td>
-                      <td className="py-2 pr-3">
+                      <td className="py-2 pr-3 max-md:p-0">
+                        <span aria-hidden className="mb-1 block text-[13px] text-muted md:hidden">Peso (kg)</span>
                         <input
                           type="number" inputMode="decimal"
                           step="0.5"
                           value={form[r.id].peso}
                           onChange={(e) => setForm((f) => ({ ...f, [r.id]: { ...f[r.id], peso: e.target.value } }))}
-                          className="field-input w-20 !py-1"
+                          aria-label={`Peso (kg), ${r.esercizio_nome}`}
+                          className="field-input w-20 !py-1 max-md:w-full"
                         />
                       </td>
-                      <td className="py-2 pr-3">
+                      <td className="py-2 pr-3 max-md:p-0">
+                        <span aria-hidden className="mb-1 block text-[13px] text-muted md:hidden">Tempo (sec)</span>
                         <input
                           type="number" inputMode="numeric"
                           value={form[r.id].tempo}
                           onChange={(e) => setForm((f) => ({ ...f, [r.id]: { ...f[r.id], tempo: e.target.value } }))}
-                          className="field-input w-20 !py-1"
+                          aria-label={`Tempo (sec), ${r.esercizio_nome}`}
+                          className="field-input w-20 !py-1 max-md:w-full"
                         />
                       </td>
-                      <td className="py-2 pr-3">
-                        <div className="flex items-center gap-1">
+                      <td className="py-2 pr-3 max-md:col-span-2 max-md:p-0">
+                        <div className="flex items-center gap-1 max-md:justify-end">
                           <button
                             type="button"
                             onClick={() => salvaRiga(r.id)}
