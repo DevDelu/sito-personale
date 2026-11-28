@@ -178,6 +178,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-muted">File Excel (.xlsx)</label>
           <input
+            aria-label="File Excel (.xlsx)"
             type="file"
             accept=".xlsx"
             onChange={handleFileChangeExcel}
@@ -197,6 +198,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-muted">Crypto.com (.csv)</label>
               <input
+                aria-label="Crypto.com (.csv)"
                 type="file"
                 accept=".csv"
                 onChange={(e) => setCryptoFile(e.target.files?.[0] ?? null)}
@@ -207,6 +209,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-muted">Intesa Sanpaolo (.xlsx)</label>
               <input
+                aria-label="Intesa Sanpaolo (.xlsx)"
                 type="file"
                 accept=".xlsx"
                 onChange={(e) => setIntesaFile(e.target.files?.[0] ?? null)}
@@ -217,6 +220,7 @@ export function ImportForm({ categorie }: { categorie: Categoria[] }) {
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-muted">Trade Republic (estratto conto .pdf)</label>
               <input
+                aria-label="Trade Republic (estratto conto .pdf)"
                 type="file"
                 accept=".pdf,application/pdf"
                 onChange={(e) => setTradeRepublicFile(e.target.files?.[0] ?? null)}
