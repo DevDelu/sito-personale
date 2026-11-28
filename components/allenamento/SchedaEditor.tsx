@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   DndContext,
@@ -81,6 +81,7 @@ export function SchedaEditor({
   const blocchi = useMemo(() => raggruppaPerBlocco(righe), [righe]);
   const nomiBlocchi = useMemo(() => blocchi.map((b) => b.nome), [blocchi]);
 
+  const dndId = useId();
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -191,7 +192,7 @@ export function SchedaEditor({
           <button
             type="button"
             onClick={() => setModaleAperto({ modo: "nuovo" })}
-            className="text-accent active:opacity-60"
+            className="flex h-11 w-11 items-center justify-center text-accent active:opacity-60"
             aria-label="Nuovo blocco"
           >
             <Plus className="h-5 w-5" strokeWidth={2.25} />
@@ -220,17 +221,18 @@ export function SchedaEditor({
         </p>
       )}
 
-      <DndContext sensors={sensors} onDragEnd={handleBloccoDragEnd}>
+      <DndContext id={`${dndId}-blocchi`} sensors={sensors} onDragEnd={handleBloccoDragEnd}>
         <SortableContext items={nomiBlocchi} strategy={verticalListSortingStrategy}>
           <div className="flex flex-col gap-4">
             {blocchi.map((blocco, bloccoIndex) => (
               <SortableBlocco key={blocco.nome} id={blocco.nome}>
                 <div className="flex min-w-0 items-center gap-1">
-                  <div className="flex shrink-0 flex-col">
+                  <div className="flex shrink-0 flex-col max-md:flex-row">
                     <button
                       type="button"
                       onClick={() => spostaBlocco(bloccoIndex, -1)}
                       disabled={bloccoIndex === 0}
+                      aria-label={`Sposta in su il blocco ${blocco.nome}`}
                       className="btn-icon !h-7 !w-7 disabled:opacity-30"
                     >
                       <ChevronUp className="h-4 w-4" />
@@ -239,6 +241,7 @@ export function SchedaEditor({
                       type="button"
                       onClick={() => spostaBlocco(bloccoIndex, 1)}
                       disabled={bloccoIndex === blocchi.length - 1}
+                      aria-label={`Sposta in giù il blocco ${blocco.nome}`}
                       className="btn-icon !h-7 !w-7 disabled:opacity-30"
                     >
                       <ChevronDown className="h-4 w-4" />
@@ -266,7 +269,7 @@ export function SchedaEditor({
                   </button>
                 </div>
 
-                <DndContext sensors={sensors} onDragEnd={(e) => handleEsercizioDragEnd(bloccoIndex, e)}>
+                <DndContext id={`${dndId}-esercizi-${bloccoIndex}`} sensors={sensors} onDragEnd={(e) => handleEsercizioDragEnd(bloccoIndex, e)}>
                   <SortableContext
                     items={blocco.esercizi.map((e) => e.id)}
                     strategy={verticalListSortingStrategy}
@@ -274,12 +277,13 @@ export function SchedaEditor({
                     <ul className="flex flex-col gap-1.5">
                       {blocco.esercizi.map((r, esIndex) => (
                         <SortableEsercizioRow key={r.id} id={r.id}>
-                          <div className="flex min-w-0 items-center gap-2">
-                            <div className="flex flex-col">
+                          <div className="flex min-w-0 items-center gap-2 max-md:contents">
+                            <div className="flex flex-col max-md:col-start-2 max-md:row-start-2 max-md:flex-row">
                               <button
                                 type="button"
                                 onClick={() => spostaEsercizio(bloccoIndex, esIndex, -1)}
                                 disabled={esIndex === 0}
+                                aria-label={`Sposta in su ${r.esercizio_nome}`}
                                 className="btn-icon !h-7 !w-7 disabled:opacity-30"
                               >
                                 <ChevronUp className="h-3.5 w-3.5" />
@@ -288,17 +292,18 @@ export function SchedaEditor({
                                 type="button"
                                 onClick={() => spostaEsercizio(bloccoIndex, esIndex, 1)}
                                 disabled={esIndex === blocco.esercizi.length - 1}
+                                aria-label={`Sposta in giù ${r.esercizio_nome}`}
                                 className="btn-icon !h-7 !w-7 disabled:opacity-30"
                               >
                                 <ChevronDown className="h-3.5 w-3.5" />
                               </button>
                             </div>
-                            <div className="flex min-w-0 flex-col">
-                              <span className="truncate font-medium">{r.esercizio_nome}</span>
-                              <span className="truncate font-figures text-xs text-muted">{targetLabel(r)}</span>
+                            <div className="flex min-w-0 flex-col max-md:col-span-2 max-md:col-start-2 max-md:row-start-1">
+                              <span className="line-clamp-2 font-medium break-words md:line-clamp-1">{r.esercizio_nome}</span>
+                              <span className="font-figures text-xs text-muted max-md:text-[13px] md:truncate">{targetLabel(r)}</span>
                             </div>
                           </div>
-                          <div className="flex shrink-0 items-center gap-1">
+                          <div className="flex shrink-0 items-center gap-1 max-md:col-start-3 max-md:row-start-2">
                             <button
                               type="button"
                               onClick={() => setModaleAperto({ modo: "modifica", riga: r })}
@@ -443,7 +448,7 @@ function SortableEsercizioRow({ id, children }: { id: string; children: React.Re
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 }}
-      className="flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm"
+      className="flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2 text-sm max-md:grid max-md:grid-cols-[auto_minmax(0,1fr)_auto] max-md:gap-x-2 max-md:gap-y-1"
     >
       <div className="flex min-w-0 items-center gap-2">
         <button
