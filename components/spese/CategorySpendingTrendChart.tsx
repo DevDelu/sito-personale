@@ -165,7 +165,7 @@ export function CategorySpendingTrendChart({
             Nessuna spesa nel periodo selezionato.
           </p>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" className="grafico-importi">
             <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid vertical={false} stroke="var(--border)" strokeWidth={1} />
               <XAxis

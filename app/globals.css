@@ -853,6 +853,12 @@ html[data-privacy="on"] .importo {
   user-select: none;
 }
 
+/* Anche la scala dei grafici di importi dice quanto c'è: nascosta (non sfocata,
+   Safari non applica filter: blur agli elementi dentro un SVG). */
+html[data-privacy="on"] .grafico-importi .recharts-yAxis-tick-labels {
+  visibility: hidden;
+}
+
 /* Sito pubblico: animazioni guidate dallo scroll, solo CSS (nessun JS).
    Barra "potenza" in alto che si riempie leggendo la pagina e sezioni che
    entrano con una lieve salita + dissolvenza. Fuori da @supports (browser
