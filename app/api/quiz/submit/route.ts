@@ -3,9 +3,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { normalizzaTempo } from "@/lib/quiz/tempo";
-import type { QuizAnswerInput, QuizAnswerResult, QuizSubmitResponse } from "@/lib/quiz/types";
-
-const MAX_DOMANDE = 20;
+import {
+  DOMANDE_PER_PARTITA,
+  type QuizAnswerInput,
+  type QuizAnswerResult,
+  type QuizSubmitResponse,
+} from "@/lib/quiz/types";
 
 // Ricalcola il punteggio server-side confrontando le risposte inviate con
 // quelle vere lette da quiz_questions (service role key): non ci si fida mai
@@ -27,7 +30,8 @@ export async function POST(request: Request) {
 
   const answersInput = Array.isArray(body.answers) ? body.answers : [];
 
-  if (answersInput.length === 0 || answersInput.length > MAX_DOMANDE) {
+  // Esattamente una partita: con più risposte si entrerebbe in classifica con punteggi impossibili.
+  if (answersInput.length !== DOMANDE_PER_PARTITA) {
     return NextResponse.json({ error: "Risposte mancanti o non valide." }, { status: 400 });
   }
 
