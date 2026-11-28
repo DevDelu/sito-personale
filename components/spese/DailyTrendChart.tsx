@@ -124,7 +124,7 @@ export function DailyTrendChart({
   return (
     <div className="card card-hover h-72 w-full p-4">
       <div className="relative h-full w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" className="grafico-importi">
           <AreaChart
             data={daily}
             margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
