@@ -77,7 +77,9 @@
   --muted: #9c9a90;
   --accent: #d4546d;
   --accent-foreground: #0c1210;
-  --spesa: #c24e4e;
+  --spesa: #d96666;
+  /* Sfondo pieno con testo bianco (.btn-danger): resta il rosso più scuro. */
+  --spesa-pieno: #c24e4e;
   --entrata: #3fa87a;
 
   --cat-alimentari: #60a5fa;
@@ -500,7 +502,7 @@ p {
 
   /* Pulsante distruttivo (elimina) */
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-full bg-spesa px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full bg-[var(--spesa-pieno,var(--spesa))] px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50;
   }
 
   /* Icona/pillola piccola (modifica/elimina riga, chip, badge) */
