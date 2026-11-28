@@ -924,3 +924,12 @@ html[data-privacy="on"] .importo {
     transform: none;
   }
 }
+
+/* Il contenuto privato entra in dissolvenza, ma a fine animazione non deve
+   trattenere nulla: con fill-mode `both` l'opacità animata restava applicata e
+   creava uno stacking context su <main>, così lo z-50 di .modal-overlay valeva
+   solo lì dentro e la tab bar (z-30) copriva Salva/Annulla/Elimina in fondo ai
+   fogli. Fuori dai layer per vincere sulla utility animate-fade-in. */
+.app-page-content.animate-fade-in {
+  animation-fill-mode: backwards;
+}
