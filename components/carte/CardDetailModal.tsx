@@ -38,23 +38,29 @@ export function CardDetailModal({
   const colorVar = variazioneColorVar(variazione);
 
   const [history, setHistory] = useState<PricePoint[] | null>(null);
+  // Una lettura fallita non è "nessun dato": ha il suo messaggio, con Riprova.
+  const [erroreStorico, setErroreStorico] = useState(false);
+  const [tentativo, setTentativo] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     const query = new URLSearchParams({ id: String(carta.id) });
     if (carta.id_product !== null) query.set("prodotto", String(carta.id_product));
     fetch(`/api/carte/storico-prezzo?${query}`)
-      .then((res) => (res.ok ? (res.json() as Promise<PricePoint[]>) : []))
+      .then((res) => {
+        if (!res.ok) throw new Error(`storico ${res.status}`);
+        return res.json() as Promise<PricePoint[]>;
+      })
       .then((data) => {
         if (!cancelled) setHistory(data);
       })
       .catch(() => {
-        if (!cancelled) setHistory([]);
+        if (!cancelled) setErroreStorico(true);
       });
     return () => {
       cancelled = true;
     };
-  }, [carta.id, carta.id_product]);
+  }, [carta.id, carta.id_product, tentativo]);
 
   return (
     <Sheet onClose={onClose} className="max-w-md p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" area="collezione.dettaglio-carta" entita={`carta:${carta.id}`}>
@@ -72,7 +78,22 @@ export function CardDetailModal({
           className="aspect-[5/7] w-full max-w-[220px] self-center rounded-lg"
         />
 
-        {history === null ? (
+        {erroreStorico ? (
+          <div role="alert" className="flex items-center justify-between gap-3">
+            <p className="text-[13px] text-muted md:text-xs">Non riesco a leggere lo storico dei prezzi.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setErroreStorico(false);
+                setHistory(null);
+                setTentativo((n) => n + 1);
+              }}
+              className="btn-secondary shrink-0 max-md:min-h-11"
+            >
+              Riprova
+            </button>
+          </div>
+        ) : history === null ? (
           <div className="h-24 w-full animate-pulse rounded-lg bg-surface-hover" />
         ) : (
           <CardPriceChart history={history} />
