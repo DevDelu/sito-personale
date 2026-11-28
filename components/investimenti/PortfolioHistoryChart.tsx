@@ -13,7 +13,6 @@ import {
 } from "recharts";
 import type { TooltipContentProps } from "recharts";
 import { formatCurrency } from "@/lib/investimenti/format";
-import { adaptiveTickInterval } from "@/lib/spese-utils";
 import type { GruppoStorico, PuntoPortafoglio } from "@/lib/investimenti/queries";
 import { PortfolioDateRangeFilter } from "@/components/investimenti/PortfolioDateRangeFilter";
 import { filtraPerIntervallo, INTERVALLI_RAPIDI, type IntervalloRapido } from "@/lib/investimenti/intervalli";
@@ -254,7 +253,7 @@ export function PortfolioHistoryChart({
               tick={axisTick}
               axisLine={{ stroke: "var(--border)" }}
               tickLine={false}
-              interval={adaptiveTickInterval(data.length)}
+              interval="preserveStartEnd"
               minTickGap={24}
             />
             <YAxis
