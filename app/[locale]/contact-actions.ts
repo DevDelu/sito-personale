@@ -3,6 +3,7 @@
 import { Resend } from "resend";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { verifyTurnstileToken } from "@/lib/turnstile";
+import { componiEmailContatto } from "@/lib/contatti/email";
 
 export type ContactState = { error?: string; success?: boolean } | undefined;
 
@@ -79,11 +80,7 @@ export async function sendContactMessage(
       from: process.env.RESEND_FROM_EMAIL || "Portfolio <onboarding@resend.dev>",
       to,
       replyTo: email,
-      subject: `Nuovo messaggio dal sito — ${name}`,
-      html: `
-        <p><strong>Da:</strong> ${name} (${email})</p>
-        <p>${message.replace(/\n/g, "<br />")}</p>
-      `,
+      ...componiEmailContatto(name, email, message),
     });
   } catch (e) {
     console.error("Contatti: invio email fallito.", e);
